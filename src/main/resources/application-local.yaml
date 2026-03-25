@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: My-AI
+  datasource:
+    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/my_ai?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai}
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:727Gx724}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  sql:
+    init:
+      mode: always
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      database: ${REDIS_DB:0}
+      timeout: 3s
+
+app:
+  memory:
+    store: mysql
+
+ollama:
+  base-url: http://localhost:11434
+  chat:
+    model: deepseek-r1:8b
+
+logging:
+  level:
+    org.XYai.myai: debug

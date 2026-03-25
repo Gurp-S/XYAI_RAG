@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My-AI Chat</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; margin: 0; background: #f3f4f6; }
+    .app { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+    h1 { margin: 0 0 0.25rem; }
+    p { margin: 0 0 1rem; color: #4b5563; }
+    .conversation-bar {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .conversation-bar label {
+      font-size: 0.9rem;
+      color: #374151;
+      font-weight: 600;
+    }
+    .conversation-id {
+      min-width: 260px;
+      max-width: 460px;
+      font-family: Consolas, monospace;
+      background: #f8fafc;
+    }
+    .ghost {
+      background: #ffffff;
+      color: #1d4ed8;
+      border: 1px solid #93c5fd;
+    }
+    .status {
+      margin: 0.5rem 0 0.75rem;
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+    .chat-box {
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      padding: 1rem;
+      height: 60vh;
+      overflow-y: auto;
+    }
+    .message {
+      margin: 0.5rem 0;
+      max-width: 80%;
+      padding: 0.65rem 0.8rem;
+      border-radius: 10px;
+      white-space: pre-wrap;
+      line-height: 1.4;
+    }
+    .user {
+      margin-left: auto;
+      background: #2563eb;
+      color: #ffffff;
+    }
+    .assistant {
+      background: #eef2ff;
+      color: #111827;
+    }
+    .meta {
+      color: #6b7280;
+      font-size: 0.75rem;
+      margin-bottom: 0.25rem;
+    }
+    .toolbar {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    input {
+      flex: 1;
+      padding: 0.7rem;
+      font-size: 1rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+    }
+    button {
+      padding: 0.7rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+      border: 1px solid #1d4ed8;
+      border-radius: 8px;
+      background: #2563eb;
+      color: #ffffff;
+    }
+    button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>My-AI</h1>
+    <p>Chat with Ollama via <code>POST /ai/chat</code>, with conversation context.</p>
+
+    <div class="conversation-bar">
+      <label for="conversationId">Conversation ID</label>
+      <input id="conversationId" class="conversation-id" type="text" placeholder="conversation id">
+      <button id="newConversation" class="ghost" type="button">New Conversation</button>
+    </div>
+    <div id="status" class="status"></div>
+
+    <div id="chatBox" class="chat-box"></div>
+
+    <div class="toolbar">
+      <input id="message" type="text" placeholder="Type your message" value="Hello">
+      <button id="send">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const chatBox = document.getElementById('chatBox');
+    const messageInput = document.getElementById('message');
+    const sendButton = document.getElementById('send');
+    const conversationIdInput = document.getElementById('conversationId');
+    const newConversationButton = document.getElementById('newConversation');
+    const statusNode = document.getElementById('status');
+    const messages = [];
+
+    function createConversationId() {
+      if (window.crypto && crypto.randomUUID) {
+        return crypto.randomUUID();
+      }
+      return 'conv-' + Date.now();
+    }
+
+    function currentConversationId() {
+      let id = conversationIdInput.value.trim();
+      if (!id) {
+        id = localStorage.getItem('conversationId') || createConversationId();
+        conversationIdInput.value = id;
+      }
+      localStorage.setItem('conversationId', id);
+      return id;
+    }
+
+    function setStatus(text) {
+      statusNode.textContent = text;
+    }
+
+    function addMeta(text) {
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.textContent = text;
+      chatBox.appendChild(meta);
+    }
+
+    function addMessage(role, text) {
+      messages.push({ role, text });
+      const item = document.createElement('div');
+      item.className = `message ${role}`;
+      item.textContent = text;
+      chatBox.appendChild(item);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      return item;
+    }
+
+    async function ask() {
+      const message = messageInput.value.trim();
+      if (!message) {
+        return;
+      }
+
+      const conversationId = currentConversationId();
+
+      addMessage('user', message);
+      addMeta(`conversation=${conversationId}`);
+      sendButton.disabled = true;
+      newConversationButton.disabled = true;
+      messageInput.value = '';
+      setStatus('Sending...');
+
+      try {
+        const response = await fetch('/ai/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Accept': 'text/plain; charset=UTF-8'
+          },
+          body: JSON.stringify({ message, conversationId })
+        });
+        if (response.ok) {
+          const assistantNode = addMessage('assistant', '');
+          if (!response.body) {
+            assistantNode.textContent = await response.text();
+          } else {
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder('utf-8');
+            let output = '';
+            while (true) {
+              const { value, done } = await reader.read();
+              if (done) {
+                output += decoder.decode();
+                break;
+              }
+              output += decoder.decode(value, { stream: true });
+              assistantNode.textContent = output;
+              chatBox.scrollTop = chatBox.scrollHeight;
+            }
+            assistantNode.textContent = output;
+          }
+          setStatus('Done');
+        } else {
+          addMessage('assistant', `Request failed: HTTP ${response.status}`);
+          setStatus(`Request failed: HTTP ${response.status}`);
+        }
+      } catch (error) {
+        addMessage('assistant', `Request failed: ${error.message}`);
+        setStatus(`Request failed: ${error.message}`);
+      } finally {
+        sendButton.disabled = false;
+        newConversationButton.disabled = false;
+        messageInput.focus();
+      }
+    }
+
+    function newConversation() {
+      const id = createConversationId();
+      conversationIdInput.value = id;
+      localStorage.setItem('conversationId', id);
+      chatBox.innerHTML = '';
+      messages.length = 0;
+      setStatus(`Switched to ${id}`);
+    }
+
+    conversationIdInput.value = localStorage.getItem('conversationId') || createConversationId();
+    localStorage.setItem('conversationId', conversationIdInput.value);
+    setStatus(`Current conversation: ${conversationIdInput.value}`);
+
+    sendButton.addEventListener('click', ask);
+    newConversationButton.addEventListener('click', newConversation);
+    conversationIdInput.addEventListener('change', () => {
+      const id = currentConversationId();
+      setStatus(`Current conversation: ${id}`);
+    });
+    messageInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        ask();
+      }
+    });
+  </script>
+</body>
+</html>
+
