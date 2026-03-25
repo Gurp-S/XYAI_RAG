@@ -42,22 +42,19 @@ public class rateLimitAspect {
         // 从注解中读取限流参数。
         int limit = rateLimit.limit();
         String name = rateLimit.rateName();
-        // 当前时间戳。
-        long now = System.currentTimeMillis();
-
+        long windowMs = rateLimit.windowMs();
+        
         // 执行 Lua 脚本进行原子限流判断。
         Boolean isAccess = stringRedisTemplate.execute(
                 redisScript,
                 Collections.singletonList(name),
                 String.valueOf(limit),
-                String.valueOf(now - 1000),
-                // 限流窗口的右区间。
-                String.valueOf(now),
-                // zset member 唯一值，避免同值覆盖。
+                // 仅传窗口大小，让Redis自己查权威时间
+                String.valueOf(windowMs),
+                // Zset member 唯一值，避免同值覆盖。
                 UUID.randomUUID().toString()
         );
-
-        if (!Boolean.TRUE.equals(isAccess)) {
+        if (!isAccess) {
             throw new rateLimitException();
         }
     }

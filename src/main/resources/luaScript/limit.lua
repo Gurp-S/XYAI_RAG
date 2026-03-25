@@ -5,15 +5,29 @@
 ---
 local key = KEYS[1]
 local limit = tonumber(ARGV[1])
-local start = tonumber(ARGV[2])
-local now = tonumber(ARGV[3])
-local uuid = ARGV[4]
-local request = tonumber(redis.call("zcount",key,start,now))
-if request + 1 > limit then
+local window_ms = tonumber(ARGV[2])
+local uuid = ARGV[3]
+
+-- 极端情况防范：不信任Java传递的时间，直接获取Redis自带的权威绝对时间
+local redis_time = redis.call('TIME')
+-- TIME返回的是长度为2的数组: {秒, 微秒}。将其合并换算成毫秒
+local now_ms = tonumber(redis_time[1]) * 1000 + math.floor(tonumber(redis_time[2]) / 1000)
+local start_ms = now_ms - window_ms
+
+-- 清理窗口前已经过期的旧请求（严格保持窗口干净）
+redis.call("zremrangebyscore", key, "-inf", start_ms)
+
+-- 统计当前窗口内剩余的请求次数
+local request = tonumber(redis.call("zcard", key))
+
+if request >= limit then
     return false
 else
-    redis.call("zadd",key,now,uuid)
-    redis.call("zremrangebyscore",key,0,start)
+    -- 放入本次请求
+    redis.call("zadd", key, now_ms, uuid)
+    -- 计算需要过期的时间(这里设为窗口大小转换成秒再加 2 秒缓冲)，防止冷门 key 永远留在内存
+    local expire_time = math.ceil(window_ms / 1000) + 2
+    redis.call("expire", key, expire_time)
     return true
 end
 

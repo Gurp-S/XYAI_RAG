@@ -1,6 +1,5 @@
 package com.XYai.myai.Controller;
 
-import com.XYai.myai.Aop.rateLimitAspect;
 import com.XYai.myai.core.memory.MemoryStore;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 import jakarta.annotation.Resource;
@@ -25,8 +24,6 @@ public class ChatController {
     private ChatService chatService;
 
     private final OllamaChatModel ollamaChatModel;
-    @Autowired
-    private rateLimitAspect rateLimitAspect;
 
     /**
      * 返回当前聊天模型的基础状态信息，用于快速健康检查。

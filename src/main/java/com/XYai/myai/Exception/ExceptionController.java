@@ -16,6 +16,7 @@ public class ExceptionController{
      * @return 限流提示文本
      */
     @ExceptionHandler(rateLimitException.class)
+    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.TOO_MANY_REQUESTS)
     public String rateLimitExceptionHandle(rateLimitException e) {
         return "rateLimit";
     }

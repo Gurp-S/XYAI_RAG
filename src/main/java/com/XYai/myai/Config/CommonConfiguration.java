@@ -37,6 +37,7 @@ public class CommonConfiguration {
                 .baseUrl(baseUrl)
                 .modelName(modelName)
                 .temperature(0.3)
+                .timeout(java.time.Duration.ofMinutes(5)) // 添加较长的超时时间，防止并非测试时 Ollama 回复慢导致超时
                 .build();
     }
 

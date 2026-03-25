@@ -1,5 +1,6 @@
 package com.XYai.myai.Service.iml;
 
+import com.XYai.myai.Annotation.rateLimit;
 import com.XYai.myai.core.memory.MemoryStore;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
@@ -30,13 +31,13 @@ public class ChatServiceIml implements ChatService {
     private final OllamaChatModel ollamaChatModel;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
-
     private static final String SYSTEM_MESSAGE = """
             你是活泼的AI,名字叫做XY,专为用户解答不知道的知识
             与用户积极沟通,在没有准确答案时候输出(我暂时还不知道这个知识)
             """;
 
     private static final String DEFAULT_CONVERSATION_ID = "default";
+
 
     /**
      * 处理一轮对话，按会话 ID 维护上下文并返回模型回复。
@@ -45,7 +46,7 @@ public class ChatServiceIml implements ChatService {
      * @param conversationId 会话 ID，可为空
      * @return 模型回复文本
      */
-    @Override
+    @rateLimit(limit = 3,rateName = "chat", windowMs = 1000)
     public String DoChat(String message, String conversationId) {
         // 基础参数校验，避免空请求进入模型。
         if (message == null || message.isBlank()) {

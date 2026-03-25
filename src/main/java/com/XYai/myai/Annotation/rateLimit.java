@@ -21,4 +21,9 @@ public @interface rateLimit{
      * 限流资源标识（例如接口名或业务名）。
      */
     String rateName() default "";
+
+    /**
+     * 窗口大小（毫秒），默认1秒。
+     */
+    long windowMs() default 1000;
 }
