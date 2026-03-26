@@ -1,9 +1,9 @@
 package com.XYai.myai.Aop;
 
 import com.XYai.myai.Service.ChatService;
-import dev.langchain4j.model.ollama.OllamaChatModel;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -73,8 +73,8 @@ public class RateLimitIntegrationTest {
 
         @Bean
         @Primary
-        public OllamaChatModel ollamaChatModelMock() {
-            return Mockito.mock(OllamaChatModel.class);
+        public ChatModel chatModelMock() {
+            return Mockito.mock(ChatModel.class);
         }
     }
 }

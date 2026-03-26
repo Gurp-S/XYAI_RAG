@@ -2,21 +2,36 @@ package com.XYai.myai.Service.iml;
 
 import com.XYai.myai.Annotation.rateLimit;
 import com.XYai.myai.core.memory.MemoryStore;
-import dev.langchain4j.data.message.ChatMessage;
-import dev.langchain4j.data.message.SystemMessage;
-import dev.langchain4j.data.message.UserMessage;
-import dev.langchain4j.model.chat.response.ChatResponse;
-import dev.langchain4j.model.ollama.OllamaChatModel;
+import com.XYai.myai.mapper.UserMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import com.XYai.myai.Service.ChatService;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Flux;
 
+import com.XYai.myai.core.dto.ChatConversation;
+import com.XYai.myai.core.dto.ChatMemorySummary;
+import com.XYai.myai.core.dto.ChatSessionRecord;
+import com.XYai.myai.mapper.ChatConversationMapper;
+import com.XYai.myai.mapper.ChatMemorySummaryMapper;
+import com.XYai.myai.mapper.ChatSessionRecordMapper;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.XYai.myai.Controller.UserController.USERID;
 
 /**
  * 聊天服务实现，基于 Ollama 模型并使用内存保存会话上下文。
@@ -28,7 +43,10 @@ public class ChatServiceIml implements ChatService {
 
     @Resource
     private MemoryStore memoryStore;
-    private final OllamaChatModel ollamaChatModel;
+    private final ChatModel chatModel;
+    private final ChatSessionRecordMapper chatSessionRecordMapper;
+    private final ChatConversationMapper chatConversationMapper;
+    private final ChatMemorySummaryMapper chatMemorySummaryMapper;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
     private static final String SYSTEM_MESSAGE = """
@@ -37,7 +55,7 @@ public class ChatServiceIml implements ChatService {
             """;
 
     private static final String DEFAULT_CONVERSATION_ID = "default";
-
+    private static final int MAX_INTERACTION_RECORDS = 20;
 
     /**
      * 处理一轮对话，按会话 ID 维护上下文并返回模型回复。
@@ -46,30 +64,166 @@ public class ChatServiceIml implements ChatService {
      * @param conversationId 会话 ID，可为空
      * @return 模型回复文本
      */
-    @rateLimit(limit = 3,rateName = "chat", windowMs = 1000)
-    public String DoChat(String message, String conversationId) {
+    @rateLimit(limit = 3,rateName = "chat")
+    public Flux<String> DoChat(String message, String conversationId) {
         // 基础参数校验，避免空请求进入模型。
         if (message == null || message.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "没有输入信息");
+            return Flux.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "没有输入信息"));
         }
-
+        //TODO意图识别用户消息
+        //TODO问题重写
         String normalizedConversationId = normalizeConversationId(conversationId);
+        Prompt prompt = buildPrompt(message, normalizedConversationId);
+        StringBuilder fullAiText = new StringBuilder();
+
+        return chatModel.stream(prompt)
+                .map(this::extractChunkText)
+                .filter(text -> !text.isEmpty())
+                .doOnNext(fullAiText::append)
+                .doOnComplete(() -> persistInteraction(normalizedConversationId, message, fullAiText));
+    }
+
+    /**
+     * 构建提示词对象，融合系统预设、历史对话上下文及摘要。
+     *
+     * @param message 用户当前输入的消息
+     * @param normalizedConversationId 规范化后的会话ID
+     * @return 包含完整上下文的 Prompt 对象
+     */
+    private Prompt buildPrompt(String message, String normalizedConversationId) {
         String summaryKey = "Chat:Mem:{cid}:recent" + normalizedConversationId + "Summary";
         String summary = stringRedisTemplate.opsForValue().get(summaryKey);
         List<String> context = memoryStore.getContext(normalizedConversationId);
         String contextLines = context.isEmpty() ? "(无)" : String.join("\n", context);
         String safeSummary = (summary == null || summary.isBlank()) ? "(无)" : summary;
-        // 使用结构化消息组装上下文，避免把系统提示和用户问题混成一条文本。
-        List<ChatMessage> messages = new ArrayList<>();
-        messages.add(SystemMessage.from(SYSTEM_MESSAGE));
-        messages.add(SystemMessage.from("历史上下文:\n" + contextLines + "\n\n历史摘要:\n" + safeSummary));
-        messages.add(UserMessage.from(message));
-        //获取ai消息
-        ChatResponse response = ollamaChatModel.chat(messages);
-        String aiText = response.aiMessage().text();
 
-        memoryStore.addInteraction(normalizedConversationId, message, aiText);
-        return aiText;
+        List<Message> messages = new ArrayList<>();
+        String combinedSystemMessage = SYSTEM_MESSAGE + "\n\n历史上下文:\n" + contextLines + "\n\n历史摘要:\n" + safeSummary;
+        messages.add(new SystemMessage(combinedSystemMessage));
+        messages.add(new UserMessage(message));
+        return new Prompt(messages);
+    }
+
+    /**
+     * 从流式响应块中提取文本内容。
+     *
+     * @param response 聊天模型的响应块
+     * @return 提取出的文本内容，若为空则返回空字符串
+     */
+    private String extractChunkText(ChatResponse response) {
+        if (response == null || response.getResult() == null || response.getResult().getOutput() == null) {
+            return "";
+        }
+        String text = response.getResult().getOutput().getText();
+        return text == null ? "" : text;
+    }
+
+    /**
+     * 异步持久化本次交互记录到存储中。
+     *
+     * @param normalizedConversationId 规范化后的会话ID
+     * @param message 用户消息
+     * @param fullAiText AI生成的完整回复内容
+     */
+    private void persistInteraction(String normalizedConversationId, String message, StringBuilder fullAiText) {
+        if (fullAiText.isEmpty()) {
+            return;
+        }
+        String assistantReply = fullAiText.toString();
+        // 异步保存记录与压缩，防止阻塞响应流或者出现跨线程阻塞异常
+        java.util.concurrent.CompletableFuture.runAsync(() -> {
+            try {
+                upsertConversation(normalizedConversationId, message);
+                ChatSessionRecord record = new ChatSessionRecord();
+                record.setConversationId(normalizedConversationId);
+                record.setUserMessage(message);
+                record.setAssistantMessage(assistantReply);
+                record.setCreatedAt(LocalDateTime.now().withNano(0));
+                chatSessionRecordMapper.insert(record);
+                // 每个会话最多保留最近记录，超出自动删除最旧记录
+                long total = chatSessionRecordMapper.countByConversationId(normalizedConversationId);
+                int deleteCount = (int) Math.max(0, total - MAX_INTERACTION_RECORDS);
+                if (deleteCount > 0) {
+                    chatSessionRecordMapper.deleteOldestByLimit(normalizedConversationId, deleteCount);
+                }
+            } catch (Exception e) {
+                log.error("保存会话到数据库失败", e);
+            }
+            //
+            try {
+                memoryStore.addInteraction(normalizedConversationId, message, assistantReply);
+                String summaryKey = "Chat:Mem:{cid}:recent" + normalizedConversationId + "Summary";
+                String summary = stringRedisTemplate.opsForValue().get(summaryKey);
+                if (summary != null && !summary.isBlank()) {
+                    upsertSummary(normalizedConversationId, summary);
+                }
+            } catch (Exception e) {
+                log.error("保存对话记忆失败", e);
+            }
+        });
+    }
+
+    /**
+     * 设置会话
+     * @param conversationId 会话ID
+     * @param message 用户消息
+     */
+    private void upsertConversation(String conversationId, String message) {
+        ChatConversation existing = chatConversationMapper.selectOne(
+                new LambdaQueryWrapper<ChatConversation>()
+                        .eq(ChatConversation::getConversationId, conversationId)
+                        .last("LIMIT 1")
+        );
+        if (existing != null) {
+            return;
+        }
+        ChatConversation conversation = new ChatConversation();
+        conversation.setConversationId(conversationId);
+        if (USERID != null && USERID > 0) {
+            conversation.setUserId(String.valueOf(USERID));
+        }
+        conversation.setTitle(buildConversationTitle(message));
+        conversation.setCreatedAt(LocalDateTime.now().withNano(0));
+        chatConversationMapper.insert(conversation);
+    }
+
+    /**
+     * 设置会话标题
+     * @param message 用户最后会话当标题
+     * @return 返回标题
+     */
+    private String buildConversationTitle(String message) {
+        if (message == null || message.isBlank()) {
+            return "新会话";
+        }
+        String trimmed = message.trim();
+        return trimmed.length() > 20 ? trimmed.substring(0, 20) : trimmed;
+    }
+
+    /**
+     * 更新会话摘要
+     * @param conversationId 会话ID
+     * @param summaryText 摘要文本
+     */
+    private void upsertSummary(String conversationId, String summaryText) {
+        ChatMemorySummary existing = chatMemorySummaryMapper.selectOne(
+                new LambdaQueryWrapper<ChatMemorySummary>()
+                        .eq(ChatMemorySummary::getConversationId, conversationId)
+                        .last("LIMIT 1")
+        );
+        if (existing == null) {
+            ChatMemorySummary summary = new ChatMemorySummary();
+            summary.setConversationId(conversationId);
+            summary.setSummaryText(summaryText);
+            chatMemorySummaryMapper.insert(summary);
+            return;
+        }
+        chatMemorySummaryMapper.update(
+                null,
+                new LambdaUpdateWrapper<ChatMemorySummary>()
+                        .eq(ChatMemorySummary::getConversationId, conversationId)
+                        .set(ChatMemorySummary::getSummaryText, summaryText)
+        );
     }
 
     /**
@@ -90,10 +244,10 @@ public class ChatServiceIml implements ChatService {
      */
     @jakarta.annotation.PostConstruct
     private void init() {
-        if (this.ollamaChatModel == null) {
-            log.error("OllamaChatModel was not injected into ChatServiceIml - application context may be misconfigured");
-            throw new IllegalStateException("OllamaChatModel bean not injected into ChatServiceIml");
+        if (this.chatModel == null) {
+            log.error("ChatModel was not injected into ChatServiceIml - application context may be misconfigured");
+            throw new IllegalStateException("ChatModel bean not injected into ChatServiceIml");
         }
-        log.info("OllamaChatModel injected into ChatServiceIml: {}", this.ollamaChatModel.getClass().getName());
+        log.info("ChatModel injected into ChatServiceIml: {}", this.chatModel.getClass().getName());
     }
 }

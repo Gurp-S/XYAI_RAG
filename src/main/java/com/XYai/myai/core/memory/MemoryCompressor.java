@@ -1,11 +1,12 @@
 package com.XYai.myai.core.memory;
 
-import dev.langchain4j.data.message.ChatMessage;
-import dev.langchain4j.data.message.SystemMessage;
-import dev.langchain4j.data.message.UserMessage;
-import dev.langchain4j.model.chat.response.ChatResponse;
-import dev.langchain4j.model.ollama.OllamaChatModel;
 import jakarta.annotation.Resource;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.List;
 public class MemoryCompressor {
 
     @Resource
-    private OllamaChatModel ollamaChatModel;
+    private ChatModel chatModel;
 
     /**
      * 生成增量会话摘要。
@@ -37,19 +38,12 @@ public class MemoryCompressor {
         List<String> safeRounds = oldRoundsText == null
                 ? List.of()
                 : oldRoundsText.stream().filter(line -> line != null && !line.isBlank()).toList();
-
         if (safeRounds.isEmpty()) {
             return safeExisting;
         }
         //使用系统提示词
         String roundsText = String.join("\n", safeRounds);
         String prompt = """
-                你是会话记忆压缩器。请把输入对话压缩成精简摘要。
-                输出要求：
-                1) 保留事实、约束、用户偏好、未完成任务
-                2) 删除寒暄和重复内容
-                3) 只输出摘要正文，不要额外解释
-                4) 不可丢失用户之前的内容
                 已有摘要：
                 %s
                 
@@ -57,23 +51,48 @@ public class MemoryCompressor {
                 %s
                 """.formatted(safeExisting.isBlank() ? "(无)" : safeExisting, roundsText);
 
-        if (ollamaChatModel == null) {
+        if (chatModel == null) {
             return fallbackSummary(safeExisting, safeRounds);
         }
+        return getSummary(prompt, safeExisting, safeRounds);
+    }
+
+    /**
+     * 补充新摘要
+     *
+     * @param prompt 上下文
+     * @param safeExisting 安全的旧摘要
+     * @param safeRounds 安全的旧会话
+     * @return 返回摘要
+     */
+    private String getSummary(String prompt, String safeExisting, List<String> safeRounds) {
         //补充新摘要
         try {
-            List<ChatMessage> messages = List.of(
-                    SystemMessage.from("你负责做增量会话摘要，确保信息不丢失。"),
-                    UserMessage.from(prompt)
+            List<Message> messages = List.of(
+                    new SystemMessage("""
+                            你是会话记忆压缩器。请把输入对话压缩成精简摘要。
+                            输出要求：
+                            1) 保留事实、约束、用户偏好、未完成任务
+                            2) 删除寒暄和重复内容
+                            3) 只输出摘要正文，不要额外解释
+                            4) 不可丢失用户之前的内容
+                            5) 不可超过200字"""
+                    ),
+                    new UserMessage(prompt)
             );
-            ChatResponse response = ollamaChatModel.chat(messages);
-            if (response == null || response.aiMessage() == null || response.aiMessage().text() == null) {
+            ChatResponse response = chatModel.call(new Prompt(messages));
+            if (response == null || response.getResult() == null || response.getResult().getOutput() == null) {
                 return fallbackSummary(safeExisting, safeRounds);
             }
-            String summary = response.aiMessage().text().trim();
+            String summary = response.getResult().getOutput().getText();
+            if (summary == null) {
+                return fallbackSummary(safeExisting, safeRounds);
+            }
+            summary = summary.trim();
             if (summary.isBlank()) {
                 return fallbackSummary(safeExisting, safeRounds);
             }
+            //TODO记忆过长后存入RAG
             return summary;
         } catch (Exception ex) {
             return fallbackSummary(safeExisting, safeRounds);
