@@ -1,7 +1,11 @@
 package com.XYai.myai.Service.iml;
 
+import com.XYai.myai.Annotation.RagTraceNode;
 import com.XYai.myai.Annotation.rateLimit;
+import com.XYai.myai.core.dto.IntentNode;
+import com.XYai.myai.core.intent.IntentRecognitionService;
 import com.XYai.myai.core.memory.MemoryStore;
+import com.XYai.myai.core.rewrite.QueryRewriter;
 import com.XYai.myai.mapper.UserMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +33,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static com.XYai.myai.Controller.UserController.USERID;
 
@@ -49,7 +55,11 @@ public class ChatServiceIml implements ChatService {
     private final ChatMemorySummaryMapper chatMemorySummaryMapper;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
-    private static final String SYSTEM_MESSAGE = """
+    @Resource
+    private QueryRewriter queryRewriter;
+    @Resource
+    private IntentRecognitionService intentRecognitionService;
+    public static final String SYSTEM_MESSAGE = """
             你是活泼的AI,名字叫做XY,专为用户解答不知道的知识
             与用户积极沟通,在没有准确答案时候输出(我暂时还不知道这个知识)
             """;
@@ -64,44 +74,34 @@ public class ChatServiceIml implements ChatService {
      * @param conversationId 会话 ID，可为空
      * @return 模型回复文本
      */
+    @RagTraceNode(name = "对话", type = "chat")
     @rateLimit(limit = 3,rateName = "chat")
     public Flux<String> DoChat(String message, String conversationId) {
         // 基础参数校验，避免空请求进入模型。
         if (message == null || message.isBlank()) {
             return Flux.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "没有输入信息"));
         }
-        //TODO意图识别用户消息
-        //TODO问题重写
-        String normalizedConversationId = normalizeConversationId(conversationId);
-        Prompt prompt = buildPrompt(message, normalizedConversationId);
         StringBuilder fullAiText = new StringBuilder();
-
-        return chatModel.stream(prompt)
-                .map(this::extractChunkText)
-                .filter(text -> !text.isEmpty())
-                .doOnNext(fullAiText::append)
-                .doOnComplete(() -> persistInteraction(normalizedConversationId, message, fullAiText));
-    }
-
-    /**
-     * 构建提示词对象，融合系统预设、历史对话上下文及摘要。
-     *
-     * @param message 用户当前输入的消息
-     * @param normalizedConversationId 规范化后的会话ID
-     * @return 包含完整上下文的 Prompt 对象
-     */
-    private Prompt buildPrompt(String message, String normalizedConversationId) {
-        String summaryKey = "Chat:Mem:{cid}:recent" + normalizedConversationId + "Summary";
-        String summary = stringRedisTemplate.opsForValue().get(summaryKey);
-        List<String> context = memoryStore.getContext(normalizedConversationId);
-        String contextLines = context.isEmpty() ? "(无)" : String.join("\n", context);
-        String safeSummary = (summary == null || summary.isBlank()) ? "(无)" : summary;
-
-        List<Message> messages = new ArrayList<>();
-        String combinedSystemMessage = SYSTEM_MESSAGE + "\n\n历史上下文:\n" + contextLines + "\n\n历史摘要:\n" + safeSummary;
-        messages.add(new SystemMessage(combinedSystemMessage));
-        messages.add(new UserMessage(message));
-        return new Prompt(messages);
+        String normalizedConversationId = normalizeConversationId(conversationId);
+        // RAG 对话
+        //并行加载摘要和历史记录
+        String summyAndHistory = memoryStore.load(conversationId);
+        //意图识别用户消息
+        intentRecognitionService.recognize(message);
+        //问题重写
+        message = queryRewriter.rewrite(message,summyAndHistory);
+        log.info("重写的问题:"+message);
+        //TODO 网页 | 向量检索
+    
+        //TODO 重排序
+    
+        //LLM 生成
+        //对话
+        Prompt prompt = new Prompt(List.of(
+                new SystemMessage(SYSTEM_MESSAGE),
+                new UserMessage(message)
+        ));
+        return null;
     }
 
     /**
@@ -131,7 +131,7 @@ public class ChatServiceIml implements ChatService {
         }
         String assistantReply = fullAiText.toString();
         // 异步保存记录与压缩，防止阻塞响应流或者出现跨线程阻塞异常
-        java.util.concurrent.CompletableFuture.runAsync(() -> {
+        CompletableFuture.runAsync(() -> {
             try {
                 upsertConversation(normalizedConversationId, message);
                 ChatSessionRecord record = new ChatSessionRecord();

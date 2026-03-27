@@ -46,4 +46,7 @@ public interface MemoryStore {
      * @param conversationId 会话 ID
      */
     void compactConversation(String conversationId);
+
+
+    String load(String conversationId);
 }

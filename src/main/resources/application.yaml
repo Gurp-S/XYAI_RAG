@@ -21,7 +21,7 @@ spring:
       chat:
         options:
           model: deepseek-r1:8b
-          temperature: 0.3
+          temperature: 0.1
           keep-alive: 24h
 
 app:
@@ -31,3 +31,7 @@ app:
 logging:
   level:
     org.XYai.myai: debug
+ragent:
+  trace:
+    enabled: true  # 生产环境启用，用于问题排查和性能监控
+    # enabled: false  # 开发环境可关闭，提升性能

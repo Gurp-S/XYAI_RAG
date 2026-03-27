@@ -1,5 +1,7 @@
 package com.XYai.myai.Controller;
 
+import com.XYai.myai.Annotation.RagTraceNode;
+import com.XYai.myai.Annotation.RagTraceRoot;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -74,6 +76,7 @@ public class ChatController {
      * @param conversationId 会话 ID
      * @return 模型返回的文本内容
      */
+    @RagTraceRoot(name = "对话", conversationIdArg = "conversationId", taskIdArg = "taskId")
     private Flux<String> doChat(String message, String conversationId) {
         return chatService.DoChat(message, conversationId);
     }

@@ -681,12 +681,16 @@
       const assistantMsgNode = addMessage('assistant', null, showRagTag);
 
       try {
+        const headers = {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'text/event-stream'
+        };
+        const currentUserId = getCurrentUserId();
+        if (currentUserId) headers['userId'] = currentUserId;
+
         const response = await fetch('/ai/chat', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json; charset=UTF-8',
-            'Accept': 'text/event-stream'
-          },
+          headers,
           body: JSON.stringify({ message, conversationId })
         });
 
