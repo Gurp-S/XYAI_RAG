@@ -1,31 +1,31 @@
 package com.XYai.myai.core.intent;
 
+import com.XYai.myai.core.dto.RewriteResult;
 import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  * 意图识别结果。
  *
  */
-@Service
-public class IntentResult implements IntentRecognitionService{
-    @Resource
-    private StringRedisTemplate stringRedisTemplate;
+@RestController
+public class IntentResult{
 
+    @Resource
+    private IntentRecognitionService intentRecognitionService;
 
     /**
      * 意图识别
-     * @param text 用户输入文本
+     * @param rewriteResult 重写对象
      * @return 意图
      */
-    public String recognize(String text) {
-//      1. [前置准备] 意图体系加载与缓存 (Metadata Loading)
-//      1.1 优先读取 Redis/本地缓存 (高性能，毫秒级)。
-//      1.2 缓存未命中则查库并回写。
-//      1.3 树结构扁平化：提取所有叶子节点，构建包含"意图名称+描述"的标准化 System Prompt。
+    public List<String> recognize(RewriteResult rewriteResult) {
+        intentRecognitionService.recognize(rewriteResult);
         return null;
     }
 

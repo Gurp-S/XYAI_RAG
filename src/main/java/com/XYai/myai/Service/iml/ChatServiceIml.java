@@ -2,15 +2,14 @@ package com.XYai.myai.Service.iml;
 
 import com.XYai.myai.Annotation.RagTraceNode;
 import com.XYai.myai.Annotation.rateLimit;
-import com.XYai.myai.core.dto.IntentNode;
-import com.XYai.myai.core.intent.IntentRecognitionService;
+import com.XYai.myai.core.dto.RewriteResult;
+import com.XYai.myai.core.intent.IntentResult;
 import com.XYai.myai.core.memory.MemoryStore;
 import com.XYai.myai.core.rewrite.QueryRewriter;
-import com.XYai.myai.mapper.UserMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import com.XYai.myai.Service.ChatService;
-import org.springframework.ai.chat.messages.Message;
+import org.aspectj.weaver.ast.Var;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
@@ -32,8 +31,6 @@ import com.XYai.myai.mapper.ChatSessionRecordMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -58,7 +55,7 @@ public class ChatServiceIml implements ChatService {
     @Resource
     private QueryRewriter queryRewriter;
     @Resource
-    private IntentRecognitionService intentRecognitionService;
+    private IntentResult intentResult;
     public static final String SYSTEM_MESSAGE = """
             你是活泼的AI,名字叫做XY,专为用户解答不知道的知识
             与用户积极沟通,在没有准确答案时候输出(我暂时还不知道这个知识)
@@ -85,12 +82,12 @@ public class ChatServiceIml implements ChatService {
         String normalizedConversationId = normalizeConversationId(conversationId);
         // RAG 对话
         //并行加载摘要和历史记录
-        String summyAndHistory = memoryStore.load(conversationId);
-        //意图识别用户消息
-        intentRecognitionService.recognize(message);
+        String summyAndHistory = memoryStore.load(normalizedConversationId);
         //问题重写
-        message = queryRewriter.rewrite(message,summyAndHistory);
-        log.info("重写的问题:"+message);
+        RewriteResult rewriteResult = queryRewriter.rewrite(message,summyAndHistory);
+        log.info(String.valueOf(rewriteResult));
+        //意图识别用户消息
+        intentResult.recognize(rewriteResult);
         //TODO 网页 | 向量检索
     
         //TODO 重排序

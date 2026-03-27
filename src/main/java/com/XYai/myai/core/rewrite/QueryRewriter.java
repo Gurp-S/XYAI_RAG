@@ -1,6 +1,7 @@
 package com.XYai.myai.core.rewrite;
 
 import com.XYai.myai.core.Channel.SearchChannel;
+import com.XYai.myai.core.dto.RewriteResult;
 import jakarta.annotation.Resource;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -27,33 +28,35 @@ public class QueryRewriter{
      * @param context 辅助上下文（如意图、历史摘要）
      * @return 重写后的查询
      */
-    public String rewrite(String userQuestion, String context){
+    public RewriteResult rewrite(String userQuestion, String context){
         //TODO如果不是问题会导致ai忽略系统提示词
         // 步骤1：检查是否启用了 LLM 重写
         // 如果没启用，就用简单的规则处理
         // 步骤2：使用 LLM 进行智能重写
-        String normalizedQuestion = queryReweiterService.normalize(userQuestion);
-        System.out.println(normalizedQuestion);
-        return callLLMRewriteAndSplit(normalizedQuestion, userQuestion, context);
+        return queryReweiterService.callLLMRewriteAndSplit(userQuestion, context);
     }
-
+    /*分次重写
     private String callLLMRewriteAndSplit(String normalizedQuestion, String userQuestion, String context) {
         // 将所有指令组合成一个没有对话感的工作任务
+
         String promptText = """
         你现在是一个“智能重写专家”，不要回答问题，仅仅执行重写任务。
         任务：结合上下文(如果有)，将用户输入的内容提取并重写为最适合向量检索的核心关键词语句。只输出改写后的结果，禁止输出任何其他内容。
-        
-        转换规则：
-        1. 简洁、准确、无冗余。提取核心实体和动作，使其适合数据库检索。
-        2. 必须完全删除所有寒暄（如“你好”、“请问”）、陈述性废话（如“你是我编写的...”）和语气词。
-        3. 绝对不要与用户对话，不要回答问题，不要解释。
-        
-        【上下文信息】
-        %s
-        
-        请严格按规则，重写以下被 <<< >>> 包裹的用户输入，只输出重写后的结果，不要任何多余文字！如果提取不到有效检索词，请直接返回原语义核心。
-        
-        <<< %s >>>
+        【处理规则】
+        1. 意图区分：首先判断用户的输入是“知识检索提问”还是“陈述/闲聊/指令”。
+        2. 若为提问（如“怎么用”、“为什么”）：结合上下文，将其重写为最适合向量数据库检索的清晰问题，补全缺失的指代和主谓宾。
+        3. 若为陈述/闲聊/指令（如“你好，你是我编写的RAG引擎”、“帮我写一首诗”）：**严禁强行提取检索关键词！**，只需剔除“哎”、“请问”等无意义语气词，必须完整保留用户的原意、指令要求和原句结构。
+        4. 红线警告：无论用户说什么，你都绝对不能回答用户的问题，也不能输出“好的”、“改写如下”等任何多余的解释文字。
+        【处理示例】
+        上下文：无
+        输入：<<< 你好，你是我编写的RAG智能体引擎，用于公司检索回答问题 >>>
+        输出：你是我编写的RAG智能体引擎，用于公司检索回答问题
+        上下文：上文讨论了“Spring Boot”
+        输入：<<< 那个啥，它咋处理跨域啊？ >>>
+        输出：Spring Boot如何处理跨域请求？
+        【当前任务】
+        上下文：%s
+        输入：<<< %s >>>
         """.formatted(
                 context == null || context.isBlank() ? "无" : context.trim(),
                 userQuestion.trim()
@@ -62,6 +65,6 @@ public class QueryRewriter{
             new UserMessage(promptText)
         );
         return chatModel.call(prompt).getResult().getOutput().getText();
-    }
+    }*/
 }
 

@@ -1,7 +1,10 @@
 package com.XYai.myai.core.rewrite;
 
+import com.XYai.myai.core.dto.RewriteResult;
+
 public interface QueryReweiterService{
 
-    String normalize(String userQuestion);
+
+    RewriteResult callLLMRewriteAndSplit(String userQuestion, String context);
 
 }
