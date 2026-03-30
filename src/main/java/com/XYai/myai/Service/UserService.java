@@ -1,8 +1,8 @@
 package com.XYai.myai.Service;
 
-import com.XYai.myai.core.dto.ChatConversation;
-import com.XYai.myai.core.dto.ChatSessionRecord;
-import com.XYai.myai.core.dto.Result;
+import com.XYai.myai.Memory.ChatConversation;
+import com.XYai.myai.Memory.ChatSessionRecord;
+import com.XYai.myai.Config.Result;
 
 import java.util.List;
 
@@ -12,8 +12,9 @@ public interface UserService {
 
     Result<String> login(Long id, String password);
 
-    Result<List<ChatConversation>> history(Long userId);
+    Result<java.util.List<ChatSessionRecord>> history(Long userId);
 
-    Result<List<ChatSessionRecord>> conversationHistory(String conversationId, java.time.LocalDateTime cursor);
+    // 修正为返回会话内容（ChatConversation），以匹配 controller/impl 语义
+    Result<java.util.List<ChatConversation>> conversationHistory(String conversationId, java.time.LocalDateTime cursor);
 
 }

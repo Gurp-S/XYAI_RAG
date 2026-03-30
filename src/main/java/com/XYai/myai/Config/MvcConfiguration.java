@@ -1,16 +1,24 @@
 package com.XYai.myai.Config;
 
+import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 /**
  * Web MVC 配置类，统一定义接口跨域访问策略。
  */
 @Configuration
 public class MvcConfiguration implements WebMvcConfigurer {
+
+    @Bean
+    public LoginHandlerInterceptor loginHandlerInterceptor() {
+        return new LoginHandlerInterceptor();
+    }
 
     /**
      * 配置专门用于处理 Spring MVC 异步请求（如 Flux / SSE 流式输出）的线程池，
@@ -45,4 +53,10 @@ public class MvcConfiguration implements WebMvcConfigurer {
                 .allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
                 .allowedHeaders("*");
     }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(loginHandlerInterceptor()).addPathPatterns("/**");
+    }
+
 }

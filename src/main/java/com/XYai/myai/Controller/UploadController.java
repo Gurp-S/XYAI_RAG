@@ -1,7 +1,7 @@
 package com.XYai.myai.Controller;
 
 
-import com.XYai.myai.core.dto.Result;
+import com.XYai.myai.Config.Result;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;

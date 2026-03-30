@@ -1,3 +1,0 @@
--- 索引已添加成功，无需重复执行
--- ALTER TABLE `chat_conversation` ADD INDEX `idx_user_conv` (`user_id`, `conversation_id`);
--- ALTER TABLE `chat_memory_interaction` ADD INDEX `idx_conv_time` (`conversation_id`, `created_at`);

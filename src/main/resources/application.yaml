@@ -20,7 +20,7 @@ spring:
       base-url: http://localhost:11434
       chat:
         options:
-          model: deepseek-r1:8b
+          model: qwen3-vl:8b
           temperature: 0.1
           keep-alive: 24h
 
@@ -35,3 +35,11 @@ ragent:
   trace:
     enabled: true  # 生产环境启用，用于问题排查和性能监控
     # enabled: false  # 开发环境可关闭，提升性能
+memory:
+    history-keep-turns: 4
+    summary-start-turns: 4
+    summary-max-chars: 300
+    summary-enabled: false
+rewriter:
+  rewriter-min-chars: 50
+  rewriter-enabled: true
