@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -38,7 +37,6 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
 
     private static final JiebaSegmenter JIEBA = new JiebaSegmenter();
     private static final String INTENT_NODE_HASH = "intent:tree:";
-
 
 
     public List<SubQuestionIntent> recognize(RewriteResult rewriteResult) {
@@ -62,24 +60,37 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
         //分词判断
         List<String> tokenizes = tokenizeWithJieba(query);
         //读取redis意图树.有->返回,没有->数据库查询
-        List<IntentNode> match = matchIntentFromRedis(tokenizes);
-        if (!match.isEmpty()) {
+        List<IntentNode> byRedis = matchIntentFromRedis(tokenizes);
+        if (!byRedis.isEmpty()) {
             log.info("redis判断成功");
-            return SubQuestionIntent.builder().subIntent(match).build();
+            return SubQuestionIntent.builder().subIntent(byRedis).build();
         }
         //数据库查询,没有->向量检索
         List<IntentNode> bySql = getBySql(tokenizes);
-        if (!match.isEmpty()) {
+        if (!bySql.isEmpty()) {
             log.info("数据库判断成功");
-            return SubQuestionIntent.builder().subIntent(match).build();
+            return SubQuestionIntent.builder().subIntent(bySql).build();
         }
-        //向量检索,没有->加载所有意图子节点
-        log.info("向量判断成功");
-        // 1. 查询所有叶子节点
+        //TODO RAG向量检索,没有->兜底策略加载所有意图子节点
+        List<IntentNode> byRag = new ArrayList<>();
+        if (!byRag.isEmpty()) {
+            log.info("向量判断成功");
+        }
+        // 1. 查询所有叶子节点(兜底)
+        if(!intentProperties.getUpdateIntentEnabled()){
+            log.info("兜底更新未开启,分词降级返回");
+            List<IntentNode> degradeIntent = degradeJieba(tokenizes);
+            return SubQuestionIntent.builder().subIntent(degradeIntent).build();
+        }
+        //返回降级策略
+        return fallback(query);
+    }
+
+    private SubQuestionIntent fallback(String query) {
         //Select * form IntentNode where Son = 0
         log.info("兜底进行");
         //先查redis
-
+        //TODO加锁
         List<IntentNode> leafNodes = intentNodeMapper.selectList(
                 new QueryWrapper<IntentNode>().eq("children_count", 0)
         );
@@ -89,9 +100,9 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
         // 2. 构建标准化 System Prompt（意图名称 + 描述）新节点设置TopK++,id+name,父节点设置
         StringBuilder systemPrompt = new StringBuilder();
         //TODO加入上下文
-        systemPrompt.append("你是意图识别助手，请根据用户问题和上下文，从下面的意图列表中最匹配的三个\n");
+        systemPrompt.append("你是意图识别助手，请根据用户问题和上下文，从下面的意图列表中匹配最匹配的三个\n");
         systemPrompt.append("将用户意图,严格按照提供的JSON格式返回,要求:");
-        systemPrompt.append("subIntent中,name设置为用户问题的意图,id为匹配的意图nodeId+'-'+name,parent_name设置为最匹配的意图name,topK++,其他设置为空,JSON格式:");
+        systemPrompt.append("subIntent中,name设置为用户问题的意图(中文),id为匹配的意图nodeId+'-'+name(英文),parent_name设置为最匹配的意图name,topK++,其他设置为空,JSON格式:");
         systemPrompt.append(converterFormat);
         systemPrompt.append("意图列表：\n");
         for (IntentNode node : leafNodes) {
@@ -99,9 +110,9 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
         }
         // 2. 正确调用AI：系统提示词 + 用户问题
         String promptTemplate = """
-            %s
-            用户问题：<<%s>>
-            """;
+                %s
+                用户问题：<<%s>>
+                """;
         // 最终 Prompt
         String fullPrompt = String.format(promptTemplate, systemPrompt, query);
         //得到结果
@@ -109,28 +120,35 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
         SubQuestionIntent intentNodes = new SubQuestionIntent();
         try {
             //转换为节点对象
-            intentNodes = objectMapper.readValue(intentResult,SubQuestionIntent.class);
+            intentNodes = objectMapper.readValue(intentResult, SubQuestionIntent.class);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("结果转换失败",e);
+            throw new RuntimeException("结果转换失败", e);
         }
         //将树保存再redis(如果开启)
-        if (intentProperties.getUpdateIntentEnabled()) {
-            for (IntentNode token : intentNodes.getSubIntent()) {
-                cacheNodesToRedis(token);
-            }
+        for (IntentNode token : intentNodes.getSubIntent()) {
+            cacheNodesToRedis(token);
         }
         //返回对应树
         return intentNodes;
     }
 
-    private List<IntentNode> getBySql(List<String> tokenizes) {
-        List<IntentNode> maches = new ArrayList<>();
+    private static List<IntentNode> degradeJieba(List<String> tokenizes) {
+        List<IntentNode> degradeIntent = new ArrayList<>();
         for (String tokenize : tokenizes) {
-            IntentNode getLeafNodes = intentNodeMapper.selectById(
-                    new QueryWrapper<IntentNode>().eq("name", tokenize)
-            );
-            maches.add(getLeafNodes);
-        }return maches;
+            IntentNode degrade = new IntentNode();
+            degrade.setNodeId(tokenize);
+            degradeIntent.add(degrade);
+        }
+        return degradeIntent;
+    }
+
+    private List<IntentNode> getBySql(List<String> tokenizes) {
+        List<IntentNode> matches = new ArrayList<>();
+        for (String tokenize : tokenizes) {
+            IntentNode getLeafNodes = intentNodeMapper.selectById(tokenize);
+            if(getLeafNodes!=null) matches.add(getLeafNodes);
+        }
+        return matches;
     }
 
     private void cacheNodesToRedis(IntentNode token) {
@@ -147,7 +165,7 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
         //id使用如 "group-hr"、"group-hr-leave-annual"格式可以直接返回树
         for (String tokenize : tokenizes) {
             Object nodeObj = stringRedisTemplate.opsForHash()
-                    .get(INTENT_NODE_HASH,tokenize);
+                    .get(INTENT_NODE_HASH, tokenize);
             if (nodeObj == null) continue;
             String node = nodeObj.toString();
             IntentNode intentNode = new IntentNode();
@@ -163,6 +181,7 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
     private List<String> tokenizeWithJieba(String text) {
         if (text == null || text.isBlank()) return List.of();
         List<String> raw = JIEBA.sentenceProcess(text);
+        System.out.println(raw);
         return raw.stream()
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
