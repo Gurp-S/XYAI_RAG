@@ -29,7 +29,6 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
 
         String userId = request.getHeader(USER_ID);
         // userId校验
-        log.info(userId);
         if (StringUtils.isEmpty(userId)) {
             return true;
         }

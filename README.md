@@ -69,7 +69,6 @@ java -jar target\*.jar
 - 会话记忆：`com.XYai.myai.core.memory.MemoryStore`
 - 文档入库 Pipeline：`com.XYai.myai.core.pipeline.PipelineNode` 等
 - MCP 工具：`com.XYai.myai.core.mcp.MCPToolExecutor`
-- RAG 协调器：`com.XYai.myai.core.rag.RAGOrchestrator`
 
 这些接口已生成为源码文件，方便你按需实现具体逻辑（向量库、LLM、检索器适配器等）。
 
@@ -82,10 +81,6 @@ java -jar target\*.jar
 ```java
 package com.XYai.myai.impl;
 
-import com.XYai.myai.core.dto.DocumentChunk;
-import com.XYai.myai.core.dto.RetrievalResult;
-import com.XYai.myai.core.dto.SearchResult;
-import com.XYai.myai.core.retriever.Retriever;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

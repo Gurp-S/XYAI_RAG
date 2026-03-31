@@ -1,24 +1,22 @@
 package com.XYai.myai.Service.iml;
 
-import com.XYai.myai.Annotation.RagTraceNode;
-import com.XYai.myai.Annotation.rateLimit;
+import com.XYai.myai.Aop.Annotation.RagTraceNode;
+import com.XYai.myai.Aop.Annotation.rateLimit;
 import com.XYai.myai.Chat.ChatMessage;
-import com.XYai.myai.Memory.ConversationMemorySummaryService;
-import com.XYai.myai.Memory.LoadSession;
-import com.XYai.myai.intent.IntentResult;
-import com.XYai.myai.rewrite.RewriteResult;
-import com.XYai.myai.rewrite.QueryRewriter;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.XYai.myai.RAG.Memory.ConversationMemorySummaryService;
+import com.XYai.myai.RAG.Memory.LoadSession;
+import com.XYai.myai.RAG.intent.IntentResult;
+import com.XYai.myai.RAG.intent.SubQuestionIntent;
+import com.XYai.myai.RAG.rewrite.RewriteResult;
+import com.XYai.myai.RAG.rewrite.QueryRewriter;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import com.XYai.myai.Service.ChatService;
-import org.glassfish.jaxb.core.v2.TODO;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -67,8 +65,10 @@ public class ChatServiceIml implements ChatService {
         //LoadSession load = conversationMemorySummaryService.load(conversationId);
         //问题重写
         RewriteResult rewrittenMessage = queryRewriter.rewrite(message);
+        log.info(String.valueOf(rewrittenMessage));
         //TODO 意图识别用户消息
-        intentResult.recognize(rewrittenMessage);
+        List<SubQuestionIntent> questionIntents = intentResult.recognize(rewrittenMessage);
+        System.out.println(questionIntents);
         //TODO 网页 | 向量检索
     
         //TODO 重排序

@@ -1,6 +1,6 @@
 package com.XYai.myai.mapper;
 
-import com.XYai.myai.Memory.ChatSessionRecord;
+import com.XYai.myai.RAG.Memory.ChatSessionRecord;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;

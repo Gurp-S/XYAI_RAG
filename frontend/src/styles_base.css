@@ -1,0 +1,5 @@
+/* extracted high-level styles */
+:root{--bg:#fff7fa;--text-main:#43435f}
+body{margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto}
+.app{display:flex;height:100%}
+

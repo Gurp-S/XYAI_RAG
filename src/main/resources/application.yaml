@@ -42,4 +42,7 @@ memory:
     summary-enabled: false
 rewriter:
   rewriter-min-chars: 50
-  rewriter-enabled: true
+  rewriter-enabled: false
+intent:
+  intent-enabled: true
+  update-intent-enabled: false

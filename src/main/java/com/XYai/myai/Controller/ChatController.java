@@ -1,7 +1,6 @@
 package com.XYai.myai.Controller;
 
-import com.XYai.myai.Annotation.RagTraceNode;
-import com.XYai.myai.Annotation.RagTraceRoot;
+import com.XYai.myai.Aop.Annotation.RagTraceRoot;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,6 +1,6 @@
 package com.XYai.myai.mapper;
 
-import com.XYai.myai.Annotation.TraceRecord;
+import com.XYai.myai.Aop.Annotation.TraceRecord;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 

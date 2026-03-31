@@ -2,10 +2,9 @@ package com.XYai.myai.Aop;
 
 import cn.hutool.core.util.IdUtil;
 import com.XYai.myai.Service.TraceRecordService;
-import com.XYai.myai.Annotation.RagTraceNode;
-import com.XYai.myai.Annotation.RagTraceRoot;
-import com.XYai.myai.core.rag.RagTraceContext;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.XYai.myai.Aop.Annotation.RagTraceNode;
+import com.XYai.myai.Aop.Annotation.RagTraceRoot;
+import com.XYai.myai.RAG.RagTraceContext;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 // REMARK: 注意不要把注解类型和 DTO 同名（例如 RagTraceRoot 既可能是 DTO 也可能被期望为注解）。

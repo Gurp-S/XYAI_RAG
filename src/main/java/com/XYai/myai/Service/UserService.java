@@ -1,10 +1,8 @@
 package com.XYai.myai.Service;
 
-import com.XYai.myai.Memory.ChatConversation;
-import com.XYai.myai.Memory.ChatSessionRecord;
+import com.XYai.myai.RAG.Memory.ChatConversation;
+import com.XYai.myai.RAG.Memory.ChatSessionRecord;
 import com.XYai.myai.Config.Result;
-
-import java.util.List;
 
 public interface UserService {
 

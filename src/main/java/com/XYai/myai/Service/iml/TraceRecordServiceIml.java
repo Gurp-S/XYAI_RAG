@@ -1,8 +1,8 @@
 package com.XYai.myai.Service.iml;
 
 import com.XYai.myai.Service.TraceRecordService;
-import com.XYai.myai.Annotation.NodeRecord;
-import com.XYai.myai.Annotation.TraceRecord;
+import com.XYai.myai.Aop.Annotation.NodeRecord;
+import com.XYai.myai.Aop.Annotation.TraceRecord;
 import com.XYai.myai.mapper.NodeRecordMapper;
 import com.XYai.myai.mapper.TraceRecordMapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;

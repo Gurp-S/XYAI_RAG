@@ -1,9 +1,9 @@
 package com.XYai.myai.User;
 
-import com.XYai.myai.Annotation.RagTraceRoot;
+import com.XYai.myai.Aop.Annotation.RagTraceRoot;
 import com.XYai.myai.Config.Result;
-import com.XYai.myai.Memory.ChatConversation;
-import com.XYai.myai.Memory.ChatSessionRecord;
+import com.XYai.myai.RAG.Memory.ChatConversation;
+import com.XYai.myai.RAG.Memory.ChatSessionRecord;
 import com.XYai.myai.Service.UserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
