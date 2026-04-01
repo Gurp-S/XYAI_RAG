@@ -46,8 +46,6 @@ public class UploadController {
 
     @Value("${upload.rag.enabled:true}")
     private boolean ragEnabled;
-    @Resource
-    private UpLoadAccumulator upLoadAccumulator;
 
     @PostMapping("up")
     public Result<String> upLoad(@RequestParam("file") List<MultipartFile> files) {
