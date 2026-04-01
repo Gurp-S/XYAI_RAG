@@ -1,19 +1,22 @@
 spring:
   application:
     name: My-AI
+  profiles:
+    active: local
   datasource:
-    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/my_ai?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai}
-    username: ${MYSQL_USERNAME:root}
-    password: ${MYSQL_PASSWORD:727Gx724}
+    url: ${SPRING_MYSQL_URL:jdbc:mysql://localhost:3306/my_ai?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai}
+    # Move sensitive defaults into application-local.yaml or environment variables
+    username: ${SPRING_MYSQL_USERNAME:}
+    password: ${SPRING_MYSQL_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
   sql:
     init:
       mode: always
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      database: ${REDIS_DB:0}
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
+      database: ${SPRING_REDIS_DB:0}
       timeout: 3s
   ai:
     ollama:
@@ -23,6 +26,17 @@ spring:
           model: qwen3-vl:8b
           temperature: 0.1
           keep-alive: 24h
+    vectorstore:
+      milvus:
+        client:
+          host: "localhost"
+          port: 19530
+        databaseName: "XY_AI"
+        collectionName: "vector_store"
+        embeddingDimension: 1536
+        indexType: IVF_FLAT
+        metricType: COSINE
+
 
 app:
   memory:
@@ -46,3 +60,11 @@ rewriter:
 intent:
   intent-enabled: true
   update-intent-enabled: false
+aliyun:
+  oss:
+    # Moved secrets to application-local.yaml which is git-ignored.
+    # Provide values via environment variables in CI or local application-local.yaml for development.
+    endpoint: ${ALIOSS_ENDPOINT:oss-cn-shanghai.aliyuncs.com}
+    access-key-id: ${ALIOSS_ACCESS_KEY_ID:}
+    access-key-secret: ${ALIOSS_ACCESS_KEY_SECRET:}
+    bucket: ${ALIOSS_BUCKET_NAME:}

@@ -1,4 +1,4 @@
-
+﻿
 <!doctype html>
 <html lang="zh-CN">
 
@@ -367,8 +367,8 @@
             padding: 1rem 2rem;
             border-bottom: 1px solid var(--border);
             background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+
+
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -695,8 +695,8 @@
             border-radius: 28px;
             border: 1px solid rgba(255, 255, 255, 0.78);
             box-shadow: 0 20px 50px rgba(240, 145, 166, 0.12);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+
+
         }
 
         .sidebar-header {
@@ -800,8 +800,8 @@
             border-radius: 28px;
             overflow: hidden;
             box-shadow: 0 20px 50px rgba(240, 145, 166, 0.12);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
+
+
         }
 
         .header {
@@ -901,7 +901,7 @@
             line-height: 1.7;
             font-size: 0.96rem;
             box-shadow: 0 14px 30px rgba(206, 150, 169, 0.09);
-            backdrop-filter: blur(10px);
+
         }
 
         .user .message {
@@ -950,8 +950,8 @@
             border-radius: 26px;
             padding: 0.95rem 0.95rem 0.95rem 1.25rem;
             box-shadow: 0 18px 30px rgba(222, 158, 177, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+
+
             transform: translateY(-2px);
         }
 
@@ -963,16 +963,16 @@
         }
 
         .btn-send {
-            background: linear-gradient(135deg, #f47c8e, #8b7cf6);
+            background: var(--btn-send-bg, linear-gradient(135deg, #f47c8e, #8b7cf6));
             border-radius: 18px;
             width: 46px;
             height: 46px;
-            box-shadow: 0 14px 24px rgba(244, 124, 142, 0.28);
+            box-shadow: var(--btn-send-shadow, 0 14px 24px rgba(244, 124, 142, 0.28));
         }
 
         .btn-send:hover:not(:disabled) {
             transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 18px 28px rgba(244, 124, 142, 0.34);
+            box-shadow: var(--btn-send-hover-shadow, 0 18px 28px rgba(244, 124, 142, 0.34));
         }
 
         .empty-state {
@@ -1099,8 +1099,8 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+
+
             display: flex;
             justify-content: center;
             align-items: center;
@@ -1236,8 +1236,8 @@
         .input-area {
             padding: 1.5rem 4%;
             background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+
+
             border-top: 1px solid var(--border);
             box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.02);
             z-index: 10;
@@ -1317,7 +1317,7 @@
             position: fixed;
             inset: 0;
             background: rgba(15, 23, 42, 0.5);
-            backdrop-filter: blur(4px);
+
             display: flex;
             justify-content: center;
             align-items: center;

@@ -13,6 +13,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.converter.BeanOutputConverter;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -34,10 +35,11 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
     private IntentNodeMapper intentNodeMapper;
     @Resource
     private IntentProperties intentProperties;
+    @Resource
+    private VectorStore vectorStore;
 
     private static final JiebaSegmenter JIEBA = new JiebaSegmenter();
     private static final String INTENT_NODE_HASH = "intent:tree:";
-
 
     public List<SubQuestionIntent> recognize(RewriteResult rewriteResult) {
         // 加载子问题（优先使用已分解的子查询）
@@ -66,15 +68,16 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
             return SubQuestionIntent.builder().subIntent(byRedis).build();
         }
         //数据库查询,没有->向量检索
-        List<IntentNode> bySql = getBySql(tokenizes);
+        List<IntentNode> bySql = matchIntentFromSql(tokenizes);
         if (!bySql.isEmpty()) {
             log.info("数据库判断成功");
             return SubQuestionIntent.builder().subIntent(bySql).build();
         }
         //TODO RAG向量检索,没有->兜底策略加载所有意图子节点
-        List<IntentNode> byRag = new ArrayList<>();
+        List<IntentNode> byRag = matchIntentFromRag(tokenizes);
         if (!byRag.isEmpty()) {
             log.info("向量判断成功");
+            return SubQuestionIntent.builder().subIntent(byRag).build();
         }
         // 1. 查询所有叶子节点(兜底)
         if(!intentProperties.getUpdateIntentEnabled()){
@@ -84,6 +87,13 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
         }
         //返回降级策略
         return fallback(query);
+    }
+
+    private List<IntentNode> matchIntentFromRag(List<String> tokenizes) {
+        List<IntentNode> matches = new ArrayList<>();
+        for (String tokenize : tokenizes) {
+        }
+        return matches;
     }
 
     private SubQuestionIntent fallback(String query) {
@@ -142,7 +152,7 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
         return degradeIntent;
     }
 
-    private List<IntentNode> getBySql(List<String> tokenizes) {
+    private List<IntentNode> matchIntentFromSql(List<String> tokenizes) {
         List<IntentNode> matches = new ArrayList<>();
         for (String tokenize : tokenizes) {
             IntentNode getLeafNodes = intentNodeMapper.selectById(tokenize);

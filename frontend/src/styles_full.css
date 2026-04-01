@@ -1,4 +1,4 @@
-/* Full extracted styles (condensed) adapted from original index.html */
+﻿/* Full extracted styles (condensed) adapted from original index.html */
 :root{--bg:#fff7fa;--text-main:#43435f;--muted:#9ca3af;--primary:#f47c8e}
 /* ...existing code... */
 /* performance hints */
@@ -16,9 +16,8 @@
    wrapper so the existing pixel-based CSS scales proportionally. This is an
    incremental compatibility approach while migrating styles to rems/variables. */
 #app{
-  /* default 1 if variable not set */
-  --_scale: 1;
-  --_scale: var(--ui-scale, var(--_scale));
+  /* default to --ui-scale if provided, otherwise 1 */
+  --_scale: var(--ui-scale, 1);
   transform-origin: top center;
   transform: scale(var(--_scale));
   /* keep layout flow for page height: use transform-box fallback by adjusting
@@ -48,21 +47,214 @@ body{padding-bottom: env(safe-area-inset-bottom, 0); padding-left: env(safe-area
 
 /* ...existing code... */
 /* dark mode */
-body.dark{--bg:#09090f;--text-main:#f9fafb}
+body.dark{
+  --bg:#09090f;
+  --text-main:#f9fafb;
+  /* Default to Palette B (Teal / 绿松石) when no explicit palette class is present */
+  --dm-dark-bg: #07131a;
+  --dm-surface: #0c1416;
+  --dm-muted: #9fbfc4;
+  --dm-main-text: #e8f6f5;
+  --dm-accent-primary: #3ec5b0;
+  --dm-accent-secondary: #a7f0e5;
+  --dm-card-shadow: rgba(0,8,10,0.6);
+}
 body.dark::before{background:radial-gradient(circle at 30% 30%, rgba(249,141,160,0.22), rgba(249,141,160,0.02) 70%);opacity:0.85;filter:blur(6px)}
 body.dark::after{background:radial-gradient(circle at 35% 35%, rgba(155,140,255,0.16), rgba(155,140,255,0.02) 72%);animation-delay:-4s;opacity:0.8;filter:blur(6px)}
 /* Reduce backdrop-filter and heavy shadows in dark mode to lower repaint cost and increase contrast */
-body.dark .header,body.dark .input-area{background:rgba(15,23,42,0.76);backdrop-filter:blur(6px)}
+body.dark .header,body.dark .input-area{background:rgba(15,23,42,0.76);}
 body.dark .sidebar{background:rgba(13,20,36,0.86);border-color:rgba(148,163,184,0.24);color:#cbd5e1;box-shadow:0 10px 24px rgba(100,80,100,0.06)}
-body.dark .main-content{background:rgba(9,14,27,0.76);border-color:rgba(148,163,184,0.22);backdrop-filter:blur(6px);box-shadow:0 10px 28px rgba(80,64,100,0.06)}
+body.dark .main-content{background:rgba(9,14,27,0.76);border-color:rgba(148,163,184,0.22);box-shadow:0 10px 28px rgba(80,64,100,0.06)}
 
 /* Tweak message shadows and reduce heavy blur on message surfaces */
-body.dark .message{background:rgba(255,255,255,0.95);border:1px solid rgba(255,255,255,0.06);border-top-left-radius:6px;backdrop-filter:blur(4px);box-shadow:0 8px 18px rgba(0,0,0,0.12)}
+body.dark .message{background:rgba(255,255,255,0.95);border:1px solid rgba(255,255,255,0.06);border-top-left-radius:6px;box-shadow:0 8px 18px rgba(0,0,0,0.12)}
 body.dark .user .message{box-shadow:0 12px 22px rgba(243,125,143,0.14)}
 
 /* Ensure the floating blobs are less costly in dark mode */
 body.dark::before, body.dark::after{filter:blur(6px)}
 
 /* Use smaller shadows for input and floating cards in dark mode */
-body.dark .input-wrapper{backdrop-filter:blur(6px);box-shadow:0 8px 20px rgba(30,24,40,0.06)}
+body.dark .input-wrapper{box-shadow:0 8px 20px rgba(30,24,40,0.06)}
 body.dark .empty-card{animation:floatCard 4s ease-in-out infinite;box-shadow:0 12px 34px rgba(60,40,60,0.06)}
+
+/* Ensure send button is always visible and styled for both light and dark themes.
+   Some builds may include multiple CSS sources; provide explicit, slightly
+   higher-specificity rules here to avoid accidental overrides. */
+.input-wrapper{position:relative}
+.input-wrapper .btn-send{ /* baseline for both themes */
+  position:relative; /* keep inside flow but above background */
+  z-index:2;
+  display:inline-flex;align-items:center;justify-content:center;
+  width:46px;height:46px;border-radius:18px;border:none;cursor:pointer;
+  color:#fff;font-weight:600;font-size:14px;line-height:1;
+  transition:transform .16s ease,box-shadow .16s ease,opacity .12s ease,background .12s ease;
+  box-shadow:0 12px 24px rgba(240,124,142,0.18);
+}
+
+/* Light mode: stronger gradient and subtle border for contrast on bright backgrounds */
+body:not(.dark) .btn-send{
+  background: linear-gradient(135deg,#f47c8e 0%, #ff9fb0 100%);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+body:not(.dark) .btn-send:hover:not(:disabled){
+  transform: translateY(-2px) scale(1.02);
+  box-shadow:0 18px 28px rgba(244, 124, 142, 0.32);
+}
+
+/* Dark mode: adapt colors so button keeps good contrast against dark input surface */
+body.dark .btn-send{
+  background: linear-gradient(135deg,#8b7cf6 0%, #f47c8e 100%);
+  color: #0b0b10; /* slightly dark text on bright gradient for better perceived contrast */
+  box-shadow:0 10px 26px rgba(0,0,0,0.5);
+}
+body.dark .btn-send:hover:not(:disabled){
+  transform: translateY(-2px) scale(1.02);
+  box-shadow:0 20px 36px rgba(0,0,0,0.54);
+}
+
+/* Disabled state should remain visible but muted */
+.btn-send:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* If .btn-send contains an SVG, ensure the icon uses currentColor so its color follows the text color */
+.btn-send svg{width:20px;height:20px;fill:currentColor;display:block}
+
+/* Strong override: make sure the input-area background pseudo-element does not
+   overlap interactive controls. This fixes cases where the large decorative
+   pseudo-element covers the send button visually even though pointer-events
+   are disabled. */
+.input-area::before{z-index:0 !important; pointer-events:none !important}
+.input-area .input-wrapper{position:relative !important; z-index:9998 !important}
+.btn-send, .btn-send-inline{position:relative !important; z-index:9999 !important; pointer-events:auto !important}
+
+/* ==========================================================
+   Dark-mode palette variants (Palette A: 蓝灰 / Palette B: 绿松石)
+   Usage: add one of the classes `palette-a` or `palette-b` to the
+   <body> together with `dark`, e.g.
+     <body class="dark palette-a">  (blue-gray)
+     <body class="dark palette-b">  (teal/绿松石)
+   These blocks intentionally use variables and higher-specificity
+   rules to safely override the defaults above.
+   ========================================================== */
+
+/* Palette A: Blue-gray (偏蓝灰) - 稳重、偏冷中性风格 */
+body.dark.palette-a{
+  --dm-dark-bg: #0b1620;
+  --dm-surface: #0f1720;
+  --dm-muted: #9aa8b6;
+  --dm-main-text: #e6eef6;
+  --dm-accent-primary: #6b7cff; /* 柔和紫偏蓝 */
+  --dm-accent-secondary: #f0a8c2; /* 轻度粉色点缀 */
+  --dm-card-shadow: rgba(2,6,12,0.6);
+}
+
+body.dark.palette-a{
+  background: linear-gradient(180deg, var(--dm-dark-bg), #071018 60%) fixed !important;
+  color: var(--dm-main-text) !important;
+}
+body.dark.palette-a::before,
+body.dark.palette-a::after{ opacity: 0.06 !important; filter: blur(10px) !important }
+
+body.dark.palette-a .sidebar{
+  background: linear-gradient(180deg, #0d1620, #081014) !important;
+  color: var(--dm-muted) !important;
+  border-color: rgba(255,255,255,0.03) !important;
+  box-shadow: none !important;
+}
+
+body.dark.palette-a .header,
+body.dark.palette-a .main-content,
+body.dark.palette-a .empty-card{
+  background: linear-gradient(180deg, var(--dm-surface), #0b1116) !important;
+  border-color: rgba(255,255,255,0.04) !important;
+  box-shadow: 0 8px 24px var(--dm-card-shadow) !important;
+}
+
+body.dark.palette-a .message{
+  background: rgba(255,255,255,0.03) !important;
+  color: var(--dm-main-text) !important;
+  box-shadow: none !important;
+}
+body.dark.palette-a .message-wrapper.user .message{
+  background: linear-gradient(135deg, rgba(107,124,255,0.12), rgba(240,168,194,0.06)) !important;
+  color: var(--dm-main-text) !important;
+}
+
+body.dark.palette-a .input-wrapper{ background: rgba(8,10,12,0.9) !important; border:1px solid rgba(255,255,255,0.04) !important; box-shadow: 0 8px 30px rgba(0,0,0,0.55) inset !important }
+body.dark.palette-a textarea, body.dark.palette-a input, body.dark.palette-a .input-wrapper textarea{ color: var(--dm-main-text) !important; background: rgba(255,255,255,0.02) !important }
+
+body.dark.palette-a .btn-send, body.dark.palette-a .btn-send-inline{
+  background: linear-gradient(135deg, var(--dm-accent-primary), #9aa8ff) !important;
+  color: #0b0b10 !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.55) !important;
+  border: 1px solid rgba(255,255,255,0.06) !important;
+  transition: transform .14s ease, box-shadow .14s ease !important;
+}
+body.dark.palette-a .btn-send:hover:not(:disabled), body.dark.palette-a .btn-send-inline:hover:not(:disabled){ transform: translateY(-2px) scale(1.02) !important; box-shadow: 0 14px 28px rgba(0,0,0,0.62) !important }
+
+/* ensure decorative pseudo-elements don't cover controls */
+body.dark.palette-a .input-area::before, body.dark.palette-a .input-area::after{ pointer-events:none !important; opacity:0.05 !important; z-index:0 !important }
+body.dark.palette-a .input-wrapper{ position:relative !important; z-index:5 !important }
+body.dark.palette-a .btn-send, body.dark.palette-a .btn-send-inline{ position:relative !important; z-index:10 !important; pointer-events:auto !important }
+
+/* Palette B: Teal / 绿松石 (偏暖中性，带清新感) */
+body.dark.palette-b{
+  --dm-dark-bg: #07131a;
+  --dm-surface: #0c1416;
+  --dm-muted: #9fbfc4;
+  --dm-main-text: #e8f6f5;
+  --dm-accent-primary: #3ec5b0; /* 绿松石 */
+  --dm-accent-secondary: #a7f0e5; /* 轻柔点缀 */
+  --dm-card-shadow: rgba(0,8,10,0.6);
+}
+
+body.dark.palette-b{
+  background: linear-gradient(180deg, var(--dm-dark-bg), #041014 60%) fixed !important;
+  color: var(--dm-main-text) !important;
+}
+body.dark.palette-b::before,
+body.dark.palette-b::after{ opacity: 0.06 !important; filter: blur(10px) !important }
+
+body.dark.palette-b .sidebar{
+  background: linear-gradient(180deg, #061219, #041014) !important;
+  color: var(--dm-muted) !important;
+  border-color: rgba(255,255,255,0.03) !important;
+  box-shadow: none !important;
+}
+
+body.dark.palette-b .header,
+body.dark.palette-b .main-content,
+body.dark.palette-b .empty-card{
+  background: linear-gradient(180deg, var(--dm-surface), #071014) !important;
+  border-color: rgba(255,255,255,0.04) !important;
+  box-shadow: 0 8px 24px var(--dm-card-shadow) !important;
+}
+
+body.dark.palette-b .message{
+  background: rgba(255,255,255,0.03) !important;
+  color: var(--dm-main-text) !important;
+  box-shadow: none !important;
+}
+body.dark.palette-b .message-wrapper.user .message{
+  background: linear-gradient(135deg, rgba(62,197,176,0.12), rgba(167,240,229,0.06)) !important;
+  color: var(--dm-main-text) !important;
+}
+
+body.dark.palette-b .input-wrapper{ background: rgba(6,8,10,0.88) !important; border:1px solid rgba(255,255,255,0.04) !important; box-shadow: 0 8px 30px rgba(0,0,0,0.55) inset !important }
+body.dark.palette-b textarea, body.dark.palette-b input, body.dark.palette-b .input-wrapper textarea{ color: var(--dm-main-text) !important; background: rgba(255,255,255,0.02) !important }
+
+body.dark.palette-b .btn-send, body.dark.palette-b .btn-send-inline{
+  background: linear-gradient(135deg, var(--dm-accent-primary), #6fe6d4) !important;
+  color: #021012 !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.55) !important;
+  border: 1px solid rgba(255,255,255,0.06) !important;
+  transition: transform .14s ease, box-shadow .14s ease !important;
+}
+body.dark.palette-b .btn-send:hover:not(:disabled), body.dark.palette-b .btn-send-inline:hover:not(:disabled){ transform: translateY(-2px) scale(1.02) !important; box-shadow: 0 14px 28px rgba(0,0,0,0.62) !important }
+
+body.dark.palette-b .input-area::before, body.dark.palette-b .input-area::after{ pointer-events:none !important; opacity:0.05 !important; z-index:0 !important }
+body.dark.palette-b .input-wrapper{ position:relative !important; z-index:5 !important }
+body.dark.palette-b .btn-send, body.dark.palette-b .btn-send-inline{ position:relative !important; z-index:10 !important; pointer-events:auto !important }
+
+/* End of palette variants */
+

@@ -1,32 +1,22 @@
+# Local overrides for sensitive configuration. This file is ignored by git (.gitignore)
+# Use this file for local development only. Do NOT commit to version control.
+
+aliyun:
+  oss:
+    endpoint: oss-cn-shanghai.aliyuncs.com
+    access-key-id: LTAI5tG19NygUAUzrZ1u3XZS
+    access-key-secret: A3l7jff68ag8odfLrOGj3EibFpayEh
+    bucket: xy-sky-take1
+
+# Local overrides for datasource and redis for development (sensitive values kept locally)
 spring:
-  application:
-    name: My-AI
   datasource:
-    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/my_ai?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai}
-    username: ${MYSQL_USERNAME:root}
-    password: ${MYSQL_PASSWORD:727Gx724}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  sql:
-    init:
-      mode: always
+    url: jdbc:mysql://localhost:3306/my_ai?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 727Gx724
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      database: ${REDIS_DB:0}
-      timeout: 3s
-  ai:
-    ollama:
-      base-url: http://localhost:11434
-      chat:
-        options:
-          model: deepseek-r1:8b
-          temperature: 0.3
+      host: localhost
+      port: 6379
+      database: 0
 
-app:
-  memory:
-    store: mysql
-
-logging:
-  level:
-    org.XYai.myai: debug

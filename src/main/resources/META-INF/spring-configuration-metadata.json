@@ -1,0 +1,25 @@
+{
+  "properties": [
+    {
+      "name": "alioss.endpoint",
+      "type": "java.lang.String",
+      "description": "Aliyun OSS endpoint (e.g. oss-cn-shanghai.aliyuncs.com)"
+    },
+    {
+      "name": "alioss.access-key-id",
+      "type": "java.lang.String",
+      "description": "Access Key ID for Aliyun OSS"
+    },
+    {
+      "name": "alioss.access-key-secret",
+      "type": "java.lang.String",
+      "description": "Access Key Secret for Aliyun OSS"
+    },
+    {
+      "name": "alioss.bucket-name",
+      "type": "java.lang.String",
+      "description": "Bucket name for Aliyun OSS"
+    }
+  ]
+}
+
