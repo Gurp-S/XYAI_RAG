@@ -27,9 +27,11 @@ public class UserController {
 
     /**
      * 登录
-     * @param id id
+     * 用户登录接口，会将用户 ID 存入本地静态变量（仅示例）。
+     *
+     * @param id 用户 ID
      * @param password 密码
-     * @return 成功
+     * @return Result<String> 登录结果，通常 msg 为 success 或错误信息
      */
     @PostMapping("/login")
     public Result<String> login(Long id, String password){
@@ -40,8 +42,9 @@ public class UserController {
 
     /**
      * 查询用户对话（返回会话列表 metadata）
-     * @param userId 用户Id
-     * @return 返回对话对象
+     *
+     * @param userId 用户 ID
+     * @return Result<List<ChatSessionRecord>> 包含用户会话元信息的列表
      */
     @GetMapping("/history")
     public Result<List<ChatSessionRecord>> history(Long userId){
@@ -50,8 +53,9 @@ public class UserController {
 
     /**
      * 查询对话内容
-     * @param conversationId 对话Id
-     * @return 返回对话内容（会话内的消息）
+     *
+     * @param conversationId 对话 ID
+     * @return Result<List<ChatConversation>> 返回会话中的消息列表
      */
     @RagTraceRoot(name="历史对话查询", conversationIdArg = "conversationId", taskIdArg = "taskId")
     @GetMapping("/history/conversation")
@@ -62,8 +66,9 @@ public class UserController {
 
     /**
      * 用户登出
-     * @param userId 用户id
-     * @return 成功返回
+     *
+     * @param userId 用户 ID
+     * @return Result<String> 登出结果
      */
     @PostMapping("/logout")
     public Result<String> logout(Long userId){

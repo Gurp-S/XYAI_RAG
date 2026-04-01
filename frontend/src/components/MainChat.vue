@@ -1,18 +1,23 @@
-<template>
+﻿<template>
   <main class="main-content">
-    <HeaderBar @toggleTheme="toggleTheme" @toggleSidebar="$emit('toggleSidebar')" />
+    <HeaderBar @toggleSidebar="$emit('toggleSidebar')" @toggleTheme="toggleTheme" />
 
-    <section class="chat-box" ref="chatBox">
-      <div v-if="messages.length===0" class="empty-state">
-        <div class="empty-card">
-          <div class="empty-emoji">🐱</div>
-          <h3 class="empty-title">你好呀！我是 XY-AI</h3>
-          <p class="empty-desc">试着上传资料或直接向我发起一次对话吧。</p>
+    <div id="chatBox" class="chat-box" ref="chatBox">
+        <div v-if="messages.length === 0" class="empty-state" id="welcomeState">
+            <div class="empty-card">
+                <div class="empty-emoji"></div>
+                <h2 class="empty-title">你好呀！我是 XY-AI</h2>
+                <p class="empty-desc">我可以帮你检索企业知识库、总结文档、回答业务问题，也可以陪你继续扩展更有趣的智能体体验。试着从左侧上传资料，或直接向我发起一次对话吧。</p>
+                <div class="empty-hints">
+                    <span class="hint-pill">支持企业知识库检索</span>
+                    <span class="hint-pill">支持多轮会话</span>
+                    <span class="hint-pill">支持上传入库</span>
+                </div>
+            </div>
         </div>
-      </div>
 
-      <MessageItem v-for="(m, idx) in messages" :key="idx" :role="m.role" :text="m.text" :rag="m.rag" />
-    </section>
+        <MessageItem v-for="(m, idx) in messages" :key="idx" :role="m.role" :text="m.text" :rag="m.rag" />
+    </div>
 
     <FooterInput v-model="input" @send="send" />
   </main>
@@ -29,6 +34,17 @@ const messages = ref([])
 const input = ref('')
 const isStreaming = ref(false)
 let currentAbort = null
+
+function toggleTheme() {
+    const isDark = !document.body.classList.contains('dark')
+    if (isDark) {
+        document.body.classList.add('dark')
+        localStorage.setItem('theme', 'dark')
+    } else {
+        document.body.classList.remove('dark')
+        localStorage.setItem('theme', 'light')
+    }
+}
 
 function scrollToBottom() {
   if (!chatBox.value) return
@@ -55,99 +71,15 @@ async function send() {
   input.value = ''
   scrollToBottom()
 
-  messages.value.push({ role: 'assistant', text: '...', rag: Math.random() > 0.6 })
+  messages.value.push({ role: 'assistant', text: '思考中...', rag: Math.random() > 0.6 })
   const assistantIndex = messages.value.length - 1
-
-  const controller = new AbortController()
-  currentAbort = controller
-  isStreaming.value = true
-
-  try {
-    const resp = await fetch('/ai/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text }),
-      signal: controller.signal
-    })
-
-    if (!resp.ok) {
-      messages.value[assistantIndex].text = `请求失败: HTTP ${resp.status}`
-      isStreaming.value = false
-      currentAbort = null
+  
+  setTimeout(() => {
+      messages.value[assistantIndex].text = safeHtml('您发送的内容是：' + text)
       scrollToBottom()
-      return
-    }
-
-    if (!resp.body) {
-      const t = await resp.text()
-      messages.value[assistantIndex].text = safeHtml(t)
-      isStreaming.value = false
-      currentAbort = null
-      scrollToBottom()
-      return
-    }
-
-    const reader = resp.body.getReader()
-    const decoder = new TextDecoder('utf-8')
-    let buf = ''
-    let output = ''
-    let renderPending = false
-
-    const flushRender = () => {
-      if (renderPending) return
-      renderPending = true
-      requestAnimationFrame(() => {
-        messages.value[assistantIndex].text = safeHtml(output)
-        scrollToBottom()
-        renderPending = false
-      })
-    }
-
-    while (true) {
-      const { value, done } = await reader.read()
-      if (done) break
-      buf += decoder.decode(value, { stream: true })
-      let idx
-      while ((idx = buf.indexOf('\n')) !== -1) {
-        const line = buf.slice(0, idx).trim()
-        buf = buf.slice(idx + 1)
-        if (!line) continue
-        const part = line.startsWith('data:') ? line.substring(5) : line
-        output += part
-      }
-      flushRender()
-    }
-
-    if (buf.length) {
-      output += buf
-      flushRender()
-    }
-
-    messages.value[assistantIndex].text = safeHtml(output)
-    isStreaming.value = false
-    currentAbort = null
-    scrollToBottom()
-  } catch (err) {
-    if (err.name === 'AbortError') {
-      messages.value.push({ role: 'system', text: '已取消流式响应' })
-    } else {
-      messages.value[assistantIndex].text = `请求失败: ${err.message}`
-    }
-    isStreaming.value = false
-    currentAbort = null
-    scrollToBottom()
-  }
-}
-
-onMounted(() => {})
-
-function toggleTheme() {
-  document.body.classList.toggle('dark')
+  }, 500)
 }
 </script>
 
 <style scoped>
-.main-content{display:flex;flex-direction:column;height:100%}
-.chat-box{flex:1;overflow:auto}
 </style>
-

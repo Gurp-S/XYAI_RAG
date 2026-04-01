@@ -14,6 +14,11 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 @Slf4j
 public class LoginHandlerInterceptor implements HandlerInterceptor {
+    /**
+     * 登录拦截器：从请求头提取 userId 并加载用户信息到线程上下文（LoginUserInfoManager）。
+     *
+     * 注：当前实现假定在网关层已经验证 token 并将 userId 放入请求头中。
+     */
     private static final String USER_ID = "userId";
 
     @Resource
@@ -21,6 +26,11 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object obj) {
+
+        /*
+         * 在请求处理前尝试从 header 中读取 userId 并将对应的 User 加入线程上下文。
+         * 若 header 中不包含 userId 则允许通过（不强制认证），若解析失败则抛出 SecurityException。
+         */
 
         // 先不校验权限数据 如果不是映射到方法直接通过
         if (!(obj instanceof HandlerMethod)) {
@@ -49,7 +59,7 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object obj, Exception e) {
-        //移除线程变量, 防止内存泄漏
+        // 移除线程变量，防止内存泄漏或线程复用时信息残留
         LoginUserInfoManager.remove();
     }
 

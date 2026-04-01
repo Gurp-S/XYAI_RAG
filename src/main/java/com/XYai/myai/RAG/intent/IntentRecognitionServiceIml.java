@@ -22,6 +22,12 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+/**
+ * 意图识别服务实现。实现流程：
+ * 1. 优先使用 RewriteResult 中已拆分的子查询进行识别；
+ * 2. 依次尝试 Redis 缓存、数据库精确匹配、向量检索等策略；
+ * 3. 若均未命中则使用兜底策略（调用 LLM 通过意图列表匹配或分词降级）。
+ */
 @Slf4j
 @Service
 public class IntentRecognitionServiceIml implements IntentRecognitionService {
@@ -41,12 +47,19 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
     private static final JiebaSegmenter JIEBA = new JiebaSegmenter();
     private static final String INTENT_NODE_HASH = "intent:tree:";
 
+    /**
+     * 识别一组查询（可能包含拆分后的子问题）并返回意图列表。
+     * 该方法并行识别每个子问题，最终返回最多前三个识别结果。
+     *
+     * @param rewriteResult 含重写后查询及可选子查询的对象
+     * @return 最多三个 SubQuestionIntent 结果
+     */
     public List<SubQuestionIntent> recognize(RewriteResult rewriteResult) {
         // 加载子问题（优先使用已分解的子查询）
         List<String> list = CollUtil.isNotEmpty(rewriteResult.getSubQuery()) ?
                 rewriteResult.getSubQuery() :
                 List.of(rewriteResult.getRewrittenQuery());
-        //获取意图
+        // 并行识别每个子问题
         List<CompletableFuture<SubQuestionIntent>> tasks = list.stream().map(
                 query -> CompletableFuture.supplyAsync(
                         () -> classifyIntent(query)
@@ -57,6 +70,16 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
         return subIntent.subList(0, Math.min(3, list.size()));
     }
 
+    /**
+     * 单条查询的意图分类逻辑：
+     * 1. 使用分词结果尝试从 Redis 匹配意图；
+     * 2. 未命中则尝试数据库匹配；
+     * 3. 未命中则尝试向量检索；
+     * 4. 若仍未命中则根据配置选择降级或使用 LLM 兜底匹配。
+     *
+     * @param query 单条子查询文本
+     * @return 匹配到的 SubQuestionIntent，未命中时可能返回降级结果
+     */
     private SubQuestionIntent classifyIntent(String query) {
         if (query == null || StrUtil.isBlank(query)) return null;
         //分词判断
@@ -89,13 +112,27 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
         return fallback(query);
     }
 
+    /**
+     * 使用 RAG/向量检索方式匹配意图（目前为占位实现）。
+     *
+     * @param tokenizes 分词后的 token 列表
+     * @return 匹配到的 IntentNode 列表（可能为空）
+     */
     private List<IntentNode> matchIntentFromRag(List<String> tokenizes) {
         List<IntentNode> matches = new ArrayList<>();
         for (String tokenize : tokenizes) {
+            // TODO: 向量检索实现
         }
         return matches;
     }
 
+    /**
+     * 兜底策略：当其他匹配策略未命中且允许更新意图树时，
+     * 使用 LLM 对预置意图叶子节点进行匹配，然后将结果缓存到 Redis。
+     *
+     * @param query 原始查询
+     * @return 识别到的意图对象
+     */
     private SubQuestionIntent fallback(String query) {
         //Select * form IntentNode where Son = 0
         log.info("兜底进行");
@@ -142,6 +179,12 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
         return intentNodes;
     }
 
+    /**
+     * 降级策略：使用 jieba 分词结果作为意图标识的简单回退实现。
+     *
+     * @param tokenizes 分词结果
+     * @return IntentNode 列表（以分词作为 nodeId）
+     */
     private static List<IntentNode> degradeJieba(List<String> tokenizes) {
         List<IntentNode> degradeIntent = new ArrayList<>();
         for (String tokenize : tokenizes) {
@@ -152,6 +195,12 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
         return degradeIntent;
     }
 
+    /**
+     * 从数据库按 token 查找意图节点（精确 id 查询）。
+     *
+     * @param tokenizes 分词结果
+     * @return 匹配到的 IntentNode 列表
+     */
     private List<IntentNode> matchIntentFromSql(List<String> tokenizes) {
         List<IntentNode> matches = new ArrayList<>();
         for (String tokenize : tokenizes) {
@@ -161,6 +210,11 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
         return matches;
     }
 
+    /**
+     * 将意图节点缓存到 Redis（Hash 结构），便于快速匹配。
+     *
+     * @param token 要缓存的意图节点
+     */
     private void cacheNodesToRedis(IntentNode token) {
         try {
             stringRedisTemplate.opsForHash().put(INTENT_NODE_HASH, token.getName(), token.getNodeId());
@@ -169,6 +223,12 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
         }
     }
 
+    /**
+     * 从 Redis 中按 token 查找意图节点的简单实现（Hash lookup）。
+     *
+     * @param tokenizes 分词结果
+     * @return 匹配到的 IntentNode 列表
+     */
     private List<IntentNode> matchIntentFromRedis(List<String> tokenizes) {
         List<IntentNode> matches = new ArrayList<>();
         //redis用hash存,hashkey为名字,value为id
@@ -186,7 +246,10 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
     }
 
     /**
-     * 使用 jieba 进行简单分词并做基础清洗（去空、trim）
+     * 使用 jieba 进行简单分词并做基础清洗（去空、trim）。
+     *
+     * @param text 待分词文本
+     * @return 处理后的 token 列表
      */
     private List<String> tokenizeWithJieba(String text) {
         if (text == null || text.isBlank()) return List.of();

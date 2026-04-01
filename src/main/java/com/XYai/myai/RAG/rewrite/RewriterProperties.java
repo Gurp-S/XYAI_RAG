@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "rewriter")
 public class RewriterProperties {
-    int RewriterMinChars;	//开始重写最小字符数，避免摘要本身占用过多Token
-    Boolean RewriterEnabled;	//是否启用摘要功能，开发环境关闭便于调试历史消息
+    /** 开始进行重写的最小字符数阈值，低于该长度将跳过 LLM 重写 */
+    int RewriterMinChars;    
+
+    /** 是否启用重写功能（用于在开发或调试时关闭） */
+    Boolean RewriterEnabled;    
 }

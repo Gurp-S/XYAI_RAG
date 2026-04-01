@@ -23,6 +23,13 @@ public class RagTraceAspect {
     @Resource
     private TraceRecordService traceRecordService;
 
+    /**
+     * 环绕通知：在带 {@link RagTraceRoot} 注解的方法执行前后进行全链路 traceId 管理与记录。
+     *
+     * @param joinPoint 切入点
+     * @param traceRoot 注解实例，包含任务名等信息
+     * @return 目标方法执行结果
+     */
     @Around("@annotation(traceRoot)")
     public Object aroundRoot(ProceedingJoinPoint joinPoint, RagTraceRoot traceRoot) throws Throwable {
         // 1. 生成全局唯一traceId（雪花算法）
@@ -44,6 +51,13 @@ public class RagTraceAspect {
         }
     }
 
+    /**
+     * 环绕通知：为带 {@link RagTraceNode} 注解的方法创建节点记录（nodeId），并在方法完成后记录耗时与状态。
+     *
+     * @param joinPoint 切入点
+     * @param traceNode 注解实例，包含节点名称与类型
+     * @return 目标方法执行结果
+     */
     @Around("@annotation(traceNode)")
     public Object aroundNode(ProceedingJoinPoint joinPoint, RagTraceNode traceNode) throws Throwable {
         // 1. 从上下文获取当前traceId（若没有则不追踪，避免空指针）

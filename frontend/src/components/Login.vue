@@ -1,19 +1,24 @@
-<template>
-  <div class="modal-overlay" @click.self="close">
-    <div class="modal">
-      <div class="modal-header">
-        <h3>登录</h3>
-        <button class="modal-close" @click="close">✕</button>
-      </div>
-      <div class="modal-body">
-        <label>用户名</label>
-        <input v-model="username" />
-        <label>密码</label>
-        <input type="password" v-model="password" />
-      </div>
-      <div class="modal-footer">
-        <button @click="submit" class="btn-send">登录</button>
-      </div>
+﻿<template>
+  <div id="login-overlay" v-if="ui.showLogin" @click.self="ui.closeLogin()">
+    <div class="login-container">
+        <div class="login-logo">XY</div>
+        <div class="login-title">欢迎使用 XY-AI 智能体平台</div>
+        <div class="login-subtitle">请登录以继续</div>
+
+        <div class="login-field">
+            <label for="username">用户名</label>
+            <input type="text" id="username" class="login-input" placeholder="输入你的用户名" v-model="username">
+        </div>
+
+        <div class="login-field">
+            <label for="password">密码</label>
+            <input type="password" id="password" class="login-input" placeholder="输入你的密码" v-model="password" @keyup.enter="submit">
+        </div>
+
+        <button class="btn-ghost login-btn" id="loginButton" @click="submit" :disabled="loading">
+            {{ loading ? '登录中...' : '登 录' }}
+        </button>
+        <div class="login-error" id="loginError" :style="{ display: error ? 'block' : 'none' }">{{ error }}</div>
     </div>
   </div>
 </template>
@@ -25,24 +30,26 @@ import { useUiStore } from '../store/index'
 const ui = useUiStore()
 const username = ref('')
 const password = ref('')
+const loading = ref(false)
+const error = ref('')
 
-function close() {
-  ui.closeLogin()
-}
-
-function submit() {
-  ui.setUser({ name: username.value || 'Admin User' })
-  ui.closeLogin()
+async function submit() {
+  if (!username.value || !password.value) {
+      error.value = '账号和密码不能为空'
+      return
+  }
+  loading.value = true
+  error.value = ''
+  
+  // mock real login logic
+  setTimeout(() => {
+      ui.setUser({ name: username.value || 'Admin User' })
+      ui.closeLogin()
+      loading.value = false
+  }, 500)
 }
 </script>
 
 <style scoped>
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:1000}
-.modal{background:#fff;padding:18px;border-radius:12px;min-width:320px}
-.modal-header{display:flex;align-items:center;justify-content:space-between}
-.modal-body{display:flex;flex-direction:column;gap:8px;margin-top:12px}
-.modal-footer{display:flex;justify-content:flex-end;margin-top:12px}
-.modal-close{background:transparent;border:none;font-size:18px}
-input{padding:8px;border-radius:6px;border:1px solid #ddd}
+/* Scoped styles are managed globally in styles.css */
 </style>
-

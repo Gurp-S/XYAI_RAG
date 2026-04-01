@@ -12,8 +12,9 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoadSession {
-    //摘要
+    /** 历史摘要文本 */
     String summary;
-    //上下文
+
+    /** 会话上下文消息集合（按时间排序的消息 JSON 字符串） */
     Set<String> conversation;
 }

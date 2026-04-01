@@ -10,6 +10,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RedissonConfig {
 
+    /**
+     * Redisson 客户端配置，基于 Spring 的属性注入（spring.redis.*），提供 RedissonClient Bean。
+     */
+
     @Value("${spring.redis.host:127.0.0.1}")
     private String redisHost;
 
@@ -21,6 +25,7 @@ public class RedissonConfig {
 
     @Bean(destroyMethod = "shutdown")
     public RedissonClient redissonClient() {
+        // 创建 RedissonClient 并在容器销毁时关闭
         Config config = new Config();
         String addr = "redis://" + redisHost + ":" + redisPort;
         config.useSingleServer().setAddress(addr);

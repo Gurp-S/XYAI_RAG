@@ -12,6 +12,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "aliyun.oss")
 public class OssConfig {
+    /**
+     * 阿里云 OSS 配置与客户端 Bean。
+     * 配置项通过前缀 aliyun.oss.* 注入（endpoint、accessKeyId、accessKeySecret、bucket、basePath、publicRead）。
+     */
     // standard getters & setters generated...
     @Setter
     @Getter
@@ -36,6 +40,7 @@ public class OssConfig {
 
     @Bean(destroyMethod = "shutdown")
     public OSS ossClient() {
+        /* 创建并返回一个 OSS 客户端实例，Bean 在容器销毁时会调用 shutdown 方法。 */
         if (ossClient == null) {
             ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         }

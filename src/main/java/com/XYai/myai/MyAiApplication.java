@@ -2,14 +2,6 @@ package com.XYai.myai;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Spring Boot 应用启动入口。
@@ -26,7 +18,6 @@ public class MyAiApplication {
         SpringApplication.run(MyAiApplication.class, args);
     }
 
-    private static final Logger log = LoggerFactory.getLogger(MyAiApplication.class);
 
 //    /**
 //   在应用启动时初始化 Redis 中的意图树（仅在未初始化时写入，具有幂等性）。

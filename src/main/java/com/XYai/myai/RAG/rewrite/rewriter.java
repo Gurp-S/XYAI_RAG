@@ -12,6 +12,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * 基于 LLM 的查询重写与拆分服务。
+ * 接收原始查询，构造 Prompt 调用 ChatModel，期望模型返回符合 RewriteResult 的 JSON，
+ * 并将 JSON 反序列化为 RewriteResult 对象；失败时回退到原始输入。
+ */
 @Slf4j
 @Service
 public class rewriter implements QueryReweiterService {
@@ -21,6 +26,12 @@ public class rewriter implements QueryReweiterService {
     @Resource
     private ObjectMapper objectMapper;
 
+    /**
+     * 调用大模型对查询进行重写与拆分。
+     *
+     * @param userMessage 初始的 RewriteResult（可仅包含原始 query）
+     * @return 重写并拆分后的 RewriteResult，失败时返回输入的 userMessage
+     */
     public RewriteResult callLLMRewriteAndSplit(RewriteResult userMessage) {
         String userQuestion = userMessage.getRewrittenQuery();
         if (userQuestion == null) {
@@ -47,7 +58,7 @@ public class rewriter implements QueryReweiterService {
 
 
     private static Prompt getPrompt(String userQuestion, BeanOutputConverter<RewriteResult> outputConverter) {
-        //返回JSON格式
+        // 返回 JSON 格式的 Prompt
         String format = outputConverter.getFormat();
         String systemText = """
                 你是查询重写与子问题拆分器，不是问答助手。

@@ -11,8 +11,15 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "memory")
 public class MemoryProperties {
 
-    int HistoryKeepTurns;	//保留最近n轮对话原文，保证近期交互的连贯性，无需压缩
-    int SummaryStartTurns;	//当对话总轮数达到n轮时，开始对超出n轮的部分进行摘要压缩
-    int SummaryMaxChars;	//单个摘要的最大字符数，避免摘要本身占用过多Token
-    Boolean SummaryEnabled;	//是否启用摘要压缩功能，开发环境关闭便于调试历史消息
+    /** 保留最近 n 轮对话原文，不参与摘要压缩 */
+    int HistoryKeepTurns;
+
+    /** 当对话轮数达到该值时触发摘要压缩 */
+    int SummaryStartTurns;
+
+    /** 单个摘要允许的最大字符数限制 */
+    int SummaryMaxChars;
+
+    /** 是否启用摘要压缩功能 */
+    Boolean SummaryEnabled;
 }

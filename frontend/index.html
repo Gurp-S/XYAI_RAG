@@ -1,59 +1,12 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <!-- Dynamic UI scaling: computes a CSS variable (--ui-scale) based on viewport size
-         and devicePixelRatio. This allows the whole app (#app) to be scaled via CSS
-         without rewriting all component styles immediately. -->
-    <script>
-      (function(){
-        const DESIGN_WIDTH = 1440; // change to your design reference width (e.g. 375 for mobile-first)
-        const MIN_SCALE = 0.6;     // minimum allowed scale
-        const MAX_SCALE = 1.2;     // maximum allowed scale
-
-        function computeScale(viewWidth){
-          // prefer width-based scaling; clamp to sensible bounds
-          const raw = (viewWidth || document.documentElement.clientWidth || window.innerWidth) / DESIGN_WIDTH;
-          return Math.max(MIN_SCALE, Math.min(MAX_SCALE, raw));
-        }
-
-        function updateScale(){
-          const viewWidth = (window.visualViewport && window.visualViewport.width) || document.documentElement.clientWidth || window.innerWidth;
-          const scale = computeScale(viewWidth);
-          document.documentElement.style.setProperty('--ui-scale', String(scale));
-          document.documentElement.setAttribute('data-dpr', String(window.devicePixelRatio || 1));
-        }
-
-        // Debounced/RAF-backed update to be responsive but not noisy
-        let rafId = null; let timeoutId = null;
-        function scheduleUpdate(){
-          if(rafId) cancelAnimationFrame(rafId);
-          rafId = requestAnimationFrame(updateScale);
-          if(timeoutId) clearTimeout(timeoutId);
-          timeoutId = setTimeout(updateScale, 160);
-        }
-
-        window.addEventListener('resize', scheduleUpdate, {passive:true});
-        window.addEventListener('orientationchange', scheduleUpdate, {passive:true});
-        if(window.visualViewport){
-          window.visualViewport.addEventListener('resize', scheduleUpdate, {passive:true});
-          window.visualViewport.addEventListener('scroll', scheduleUpdate, {passive:true});
-        }
-
-        // Apply early, before app bootstraps
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', updateScale);
-        } else {
-          updateScale();
-        }
-      })();
-    </script>
-    <title>XY-AI 前端 (Vue 3 + Vite)</title>
+    <title>XY-AI 智能助手</title>
   </head>
-  <body>
+  <body class="light">
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
-

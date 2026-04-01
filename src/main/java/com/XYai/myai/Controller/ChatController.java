@@ -81,7 +81,10 @@ public class ChatController {
     }
 
     /**
-     * 聊天请求体。
+     * 聊天请求体，包含用户输入的 message 与可选的 conversationId。
+     *
+     * @param message 用户的输入消息
+     * @param conversationId 可选的会话 ID，用于在多轮对话中保持上下文
      */
     public record ChatRequest(String message, String conversationId) {
     }

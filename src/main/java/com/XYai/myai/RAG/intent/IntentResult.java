@@ -20,9 +20,10 @@ public class IntentResult{
     private IntentProperties intentProperties;
 
     /**
-     * 意图识别
-     * @param rewriteResult 重写对象
-     * @return 意图
+     * 意图识别入口（Controller 层）：根据重写后的查询调用 IntentRecognitionService 并返回意图列表。
+     *
+     * @param rewriteResult 重写后的查询对象
+     * @return 识别出的意图列表（可能为空）
      */
     public List<SubQuestionIntent> recognize(RewriteResult rewriteResult){
         if(intentProperties.getIntentEnabled()) {

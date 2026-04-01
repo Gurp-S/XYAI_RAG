@@ -32,7 +32,7 @@ spring:
           host: "localhost"
           port: 19530
         databaseName: "XY_AI"
-        collectionName: "vector_store"
+        collectionName: "my_ai"
         embeddingDimension: 1536
         indexType: IVF_FLAT
         metricType: COSINE
@@ -49,6 +49,10 @@ ragent:
   trace:
     enabled: true  # 生产环境启用，用于问题排查和性能监控
     # enabled: false  # 开发环境可关闭，提升性能
+upload:
+  rag-enabled: true
+  oss-enabled: false
+  split-with-spring-a-iEnabled: true
 memory:
     history-keep-turns: 4
     summary-start-turns: 4
