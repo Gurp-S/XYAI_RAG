@@ -1,4 +1,4 @@
-package com.XYai.myai.Controller;
+package com.XYai.myai.RAG.ETLpipeline.Upload;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "upload")
 public class UploadProperties {
+    /** 是否启用upload */
+    Boolean upLoadEnabled;
+
     /** 是否启用 RAG（将文档分块后存入向量数据库） */
     Boolean ragEnabled;    
 

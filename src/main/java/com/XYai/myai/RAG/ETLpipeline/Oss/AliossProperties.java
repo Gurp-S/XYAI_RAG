@@ -1,4 +1,4 @@
-package com.XYai.myai.Oss;
+package com.XYai.myai.RAG.ETLpipeline.Oss;
 
 import lombok.Getter;
 import lombok.Setter;

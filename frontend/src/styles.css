@@ -292,12 +292,40 @@ body.dark .empty-title {
     border-left-color: #ea6479;
 }
 
+.user-avatar-img {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: #00e5ff;
+    color: #fff;
+    font-weight: bold;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 229, 255, 0.3);
+}
+
+.history-item span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+}
+
 .user-profile {
     padding: 1rem;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.user-profile:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
     cursor: pointer;
     transition: background 0.2s;
 }
@@ -1980,4 +2008,253 @@ body.dark .input-container {
 body.dark .enterprise-badge {
     background: #f59e0b !important;
     color: #000 !important;
+}
+
+
+/* PERFORMANCE OPTIMIZATION - SMOOTHNESS ENHANCEMENT */
+* {
+    /* 尽量将渲染交给 GPU 处理，触发硬件加速 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* 侧边栏和主界面大面积组件启用 GPU 加速层，防止滚动/缩放时的 CPU 抖动 */
+.sidebar, .main-content, .message-list-container, .modal {
+    will-change: transform, opacity;
+    transform: translateZ(0); 
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+/* 核心性能杀手：backdrop-filter blur 极其消耗资源（尤其是 12px-20px 的大模糊） */
+/* 我们将模糊效果替换为更平滑、开销极小的半透明色，不损失深色质感的前提下大幅提升帧率 */
+body.dark .sidebar, 
+body.dark .header, 
+body.dark .input-area::before, 
+body.dark .modal, 
+body.dark .empty-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* 补偿背景色，确保没有模糊时背景依然足够深且不发虚 */
+body.dark .sidebar {
+    background: #0f111a !important; 
+}
+
+body.dark .input-area::before {
+    background: #0d0f17 !important;
+}
+
+body.dark .modal {
+    background: #151824 !important;
+}
+
+/* 强制所有动画使用高性能的 transform 或 opacity 路径，禁止使用会导致 Reflow 的 properties */
+.menu-item, .sidebar, .modal, .history-item {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+
+/* FIX: SIDEBAR BORDER, TRANSITION LAG, AND AI AVATAR */
+
+/* 1. 彻底移除侧边栏头部残留的白线 (Border-Bottom) */
+body.dark .sidebar-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    background: transparent !important;
+}
+
+.sidebar-header {
+    /* 修复层叠导致的白线，确保在 Dark 下一致 */
+    transition: background 0.2s, border-color 0.2s !important;
+}
+
+/* 2. 优化 Light/Dark 转换卡顿：
+   直接对全局变量应用 transition，而不是对每一个 property，
+   同时减少会导致重排的属性转换。 */
+:root {
+    transition: background-color 0.2s ease, color 0.15s ease !important;
+}
+
+*, *::before, *::after {
+    /* 禁止在主题切换时对会导致卡顿的属性（如 blur, shadows）进行过度过渡 */
+    transition-duration: 0.2s !important;
+}
+
+/* 3. 修改 AI 头像问题：
+   由于目前的头像仅是一个带背景的空 div，增加一个真实的智能图标或更高级的视觉呈现，
+   同时移除 Light 模式下残留的亮色阴影。 */
+.empty-emoji {
+    background: linear-gradient(135deg, #f47c8e 0%, #8b7cf6 100%) !important;
+    box-shadow: 0 12px 32px rgba(244, 124, 142, 0.25) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.empty-emoji::before {
+    /* 模拟 AI 图标的核心 - 两个交错的呼吸圆环 */
+    content: "";
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.8;
+}
+
+.empty-emoji::after {
+    content: "XY";
+    position: absolute;
+    font-size: 24px;
+    font-weight: 800;
+    color: #fff;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+body.dark .empty-emoji {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* 彻底移除侧边栏整体在 Dark 模式下的白边 */
+body.dark .sidebar {
+    border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+
+/* ABSOLUTE REMOVAL OF WHITE BORDERS/LINES IN DARK MODE */
+body.dark, body.dark * {
+    /* 拦截所有可能的白色半透明边框 */
+    border-color: rgba(0, 0, 0, 0.4) !important;
+}
+
+body.dark .sidebar, 
+body.dark .sidebar-header,
+body.dark .user-profile,
+body.dark .history-container,
+body.dark .menu-item,
+body.dark .history-item {
+    border-right: 1px solid #1a1a24 !important;
+    border-bottom: 1px solid #1a1a24 !important;
+    border-top: 1px solid #1a1a24 !important;
+    border-left: 1px solid transparent !important;
+    box-shadow: none !important;
+}
+
+/* 针对侧边栏内部特定线条的精准清除 */
+body.dark .sidebar-header {
+    border-bottom: 1px solid #1a1a24 !important;
+}
+
+body.dark .history-container {
+    border-top: 1px solid #1a1a24 !important;
+}
+
+body.dark .user-profile {
+    border-top: 1px solid #1a1a24 !important;
+}
+
+/* 移除可能存在的伪元素亮条 */
+body.dark .sidebar::before,
+body.dark .sidebar::after,
+body.dark .sidebar-header::before,
+body.dark .sidebar-header::after {
+    display: none !important;
+}
+
+/* 修正 Light 模式下的样式冲突，确保只有 Dark 模式受影响 */
+body:not(.dark) .sidebar-header {
+    /* 保持原样或在此处微调 */
+}
+
+
+/* PERFORMANCE OPTIMIZATION - ADVANCED ENGINE TUNING */
+
+/* 1. 禁用所有非必要的图像插值和耗电渲染 */
+img, svg, canvas {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    shape-rendering: geometricPrecision;
+}
+
+/* 2. 核心渲染层优化 (GPU 加速)
+   通过 translate3d 触发 GPU 合成层，减少布局抖动 */
+.app-container, .sidebar, .main-content, .chat-box, .message-bot, .message-user, .modal {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-perspective: 1000;
+    perspective: 1000;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+}
+
+/* 3. 优化滚动流畅度 (Momentum Scrolling) */
+.chat-box, .history-list, .modal-body {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    overscroll-behavior-y: contain; /* 防止滚动链影响全局性能 */
+}
+
+/* 4. 减少 Reflow (重排)
+   对频繁变化的元素（如进度条、头像）使用 content-visibility（如果支持）或 contain 属性 */
+.empty-state, .upload-progress-container, .modal {
+    contain: content;
+}
+
+/* 5. 禁用在高负载下的高级 CSS 特性
+   移除虽然美观但极其消耗渲染管道的 backdrop-blur */
+* {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* 6. 响应式布局中的性能保护 (GPU 合成) */
+@media screen and (max-width: 768px) {
+    .sidebar {
+        /* 在移动端或小屏幕禁用昂贵的并行动画计算 */
+        will-change: transform;
+    }
+}
+
+/* 7. 文本渲染速度优化 */
+body {
+    text-rendering: optimizeSpeed !important;
+    -webkit-font-smoothing: subpixel-antialiased !important;
+}
+
+
+/* DARK MODE TEXT VISIBILITY FIX */
+body.dark {
+    color: #e2e8f0 !important;
+}
+
+body.dark .message-content .message {
+    color: #f1f5f9 !important;
+}
+
+body.dark .user .message {
+    color: #ffffff !important;
+}
+
+body.dark .assistant .message {
+    color: #e2e8f0 !important;
+    background: #1e293b !important; /* 确保助手回复背景足够深，文字足够亮 */
+}
+
+body.dark .empty-title, 
+body.dark .empty-desc, 
+body.dark .user-name, 
+body.dark .menu-item span, 
+body.dark .sidebar-header span {
+    color: #f8fafc !important;
+}
+
+/* 之前优化可能误伤了文字颜色，这里进行精准恢复 */
+body.dark .message-bot {
+    color: #f1f5f9 !important;
 }

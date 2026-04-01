@@ -1,10 +1,9 @@
 package com.XYai.myai.Service.iml;
 
-import com.XYai.myai.Aop.Annotation.RagTraceNode;
-import com.XYai.myai.Aop.Annotation.rateLimit;
+import com.XYai.myai.RAG.Aop.Annotation.RagTraceNode;
+import com.XYai.myai.RAG.Aop.Annotation.rateLimit;
 import com.XYai.myai.Chat.ChatMessage;
 import com.XYai.myai.RAG.Memory.ConversationMemorySummaryService;
-import com.XYai.myai.RAG.Memory.LoadSession;
 import com.XYai.myai.RAG.intent.IntentResult;
 import com.XYai.myai.RAG.intent.SubQuestionIntent;
 import com.XYai.myai.RAG.rewrite.RewriteResult;
@@ -70,7 +69,7 @@ public class ChatServiceIml implements ChatService {
         List<SubQuestionIntent> questionIntents = intentResult.recognize(rewrittenMessage);
         System.out.println(questionIntents);
         //TODO 网页 | 向量检索
-    
+
         //TODO 重排序
     
         //LLM 生成

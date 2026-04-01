@@ -35,18 +35,39 @@ const error = ref('')
 
 async function submit() {
   if (!username.value || !password.value) {
-      error.value = '账号和密码不能为空'
-      return
+    error.value = '账号和密码不能为空'
+    return
   }
   loading.value = true
   error.value = ''
-  
-  // mock real login logic
-  setTimeout(() => {
-      ui.setUser({ name: username.value || 'Admin User' })
+
+  try {
+    const formData = new FormData()
+    formData.append('id', username.value) // 后端要求的是 Long id，这里传字符串如果后端能解析即可
+    formData.append('password', password.value)
+
+    const response = await fetch('/user/login', {
+      method: 'POST',
+      body: formData
+    })
+
+    const result = await response.json()
+    if (result.code === 200) {
+      ui.setUser({ 
+        id: username.value, 
+        name: username.value === '1' ? 'Admin' : 'User_' + username.value 
+      })
+      ui.fetchHistory() // 显式触发一次历史拉取
       ui.closeLogin()
-      loading.value = false
-  }, 500)
+    } else {
+      error.value = result.msg || '登录失败'
+    }
+  } catch (err) {
+    error.value = '连接服务器失败'
+    console.error(err)
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 

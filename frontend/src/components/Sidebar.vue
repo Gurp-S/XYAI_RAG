@@ -35,28 +35,37 @@
         </div>
     </div>
 
-    <div class="history-container">
-        <div class="history-label">历史对话</div>
-        <HistoryList />
+    <div class="history-container" style="flex: 1; overflow-y: auto;">
+        <HistoryList :history="store.chatHistory" @select="store.selectConversation" />
     </div>
 
-    <div class="user-profile" title="用户中心">
-        <div class="user-avatar-img" style="background:#00e5ff;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;border:none;">AU</div>
+    <div class="user-profile" title="用户中心" @click="!store.currentUser && store.openLogin()">
+        <div class="user-avatar-img" :style="avatarStyle">
+            {{ store.currentUser ? store.currentUser.name.substring(0,2).toUpperCase() : '?' }}
+        </div>
         <div class="user-info">
-            <div class="user-name">Admin User</div>
-            <div class="user-status">Online</div>
+            <div class="user-name">{{ store.currentUser ? store.currentUser.name : '未登录' }}</div>
+            <div class="user-status" :style="{ color: store.currentUser ? '#00e5ff' : '#94a3b8' }">
+                {{ store.currentUser ? 'Online' : 'Offline' }}
+            </div>
         </div>
     </div>
   </aside>
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUiStore } from '../store/index'
 import HistoryList from './HistoryList.vue'
 
 const store = useUiStore()
 const router = useRouter()
+
+const avatarStyle = computed(() => {
+  if (!store.currentUser) return { background: '#334155', color: '#94a3b8', border: 'none' }
+  return { background: '#00e5ff', color: '#fff', border: 'none' }
+})
 
 function navigateTo(path) {
   router.push(path)

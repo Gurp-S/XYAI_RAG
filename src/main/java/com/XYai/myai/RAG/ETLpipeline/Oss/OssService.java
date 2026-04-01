@@ -1,4 +1,4 @@
-package com.XYai.myai.Oss;
+package com.XYai.myai.RAG.ETLpipeline.Oss;
 
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.model.ObjectMetadata;

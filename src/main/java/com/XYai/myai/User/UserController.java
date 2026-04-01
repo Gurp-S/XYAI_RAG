@@ -1,6 +1,6 @@
 package com.XYai.myai.User;
 
-import com.XYai.myai.Aop.Annotation.RagTraceRoot;
+import com.XYai.myai.RAG.Aop.Annotation.RagTraceRoot;
 import com.XYai.myai.Config.Result;
 import com.XYai.myai.RAG.Memory.ChatConversation;
 import com.XYai.myai.RAG.Memory.ChatSessionRecord;

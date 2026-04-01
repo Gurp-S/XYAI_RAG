@@ -1,7 +1,7 @@
-package com.XYai.myai.Aop;
+package com.XYai.myai.RAG.Aop;
 
 
-import com.XYai.myai.Aop.Annotation.rateLimit;
+import com.XYai.myai.RAG.Aop.Annotation.rateLimit;
 import com.XYai.myai.Exception.rateLimitException;
 import jakarta.annotation.Resource;
 import org.aspectj.lang.annotation.Aspect;
@@ -29,7 +29,7 @@ public class rateLimitAspect {
     /**
      * 匹配所有使用 {@link rateLimit} 注解的方法。
      */
-    @Pointcut("@annotation(com.XYai.myai.Aop.Annotation.rateLimit)")
+    @Pointcut("@annotation(com.XYai.myai.RAG.Aop.Annotation.rateLimit)")
     public void pointCut(){}
 
     /**

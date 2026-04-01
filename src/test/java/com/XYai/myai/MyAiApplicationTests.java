@@ -1,6 +1,6 @@
 package com.XYai.myai;
 
-import com.XYai.myai.Aop.rateLimitAspect;
+import com.XYai.myai.RAG.Aop.rateLimitAspect;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

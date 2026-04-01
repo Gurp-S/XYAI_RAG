@@ -1,9 +1,9 @@
-package com.XYai.myai.Aop;
+package com.XYai.myai.RAG.Aop;
 
 import cn.hutool.core.util.IdUtil;
 import com.XYai.myai.Service.TraceRecordService;
-import com.XYai.myai.Aop.Annotation.RagTraceNode;
-import com.XYai.myai.Aop.Annotation.RagTraceRoot;
+import com.XYai.myai.RAG.Aop.Annotation.RagTraceNode;
+import com.XYai.myai.RAG.Aop.Annotation.RagTraceRoot;
 import com.XYai.myai.RAG.RagTraceContext;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

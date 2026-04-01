@@ -1,4 +1,4 @@
-package com.XYai.myai.Aop.Annotation;
+package com.XYai.myai.RAG.Aop.Annotation;
 
 import lombok.Builder;
 import lombok.Data;

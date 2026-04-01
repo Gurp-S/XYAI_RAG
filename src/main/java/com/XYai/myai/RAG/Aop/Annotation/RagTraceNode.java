@@ -1,5 +1,4 @@
-package com.XYai.myai.Aop.Annotation;
-
+package com.XYai.myai.RAG.Aop.Annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -10,14 +9,10 @@ import java.lang.annotation.Target;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface RagTraceRoot{
+public @interface RagTraceNode {
 
 
     String name();
 
-
-    String conversationIdArg();
-
-
-    String taskIdArg();
+    String type();
 }

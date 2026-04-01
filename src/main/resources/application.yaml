@@ -23,19 +23,24 @@ spring:
       base-url: http://localhost:11434
       chat:
         options:
-          model: qwen3-vl:8b
+          model: qwen3:8b
           temperature: 0.1
           keep-alive: 24h
+      embedding:
+        model: qwen3-embedding
     vectorstore:
       milvus:
         client:
-          host: "localhost"
+          host: localhost
           port: 19530
-        databaseName: "XY_AI"
-        collectionName: "my_ai"
-        embeddingDimension: 1536
-        indexType: IVF_FLAT
+        databaseName: my_xy
+        collectionName: my_ai
+        embeddingDimension: 4096
         metricType: COSINE
+        initialize-schema: true
+        index-type: ivf_flat
+        index-params:
+          nlist: 1024
 
 
 app:
@@ -50,14 +55,15 @@ ragent:
     enabled: true  # 生产环境启用，用于问题排查和性能监控
     # enabled: false  # 开发环境可关闭，提升性能
 upload:
-  rag-enabled: true
-  oss-enabled: false
-  split-with-spring-a-iEnabled: true
+  ragEnabled: true
+  ossEnabled: false
+  splitWithSpringAIEnabled: true
+  upLoadEnabled: true
 memory:
     history-keep-turns: 4
     summary-start-turns: 4
     summary-max-chars: 300
-    summary-enabled: false
+    summary-enabled: true
 rewriter:
   rewriter-min-chars: 50
   rewriter-enabled: false
@@ -72,3 +78,10 @@ aliyun:
     access-key-id: ${ALIOSS_ACCESS_KEY_ID:}
     access-key-secret: ${ALIOSS_ACCESS_KEY_SECRET:}
     bucket: ${ALIOSS_BUCKET_NAME:}
+
+# Text splitter configuration (used by AdvancedTextSplitter)
+splitter:
+  chunk-size: 1200
+  overlap: 200
+  chinese-tokenize: true
+

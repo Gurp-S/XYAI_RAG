@@ -1,8 +1,8 @@
-package com.XYai.myai.Controller;
+package com.XYai.myai.RAG.ETLpipeline.Upload;
 
-import com.XYai.myai.Aop.rateLimitAspect;
+import com.XYai.myai.RAG.Aop.rateLimitAspect;
 import com.XYai.myai.Config.Result;
-import com.XYai.myai.Oss.OssService;
+import com.XYai.myai.RAG.ETLpipeline.Oss.OssService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
@@ -25,11 +25,7 @@ import org.xml.sax.ContentHandler;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 上传控制器，负责接收前端上传的文件，上传到 OSS（如果启用），
@@ -62,11 +58,15 @@ public class UploadController {
      * 2. 逐个文件处理（上传到 OSS、解析、分块、收集分块）
      * 3. 如果启用了 RAG（向量检索），则将所有分块加入 VectorStore
      * 4. 返回处理结果信息
+     *
      * @param files 前端上传的文件列表，参数名为 "file"
      * @return Result<String> 包含处理结果的消息（成功/失败统计）
      */
     @PostMapping("up")
     public Result<String> upLoad(@RequestParam("file") List<MultipartFile> files) {
+        if(!uploadProperties.getUpLoadEnabled()) {
+            return Result.success("上传未开启");
+        }
         if (files == null || files.isEmpty()) {
             return Result.error(400, "文件不能为空");
         }
@@ -97,7 +97,7 @@ public class UploadController {
      * 5. 将分块结果收集到 accumulator 中（供后续统一向量化或存储）
      * 注意：方法内部会将出错的文件记录到 accumulator.getFailedFiles()
      *
-     * @param file 单个上传文件
+     * @param file        单个上传文件
      * @param accumulator 累积器，用于收集上传 URL、分块、失败文件等信息
      */
     private void processSingleFile(MultipartFile file, UpLoadAccumulator accumulator) {
@@ -137,10 +137,11 @@ public class UploadController {
 
     /**
      * 上传文件到OSS
-     * @param file 文件
+     *
+     * @param file        文件
      * @param accumulator 上传对象
-     * @param fileName 文件名
-     * @throws IOException
+     * @param fileName    文件名
+     * @throws IOException 报错
      */
     private void uploadToOss(MultipartFile file, UpLoadAccumulator accumulator, String fileName) throws IOException {
         OssService ossService = ossServiceProvider.getIfAvailable();
@@ -157,7 +158,7 @@ public class UploadController {
     /**
      * 根据累积器信息构建最终返回给前端的处理结果消息。
      *
-     * @param totalFiles 上传的总文件数量
+     * @param totalFiles  上传的总文件数量
      * @param accumulator 上传处理累积器，包含已上传 URL、失败文件列表、所有分块等
      * @return Result<String> 包含处理统计信息或错误信息
      */

@@ -1,6 +1,6 @@
 package com.XYai.myai.Service.iml;
 
-import com.XYai.myai.Aop.Annotation.RagTraceNode;
+import com.XYai.myai.RAG.Aop.Annotation.RagTraceNode;
 import com.XYai.myai.Config.Result;
 import com.XYai.myai.RAG.Memory.ChatConversation;
 import com.XYai.myai.RAG.Memory.ChatSessionRecord;

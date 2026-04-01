@@ -1,4 +1,4 @@
-package com.XYai.myai.Channel;
+package com.XYai.myai.RAG.Channel;
 
 public interface SearchChannel {
 

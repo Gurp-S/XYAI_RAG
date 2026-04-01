@@ -29,8 +29,7 @@ public class IntentResult{
         if(intentProperties.getIntentEnabled()) {
             List.of();
         }
-        List<SubQuestionIntent> result = intentRecognitionService.recognize(rewriteResult);
-        return result;
+        return intentRecognitionService.recognize(rewriteResult);
 
     }
 }
