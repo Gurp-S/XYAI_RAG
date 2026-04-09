@@ -1,7 +1,11 @@
 package com.XYai.myai.Service;
 
+/**
+ * 链路追踪记录服务接口。
+ * 定义了记录执行链路、节点执行情况以及报错信息的相关能力。
+ */
 public interface TraceRecordService {
-    
+
     /**
      * 记录节点报错信息
      */

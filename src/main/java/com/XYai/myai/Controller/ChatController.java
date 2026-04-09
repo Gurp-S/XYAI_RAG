@@ -1,6 +1,9 @@
 package com.XYai.myai.Controller;
 
+import com.XYai.myai.Config.Result;
 import com.XYai.myai.RAG.Aop.Annotation.RagTraceRoot;
+import com.XYai.myai.Service.UserService;
+import com.XYai.myai.User.User;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +37,8 @@ public class ChatController {
     @GetMapping("/model")
     public Map<String, String> model() {
         return Map.of(
-                "provider", "ollama",
+//                "provider", "ollama",
+                "provider", "aliyun-bailian",
                 "bean", chatModel.getClass().getSimpleName(),
                 "status", "ready"
         );
@@ -50,10 +54,11 @@ public class ChatController {
     @GetMapping(value = "/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> chat(
             @RequestParam(value = "message", defaultValue = "你好") String message,
-            @RequestParam(value = "conversationId", required = false) String conversationId
+            @RequestParam(value = "conversationId", required = false) String conversationId,
+            @RequestParam(value = "userId") Long userId
     ) {
         // 如果前端传入 header userId，则直接透传，否则服务层会回退到拦截器/线程上下文
-        return doChat(message, conversationId);
+        return doChat(message, conversationId,userId);
     }
 
     /**
@@ -65,7 +70,7 @@ public class ChatController {
     @PostMapping(value = "/chat", consumes = "application/json", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> chatPost(@RequestBody ChatRequest request) {
         // 优先使用 header 中的 userId（如果有），否则服务层回退到 BaseContext
-        return doChat(request.message(), request.conversationId());
+        return doChat(request.message(), request.conversationId(), request.userId());
     }
 
     /**
@@ -76,8 +81,8 @@ public class ChatController {
      * @return 模型返回的文本内容
      */
     @RagTraceRoot(name = "对话", conversationIdArg = "conversationId", taskIdArg = "taskId")
-    private Flux<String> doChat(String message, String conversationId) {
-        return chatService.DoChat(message, conversationId);
+    private Flux<String> doChat(String message, String conversationId,Long userId) {
+        return chatService.DoChat(message, conversationId,userId);
     }
 
     /**
@@ -86,6 +91,6 @@ public class ChatController {
      * @param message 用户的输入消息
      * @param conversationId 可选的会话 ID，用于在多轮对话中保持上下文
      */
-    public record ChatRequest(String message, String conversationId) {
+    public record ChatRequest(String message, String conversationId,Long userId) {
     }
 }

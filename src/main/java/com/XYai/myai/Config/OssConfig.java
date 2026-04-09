@@ -8,13 +8,17 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-
+/**
+ * 阿里云对象存储 (OSS) 配置类。
+ * 用于配置和创建 OSS 客户端 Bean。
+ */
 @Configuration
 @ConfigurationProperties(prefix = "aliyun.oss")
 public class OssConfig {
     /**
      * 阿里云 OSS 配置与客户端 Bean。
-     * 配置项通过前缀 aliyun.oss.* 注入（endpoint、accessKeyId、accessKeySecret、bucket、basePath、publicRead）。
+     * 配置项通过前缀 aliyun.oss.*
+     * 注入（endpoint、accessKeyId、accessKeySecret、bucket、basePath、publicRead）。
      */
     // standard getters & setters generated...
     @Setter

@@ -11,7 +11,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-
+/**
+ * 登录处理器拦截器。
+ * 负责从请求头中提取用户 ID 内容，并将其存入当前线程的用户信息上下文中。
+ */
 @Slf4j
 public class LoginHandlerInterceptor implements HandlerInterceptor {
     /**
@@ -43,9 +46,10 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
             return true;
         }
         try {
-            // 从 http 请求头中取出 userId,因为系统在网关层就验证过token，并解析token获取userId并放入请求头里，所以这里直接从请求头中获取。如果不是这样的逻辑则建议换成一个根据toeken获取用户信息的方法
+            // 从 http 请求头中取出
+            // userId,因为系统在网关层就验证过token，并解析token获取userId并放入请求头里，所以这里直接从请求头中获取。如果不是这样的逻辑则建议换成一个根据toeken获取用户信息的方法
             User userInfo = userMapper.selectById(Long.valueOf(userId));
-            if(userInfo == null){
+            if (userInfo == null) {
                 throw new NullPointerException();
             }
             LoginUserInfoManager.set(userInfo);
@@ -55,7 +59,6 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
         }
         return true;
     }
-
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object obj, Exception e) {

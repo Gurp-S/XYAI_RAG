@@ -9,14 +9,6 @@
     </div>
     <div class="menu">
         <div class="history-label">功能菜单</div>
-        <div class="menu-item active" id="navChat" title="智能问答" @click="navigateTo('/')">
-            <svg viewBox="0 0 24 24">
-                <path
-                    d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z">
-                </path>
-            </svg>
-            <span>智能问答</span>
-        </div>
         <div class="menu-item" id="navUpload" title="上传知识库" @click="store.openModal('upload')">
             <svg viewBox="0 0 24 24">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -35,20 +27,30 @@
         </div>
     </div>
 
-    <div class="history-container" style="flex: 1; overflow-y: auto;">
+    <div class="history-container">
         <HistoryList :history="store.chatHistory" @select="store.selectConversation" />
     </div>
 
-    <div class="user-profile" title="用户中心" @click="!store.currentUser && store.openLogin()">
-        <div class="user-avatar-img" :style="avatarStyle">
-            {{ store.currentUser ? store.currentUser.name.substring(0,2).toUpperCase() : '?' }}
-        </div>
-        <div class="user-info">
-            <div class="user-name">{{ store.currentUser ? store.currentUser.name : '未登录' }}</div>
-            <div class="user-status" :style="{ color: store.currentUser ? '#00e5ff' : '#94a3b8' }">
-                {{ store.currentUser ? 'Online' : 'Offline' }}
+    <div class="user-profile" title="用户中心">
+        <div class="user-profile-main" @click="!store.currentUser && store.openLogin()" style="display: flex; align-items: center; gap: 12px; flex: 1; cursor: pointer; min-width: 0;">
+            <div class="user-avatar-inner" :style="avatarStyle">
+                {{ store.currentUser ? store.currentUser.name.substring(0,2).toUpperCase() : '?' }}
+            </div>
+            <div class="user-info">
+                <div class="user-name">{{ store.currentUser ? store.currentUser.name : '未登录' }}</div>
+                <div class="user-status" :style="{ color: store.currentUser ? '#00e5ff' : '#94a3b8' }">
+                    {{ store.currentUser ? 'Online' : 'Offline' }}
+                </div>
             </div>
         </div>
+        
+        <button v-if="store.currentUser" class="logout-btn" title="退出登录" @click.stop="handleLogout">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+        </button>
     </div>
   </aside>
 </template>
@@ -70,7 +72,68 @@ const avatarStyle = computed(() => {
 function navigateTo(path) {
   router.push(path)
 }
+
+function handleLogout() {
+  store.confirmLogout()
+}
 </script>
 
 <style scoped>
+.user-profile {
+    margin-top: auto;
+    padding: 1.5rem;
+    border-top: 1px solid var(--sidebar-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+}
+
+.user-avatar-inner {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.user-info {
+    min-width: 0;
+    flex: 1;
+}
+
+.logout-btn {
+    background: rgba(255, 255, 255, 0.05); /* 增加一点底色 */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    position: relative;
+    z-index: 50; /* 极高层级 */
+    flex-shrink: 0;
+}
+
+.logout-btn:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ff4d4f;
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.sidebar.collapsed .logout-btn {
+    display: none;
+}
+
+
+body.dark .user-profile {
+    border-top-color: rgba(255,255,255,0.05);
+}
 </style>

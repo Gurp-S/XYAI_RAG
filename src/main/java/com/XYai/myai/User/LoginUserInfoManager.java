@@ -1,10 +1,9 @@
 package com.XYai.myai.User;
 
-import com.alibaba.ttl.TransmittableThreadLocal;
+// import com.alibaba.ttl.TransmittableThreadLocal; // not used currently
 
 /**
  * 管理当前线程（或可传递线程）中的登录用户信息的工具类。
- *
  * 该类使用 ThreadLocal 存储当前请求的 User 对象，提供便捷的 get/set/remove 操作。
  * 注意：使用后需在请求结束时调用 {@link #remove()} 以避免内存泄漏或线程复用时数据污染。
  */
@@ -12,7 +11,7 @@ public class LoginUserInfoManager {
     /**
      * 持有当前线程的用户信息的 ThreadLocal。使用 TransmittableThreadLocal 的版本在需要跨线程池传递时可替换。
      */
-    public static final ThreadLocal<User> USER_INFO_HOLDER = new ThreadLocal<>();
+    public static final ThreadLocal<User> USER_INFO_HOLDER = new InheritableThreadLocal<>();
 
     /**
      * 获取当前线程持有的用户 ID。

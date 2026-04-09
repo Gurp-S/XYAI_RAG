@@ -6,6 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 用户基础信息实体类。
+ * 映射数据库 `user` 表，存储用户账号、密码及基本信息。
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

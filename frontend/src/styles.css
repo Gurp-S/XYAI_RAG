@@ -128,7 +128,12 @@ body.dark .empty-title {
 }
 
 .sidebar {
+    position: relative;
+    z-index: 100;
     overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     transition: width 0.38s cubic-bezier(0.2, 0.95, 0.2, 1), transform 0.38s cubic-bezier(0.2, 0.95, 0.2, 1), box-shadow 0.38s ease;
 }
 
@@ -207,6 +212,8 @@ body.dark .empty-title {
     font-size: 0.95rem;
     color: #cbd5e1;
     border-left: 3px solid transparent;
+    pointer-events: auto !important; /* 确保可以被点击 */
+    user-select: none;
 }
 
 .menu-item:hover {
@@ -220,6 +227,8 @@ body.dark .empty-title {
     color: #ea6479;
     border-left-color: #ea6479;
     font-weight: 600;
+    position: relative;
+    z-index: 10;
 }
 
 .menu-item svg {
@@ -233,13 +242,37 @@ body.dark .empty-title {
 }
 
 .history-container {
-    flex: 1;
-    overflow-y: auto;
+    flex: 1 !important;
+    overflow-y: auto !important;
+    min-height: 0;
+    max-height: none !important; /* 恢复高度，交给 flex: 1 处理 */
     padding: 1rem 0;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     flex-direction: column;
-    transition: opacity 0.25s ease, transform 0.25s ease;
+    
+    /* 彻底隐藏默认滚动条 */
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+.history-container::-webkit-scrollbar {
+    width: 0px !important;
+    display: none;
+}
+
+.history-container:hover {
+    scrollbar-width: thin !important;
+}
+
+.history-container:hover::-webkit-scrollbar {
+    width: 4px !important;
+    display: block;
+}
+
+.history-container:hover::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1) !important;
+    border-radius: 10px;
 }
 
 .history-label {
@@ -321,6 +354,8 @@ body.dark .empty-title {
     gap: 0.75rem;
     cursor: pointer;
     transition: background 0.2s;
+    flex-shrink: 0;
+    margin-top: auto;
 }
 
 .user-profile:hover {
@@ -520,6 +555,7 @@ body.dark .empty-title {
 .chat-box {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden; /* 严禁横向滚动 */
     padding: 1rem 4%;
     display: flex;
     flex-direction: column;
@@ -527,6 +563,11 @@ body.dark .empty-title {
     scroll-behavior: smooth;
     background: transparent;
     will-change: scroll-position;
+}
+
+/* 当子元素包含 .empty-state 时隐藏滚动条轨道 */
+.chat-box:has(.empty-state) {
+    overflow: hidden;
 }
 
 .message-wrapper {
@@ -649,6 +690,7 @@ body.dark .empty-title {
 html,
 body {
     height: 100%;
+    overflow: hidden; /* 防止全局出现滚动条 */
 }
 
 body {
@@ -710,14 +752,24 @@ body::after {
 }
 
 .app-container {
-    position: relative;
+    position: fixed; /* 使用 fixed 确保铺满屏幕 */
+    inset: 0;
     z-index: 1;
     display: flex;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     padding: 16px;
     gap: 16px;
     box-sizing: border-box;
+    transition: filter 0.5s ease, transform 0.5s ease;
+}
+
+.app-container.is-blurred {
+    filter: blur(20px) brightness(0.9);
+    pointer-events: none !important;
+}
+    user-select: none;
+    transform: scale(0.98);
 }
 
 .sidebar {
@@ -770,8 +822,46 @@ body::after {
 }
 
 .history-container {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    min-height: 0;
+    max-height: none !important;
     border-top: 1px solid rgba(255, 255, 255, 0.55);
     padding-top: 1rem;
+    
+    /* 极致隐藏滚动条 */
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+.history-container:hover {
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba(0, 0, 0, 0.1) transparent !important;
+}
+
+.history-container::-webkit-scrollbar {
+    width: 0px !important;
+}
+
+.history-container:hover::-webkit-scrollbar {
+    width: 4px !important;
+}
+
+.history-container::-webkit-scrollbar-thumb {
+    background: transparent !important;
+    border-radius: 10px;
+}
+
+.history-container:hover::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1) !important;
+}
+
+body.dark .history-container:hover {
+    scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+body.dark .history-container:hover::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
 }
 
 .history-label {
@@ -816,28 +906,25 @@ body::after {
 }
 
 .user-avatar-img {
-    width: 34px;
-    height: 34px;
-    border: 2px solid rgba(244, 124, 142, 0.7);
+    display: none !important; /* 隐藏全局中有问题的头像样式 */
 }
 
-.user-name {
-    color: #584a63;
-    font-weight: 700;
+.user-profile {
+    margin: auto 0.85rem 1rem;
+    padding: 0.8rem 1.1rem; /* 稍微减小内边距 */
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.55); /* 改为全边框 */
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-.user-status {
-    color: #47c78a;
-}
-
-.main-content {
-    background: rgba(255, 255, 255, 0.66);
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    border-radius: 28px;
-    overflow: hidden;
-    box-shadow: 0 20px 50px rgba(240, 145, 166, 0.12);
-
-
+.user-profile:hover {
+    background: rgba(255, 255, 255, 0.72);
+    transform: translateY(-1px);
 }
 
 .header {
@@ -1022,6 +1109,7 @@ body::after {
     align-items: center;
     justify-content: center;
     padding: 3rem 1rem;
+    overflow: hidden; /* 确保欢迎界面不产生滚动条 */
 }
 
 .empty-card {
@@ -1131,43 +1219,146 @@ body::after {
 }
 
 /* Login Overlay */
-/* ???????????????????????????? */
 #login-overlay {
     position: fixed;
     inset: 0;
-    /* Ensures full coverage more robustly than width/height */
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-
-
-    display: flex;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.01);
+    backdrop-filter: blur(35px) saturate(160%);
+    -webkit-backdrop-filter: blur(35px) saturate(160%);
+    display: flex !important;
     justify-content: center;
     align-items: center;
-    z-index: 10000;
-    /* Ensure on top of everything */
-    transition: opacity 0.5s ease;
-    will-change: opacity;
-    transform: translateZ(0);
-    /* ??????????? */
+    z-index: 99999;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+body.dark #login-overlay {
+    background: rgba(0, 0, 0, 0.01);
+}
+
+#login-overlay.permanent,
+#login-overlay.active {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
 }
 
 .login-container {
-    margin: auto;
-    /* Double insurance for centering */
-    background: var(--bg);
-    width: 380px;
-    max-width: 90%;
-    /* Responsive adjustment */
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05);
-    /* Soft shadow */
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    width: 440px;
+    padding: 3.5rem;
+    border-radius: 40px;
+    box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.15),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.3);
     text-align: center;
-    animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transform: none; /* 移除 transform 避免位移 */
+    transition: all 0.7s cubic-bezier(0.19, 1, 0.22, 1);
     position: relative;
-    will-change: transform, opacity;
+    z-index: 100001;
+    margin: auto;
 }
+
+body.dark .login-container {
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+#login-overlay.permanent .login-container,
+#login-overlay.active .login-container {
+    transform: scale(1); /* 激活时只做缩放，不再位移 */
+}
+
+.login-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    color: white;
+    border: none;
+    border-radius: 18px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 12px 24px -6px rgba(99, 102, 241, 0.4);
+    margin-top: 1.5rem;
+    letter-spacing: 1px;
+    position: relative;
+    z-index: 10; /* 确保按钮在最上层 */
+}
+
+.login-btn:hover:not(:disabled) {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 20px 32px -8px rgba(99, 102, 241, 0.5);
+    filter: brightness(1.1);
+}
+
+.login-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.login-input {
+    width: 100%;
+    padding: 14px 18px;
+    font-size: 1rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.6);
+    outline: none;
+    transition: all 0.3s;
+    color: #334155;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.login-input:focus {
+    background: #fff;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1), 0 8px 16px -4px rgba(0, 0, 0, 0.05);
+}
+
+.confirm-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 14px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.25s;
+    position: relative;
+    z-index: 10;
+}
+
+.confirm-btn.cancel {
+    background: rgba(226, 232, 240, 0.9);
+    color: #475569;
+}
+
+.confirm-btn.cancel:hover {
+    background: #e2e8f0;
+    transform: translateY(-1px);
+}
+
+.confirm-btn.danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    box-shadow: 0 8px 16px -4px rgba(239, 68, 68, 0.4);
+}
+
+.confirm-btn.danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 20px -5px rgba(239, 68, 68, 0.5);
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes popIn { to { transform: scale(1); } }
 
 @keyframes scaleIn {
     from {
@@ -1311,9 +1502,12 @@ textarea {
     font-family: inherit;
     resize: none;
     max-height: 200px;
+    height: 24px; /* 显式设置基础高度 */
+    min-height: 24px;
     outline: none;
     color: var(--text-main);
     line-height: 1.5;
+    overflow-y: hidden;
 }
 
 .btn-send {
@@ -1355,14 +1549,21 @@ textarea {
 /* Modals */
 .modal-overlay {
     position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.5);
-
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 50;
-    padding: 1rem;
+    z-index: 1000;
+    padding: 0;
+    margin: 0;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
@@ -1374,16 +1575,25 @@ textarea {
 }
 
 .modal {
-    background: #fff;
-    border-radius: 20px;
-    width: 100%;
-    max-width: 650px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    transform: scale(0.95) translateY(10px);
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 28px;
+    width: 650px;
+    max-width: 90vw;
+    box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.2),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+    transform: scale(0.92) translateY(20px);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
     flex-direction: column;
     overflow: hidden;
+}
+
+body.dark .modal {
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .modal-overlay.active .modal {
@@ -1391,12 +1601,12 @@ textarea {
 }
 
 .modal-header {
-    padding: 1.25rem 1.75rem;
-    border-bottom: 1px solid var(--border);
+    padding: 1.5rem 1.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #f8fafc;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .modal-header h3 {
@@ -2258,3 +2468,69 @@ body.dark .sidebar-header span {
 body.dark .message-bot {
     color: #f1f5f9 !important;
 }
+
+/* 退出确认框样式 */
+.confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100000; /* 确保在最顶层，超过登录遮罩 */
+}
+
+.confirm-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 24px;
+    width: 320px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+body.dark .confirm-card {
+    background: #1e293b;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.confirm-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.confirm-btns {
+    display: flex;
+    gap: 12px;
+}
+
+.confirm-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.confirm-btn.cancel {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.confirm-btn.danger {
+    background: #ef4444;
+    color: white;
+}
+
+.confirm-btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+}
+

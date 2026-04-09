@@ -1,16 +1,22 @@
 package com.XYai.myai.Service.iml;
 
-import com.XYai.myai.RAG.Aop.Annotation.RagTraceNode;
-import com.XYai.myai.RAG.Aop.Annotation.rateLimit;
 import com.XYai.myai.Chat.ChatMessage;
+import com.XYai.myai.RAG.Aop.Annotation.RagTraceNode;
+import com.XYai.myai.RAG.Channel.MultiChannelRetrievalEngine;
+import com.XYai.myai.RAG.Channel.POJO.RetrievedChunk;
 import com.XYai.myai.RAG.Memory.ConversationMemorySummaryService;
+import com.XYai.myai.RAG.Memory.POJO.LoadSession;
 import com.XYai.myai.RAG.intent.IntentResult;
-import com.XYai.myai.RAG.intent.SubQuestionIntent;
-import com.XYai.myai.RAG.rewrite.RewriteResult;
+import com.XYai.myai.RAG.intent.POJO.SubQuestionIntent;
+import com.XYai.myai.RAG.rewrite.POJO.RewriteResult;
 import com.XYai.myai.RAG.rewrite.QueryRewriter;
+import com.XYai.myai.Service.ChatService;
+import com.alibaba.fastjson2.JSON;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import com.XYai.myai.Service.ChatService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
@@ -39,57 +45,77 @@ public class ChatServiceIml implements ChatService {
     private ConversationMemorySummaryService conversationMemorySummaryService;
     @Resource
     private IntentResult intentResult;
+    @Resource
+    private MultiChannelRetrievalEngine multiChannelRetrievalEngine;
+    @Resource
+    private ObjectMapper objectMapper;
 
-    public static final String SYSTEM_MESSAGE = """
-            你是活泼的AI,名字叫做XY,专为用户解答不知道的知识
-            与用户积极沟通,在没有准确答案时候输出(我暂时还不知道这个知识)
-            """;
 
     /**
      * 处理一轮对话，按会话 ID 维护上下文并返回模型回复。
      *
-     * @param message 用户输入内容
+     * @param message        用户输入内容
      * @param conversationId 会话 ID，可为空
      * @return 模型回复文本
      */
     @RagTraceNode(name = "对话", type = "chat")
-    @rateLimit(limit = 3,rateName = "chat")
-    public Flux<String> DoChat(String message, String conversationId) {
+    public Flux<String> DoChat(String message, String conversationId, Long userId) {
         // 基础参数校验，避免空请求进入模型。
         if (message == null || message.isBlank()) {
             return Flux.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "没有输入信息"));
         }
         // RAG 对话
         //并行加载摘要和历史记录
-        //LoadSession load = conversationMemorySummaryService.load(conversationId);
+        LoadSession load = conversationMemorySummaryService.load(conversationId);
         //问题重写
-        RewriteResult rewrittenMessage = queryRewriter.rewrite(message);
-        log.info(String.valueOf(rewrittenMessage));
-        //TODO 意图识别用户消息
-        List<SubQuestionIntent> questionIntents = intentResult.recognize(rewrittenMessage);
-        System.out.println(questionIntents);
-        //TODO 网页 | 向量检索
+        RewriteResult rewrittenMessage = queryRewriter.rewrite(message, load);
+        // 意图识别用户消息
+        List<SubQuestionIntent> questionIntents = intentResult.recognize(rewrittenMessage, load);
+        log.info(questionIntents.toString());
+        //TODO 网页检索
 
-        //TODO 重排序
-    
-        //LLM 生成
+        //TODO多通道召回
+        List<RetrievedChunk> retrieve = multiChannelRetrievalEngine.retrieve(questionIntents, message);
+        //prompt生成
+        Prompt prompt = getPrompt(message, retrieve, load);
         //对话
-        Prompt prompt = new Prompt(List.of(
-                new SystemMessage(SYSTEM_MESSAGE),
-                new UserMessage(rewrittenMessage.getRewrittenQuery())
-        ));
         StringBuilder fullAnswer = new StringBuilder();
         return chatModel.stream(prompt)
                 .map(this::extractChunkText)
                 .filter(chunk -> chunk != null && !chunk.isBlank())
                 .doOnNext(fullAnswer::append)
-                .doOnComplete(() -> {
+                .doFinally(signal -> {
                     ChatMessage chatMessage = ChatMessage.builder()
                             .userMessage(rewrittenMessage.getRewrittenQuery())
                             .assistantMessage(fullAnswer.toString())
+                            .userId(userId)
                             .build();
+                    log.info("Stream finished with signal: {}. Triggering compressIfNeeded for conversationId={}", signal, conversationId);
                     conversationMemorySummaryService.compressIfNeeded(conversationId, chatMessage);
                 });
+    }
+
+    @NotNull
+    private Prompt getPrompt(String message, List<RetrievedChunk> retrieve, LoadSession load) {
+
+        // 添加 MCP 工具调用的结果（如有）
+        // 添加知识库检索结果
+        String loadJSON = JSON.toJSONString(load);
+        String retrieveJSON = JSON.toJSONString(retrieve);
+        String systemMessage = """
+                你是活泼且专业的 AI 助手 XY。请根据提供的文档片段和历史对话（如果有）来回答用户问题。
+                重要：如果没有可用的参考文档或历史对话，不要在回答中陈述“参考文档为空”或“历史为空”等内容；直接在可用信息范围内给出回答或说明无法确定的部分。
+                如果有文档或历史，请仅使用必要的片段，不要逐字回显整个文档 JSON。
+                参考文档:<<%s>>
+                历史对话:<<%s>>
+                """.formatted(retrieve == null ? "无" : retrieveJSON, load == null ? "无" : loadJSON);
+        String userMessage = """
+                用户消息:<<%s>>
+                """.formatted(message);
+        return new Prompt(
+                new SystemMessage(systemMessage),
+                new UserMessage(userMessage)
+        );
     }
 
     /**
@@ -105,7 +131,6 @@ public class ChatServiceIml implements ChatService {
         String text = response.getResult().getOutput().getText();
         return text == null ? "" : text;
     }
-
 
     /**
      * 启动后校验核心模型是否完成注入。

@@ -19,15 +19,18 @@ spring:
       database: ${SPRING_REDIS_DB:0}
       timeout: 3s
   ai:
-    ollama:
-      base-url: http://localhost:11434
+    openai:
+      api-key: ${ALIYUN_BAILIAN_API_KEY:}
+      base-url: https://dashscope.aliyuncs.com/compatible-mode
       chat:
         options:
-          model: qwen3:8b
+          model: qwen3-max
           temperature: 0.1
-          keep-alive: 24h
+    ollama:
+      base-url: http://localhost:11434
       embedding:
-        model: qwen3-embedding
+        options:
+          model: qwen3-embedding
     vectorstore:
       milvus:
         client:
@@ -57,7 +60,6 @@ ragent:
 upload:
   ragEnabled: true
   ossEnabled: false
-  splitWithSpringAIEnabled: true
   upLoadEnabled: true
 memory:
     history-keep-turns: 4
@@ -66,10 +68,13 @@ memory:
     summary-enabled: true
 rewriter:
   rewriter-min-chars: 50
-  rewriter-enabled: false
+  rewriter-enabled: true
 intent:
   intent-enabled: true
-  update-intent-enabled: false
+  update-intent-enabled: true
+  redis-enabled: true
+  DBEnabled: true
+  vector-enabled: false
 aliyun:
   oss:
     # Moved secrets to application-local.yaml which is git-ignored.
@@ -84,4 +89,5 @@ splitter:
   chunk-size: 1200
   overlap: 200
   chinese-tokenize: true
-
+pipeline:
+  enricher-enable: false

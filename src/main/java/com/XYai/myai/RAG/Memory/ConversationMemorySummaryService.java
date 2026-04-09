@@ -1,9 +1,14 @@
 package com.XYai.myai.RAG.Memory;
 
 import com.XYai.myai.Chat.ChatMessage;
-import com.XYai.myai.User.LoginUserInfoManager;
+import com.XYai.myai.RAG.Memory.POJO.ChatConversation;
+import com.XYai.myai.RAG.Memory.POJO.ChatSessionRecord;
+import com.XYai.myai.RAG.Memory.POJO.LoadSession;
+import com.XYai.myai.RAG.Memory.POJO.MemoryProperties;
+import com.XYai.myai.RAG.intent.POJO.IntentNode;
 import com.XYai.myai.mapper.ChatConversationMapper;
 import com.XYai.myai.mapper.ChatSessionRecordMapper;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,12 +25,15 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 会话记忆与摘要服务类。
+ * 负责管理用户聊天记录的持久化，并利用 AI 异步生成历史会话摘要，以优化长对话的 token 使用。
+ */
 @Slf4j
 @Service
 public class ConversationMemorySummaryService {
@@ -43,13 +51,14 @@ public class ConversationMemorySummaryService {
     private ChatConversationMapper chatConversationMapper;
     @Resource
     private RedissonClient redissonClient;
-    //TODO streamLLM
+
+    // TODO streamLLM
     /**
      * 根据会话 ID 与新消息判断是否需要触发摘要压缩。
      * 该方法为异步入口：当满足条件且开启摘要功能时，会在后台异步执行压缩流程，避免阻塞主线程。
      *
      * @param conversationId 会话 ID
-     * @param message 新的聊天消息
+     * @param message        新的聊天消息
      */
     public void compressIfNeeded(String conversationId, ChatMessage message) {
 
@@ -57,14 +66,18 @@ public class ConversationMemorySummaryService {
         if (!memoryProperties.getSummaryEnabled()) {
             return;
         }
+
         // 异步执行压缩，不阻塞主流程（关键：避免影响用户交互响应速)
-        CompletableFuture.runAsync(Objects.requireNonNull(() -> {
+        CompletableFuture.runAsync(() -> {
             try {
-                doCompressIfNeeded(conversationId, message,LoginUserInfoManager.getId());
+                doCompressIfNeeded(conversationId, message);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                Thread.currentThread().interrupt();
+                log.error("compressIfNeeded interrupted", e);
+            } catch (Exception e) {
+                log.error("compressIfNeeded failed: {}", e.getMessage(), e);
             }
-        }));
+        });
     }
 
     /**
@@ -76,10 +89,9 @@ public class ConversationMemorySummaryService {
      * 4. 调用 LLM 生成摘要并持久化。
      *
      * @param conversationId 会话 ID
-     * @param message 待处理的聊天消息
-     * @param userId 用户 ID（用于写入会话元信息）
+     * @param message        待处理的聊天消息
      */
-    private void doCompressIfNeeded(String conversationId, ChatMessage message,Long userId) throws InterruptedException {
+    private void doCompressIfNeeded(String conversationId, ChatMessage message) throws InterruptedException {
 
         // ========== 步骤1：前置条件检查 ==========
         int maxTurns = memoryProperties.getSummaryStartTurns(); // 达到该轮数才开始压缩
@@ -87,7 +99,8 @@ public class ConversationMemorySummaryService {
         // ========== 步骤2：分布式锁（防止并发压缩，避免数据冲突） ==========
         String lockKey = "summary:lock:" + conversationId;
         RLock lock = redissonClient.getLock(lockKey);
-        if (!lock.tryLock(0, 30, TimeUnit.SECONDS)) return;
+        if (!lock.tryLock(0, 30, TimeUnit.SECONDS))
+            return;
 
         try {
             // ========== 步骤3：先保存再判断是否需要压缩 ==========
@@ -95,7 +108,7 @@ public class ConversationMemorySummaryService {
             // 先保存新消息（每轮都保存）
             String messageJson = objectMapper.writeValueAsString(message);
             stringRedisTemplate.opsForZSet().add(chatMessageKey, messageJson, System.currentTimeMillis());
-            CompletableFuture.runAsync(() -> recordSessionDB(conversationId, message,userId));
+            CompletableFuture.runAsync(() -> recordSessionDB(conversationId, message));
             // 再判断是否需要压缩
             Long total = stringRedisTemplate.opsForZSet().size(chatMessageKey);
             if (total == null || total < maxTurns) {
@@ -127,14 +140,15 @@ public class ConversationMemorySummaryService {
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
-            }// 释放锁，避免死锁
+            } // 释放锁，避免死锁
         }
     }
+
     /**
      * 调用大模型对给定的历史摘要与待压缩消息进行合并与去重，输出新的摘要文本。
      *
      * @param existingSummary 现有的摘要文本（可能为null或空）
-     * @param toSummary 需要被压缩的对话片段（JSON 字符串形式）
+     * @param toSummary       需要被压缩的对话片段（JSON 字符串形式）
      * @return 新的摘要文本
      * @throws JsonProcessingException 当序列化/反序列化失败时抛出
      */
@@ -148,10 +162,10 @@ public class ConversationMemorySummaryService {
                 "要求：严格≤" + memoryProperties.getSummaryMaxChars() + "字符；仅一行。格式:原本的JSON格式");
         Prompt prompt = new Prompt(
                 new SystemMessage(SystemMessage),
-                new UserMessage(summaryMessageJson)
-        );
+                new UserMessage(summaryMessageJson));
         return chatModel.call(prompt).getResult().getOutput().getText();
     }
+
     /**
      * 将新的聊天消息与会话元信息持久化到数据库：
      * 1. 若会话元信息不存在则创建 ChatSessionRecord；
@@ -159,10 +173,9 @@ public class ConversationMemorySummaryService {
      * 3. 保持每个会话只保留有限条数的历史记录（超出则删除最旧）。
      *
      * @param ConversationId 会话 ID
-     * @param message 要保存的聊天消息
-     * @param userId 发起用户 ID
+     * @param message        要保存的聊天消息
      */
-    private void recordSessionDB(String ConversationId, ChatMessage message,Long userId) {
+    private void recordSessionDB(String ConversationId, ChatMessage message) {
         try {
             String title = message.getUserMessage().trim();
             title = title.length() > 10 ? title.substring(0, 10) : title;
@@ -172,7 +185,7 @@ public class ConversationMemorySummaryService {
                 ChatSessionRecord record = new ChatSessionRecord();
                 record.setConversationId(ConversationId);
                 record.setTitle(title);
-                record.setUserId(userId);
+                record.setUserId(message.getUserId());
                 record.setCreatedAt(LocalDateTime.now().withNano(0));
                 try {
                     chatSessionRecordMapper.insert(record);
@@ -198,18 +211,19 @@ public class ConversationMemorySummaryService {
             log.error("保存会话到数据库失败", e);
         }
     }
+
     /**
      * 更新会话元数据中的摘要字段（DB 更新）。
      *
      * @param conversationId 会话 ID
-     * @param summary 新的摘要文本
+     * @param summary        新的摘要文本
      */
     private void upsetSummary(String conversationId, String summary) {
-
         UpdateWrapper<ChatSessionRecord> wrapper = new UpdateWrapper<>();
         wrapper.eq("conversation_id", conversationId).set("summary_text", summary);
         chatSessionRecordMapper.update(wrapper);
     }
+
     /**
      * 加载给定会话的上下文数据：包括已保存的聊天消息集合与摘要文本。
      *
@@ -219,6 +233,7 @@ public class ConversationMemorySummaryService {
     public LoadSession load(String conversationId) {
         // 获取上下文对话和摘要
         String conversationKey = "chatMessage:" + conversationId;
+        stringRedisTemplate.opsForSet().intersect("intent:tree:children:me", "me");
         String summaryKey = "summary:" + conversationId;
         Set<String> conversations = stringRedisTemplate.opsForZSet().range(conversationKey, 0, -1);
         String summary = stringRedisTemplate.opsForValue().get(summaryKey);

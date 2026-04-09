@@ -1,32 +1,21 @@
--- auto-generated definition
-create table intent_node
-(
-    name            varchar(255)                        not null
-        primary key,
-    kb_id           varchar(255)                        null,
-    node_id              varchar(255)                        not null,
-    description     text                                null,
-    parent_name     varchar(255)                        null,
-    examples        json                                null,
-    collection_name varchar(255)                        null,
-    mcp_tool_id     varchar(255)                        null,
-    top_k           int                                 null,
-    prompt_template text                                null,
-    children_count  int       default 0                 not null,
-    created_at      timestamp default CURRENT_TIMESTAMP null,
-    updated_at      timestamp default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
-    constraint fk_intent_parent
-        foreign key (parent_name) references intent_node (name)
-            on update cascade on delete set null
-)
-    collate = utf8mb4_unicode_ci;
+-- 管道定义表
+CREATE TABLE t_ingestion_pipeline (
+                                      id          bigint(20) NOT NULL,
+                                      name        varchar(100) NOT NULL,  -- 管道名称
+                                      description text,                  -- 管道描述
+                                      created_by  varchar(64),           -- 创建人
+                                      create_time datetime,              -- 创建时间
+                                      PRIMARY KEY (id)
+);
 
-create index idx_children_count
-    on intent_node (children_count);
-
-create index idx_node_id
-    on intent_node (node_id);
-
-create index idx_parent_id
-    on intent_node (parent_name);
-
+-- 节点配置表（关联管道）
+CREATE TABLE t_ingestion_pipeline_node (
+                                           id             bigint(20) NOT NULL,
+                                           pipeline_id    bigint(20) NOT NULL,  -- 所属管道ID
+                                           node_id        varchar(64) NOT NULL,  -- 节点标识
+                                           node_type      varchar(30) NOT NULL,  -- 节点类型
+                                           next_node_id   varchar(64),            -- 下一个节点ID
+                                           settings_json  json,                   -- 节点配置参数（JSON格式）
+                                           condition_json json,                  -- 执行条件（JSON格式）
+                                           PRIMARY KEY (id)
+);

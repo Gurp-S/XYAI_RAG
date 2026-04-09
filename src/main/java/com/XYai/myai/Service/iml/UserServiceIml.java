@@ -2,8 +2,8 @@ package com.XYai.myai.Service.iml;
 
 import com.XYai.myai.RAG.Aop.Annotation.RagTraceNode;
 import com.XYai.myai.Config.Result;
-import com.XYai.myai.RAG.Memory.ChatConversation;
-import com.XYai.myai.RAG.Memory.ChatSessionRecord;
+import com.XYai.myai.RAG.Memory.POJO.ChatConversation;
+import com.XYai.myai.RAG.Memory.POJO.ChatSessionRecord;
 import com.XYai.myai.Service.UserService;
 import com.XYai.myai.User.User;
 import com.XYai.myai.mapper.ChatConversationMapper;
@@ -19,6 +19,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * 用户服务实现类。
+ * 处理用户注册、会话管理以及聊天记录存储的相关业务逻辑。
+ */
 @Slf4j
 @Service
 public class UserServiceIml implements UserService {
@@ -41,7 +45,9 @@ public class UserServiceIml implements UserService {
      */
     @RagTraceNode(name = "历史对话查询", type = "conversation")
     public Result<List<ChatConversation>> conversationHistory(String conversationId, LocalDateTime cursor) {
-        if (conversationId == null || conversationId.isBlank()) return Result.error(404,"会话无记录");
+        log.info("查询对话数据");
+        if (conversationId == null || conversationId.isBlank())
+            return Result.error(404, "会话无记录");
         LambdaQueryWrapper<ChatConversation> queryWrapper = new LambdaQueryWrapper<ChatConversation>()
                 .select(ChatConversation::getConversationId,
                         ChatConversation::getUserMessage,
@@ -53,25 +59,29 @@ public class UserServiceIml implements UserService {
         }
         queryWrapper.orderByAsc(ChatConversation::getCreatedAt);
 
-        // 使用 ChatConversationMapper 查询消息（之前是错误地用 chatSessionRecordMapper）
+        // 使用 ChatConversationMapper
         List<ChatConversation> records = chatConversationMapper.selectList(queryWrapper);
 
         if (records == null || records.isEmpty()) {
             return Result.success(List.of());
         }
         // 可选：异步更新摘要（实现保留）
-        setSummary(conversationId, records);
+        setSummary(conversationId);
         return Result.success(records);
     }
 
-    private void setSummary(String conversationId, List<ChatConversation> records) {
+    private void setSummary(String conversationId) {
         CompletableFuture.runAsync(() -> {
             // TODO: 将会话摘要逻辑实现进来（或调用 ConversationMemorySummaryService）
+            ChatSessionRecord chatSessionRecord = chatSessionRecordMapper.selectById(conversationId);
+            String summaryKey = "summary:" + conversationId;
+            stringRedisTemplate.opsForValue().set(summaryKey, chatSessionRecord.getSummaryText());
         });
     }
 
     /**
      * 用户登出
+     * 
      * @param userId 用户id
      * @return 成功返回
      */
@@ -91,10 +101,10 @@ public class UserServiceIml implements UserService {
                 continue;
             }
             // 统一 key 模式，与其它模块保持一致（示例）
-            String recentKey = "Chat:Mem:" + conversationId + ":recent";
-            String summaryKey = recentKey + ":Summary";
+            String conversationKey = "chatMessage:" + conversationId;
+            String summaryKey = "summary:" + conversationId;
             try {
-                stringRedisTemplate.delete(recentKey);
+                stringRedisTemplate.delete(conversationKey);
                 stringRedisTemplate.delete(summaryKey);
             } catch (Exception e) {
                 log.warn("删除 redis key 失败: {}", e.getMessage());
@@ -105,7 +115,8 @@ public class UserServiceIml implements UserService {
 
     /**
      * 登录
-     * @param id id
+     * 
+     * @param id       id
      * @param password 密码
      * @return 成功
      */
@@ -130,12 +141,12 @@ public class UserServiceIml implements UserService {
      * @return 返回会话对象
      */
     public Result<List<ChatSessionRecord>> history(Long userId) {
-        if(userId == null || userId < 0) return Result.error(500,"id非法");
+        if (userId == null || userId < 0)
+            return Result.error(500, "id非法");
         List<ChatSessionRecord> conversations = getConversationId(userId);
         log.info("查询历史");
         return Result.success(conversations);
     }
-
 
     /**
      * 根据用户id查出对话id
@@ -148,5 +159,12 @@ public class UserServiceIml implements UserService {
         // ChatSessionRecord.userId 类型是 String
         query.eq(ChatSessionRecord::getUserId, String.valueOf(userId));
         return chatSessionRecordMapper.selectList(query);
+    }
+
+    public Result<String> register(User user, String Verification) {
+        User registerUser = new User();
+        registerUser.setId(user.getId());
+        registerUser.setPassword(user.getPassword());
+        return Result.success("注册成功");
     }
 }

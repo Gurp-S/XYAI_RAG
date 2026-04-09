@@ -16,20 +16,21 @@
             </div>
         </div>
 
-        <!-- 仅渲染消息列表 -->
-        <MessageItem v-for="(m, idx) in messages" :key="idx" :role="m.role" :text="m.text" :rag="m.rag" />
-        
-        <!-- 加载动画占位：仅在该消息正在流式传输且内容尚为空时显示 -->
-        <div v-if="isStreaming && messages.length > 0 && messages[messages.length-1].role === 'assistant' && messages[messages.length-1].text === ''" class="message-wrapper assistant loading">
-            <div class="avatar">AI</div>
-            <div class="message-content">
-                <div class="message typing-loader">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+        <!-- 渲染消息列表，如果是最后一条且正在流式传输且文本为空，则渲染动画包裹层 -->
+        <template v-for="(m, idx) in messages" :key="idx">
+            <div v-if="isStreaming && idx === messages.length - 1 && m.role === 'assistant' && m.text === ''" 
+                 class="message-wrapper assistant loading">
+                <div class="avatar">AI</div>
+                <div class="message-content">
+                    <div class="message typing-loader">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
                 </div>
             </div>
-        </div>
+            <MessageItem v-else :role="m.role" :text="m.text" :rag="m.rag" />
+        </template>
     </div>
 
     <FooterInput v-model="input" @send="send" />
@@ -53,7 +54,7 @@ const isStreaming = ref(false)
 watch(() => store.currentMessages, (newMsgs) => {
   messages.value = [...newMsgs]
   scrollToBottom()
-}, { deep: true })
+}, { deep: true, immediate: true })
 
 function toggleTheme() {
     const isDark = !document.body.classList.contains('dark')
@@ -89,13 +90,19 @@ async function send() {
   const assistantIndex = messages.value.length - 1
 
   try {
+    const headers = { 'Content-Type': 'application/json' }
+    // 如果用户已登录，在请求头中携带 userId 以供后端拦截器识别
+    if (store.currentUser && store.currentUser.id) {
+      headers['userId'] = store.currentUser.id
+    }
+
     const response = await fetch('/ai/chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: headers,
       body: JSON.stringify({ 
         message: userText, 
-        conversationId: store.activeConversationId,
-        userId: store.currentUser ? store.currentUser.id : null 
+        conversationId: store.activeConversationId, // 显式传递对话 ID
+        userId: store.currentUser?.id
       })
     })
 
@@ -104,34 +111,51 @@ async function send() {
     const reader = response.body.getReader()
     const decoder = new TextDecoder()
     let done = false
+    let buffer = '' // 添加缓冲区
 
     while (!done) {
       const { value, done: readerDone } = await reader.read()
       done = readerDone
       if (value) {
-        const chunk = decoder.decode(value, { stream: true })
-        // 简单处理 Flux 返回的 SSE 格式或纯文本块
-        const lines = chunk.split('\n')
-        for (const line of lines) {
-            let content = ''
-            if (line.startsWith('data:')) {
-                content = line.replace('data:', '').trim()
-            } else if (line.trim() && !line.startsWith(':')) {
-                content = line
-            }
-            if (content) {
-                // 第一个字符到来，loading 动画由于 text 不再为空而自动消失
-                messages.value[assistantIndex].text += content
-                scrollToBottom()
-            }
+        // 解码并合并到缓冲区
+        buffer += decoder.decode(value, { stream: true })
+        
+        // 预文本处理：如果缓冲区包含换行符，优先处理完整行
+        if (buffer.includes('\n')) {
+          const lines = buffer.split('\n')
+          // 最后一行可能是不完整的，保留在缓冲区
+          buffer = lines.pop()
+
+          for (const line of lines) {
+            processSSELine(line, assistantIndex)
+          }
         }
       }
+    }
+    // 处理最后剩余的内容
+    if (buffer) {
+      processSSELine(buffer, assistantIndex)
     }
   } catch (error) {
     console.error('Chat Error:', error)
     messages.value[assistantIndex].text = '消息发送失败，请检查后端服务是否启动。'
   } finally {
     isStreaming.value = false
+    scrollToBottom()
+  }
+}
+
+// 辅助函数：处理单行 SSE 数据并更新界面
+function processSSELine(line, assistantIndex) {
+  let content = ''
+  if (line.startsWith('data:')) {
+    content = line.replace('data:', '').trim()
+  } else if (line.trim() && !line.startsWith(':')) {
+    content = line
+  }
+
+  if (content && content !== '[DONE]') {
+    messages.value[assistantIndex].text += content
     scrollToBottom()
   }
 }

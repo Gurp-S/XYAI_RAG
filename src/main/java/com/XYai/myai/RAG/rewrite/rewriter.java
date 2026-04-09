@@ -1,5 +1,8 @@
 package com.XYai.myai.RAG.rewrite;
 
+import com.XYai.myai.RAG.Memory.POJO.LoadSession;
+import com.XYai.myai.RAG.rewrite.POJO.RewriteResult;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +13,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.stereotype.Service;
 
+import javax.naming.Context;
 import java.util.List;
 
 /**
@@ -32,13 +36,13 @@ public class rewriter implements QueryReweiterService {
      * @param userMessage 初始的 RewriteResult（可仅包含原始 query）
      * @return 重写并拆分后的 RewriteResult，失败时返回输入的 userMessage
      */
-    public RewriteResult callLLMRewriteAndSplit(RewriteResult userMessage) {
+    public RewriteResult callLLMRewriteAndSplit(RewriteResult userMessage, LoadSession load) {
         String userQuestion = userMessage.getRewrittenQuery();
         if (userQuestion == null) {
             return null;
         }
         BeanOutputConverter<RewriteResult> outputConverter = new BeanOutputConverter<>(RewriteResult.class);
-        Prompt prompt = getPrompt(userQuestion, outputConverter);
+        Prompt prompt = getPrompt(userQuestion, outputConverter,load);
         try {
             String rewrittenMessage = chatModel.call(prompt).getResult().getOutput().getText();
             // 正常输出用 debug/info，而不是 error
@@ -57,12 +61,18 @@ public class rewriter implements QueryReweiterService {
     }
 
 
-    private static Prompt getPrompt(String userQuestion, BeanOutputConverter<RewriteResult> outputConverter) {
+    private Prompt getPrompt(String userQuestion, BeanOutputConverter<RewriteResult> outputConverter, LoadSession load) {
         // 返回 JSON 格式的 Prompt
         String format = outputConverter.getFormat();
+        String context;
+        try {
+            context = objectMapper.writeValueAsString(load);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("上下文转化失败");
+        }
         String systemText = """
                 你是查询重写与子问题拆分器，不是问答助手。
-                你的唯一任务是输出结构化 JSON，严格遵守给定 schema。
+                你的唯一任务是根据用户上下文,处理用户问题输出结构化 JSON，严格遵守给定 schema。
                 规则:
                 1. 如果是闲聊，保持原样。
                 2. 如果用户的问题包含多个问题，必须拆分为多个子问题数组。
@@ -74,8 +84,9 @@ public class rewriter implements QueryReweiterService {
                 """.formatted(format);
         // 3. 将 format 嵌入到提示词中，告知模型应该返回什么结构
         String promptText = """
+                上下文: <<< %s >>>
                 当前用户输入：<<< %s >>>
-                """.formatted(userQuestion);
+                """.formatted(context==null?"无":context, userQuestion);
         return new Prompt(List.of(
                 new SystemMessage(systemText),
                 new UserMessage(promptText)

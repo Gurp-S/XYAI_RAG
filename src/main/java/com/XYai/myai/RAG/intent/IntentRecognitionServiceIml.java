@@ -3,20 +3,25 @@ package com.XYai.myai.RAG.intent;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import com.XYai.myai.RAG.rewrite.RewriteResult;
+import com.XYai.myai.RAG.Memory.POJO.LoadSession;
+import com.XYai.myai.RAG.intent.POJO.*;
+import com.XYai.myai.RAG.rewrite.POJO.RewriteResult;
 import com.XYai.myai.mapper.IntentNodeMapper;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huaban.analysis.jieba.JiebaSegmenter;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.converter.BeanOutputConverter;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -36,8 +41,6 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
     @Resource
     private ChatModel chatModel;
     @Resource
-    private ObjectMapper objectMapper;
-    @Resource
     private IntentNodeMapper intentNodeMapper;
     @Resource
     private IntentProperties intentProperties;
@@ -45,16 +48,18 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
     private VectorStore vectorStore;
 
     private static final JiebaSegmenter JIEBA = new JiebaSegmenter();
-    private static final String INTENT_NODE_HASH = "intent:tree:";
+    private static final String INTENT_NODE_NAME = "intent:tree:node:";
+    private static final String INTENT_NODE_CHILDREN_PREFIX = "intent:tree:children:";
 
     /**
      * 识别一组查询（可能包含拆分后的子问题）并返回意图列表。
      * 该方法并行识别每个子问题，最终返回最多前三个识别结果。
      *
      * @param rewriteResult 含重写后查询及可选子查询的对象
+     * @param load          加载的上下问
      * @return 最多三个 SubQuestionIntent 结果
      */
-    public List<SubQuestionIntent> recognize(RewriteResult rewriteResult) {
+    public List<SubQuestionIntent> recognize(RewriteResult rewriteResult, LoadSession load) {
         // 加载子问题（优先使用已分解的子查询）
         List<String> list = CollUtil.isNotEmpty(rewriteResult.getSubQuery()) ?
                 rewriteResult.getSubQuery() :
@@ -62,7 +67,7 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
         // 并行识别每个子问题
         List<CompletableFuture<SubQuestionIntent>> tasks = list.stream().map(
                 query -> CompletableFuture.supplyAsync(
-                        () -> classifyIntent(query)
+                        () -> classifyIntent(query, load)
                 )).toList();
         List<SubQuestionIntent> subIntent = tasks.stream().map(
                 CompletableFuture::join
@@ -78,38 +83,61 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
      * 4. 若仍未命中则根据配置选择降级或使用 LLM 兜底匹配。
      *
      * @param query 单条子查询文本
+     * @param load  山下问
      * @return 匹配到的 SubQuestionIntent，未命中时可能返回降级结果
      */
-    private SubQuestionIntent classifyIntent(String query) {
+    private SubQuestionIntent classifyIntent(String query, LoadSession load) {
         if (query == null || StrUtil.isBlank(query)) return null;
+        //TODO 同义词映射
         //分词判断
         List<String> tokenizes = tokenizeWithJieba(query);
         //读取redis意图树.有->返回,没有->数据库查询
-        List<IntentNode> byRedis = matchIntentFromRedis(tokenizes);
-        if (!byRedis.isEmpty()) {
-            log.info("redis判断成功");
-            return SubQuestionIntent.builder().subIntent(byRedis).build();
+        if (intentProperties.getRedisEnabled()) {
+            SubQuestionIntent byRedis = matchIntentFromRedis(tokenizes);
+            if (byRedis != null) {
+                log.info("redis判断成功{}", byRedis);
+                return byRedis;
+            }
         }
         //数据库查询,没有->向量检索
-        List<IntentNode> bySql = matchIntentFromSql(tokenizes);
-        if (!bySql.isEmpty()) {
-            log.info("数据库判断成功");
-            return SubQuestionIntent.builder().subIntent(bySql).build();
+        if (intentProperties.getDBEnabled()) {
+            SubQuestionIntent bySql = matchIntentFromSql(tokenizes);
+            if (bySql != null) {
+                log.info("数据库判断成功");
+                return bySql;
+            }
         }
         //TODO RAG向量检索,没有->兜底策略加载所有意图子节点
-        List<IntentNode> byRag = matchIntentFromRag(tokenizes);
-        if (!byRag.isEmpty()) {
-            log.info("向量判断成功");
-            return SubQuestionIntent.builder().subIntent(byRag).build();
+        if (intentProperties.getVectorEnabled()) {
+            SubQuestionIntent byRag = matchIntentFromRag(tokenizes);
+            if (byRag != null) {
+                log.info("向量判断成功");
+                return byRag;
+            }
         }
         // 1. 查询所有叶子节点(兜底)
-        if(!intentProperties.getUpdateIntentEnabled()){
-            log.info("兜底更新未开启,分词降级返回");
-            List<IntentNode> degradeIntent = degradeJieba(tokenizes);
-            return SubQuestionIntent.builder().subIntent(degradeIntent).build();
+        if (!intentProperties.getUpdateIntentEnabled()) {
+            log.info("兜底更新未开启,降级返回原文");
+            return getDegradeIntentResult(query);
         }
         //返回降级策略
-        return fallback(query);
+        return fallback(query, load);
+    }
+
+    @NotNull
+    private SubQuestionIntent getDegradeIntentResult(String query) {
+        IntentNode degradeIntent = new IntentNode();
+        degradeIntent.setName(query);
+        degradeIntent.setNodeId("query-degrade");
+        degradeIntent.setCreatedAt(LocalDateTime.now());
+        degradeIntent.setTopK(5);
+        degradeIntent.setCollectionName("default");
+        List<IntentNode> degradeIntentResult = new ArrayList<>();
+        degradeIntentResult.add(degradeIntent);
+        List<NodeScore> nodeScores = new ArrayList<>();
+        nodeScores.add(NodeScore.builder().intentNodeName(query).score(0.1).build());
+        return SubQuestionIntent.builder().subIntent(degradeIntentResult)
+                .nodeScore(NodesScore.builder().nodeScoreList(nodeScores).build()).build();
     }
 
     /**
@@ -118,12 +146,16 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
      * @param tokenizes 分词后的 token 列表
      * @return 匹配到的 IntentNode 列表（可能为空）
      */
-    private List<IntentNode> matchIntentFromRag(List<String> tokenizes) {
+    private SubQuestionIntent matchIntentFromRag(List<String> tokenizes) {
         List<IntentNode> matches = new ArrayList<>();
+        List<NodeScore> list = new ArrayList<>();
         for (String tokenize : tokenizes) {
             // TODO: 向量检索实现
+            vectorStore.getName();
         }
-        return matches;
+        return matches.isEmpty() && list.isEmpty() ? null
+                : SubQuestionIntent.builder().subIntent(matches).nodeScore(NodesScore.builder()
+                .nodeScoreList(list).build()).build();
     }
 
     /**
@@ -131,68 +163,65 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
      * 使用 LLM 对预置意图叶子节点进行匹配，然后将结果缓存到 Redis。
      *
      * @param query 原始查询
+     * @param load  上下文
      * @return 识别到的意图对象
      */
-    private SubQuestionIntent fallback(String query) {
+    private SubQuestionIntent fallback(String query, LoadSession load) {
         //Select * form IntentNode where Son = 0
         log.info("兜底进行");
-        //先查redis
-        //TODO加锁
-        List<IntentNode> leafNodes = intentNodeMapper.selectList(
+        //上下文转化
+        String context = com.alibaba.fastjson2.JSON.toJSONString(load);
+        //TODO加锁先查redis
+
+        List<IntentNode> leafNodesBySql = intentNodeMapper.selectList(
                 new QueryWrapper<IntentNode>().eq("children_count", 0)
         );
+
         //返回格式
-        BeanOutputConverter<SubQuestionIntent> outputConverter = new BeanOutputConverter<>(SubQuestionIntent.class);
-        String converterFormat = outputConverter.getFormat();
-        // 2. 构建标准化 System Prompt（意图名称 + 描述）新节点设置TopK++,id+name,父节点设置
+        String nodesScoreJSON = "{\"nodeScoreList\":[{\"intentNodeName\":,\"score\":}]}";
+        // 2. 构建标准化 System Prompt（意图名称 + 描述）
         StringBuilder systemPrompt = new StringBuilder();
-        //TODO加入上下文
-        systemPrompt.append("你是意图识别助手，请根据用户问题和上下文，从下面的意图列表中匹配最匹配的三个\n");
-        systemPrompt.append("将用户意图,严格按照提供的JSON格式返回,要求:");
-        systemPrompt.append("subIntent中,name设置为用户问题的意图(中文),id为匹配的意图nodeId+'-'+name(英文),parent_name设置为最匹配的意图name,topK++,其他设置为空,JSON格式:");
-        systemPrompt.append(converterFormat);
+        //加入上下文
+        systemPrompt.append("你是意图识别助手，请根据用户问题和上下文，从下面的意图列表中匹配最匹配的三个意图,并进行置信度打分\n");
+        systemPrompt.append("如果匹配的意图节点score<0.3,不返回意图节点,识别用户意图,根据JSON构建并返回,\n");
+        systemPrompt.append("上下文:\n");
+        systemPrompt.append(context);
+        systemPrompt.append("严格按照提供的JSON格式返回,每条都要有intentNodeName和score,score 必须是 0~1 的小数\n" +
+                "按降序排列,JSON格式:");
+        systemPrompt.append(nodesScoreJSON);
         systemPrompt.append("意图列表：\n");
-        for (IntentNode node : leafNodes) {
-            systemPrompt.append("- nodeId：").append(node.getNodeId()).append("- name：").append(node.getName());
+        for (IntentNode node : leafNodesBySql) {
+            systemPrompt.append("- IntentName:").append(node.getName());
         }
         // 2. 正确调用AI：系统提示词 + 用户问题
-        String promptTemplate = """
-                %s
-                用户问题：<<%s>>
-                """;
-        // 最终 Prompt
-        String fullPrompt = String.format(promptTemplate, systemPrompt, query);
-        //得到结果
-        String intentResult = chatModel.call(fullPrompt);
+        String fullPrompt = "用户问题：<<%s>>".formatted(query);
+        //得到结果(分数加意图节点名)
+        Prompt prompt = new Prompt(
+                new SystemMessage(String.valueOf(systemPrompt)),
+                new UserMessage(fullPrompt)
+                );
+        String intentResult = chatModel.call(prompt).getResult().getOutput().getText();
+        log.info(intentResult);
+        //转换对象
+        NodesScore nodeScoreLLM = JSON.parseObject(intentResult, NodesScore.class);
+        //构建结果
+        log.info(String.valueOf(nodeScoreLLM));
         SubQuestionIntent intentNodes = new SubQuestionIntent();
-        try {
-            //转换为节点对象
-            intentNodes = objectMapper.readValue(intentResult, SubQuestionIntent.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("结果转换失败", e);
+        intentNodes.setNodeScore(nodeScoreLLM);
+        intentNodes.setSubIntent(new ArrayList<>());
+        for (NodeScore nodeScore : nodeScoreLLM.getNodeScoreList()) {
+            String intentNodeJSON =
+                    stringRedisTemplate.opsForValue().get(INTENT_NODE_NAME + nodeScore.getIntentNodeName());
+            IntentNode intentNode =
+                    com.alibaba.fastjson2.JSON.parseObject(intentNodeJSON, IntentNode.class);
+            //添加
+            intentNodes.getSubIntent().add(intentNode);
+            //TODO添加到节点
+            //cacheNodesToRedis(intentNode);
         }
-        //将树保存再redis(如果开启)
-        for (IntentNode token : intentNodes.getSubIntent()) {
-            cacheNodesToRedis(token);
-        }
+        log.info(String.valueOf(intentNodes));
         //返回对应树
         return intentNodes;
-    }
-
-    /**
-     * 降级策略：使用 jieba 分词结果作为意图标识的简单回退实现。
-     *
-     * @param tokenizes 分词结果
-     * @return IntentNode 列表（以分词作为 nodeId）
-     */
-    private static List<IntentNode> degradeJieba(List<String> tokenizes) {
-        List<IntentNode> degradeIntent = new ArrayList<>();
-        for (String tokenize : tokenizes) {
-            IntentNode degrade = new IntentNode();
-            degrade.setNodeId(tokenize);
-            degradeIntent.add(degrade);
-        }
-        return degradeIntent;
     }
 
     /**
@@ -201,23 +230,39 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
      * @param tokenizes 分词结果
      * @return 匹配到的 IntentNode 列表
      */
-    private List<IntentNode> matchIntentFromSql(List<String> tokenizes) {
+    private SubQuestionIntent matchIntentFromSql(List<String> tokenizes) {
+        List<NodeScore> list = new ArrayList<>();
         List<IntentNode> matches = new ArrayList<>();
         for (String tokenize : tokenizes) {
             IntentNode getLeafNodes = intentNodeMapper.selectById(tokenize);
-            if(getLeafNodes!=null) matches.add(getLeafNodes);
+            if (getLeafNodes != null) {
+                matches.add(getLeafNodes);
+                list.add(NodeScore.builder().intentNodeName(tokenize).score(0.95).build());
+            }
         }
-        return matches;
+        return matches.isEmpty() && list.isEmpty() ? null
+                : SubQuestionIntent.builder().subIntent(matches).nodeScore(NodesScore.builder()
+                .nodeScoreList(list).build()).build();
     }
 
     /**
-     * 将意图节点缓存到 Redis（Hash 结构），便于快速匹配。
+     * 将意图节点缓存到 Redis，便于快速匹配。
+     * TODO修改
      *
      * @param token 要缓存的意图节点
      */
     private void cacheNodesToRedis(IntentNode token) {
+        if (token == null || StrUtil.isBlank(token.getNodeId())) {
+            return;
+        }
         try {
-            stringRedisTemplate.opsForHash().put(INTENT_NODE_HASH, token.getName(), token.getNodeId());
+            // 1) 节点完整 JSON
+            String json = com.alibaba.fastjson2.JSON.toJSONString(token);
+            stringRedisTemplate.opsForValue().set(INTENT_NODE_NAME + token.getName(), json);
+            // 2) 父子关系
+            if (StrUtil.isNotBlank(token.getParentName())) {
+                stringRedisTemplate.opsForSet().add(INTENT_NODE_CHILDREN_PREFIX + token.getParentName(), token.getName());
+            }
         } catch (Exception e) {
             log.warn("缓存意图节点到 redis 失败", e);
         }
@@ -229,20 +274,31 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
      * @param tokenizes 分词结果
      * @return 匹配到的 IntentNode 列表
      */
-    private List<IntentNode> matchIntentFromRedis(List<String> tokenizes) {
-        List<IntentNode> matches = new ArrayList<>();
+    private SubQuestionIntent matchIntentFromRedis(List<String> tokenizes) {
         //redis用hash存,hashkey为名字,value为id
         //id使用如 "group-hr"、"group-hr-leave-annual"格式可以直接返回树
+        List<IntentNode> matches = new ArrayList<>();
+        List<NodeScore> list = new ArrayList<>();
         for (String tokenize : tokenizes) {
-            Object nodeObj = stringRedisTemplate.opsForHash()
-                    .get(INTENT_NODE_HASH, tokenize);
-            if (nodeObj == null) continue;
-            String node = nodeObj.toString();
-            IntentNode intentNode = new IntentNode();
-            intentNode.setNodeId(node);
-            matches.add(intentNode);
+            if (StrUtil.isBlank(tokenize)) {
+                continue;
+            }
+            // 1) 先按 name -> nodeId 查
+            // 安全获取 Redis 中的意图ID
+            String nodeName = stringRedisTemplate.opsForValue().get(INTENT_NODE_NAME + tokenize);
+            if (StrUtil.isBlank(nodeName)) {
+                continue;
+            }
+            IntentNode node =
+                    com.alibaba.fastjson2.JSON.parseObject(nodeName, IntentNode.class);
+            if (node != null) {
+                matches.add(node);
+                list.add(NodeScore.builder().intentNodeName(tokenize).score(0.95).build());
+            }
         }
-        return matches;
+        return matches.isEmpty() && list.isEmpty() ? null
+                : SubQuestionIntent.builder().subIntent(matches).nodeScore(NodesScore.builder()
+                .nodeScoreList(list).build()).build();
     }
 
     /**
@@ -254,7 +310,6 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
     private List<String> tokenizeWithJieba(String text) {
         if (text == null || text.isBlank()) return List.of();
         List<String> raw = JIEBA.sentenceProcess(text);
-        System.out.println(raw);
         return raw.stream()
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())

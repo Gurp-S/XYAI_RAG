@@ -1,5 +1,5 @@
 ﻿<template>
-  <div id="login-overlay" v-if="ui.showLogin" @click.self="ui.closeLogin()">
+  <div id="login-overlay" :class="{ 'permanent': !ui.currentUser, 'active': ui.showLogin }" @click.self="ui.currentUser && ui.closeLogin()">
     <div class="login-container">
         <div class="login-logo">XY</div>
         <div class="login-title">欢迎使用 XY-AI 智能体平台</div>
@@ -7,12 +7,12 @@
 
         <div class="login-field">
             <label for="username">用户名</label>
-            <input type="text" id="username" class="login-input" placeholder="输入你的用户名" v-model="username">
+            <input type="text" id="username" class="login-input" placeholder="输入你的用户名" v-model="username" autocomplete="username">
         </div>
 
         <div class="login-field">
             <label for="password">密码</label>
-            <input type="password" id="password" class="login-input" placeholder="输入你的密码" v-model="password" @keyup.enter="submit">
+            <input type="password" id="password" class="login-input" placeholder="输入你的密码" v-model="password" @keyup.enter="submit" autocomplete="current-password">
         </div>
 
         <button class="btn-ghost login-btn" id="loginButton" @click="submit" :disabled="loading">

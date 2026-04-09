@@ -1,5 +1,8 @@
 package com.XYai.myai.RAG.rewrite;
 
+import com.XYai.myai.RAG.Memory.POJO.LoadSession;
+import com.XYai.myai.RAG.rewrite.POJO.RewriteResult;
+import com.XYai.myai.RAG.rewrite.POJO.RewriterProperties;
 import jakarta.annotation.Resource;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,14 +29,14 @@ public class QueryRewriter{
      * @param userQuestion 原始查询
      * @return 重写后的查询
      */
-    public RewriteResult rewrite(String userQuestion){
+    public RewriteResult rewrite(String userQuestion, LoadSession load){
         //TODO如果不是问题会导致ai忽略系统提示词
         // 步骤1：检查是否启用了 LLM 重写
         RewriteResult userMessage = RewriteResult.builder().rewrittenQuery(userQuestion).build();
         if(!rewriterProperties.getRewriterEnabled())return userMessage;
         // 如果没启用，就用简单的规则处理
         // 步骤2：使用 LLM 进行智能重写
-        return queryReweiterService.callLLMRewriteAndSplit(userMessage);
+        return queryReweiterService.callLLMRewriteAndSplit(userMessage,load);
     }
 
 

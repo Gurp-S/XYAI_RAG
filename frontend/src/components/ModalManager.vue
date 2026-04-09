@@ -17,6 +17,18 @@
                 </button>
             </div>
             <div class="modal-body">
+                <div style="margin-bottom: 1rem; display: flex; gap: 10px;">
+                    <div style="flex: 1;">
+                        <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px;">集合名称 (Collection)</label>
+                        <input type="text" v-model="collectionName" placeholder="例如: enterprise_docs" 
+                               style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: white; outline: none; border-color: #6366f1;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px;">知识库 ID (可选)</label>
+                        <input type="text" v-model="kbId" placeholder="例如: kb_001" 
+                               style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: white; outline: none;">
+                    </div>
+                </div>
                 <div class="upload-zone" id="uploadZone" @dragover.prevent @drop.prevent="handleFileDrop">
                     <input type="file" class="file-input" id="fileInput" accept=".pdf,.doc,.docx,.txt" multiple @change="handleFileSelect" title="" />
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
@@ -138,6 +150,8 @@ const isUploading = ref(false)
 const uploadProgress = ref(0)
 const uploadStatusText = ref('')
 const uploadFileName = ref('')
+const collectionName = ref('default_collection')
+const kbId = ref('')
 
 function handleFileSelect(e) {
     const files = e.target.files
@@ -151,6 +165,11 @@ function handleFileDrop(e) {
 }
 
 function startUpload(files, inputTarget = null) {
+    if (!collectionName.value.trim()) {
+        alert('请输入集合名称后再上传')
+        return
+    }
+
     isUploading.value = true
     uploadProgress.value = 0
     uploadStatusText.value = '正在上传并进行向量化切片...'
@@ -163,11 +182,17 @@ function startUpload(files, inputTarget = null) {
     }
     uploadFileName.value = names
 
-    // Using "file" field name and "multiple" as requested by backend (@RequestParam("file") List<MultipartFile> files)
     const formData = new FormData()
+    // Align with Backend: @RequestParam("file") List<MultipartFile> files
     fileArray.forEach(file => {
         formData.append('file', file)
     })
+    // Align with Backend: @RequestParam("collectionName") String collectionName
+    formData.append('collectionName', collectionName.value)
+    // Align with Backend: @RequestParam(value = "kbId", required = false) String kbId
+    if (kbId.value) {
+        formData.append('kbId', kbId.value)
+    }
 
     const xhr = new XMLHttpRequest()
     // Backend API mapping: @RequestMapping("/upload") + @PostMapping("up")

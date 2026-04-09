@@ -1,14 +1,17 @@
 package com.XYai.myai.Service;
 
-import com.XYai.myai.RAG.Memory.ChatConversation;
-import com.XYai.myai.RAG.Memory.ChatSessionRecord;
+import com.XYai.myai.RAG.Memory.POJO.ChatConversation;
+import com.XYai.myai.RAG.Memory.POJO.ChatSessionRecord;
 import com.XYai.myai.Config.Result;
+import com.XYai.myai.User.User;
 
+import java.util.List;
+
+/**
+ * 用户相关服务接口，包含登录、登出、会话历史查询等功能。
+ */
 public interface UserService {
 
-    /**
-     * 用户相关服务接口，包含登录、登出、会话历史查询等功能。
-     */
 
     /**
      * 用户登出处理。
@@ -33,7 +36,7 @@ public interface UserService {
      * @param userId 用户 ID
      * @return 包含 ChatSessionRecord 的列表
      */
-    Result<java.util.List<ChatSessionRecord>> history(Long userId);
+    Result<List<ChatSessionRecord>> history(Long userId);
 
     /**
      * 查询指定会话的消息内容（分页/游标方式）。
@@ -42,6 +45,8 @@ public interface UserService {
      * @param cursor 查询游标（时间点），用于分页
      * @return 会话内消息列表
      */
-    Result<java.util.List<ChatConversation>> conversationHistory(String conversationId, java.time.LocalDateTime cursor);
+    Result<List<ChatConversation>> conversationHistory(String conversationId, java.time.LocalDateTime cursor);
 
+
+    Result<String> register(User user,String Verification);
 }

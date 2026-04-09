@@ -19,22 +19,48 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue', 'send'])
 const textareaRef = ref(null)
 
+// 深度重置高度逻辑
+function adjustHeight() {
+  const el = textareaRef.value
+  if (!el) return
+  
+  el.style.height = 'auto'
+  if (el.value) {
+    // 限制最高高度防止遮挡聊天区域
+    const maxHeight = 200
+    const targetHeight = Math.min(el.scrollHeight, maxHeight)
+    el.style.height = targetHeight + 'px'
+    el.style.overflowY = el.scrollHeight > maxHeight ? 'auto' : 'hidden'
+  } else {
+    el.style.overflowY = 'hidden'
+  }
+}
+
+// 监听外部对 modelValue 的清空（例如发送后清空）
+watch(() => props.modelValue, (newVal) => {
+  if (newVal === '') {
+    nextTick(() => {
+      adjustHeight()
+    })
+  }
+})
+
 function onInput(e) {
   emit('update:modelValue', e.target.value)
-  e.target.style.height = 'auto'
-  e.target.style.height = (e.target.scrollHeight) + 'px'
-  if (e.target.value === '') e.target.style.height = 'auto'
+  adjustHeight()
 }
 
 function handleEnter(e) {
   if (!e.shiftKey) {
     emit('send')
+    // 发送后立即手动重置一次，防止由于 nextTick 导致的视觉延迟
+    setTimeout(() => adjustHeight(), 0)
   }
 }
 </script>

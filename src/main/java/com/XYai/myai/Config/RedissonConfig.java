@@ -7,6 +7,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Redisson 配置类。
+ * 用于配置 RedissonClient 客户端，以便在 Spring 应用中使用分布式锁等 Redisson 功能。
+ */
 @Configuration
 public class RedissonConfig {
 

@@ -3,6 +3,8 @@ package com.XYai.myai.RAG.ETLpipeline.Oss;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.model.ObjectMetadata;
 import com.XYai.myai.Config.OssConfig;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,6 +14,10 @@ import java.net.URL;
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * 阿里云对象存储服务实现类。
+ * 提供文件的上传、删除以及访问链接生成等基础功能。
+ */
 @Service
 public class OssService {
 
@@ -66,7 +72,7 @@ public class OssService {
         /**
          * 为私有对象生成带签名的临时访问 URL。
          *
-         * @param key 对象在 OSS 中的 key
+         * @param key           对象在 OSS 中的 key
          * @param expireSeconds 过期时间（秒）
          * @return 带签名的临时访问 URL 字符串，生成失败时返回 null
          */
@@ -82,5 +88,43 @@ public class OssService {
          * @param key 对象的 key
          */
         ossClient.deleteObject(ossConfig.getBucket(), key);
+    }
+
+    /**
+     * Configuration properties for the text splitter.
+     */
+    @Component
+    @ConfigurationProperties(prefix = "splitter")
+    public static class SplitterProperties {
+        /** chunk size in characters (default) */
+        private int chunkSize = 1200;
+        /** overlap in characters */
+        private int overlap = 200;
+        /** when true, for Chinese prefer token-based chunking */
+        private boolean chineseTokenize = true;
+
+        public int getChunkSize() {
+            return chunkSize;
+        }
+
+        public void setChunkSize(int chunkSize) {
+            this.chunkSize = chunkSize;
+        }
+
+        public int getOverlap() {
+            return overlap;
+        }
+
+        public void setOverlap(int overlap) {
+            this.overlap = overlap;
+        }
+
+        public boolean isChineseTokenize() {
+            return chineseTokenize;
+        }
+
+        public void setChineseTokenize(boolean chineseTokenize) {
+            this.chineseTokenize = chineseTokenize;
+        }
     }
 }

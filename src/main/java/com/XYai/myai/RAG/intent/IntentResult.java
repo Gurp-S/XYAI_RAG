@@ -1,8 +1,10 @@
 package com.XYai.myai.RAG.intent;
 
-import com.XYai.myai.RAG.rewrite.RewriteResult;
+import com.XYai.myai.RAG.Memory.POJO.LoadSession;
+import com.XYai.myai.RAG.intent.POJO.IntentProperties;
+import com.XYai.myai.RAG.intent.POJO.SubQuestionIntent;
+import com.XYai.myai.RAG.rewrite.POJO.RewriteResult;
 import jakarta.annotation.Resource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -23,13 +25,14 @@ public class IntentResult{
      * 意图识别入口（Controller 层）：根据重写后的查询调用 IntentRecognitionService 并返回意图列表。
      *
      * @param rewriteResult 重写后的查询对象
+     * @param load
      * @return 识别出的意图列表（可能为空）
      */
-    public List<SubQuestionIntent> recognize(RewriteResult rewriteResult){
-        if(intentProperties.getIntentEnabled()) {
-            List.of();
+    public List<SubQuestionIntent> recognize(RewriteResult rewriteResult, LoadSession load){
+        if(!intentProperties.getIntentEnabled()) {
+            return List.of();
         }
-        return intentRecognitionService.recognize(rewriteResult);
+        return intentRecognitionService.recognize(rewriteResult,load);
 
     }
 }

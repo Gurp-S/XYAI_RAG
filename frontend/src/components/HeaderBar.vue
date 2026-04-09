@@ -35,7 +35,7 @@
                 <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
             </svg>
         </button>
-        <button id="newConversation" class="btn-ghost" type="button" title="开启新会话">
+        <button id="newConversation" class="btn-ghost" type="button" title="开启新会话" @click="handleNewChat">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -49,10 +49,19 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useUiStore } from '../store/index'
 
 const store = useUiStore()
+const router = useRouter()
 const isDark = ref(document.body.classList.contains('dark'))
+
+function handleNewChat() {
+    console.log('--- [DEBUG] HeaderBar: handleNewChat clicked');
+    store.fetchHistory(true);
+    store.newConversation();
+    router.push('/');
+}
 
 function toggleThemeLocally() {
     const willBeDark = !document.body.classList.contains('dark')

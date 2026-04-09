@@ -19,4 +19,7 @@ spring:
       host: localhost
       port: 6379
       database: 0
+  ai:
+    openai:
+      api-key: sk-37744335322d444d90d4111bd932837c
 

@@ -15,6 +15,11 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
+/**
+ * RAG 全链路追踪切面类。
+ * 负责拦截由 {@link RagTraceRoot} 和 {@link RagTraceNode} 标记的方法，
+ * 在方法执行前后维护链路上下文并记录执行轨迹和耗时情况。
+ */
 @Slf4j
 @Aspect
 @Component
