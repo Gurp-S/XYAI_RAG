@@ -149,7 +149,7 @@ public class IntentDirectedSearchChannel implements SearchChannel {
             }
             return chunks;
         } catch (Exception e) {
-            log.warn("Milvus collection '{}' 搜索失败, skip: {}", collectionName, e.getMessage());
+            log.warn("Milvus collection '{}' 匹配失败, skip: {}", collectionName, e.getMessage());
             return List.of();
         }
     }

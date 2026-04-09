@@ -1,11 +1,15 @@
 package com.XYai.myai.RAG.Milvus;
 
 import io.milvus.client.MilvusServiceClient;
+import io.milvus.exception.ParamException;
 import io.milvus.grpc.ShowCollectionsResponse;
 import io.milvus.param.R;
 import io.milvus.param.collection.HasCollectionParam;
 import io.milvus.param.collection.ShowCollectionsParam;
+import io.milvus.param.dml.QueryParam;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -13,7 +17,9 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -25,6 +31,9 @@ import java.util.concurrent.locks.ReentrantLock;
 public class MilvusService {
 
     private final MilvusServiceClient milvusClient;
+
+    @Resource
+    private MilvusCollectionService milvusCollectionService;
 
     @Autowired
     public MilvusService(MilvusServiceClient milvusClient) {
@@ -103,5 +112,26 @@ public class MilvusService {
         } catch (Exception e) {
             throw new IllegalStateException("Milvus collection 存在性检查失败: " + resolved, e);
         }
+    }
+
+    /**
+     * 获取集合metadata
+     * @param collectionName 集合名
+     * @return metadata
+     */
+    public Map<String,Object> getCollectionNameMetadata(String collectionName) {
+        Map<String,Object> metadata = new HashMap<>();
+        if (collectionName == null) { return null;}
+        try {
+            QueryParam queryParam = QueryParam.newBuilder()
+                    .withCollectionName(collectionName)
+                    .withExpr("") // 为空字符串表示查询所有数据
+                    .withOutFields(List.of("metadata")) // 明确要求返回 metadata 字段
+                    .withLimit(1L) // 只取第一条记录以提取元数据
+                    .build();
+        } catch (ParamException e) {
+            throw new RuntimeException(e);
+        }
+        return metadata;
     }
 }

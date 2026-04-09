@@ -189,7 +189,7 @@ public class VectorGlobalSearchChannel implements SearchChannel {
 
         } catch (Exception e) {
             // 异常安全：单个集合查询失败不影响全局，只打印日志并跳过
-            log.error("Error querying Milvus collection '{}': {}", collectionName, e.getMessage(), e);
+            log.error("匹配失败 Milvus 集合 '{}': {}", collectionName, e.getMessage(), e);
             return List.of();
         }
     }
