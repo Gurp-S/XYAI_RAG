@@ -9,6 +9,12 @@
     </div>
     <div class="menu">
         <div class="history-label">功能菜单</div>
+        <div class="menu-item" id="navChat" title="聊天会话" @click="store.setView('chat')" :class="{ active: store.currentView === 'chat' }">
+            <svg viewBox="0 0 24 24">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>聊天会话</span>
+        </div>
         <div class="menu-item" id="navUpload" title="上传知识库" @click="store.openModal('upload')">
             <svg viewBox="0 0 24 24">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -17,7 +23,7 @@
             </svg>
             <span>上传知识库</span>
         </div>
-        <div class="menu-item" id="navDB" title="向量数据库" @click="store.openModal('db')">
+        <div class="menu-item" id="navDB" title="向量数据库" @click="store.setView('db')" :class="{ active: store.currentView === 'db' }">
             <svg viewBox="0 0 24 24">
                 <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
                 <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>

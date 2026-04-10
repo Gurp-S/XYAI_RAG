@@ -7,6 +7,7 @@ export const useUiStore = defineStore("ui", {
     highPerf: false,
     isSidebarCollapsed: false,
     activeModal: null,
+    currentView: "chat", // 'chat' or 'db'
     chatHistory: JSON.parse(localStorage.getItem("chatHistory")) || [],
     loadingHistory: false,
     activeConversationId: crypto.randomUUID(),
@@ -182,7 +183,14 @@ export const useUiStore = defineStore("ui", {
       this.isSidebarCollapsed = !this.isSidebarCollapsed;
     },
     openModal(modalName) {
+      if (modalName === "db") {
+        this.currentView = "db";
+        return;
+      }
       this.activeModal = modalName;
+    },
+    setView(view) {
+      this.currentView = view;
     },
     closeModal() {
       this.activeModal = null;

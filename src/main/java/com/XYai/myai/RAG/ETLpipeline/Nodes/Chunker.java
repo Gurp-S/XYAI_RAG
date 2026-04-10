@@ -70,7 +70,9 @@ public class Chunker implements Ingestion {
 
         // 5. 将分块结果存入上下文，供后续节点使用
         context.setChunks(chunks);
-        return NodeResult.ok("分块数量=" + chunks.size());
+        int sizeOfChunks = chunks.size();
+        context.getDocument().getMetadata().put(IngestionContext.META_CHUNK_SIZE, sizeOfChunks);
+        return NodeResult.ok("分块数量=" + sizeOfChunks);
     }
 
     /** 使用阿里云 SentenceSplitter 分块 */

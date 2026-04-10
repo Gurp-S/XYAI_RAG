@@ -1,25 +1,23 @@
 package com.XYai.myai.RAG.Milvus;
 
 import io.milvus.client.MilvusServiceClient;
-import io.milvus.exception.ParamException;
+import io.milvus.grpc.QueryResults;
 import io.milvus.grpc.ShowCollectionsResponse;
 import io.milvus.param.R;
 import io.milvus.param.collection.HasCollectionParam;
 import io.milvus.param.collection.ShowCollectionsParam;
 import io.milvus.param.dml.QueryParam;
+import io.milvus.response.QueryResultsWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.milvus.MilvusVectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -30,26 +28,23 @@ import java.util.concurrent.locks.ReentrantLock;
 @Service
 public class MilvusService {
 
-    private final MilvusServiceClient milvusClient;
-
     @Resource
-    private MilvusCollectionService milvusCollectionService;
+    private final MilvusServiceClient milvusClient;
+    private final ReentrantLock refreshLock = new ReentrantLock();
+    // 缓存 TTL，单位毫秒。可按需调整（例如 5 秒或 10 秒）
+    private final long ttlMillis = Duration.ofSeconds(10).toMillis();
+    @Resource
+    private MilvusVectorStore milvusVectorStore;
+    @Value("${spring.ai.vectorstore.milvus.databaseName:default}")
+    private String databaseName;
+    // 缓存相关
+    private volatile List<String> cachedCollectionNames = Collections.emptyList();
+    private volatile Instant lastRefresh = Instant.EPOCH;
 
     @Autowired
     public MilvusService(MilvusServiceClient milvusClient) {
         this.milvusClient = milvusClient;
     }
-
-    @Value("${spring.ai.vectorstore.milvus.databaseName:default}")
-    private String databaseName;
-
-    // 缓存相关
-    private volatile List<String> cachedCollectionNames = Collections.emptyList();
-    private volatile Instant lastRefresh = Instant.EPOCH;
-    private final ReentrantLock refreshLock = new ReentrantLock();
-
-    // 缓存 TTL，单位毫秒。可按需调整（例如 5 秒或 10 秒）
-    private final long ttlMillis = Duration.ofSeconds(10).toMillis();
 
     /**
      * 获取 Milvus 中所有 Collection 的名称（带本地缓存，过期后会刷新）
@@ -97,6 +92,7 @@ public class MilvusService {
 
     /**
      * 判断指定集合是否存在
+     *
      * @param collectionName 集合名称
      * @return true 存在 / false 不存在
      */
@@ -115,23 +111,65 @@ public class MilvusService {
     }
 
     /**
-     * 获取集合metadata
+     * 获取集合内的数据（模拟查看 metadata）
+     *
      * @param collectionName 集合名
-     * @return metadata
+     * @return 每一行记录的 Map 列表
      */
-    public Map<String,Object> getCollectionNameMetadata(String collectionName) {
-        Map<String,Object> metadata = new HashMap<>();
-        if (collectionName == null) { return null;}
-        try {
-            QueryParam queryParam = QueryParam.newBuilder()
-                    .withCollectionName(collectionName)
-                    .withExpr("") // 为空字符串表示查询所有数据
-                    .withOutFields(List.of("metadata")) // 明确要求返回 metadata 字段
-                    .withLimit(1L) // 只取第一条记录以提取元数据
-                    .build();
-        } catch (ParamException e) {
-            throw new RuntimeException(e);
+    public List<Map<String, Object>> getCollectionNameMetadata(String collectionName) {
+        if (collectionName == null || collectionName.trim().isEmpty()) {
+            return Collections.emptyList();
         }
-        return metadata;
+
+        try {
+            // 1. 构建查询参数
+            QueryParam queryParam = QueryParam.newBuilder()
+                    .withDatabaseName(databaseName)
+                    .withCollectionName(collectionName)
+                    // 修复点 1: 如果要查询全部，expr 设为 "id != -1" (假设主键是 id)
+                    // 或者在 expr 为空时一定要加 limit
+                    .withExpr("")
+                    .withLimit(100L) // 必须加上 limit，否则空 expr 会报错
+                    .withOutFields(Collections.singletonList("metadata")) // 返回所有字段
+                    .build();
+
+            // 2. 执行查询并检查响应状态
+            R<QueryResults> response = milvusClient.query(queryParam);
+            log.info(String.valueOf(response.getData()));
+            // 修复点 2: 严格检查响应状态，防止 NullPointerException
+            if (response.getStatus() != R.Status.Success.getCode()) {
+                log.error("查询 Milvus 失败: {}", response.getMessage());
+                return Collections.emptyList();
+            }
+
+            if (response.getData() == null) {
+                return Collections.emptyList();
+            }
+
+            // 3. 解析结果
+            QueryResultsWrapper wrapper = new QueryResultsWrapper(response.getData());
+            List<QueryResultsWrapper.RowRecord> rowRecords = wrapper.getRowRecords();
+
+            List<Map<String, Object>> list = new ArrayList<>();
+            for (QueryResultsWrapper.RowRecord rowRecord : rowRecords) {
+                //取消googleJSON
+                Map<String, Object> original = rowRecord.getFieldValues();
+                Map<String, Object> cleanMap = new HashMap<>();
+                original.forEach((key, value) -> {
+                    if(value!=null&&value.getClass().getName().contains("google.gson")){
+                        cleanMap.put(key,value.toString());
+                    }else{
+                        cleanMap.put(key,value);
+                    }
+                });
+                list.add(cleanMap);
+            }
+            return list;
+
+        } catch (Exception e) {
+            log.error("获取集合 {} 数据异常: ", collectionName, e);
+            return Collections.emptyList();
+        }
     }
+
 }

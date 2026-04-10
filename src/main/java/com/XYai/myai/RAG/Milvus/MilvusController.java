@@ -2,12 +2,15 @@ package com.XYai.myai.RAG.Milvus;
 
 import com.XYai.myai.Config.Result;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/milvus")
 public class MilvusController {
@@ -27,8 +30,9 @@ public class MilvusController {
     }
 
     @GetMapping("/metadata")
-    public Result<List<String>> getCollectionsMetadata(String collectionName) {
-        milvusService.getCollectionNameMetadata(collectionName);
-        return Result.success();
+    public Result<List<Map<String,Object>>> getCollectionsMetadata(String collectionName) {
+        List<Map<String, Object>> collectionNameMetadata = milvusService.getCollectionNameMetadata(collectionName);
+        log.info(collectionNameMetadata.toString());
+        return Result.success(collectionNameMetadata);
     }
 }

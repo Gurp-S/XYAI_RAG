@@ -77,59 +77,9 @@
                 </button>
             </div>
             <div class="modal-body" style="padding: 0;">
-                <div class="db-table-wrapper" style="margin: 1.5rem; border: none;">
-                    <table class="db-table">
-                        <thead>
-                            <tr>
-                                <th>文档名称</th>
-                                <th>切片数量 (Chunks)</th>
-                                <th>入库时间</th>
-                                <th>状态</th>
-                            </tr>
-                        </thead>
-                        <tbody id="dbTableBody">
-                            <tr>
-                                <td>
-                                    <span class="doc-icon">
-                                        <svg viewBox="0 0 24 24" fill="currentColor">
-                                            <path
-                                                d="M12 0L3 7v10l9 7 9-7V7l-9-7zm0 2.4l7 5.4-7 5.4-7-5.4 7-5.4zm0 21l-7.5-5.8v-7.2l7.5 5.8 7.5-5.8v7.2L12 23.4z" />
-                                        </svg>
-                                        2026年企业战略规划.pdf
-                                    </span>
-                                </td>
-                                <td>342</td>
-                                <td>2026-03-25 14:30</td>
-                                <td><span class="badge badge-success"> 已就绪</span></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span class="doc-icon">
-                                        <svg viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" />
-                                        </svg>
-                                        员工报销管理制度.docx
-                                    </span>
-                                </td>
-                                <td>89</td>
-                                <td>2026-03-24 09:15</td>
-                                <td><span class="badge badge-success"> 已就绪</span></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span class="doc-icon">
-                                        <svg viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" />
-                                        </svg>
-                                        Q1财务报表总结.txt
-                                    </span>
-                                </td>
-                                <td>45</td>
-                                <td>2026-03-26 10:00</td>
-                                <td><span class="badge badge-process"> 向量化中</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <!-- 静态内容，仅用于预览或管理，不再直接承载 DB 核心逻辑 -->
+                <div style="padding: 40px; text-align: center; color: #94a3b8;">
+                    已跳转至数据库管理主界面
                 </div>
             </div>
         </div>
@@ -142,6 +92,7 @@
 <script setup>
 import { ref } from 'vue'
 import Login from './Login.vue'
+import MilvusManager from './MilvusManager.vue'
 import { useUiStore } from '../store/index'
 
 const ui = useUiStore()

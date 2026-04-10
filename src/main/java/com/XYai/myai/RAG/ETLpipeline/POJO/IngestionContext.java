@@ -25,10 +25,13 @@ public class IngestionContext implements Serializable {
                     sourceType
                     rawBytes
                     mimeType
+                    enhancedText
                     kbId
                     collectionName
                     fileName
                     fileSize
+                    fileContentType
+                    chunkSize
         */
     public static final String META_SOURCE_URI = "sourceUri";
     public static final String META_SOURCE_TYPE = "sourceType";
@@ -40,6 +43,7 @@ public class IngestionContext implements Serializable {
     public static final String META_FILE_NAME = "fileName";
     public static final String META_FILE_SIZE = "fileSize";
     public static final String META_FILE_CONTENT_TYPE = "fileContentType";
+    public static final String META_CHUNK_SIZE = "chunkSize";
 
     // 主文档：文本在 text，其他信息在 metadata
     @Builder.Default

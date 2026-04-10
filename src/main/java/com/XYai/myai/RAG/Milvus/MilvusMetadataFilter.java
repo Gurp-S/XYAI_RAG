@@ -1,6 +1,7 @@
 package com.XYai.myai.RAG.Milvus;
 
 import org.springframework.ai.document.Document;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,19 +9,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@Component
 public final class MilvusMetadataFilter {
 
     private static final int MAX_STRING_LENGTH = 2000;
 
     private static final Set<String> ALLOWED_METADATA_KEYS = Set.of(
             "chunkId",
-            "source",
             "fileName",
-            "title",
-            "page",
-            "section",
             "score",
-            "collectionName"
+            "collectionName",
+            "fileSize",
+            "chunkSize"
     );
 
     /**

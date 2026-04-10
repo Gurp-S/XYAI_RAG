@@ -5,6 +5,7 @@ import com.XYai.myai.RAG.ETLpipeline.POJO.NodeConfig;
 import com.XYai.myai.RAG.ETLpipeline.POJO.NodeResult;
 import com.XYai.myai.RAG.ETLpipeline.POJO.UploadProperties;
 import com.XYai.myai.RAG.Milvus.MilvusCollectionService;
+import com.XYai.myai.RAG.Milvus.MilvusMetadataFilter;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.milvus.client.MilvusServiceClient;
 import io.milvus.param.IndexType;
@@ -49,6 +50,12 @@ public class Indexer implements Ingestion {
      */
     @Resource
     private MilvusServiceClient milvusClient;
+
+    /**
+     * 过滤数据
+     */
+    @Resource
+    private MilvusMetadataFilter milvusMetadataFilter;
 
     /**
      * 默认集合名（配置未指定时使用）
@@ -119,11 +126,14 @@ public class Indexer implements Ingestion {
             // 确保集合存在并准备好可写入
             milvusCollectionService.ensureReadyForWrite(collectionName);
 
+            //过滤metadata数据
+            List<Document> filterChunks = milvusMetadataFilter.filter(chunks);
+
             // 为向量字段创建索引（不存在才创建）
             ensureEmbeddingIndex(collectionName);
 
             // 执行向量库批量写入
-            milvusCollectionService.add(collectionName, chunks);
+            milvusCollectionService.add(collectionName, filterChunks);
 
             // 强制刷盘，确保数据立即落盘
             milvusCollectionService.flush(collectionName);
