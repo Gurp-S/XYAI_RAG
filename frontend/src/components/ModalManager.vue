@@ -19,14 +19,9 @@
             <div class="modal-body">
                 <div style="margin-bottom: 1rem; display: flex; gap: 10px;">
                     <div style="flex: 1;">
-                        <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px;">集合名称 (Collection)</label>
-                        <input type="text" v-model="collectionName" placeholder="例如: enterprise_docs" 
-                               style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: white; outline: none; border-color: #6366f1;">
-                    </div>
-                    <div style="flex: 1;">
-                        <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px;">知识库 ID (可选)</label>
+                        <label style="display: block; font-size: 13px; color: #94a3b8; margin-bottom: 8px;">知识库 ID (可选，建议留空由系统自动生成)</label>
                         <input type="text" v-model="kbId" placeholder="例如: kb_001" 
-                               style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: white; outline: none;">
+                               style="width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: white; outline: none; transition: border-color 0.2s;">
                     </div>
                 </div>
                 <div class="upload-zone" id="uploadZone" @dragover.prevent @drop.prevent="handleFileDrop">
@@ -40,20 +35,20 @@
                     <span>支持 PDF, DOCX, TXT 格式，单文件最大 50MB</span>
                 </div>
 
-                <div class="upload-progress-container" id="uploadProgressContainer" v-show="isUploading">
+                <div class="upload-progress-container" id="uploadProgressContainer" v-show="ui.isUploading">
                     <div class="upload-doc-info">
                         <span id="uploadFileName">{{ uploadFileName }}</span>
-                        <span id="uploadPercent">{{ uploadProgress }}%</span>
+                        <!-- 隐藏不必要的百分号进度数字 -->
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill" id="uploadProgressBar" :style="{ width: uploadProgress + '%' }"></div>
+                        <div class="progress-fill" id="uploadProgressBar" :style="{ width: ui.uploadProgress + '%' }"></div>
                     </div>
                     <div class="upload-status" id="uploadStatusText">
-                        <svg v-if="uploadProgress < 100" class="spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        <svg v-if="ui.uploadProgress < 100" class="spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
                         </svg>
-                        {{ uploadStatusText }}
+                        {{ ui.uploadStatusText }}
                     </div>
                 </div>
             </div>
@@ -90,19 +85,26 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import Login from './Login.vue'
 import MilvusManager from './MilvusManager.vue'
 import { useUiStore } from '../store/index'
 
 const ui = useUiStore()
 
-const isUploading = ref(false)
-const uploadProgress = ref(0)
-const uploadStatusText = ref('')
 const uploadFileName = ref('')
 const collectionName = ref('default_collection')
 const kbId = ref('')
+
+let pollInterval = null
+
+watch(() => ui.activeModal, (val) => {
+    if (val === 'upload' && ui.uploadTargetCollection) {
+        collectionName.value = ui.uploadTargetCollection
+        // Clear it so it doesn't persist forever
+        ui.uploadTargetCollection = null
+    }
+})
 
 function handleFileSelect(e) {
     const files = e.target.files
@@ -115,65 +117,111 @@ function handleFileDrop(e) {
     if (files.length > 0) startUpload(files)
 }
 
+function startPollingTask(fileName) {
+    if (pollInterval) clearInterval(pollInterval)
+    console.log('开始轮询任务:', fileName)
+    pollInterval = setInterval(async () => {
+        try {
+            const res = await fetch(`/upload/Task?fileName=${encodeURIComponent(fileName)}`)
+            
+            const contentType = res.headers.get("content-type")
+            if (!contentType || !contentType.includes("application/json")) {
+                return
+            }
+
+            const data = await res.json()
+            console.log('轮询原始数据:', data)
+            
+            if (data.code === 200 && data.data) {
+                const info = data.data
+                ui.uploadProgress = info.progress || 0
+                
+                const statusStr = (info.status || '').toUpperCase().trim()
+                
+                if (statusStr === 'WAITING') {
+                    ui.uploadStatusText = '任务排队中...'
+                } else if (statusStr.includes('FAILED')) {
+                    ui.uploadStatusText = `解析失败: ${info.status}`
+                    clearInterval(pollInterval)
+                    finishUpload()
+                } else if (statusStr === 'COMPLETED' || info.progress === 100) {
+                    ui.uploadStatusText = '入库完成'
+                    ui.uploadProgress = 100
+                    clearInterval(pollInterval)
+                    finishUpload()
+                } else if (statusStr.includes('PROCESSING:')) {
+                    // 更加鲁棒的字符串截取
+                    const nodeType = statusStr.split(':')[1]?.trim() || ''
+                    const nodeMap = {
+                        'FETCHER': '获取源文件',
+                        'PARSER': '解析文档',
+                        'ENRICHER': '语义增强',
+                        'CHUNKER': '内容分块',
+                        'INDEXER': '向量入库'
+                    }
+                    ui.uploadStatusText = `正在${nodeMap[nodeType] || nodeType}...`
+                } else {
+                    ui.uploadStatusText = info.status
+                }
+            } else if (data.code === 404) {
+                clearInterval(pollInterval)
+                finishUpload()
+            }
+        } catch (err) {
+            console.error('轮询出错', err)
+        }
+    }, 1000)
+}
+
 function startUpload(files, inputTarget = null) {
     if (!collectionName.value.trim()) {
-        alert('请输入集合名称后再上传')
+        alert('没有指定所属集合名称，无法上传。请切换合集后再试。')
         return
     }
 
-    isUploading.value = true
-    uploadProgress.value = 0
-    uploadStatusText.value = '正在上传并进行向量化切片...'
+    ui.isUploading = true
+    ui.uploadProgress = 0
+    ui.uploadStatusText = '正在上传文件...'
     
-    // Convert FileList to Array and get names
     const fileArray = Array.from(files)
+    const firstFileName = fileArray[0].name
     let names = fileArray.map(f => f.name).join(', ')
-    if (names.length > 40) {
-        names = names.substring(0, 40) + '...'
-    }
+    if (names.length > 40) names = names.substring(0, 40) + '...'
     uploadFileName.value = names
 
     const formData = new FormData()
-    // Align with Backend: @RequestParam("file") List<MultipartFile> files
-    fileArray.forEach(file => {
-        formData.append('file', file)
-    })
-    // Align with Backend: @RequestParam("collectionName") String collectionName
+    fileArray.forEach(file => formData.append('file', file))
     formData.append('collectionName', collectionName.value)
-    // Align with Backend: @RequestParam(value = "kbId", required = false) String kbId
-    if (kbId.value) {
-        formData.append('kbId', kbId.value)
-    }
+    if (kbId.value) formData.append('kbId', kbId.value)
 
     const xhr = new XMLHttpRequest()
-    // Backend API mapping: @RequestMapping("/upload") + @PostMapping("up")
     xhr.open('POST', '/upload/up', true)
-
-    // Optional: Add headers like auth token if necessary
-    // xhr.setRequestHeader('Authorization', 'Bearer ' + token)
 
     xhr.upload.onprogress = (e) => {
         if (e.lengthComputable) {
-            uploadProgress.value = Math.round((e.loaded / e.total) * 100)
+            const networkProgress = Math.round((e.loaded / e.total) * 20)
+            if (ui.uploadProgress < 20) ui.uploadProgress = networkProgress
         }
     }
 
     xhr.onload = () => {
         if (xhr.status >= 200 && xhr.status < 300) {
-            try {
-                const res = JSON.parse(xhr.responseText)
-                uploadStatusText.value = res.code === 200 ? ('上传成功！' + (res.msg || '')) : ('完成: ' + (res.msg || 'OK'))
-            } catch (err) {
-                uploadStatusText.value = '上传成功并进入处理队列！'
-            }
+            ui.uploadStatusText = '上传成功，正在送入 ETL 队列解析...'
+            // 强制关闭模态框
+            ui.activeModal = null
+            // 确保同步给 Pinia 的状态是 false，彻底关掉遮罩
+            const overlay = document.getElementById('uploadModalOverlay')
+            if (overlay) overlay.classList.remove('active')
+            
+            startPollingTask(firstFileName)
         } else {
-            uploadStatusText.value = '上传失败，服务器返回异常（' + xhr.status + '）。'
+            ui.uploadStatusText = '上传失败，服务器返回异常（' + xhr.status + '）。'
+            finishUpload(inputTarget)
         }
-        finishUpload(inputTarget)
     }
 
     xhr.onerror = () => {
-        uploadStatusText.value = '网络错误，上传失败。'
+        ui.uploadStatusText = '网络错误，上传失败。'
         finishUpload(inputTarget)
     }
 
@@ -181,10 +229,14 @@ function startUpload(files, inputTarget = null) {
 }
 
 function finishUpload(inputTarget) {
+    if (pollInterval) {
+        clearInterval(pollInterval)
+        pollInterval = null
+    }
     setTimeout(() => {
-        isUploading.value = false
+        ui.isUploading = false
         if (inputTarget) inputTarget.value = ''
-    }, 4500)
+    }, 1500)
 }
 </script>
 

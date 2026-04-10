@@ -15,14 +15,6 @@
             </svg>
             <span>聊天会话</span>
         </div>
-        <div class="menu-item" id="navUpload" title="上传知识库" @click="store.openModal('upload')">
-            <svg viewBox="0 0 24 24">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="17 8 12 3 7 8"></polyline>
-                <line x1="12" y1="3" x2="12" y2="15"></line>
-            </svg>
-            <span>上传知识库</span>
-        </div>
         <div class="menu-item" id="navDB" title="向量数据库" @click="store.setView('db')" :class="{ active: store.currentView === 'db' }">
             <svg viewBox="0 0 24 24">
                 <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>

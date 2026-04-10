@@ -6,7 +6,7 @@
             placeholder="输入你想咨询的问题，或要求查询企业知识库... (按 Enter 发送，Shift+Enter 换行)"
             :value="modelValue" 
             @input="onInput"
-            @keydown.enter.prevent="handleEnter"
+            @keydown.enter="handleEnter"
             ref="textareaRef"
             ></textarea>
         <button id="send" class="btn-send" title="发送消息" @click="$emit('send')">
@@ -58,6 +58,7 @@ function onInput(e) {
 
 function handleEnter(e) {
   if (!e.shiftKey) {
+    e.preventDefault()
     emit('send')
     // 发送后立即手动重置一次，防止由于 nextTick 导致的视觉延迟
     setTimeout(() => adjustHeight(), 0)

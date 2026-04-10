@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 上传文件 摄取上下文工厂
@@ -88,7 +89,9 @@ public class UploadIngestionContextFactory {
         metadata.put(IngestionContext.META_RAW_BYTES, rawBytes);                  // 文件原始字节流
         metadata.put(IngestionContext.META_MIME_TYPE, mimeType);                  // 文件MIME类型
         metadata.put(IngestionContext.META_COLLECTION_NAME, collectionName);      // 向量数据库collectionName
-        metadata.put(IngestionContext.META_KB_ID, kbId);                          // 知识库编号
+        // 示例：确保 kbId 不为 null 才能 put
+        metadata.put("kbId", Objects.requireNonNullElse(kbId, ""));
+        // 知识库编号
         metadata.put(IngestionContext.META_FILE_NAME, fileName == null ? sourceUri : fileName); // 文件名
         metadata.put(IngestionContext.META_FILE_SIZE, fileSize);                   // 文件大小
         metadata.put(IngestionContext.META_FILE_CONTENT_TYPE, mimeType);          // 文件内容类型

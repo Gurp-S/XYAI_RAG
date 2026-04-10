@@ -1,6 +1,8 @@
 package com.XYai.myai.RAG.ETLpipeline;
 
 import com.XYai.myai.Config.Result;
+import com.XYai.myai.RAG.Aop.Annotation.TaskTracker;
+import com.XYai.myai.RAG.Aop.Annotation.TrackETLJob;
 import com.XYai.myai.RAG.ETLpipeline.Oss.OssService;
 import com.XYai.myai.RAG.ETLpipeline.POJO.IngestionContext;
 import com.XYai.myai.RAG.ETLpipeline.POJO.UpLoadAccumulator;
@@ -11,15 +13,13 @@ import com.XYai.myai.RAG.ETLpipeline.POJO.UploadProperties;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 上传控制器：只负责接收文件、构造 ETL 输入、调用 IngestionEngine、汇总结果。
@@ -41,6 +41,9 @@ public class UploadController {
     private UploadIngestionContextFactory uploadIngestionContextFactory;
     @Resource
     private MilvusCollectionService milvusCollectionService;
+    @Resource
+    private TaskTracker taskTracker;
+
 
     /**
      * 接收前端上传的文件列表并处理。
@@ -75,6 +78,26 @@ public class UploadController {
         // 设置并返回成功/失败信息
         return buildUploadResult(files.size(), accumulator);
     }
+
+    /**
+     * 获取实时的ETL执行任务
+     * @return
+     */
+    @GetMapping("/Task")
+    public Result<Map<String, Object>> getJob(String fileName) {
+        if (fileName == null || fileName.isBlank()) {
+            return Result.error(400, "fileName不能为空");
+        }
+        Map<String, Object> taskData = taskTracker.get(fileName);
+        if (taskData == null) {
+            // 返回一个排队中或已处理完的默认状态，或者保持 404
+            log.warn("查询的任务不存在: {}", fileName);
+            return Result.success(Map.of("status", "WAITING", "progress", 0, "msg", "任务排队中或已过期"));
+        }
+        log.info("任务进度查询: {} -> {}", fileName, taskData);
+        return Result.success(taskData);
+    }
+
 
     /**
      * 外部来源入口：URL / 本地文件路径。

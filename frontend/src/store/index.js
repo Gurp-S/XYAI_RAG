@@ -7,6 +7,10 @@ export const useUiStore = defineStore("ui", {
     highPerf: false,
     isSidebarCollapsed: false,
     activeModal: null,
+    uploadTargetCollection: null,
+    isUploading: false,
+    uploadProgress: 0,
+    uploadStatusText: "",
     currentView: "chat", // 'chat' or 'db'
     chatHistory: JSON.parse(localStorage.getItem("chatHistory")) || [],
     loadingHistory: false,

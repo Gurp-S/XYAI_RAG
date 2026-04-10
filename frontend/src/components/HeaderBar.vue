@@ -48,18 +48,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUiStore } from '../store/index'
 
 const store = useUiStore()
 const router = useRouter()
 const isDark = ref(document.body.classList.contains('dark'))
+let observer
 
 function handleNewChat() {
     console.log('--- [DEBUG] HeaderBar: handleNewChat clicked');
-    store.fetchHistory(true);
     store.newConversation();
+    store.setView('chat');
     router.push('/');
 }
 
@@ -76,10 +77,14 @@ function toggleThemeLocally() {
 }
 
 onMounted(() => {
-    const observer = new MutationObserver(() => {
+    observer = new MutationObserver(() => {
         isDark.value = document.body.classList.contains('dark')
     })
     observer.observe(document.body, { attributes: true, attributeFilter: ['class'] })
+})
+
+onUnmounted(() => {
+    if (observer) observer.disconnect()
 })
 </script>
 

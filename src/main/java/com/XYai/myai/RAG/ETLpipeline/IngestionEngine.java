@@ -1,5 +1,6 @@
 package com.XYai.myai.RAG.ETLpipeline;
 
+import com.XYai.myai.RAG.Aop.Annotation.TrackETLJob;
 import com.XYai.myai.RAG.ETLpipeline.Nodes.Ingestion;
 import com.XYai.myai.RAG.ETLpipeline.POJO.IngestionContext;
 import com.XYai.myai.RAG.ETLpipeline.POJO.NodeConfig;
@@ -34,6 +35,7 @@ public class IngestionEngine {
     /**
      * 按节点顺序执行单条文档的 ETL 管道。
      */
+    @TrackETLJob
     public IngestionContext execute(PipelineDefinition pipeline,
             IngestionContext context) {
         Objects.requireNonNull(pipeline, "pipeline must not be null");

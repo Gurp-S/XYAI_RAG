@@ -130,12 +130,11 @@ public class MilvusService {
                     // 或者在 expr 为空时一定要加 limit
                     .withExpr("")
                     .withLimit(100L) // 必须加上 limit，否则空 expr 会报错
-                    .withOutFields(Collections.singletonList("metadata")) // 返回所有字段
+                    .withOutFields(Collections.singletonList("*")) // 返回所有字段
                     .build();
 
             // 2. 执行查询并检查响应状态
             R<QueryResults> response = milvusClient.query(queryParam);
-            log.info(String.valueOf(response.getData()));
             // 修复点 2: 严格检查响应状态，防止 NullPointerException
             if (response.getStatus() != R.Status.Success.getCode()) {
                 log.error("查询 Milvus 失败: {}", response.getMessage());
@@ -156,10 +155,10 @@ public class MilvusService {
                 Map<String, Object> original = rowRecord.getFieldValues();
                 Map<String, Object> cleanMap = new HashMap<>();
                 original.forEach((key, value) -> {
-                    if(value!=null&&value.getClass().getName().contains("google.gson")){
-                        cleanMap.put(key,value.toString());
-                    }else{
-                        cleanMap.put(key,value);
+                    if (value != null && value.getClass().getName().contains("google.gson")) {
+                        cleanMap.put(key, value.toString());
+                    } else {
+                        cleanMap.put(key, value);
                     }
                 });
                 list.add(cleanMap);
@@ -172,4 +171,21 @@ public class MilvusService {
         }
     }
 
+    /**
+     * 模糊搜索集合
+     * @param str 搜索词
+     * @return 搜索结果
+     */
+    public List<String> search(String str) {
+        //获取所有向量集合名字
+        List<String> collectionNames = getAllCollectionNames();
+        //判空
+        if (collectionNames.isEmpty()) return null;
+
+        String strLowerCase = str.toLowerCase();
+        return collectionNames.stream()
+                .filter(name -> name.toLowerCase().contains(strLowerCase))
+                .sorted()
+                .toList();
+    }
 }

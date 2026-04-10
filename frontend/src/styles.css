@@ -8,10 +8,10 @@
     --secondary: #9b8cff;
     --text-main: #334155;
     --text-muted: #6f5f72;
-    --border: rgba(244, 124, 142, 0.18);
+    --border: rgba(244, 124, 142, 0.35);
     --user-msg: linear-gradient(135deg, #f47c8e 0%, #8b7cf6 100%);
     --bot-msg: rgba(255, 255, 255, 0.85);
-    --bot-border: rgba(244, 124, 142, 0.18);
+    --bot-border: rgba(244, 124, 142, 0.3);
     --success: #47c78a;
     --shadow: 0 20px 50px rgba(240, 145, 166, 0.12);
 }
@@ -25,10 +25,10 @@ body.dark { background-color: var(--bg); background-image: none;
     --secondary: #9b8cff;
     --text-main: #f9fafb;
     --text-muted: #9ca3af;
-    --border: #1f2937;
+    --border: rgba(255, 255, 255, 0.15);
     --user-msg: linear-gradient(135deg, #f47c8e 0%, #8b7cf6 100%);
     --bot-msg: #1f2937;
-    --bot-border: #374151;
+    --bot-border: rgba(255, 255, 255, 0.12);
     --success: #34d399;
     --shadow: 0 25px 55px rgba(0, 0, 0, 0.38);
 }
@@ -183,7 +183,7 @@ body.dark .empty-title {
     align-items: center;
     gap: 0.75rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.05); /* Lighter background for better blend */
     white-space: nowrap;
     transition: padding 0.35s ease;
 }
@@ -210,16 +210,27 @@ body.dark .empty-title {
     cursor: pointer;
     transition: all 0.25s ease;
     font-size: 0.95rem;
-    color: #cbd5e1;
+    color: var(--text-main); /* Ensure menu items visibility in light theme */
     border-left: 3px solid transparent;
     pointer-events: auto !important; /* 确保可以被点击 */
     user-select: none;
 }
 
+body.dark .menu-item {
+    color: #cbd5e1;
+}
+
+body.dark .menu-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #f1f5f9;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
 .menu-item:hover {
     background: rgba(255, 255, 255, 0.72);
-    color: #5f546d;
-    transform: translateX(3px);
+    color: var(--primary); /* subtle highlight instead of hardcoded color */
+    transform: translateX(4px); /* slightly more pronounced hover effect */
+    box-shadow: 0 4px 12px rgba(240, 132, 155, 0.08); /* added subtle shadow */
 }
 
 .menu-item.active {
@@ -251,28 +262,33 @@ body.dark .empty-title {
     display: flex;
     flex-direction: column;
     
-    /* 彻底隐藏默认滚动条 */
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
+    /* 预留滚动条宽度防止抖动 */
+    scrollbar-width: thin !important;
+    scrollbar-color: transparent transparent !important;
+    transition: scrollbar-color 0.2s ease;
 }
 
 .history-container::-webkit-scrollbar {
-    width: 0px !important;
-    display: none;
+    width: 4px !important;
+    background-color: transparent;
+}
+
+.history-container::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 10px;
+    transition: background-color 0.2s ease;
 }
 
 .history-container:hover {
-    scrollbar-width: thin !important;
-}
-
-.history-container:hover::-webkit-scrollbar {
-    width: 4px !important;
-    display: block;
+    scrollbar-color: rgba(0, 0, 0, 0.1) transparent !important;
 }
 
 .history-container:hover::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.1) !important;
-    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+body.dark .history-container:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.15) !important;
 }
 
 .history-label {
@@ -304,7 +320,7 @@ body.dark .empty-title {
     cursor: pointer;
     transition: all 0.22s ease;
     font-size: 0.9rem;
-    color: #756a80;
+    color: var(--text-muted); /* dynamic color */
     border-left: 3px solid transparent;
     white-space: nowrap;
     overflow: hidden;
@@ -313,10 +329,19 @@ body.dark .empty-title {
     animation: historyItemIn 0.32s ease both;
 }
 
+body.dark .history-item {
+    color: #94a3b8;
+}
+
+body.dark .history-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+}
+
 .history-item:hover {
     background: rgba(255, 255, 255, 0.72);
-    color: #5b5268;
-    transform: translateX(3px);
+    color: var(--primary); 
+    transform: translateX(4px);
 }
 
 .history-item.active {
@@ -385,10 +410,14 @@ body.dark .empty-title {
     overflow: hidden;
 }
 
+body.dark .user-name {
+    color: #f1f5f9;
+}
+
 .user-name {
     font-size: 0.9rem;
     font-weight: 600;
-    color: #f1f5f9;
+    color: var(--text-main);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -541,14 +570,20 @@ body.dark .empty-title {
     display: flex;
     align-items: center;
     gap: 6px;
-    transition: all 0.2s;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .btn-ghost:hover {
     border-color: var(--primary);
     color: var(--primary);
-    background: #eff6ff;
+    background: var(--chat-bg);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(244, 124, 142, 0.15);
+}
+
+.btn-ghost:active {
+    transform: translateY(1px);
 }
 
 /* Chat Box */
@@ -574,10 +609,14 @@ body.dark .empty-title {
     display: flex;
     gap: 1rem;
     max-width: 100%;
-    animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     opacity: 0;
     transform: translateY(20px);
     will-change: transform, opacity;
+}
+
+.message-wrapper:hover .avatar {
+    transform: scale(1.05);
 }
 
 @keyframes fadeInUp {
@@ -609,6 +648,7 @@ body.dark .empty-title {
     font-size: 0.95rem;
     flex-shrink: 0;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .user .avatar {
@@ -829,39 +869,37 @@ body::after {
     border-top: 1px solid rgba(255, 255, 255, 0.55);
     padding-top: 1rem;
     
-    /* 极致隐藏滚动条 */
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
-}
-
-.history-container:hover {
+    /* 预留滚动条宽度防止布局抖动 */
     scrollbar-width: thin !important;
-    scrollbar-color: rgba(0, 0, 0, 0.1) transparent !important;
+    scrollbar-color: transparent transparent !important;
+    transition: scrollbar-color 0.2s ease;
 }
 
 .history-container::-webkit-scrollbar {
-    width: 0px !important;
-}
-
-.history-container:hover::-webkit-scrollbar {
     width: 4px !important;
+    background-color: transparent;
 }
 
 .history-container::-webkit-scrollbar-thumb {
-    background: transparent !important;
+    background-color: transparent !important;
     border-radius: 10px;
+    transition: background-color 0.2s ease;
+}
+
+.history-container:hover {
+    scrollbar-color: rgba(0, 0, 0, 0.1) transparent !important;
 }
 
 .history-container:hover::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.1) !important;
+    background-color: rgba(0, 0, 0, 0.1) !important;
 }
 
 body.dark .history-container:hover {
-    scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+    scrollbar-color: rgba(255, 255, 255, 0.15) transparent !important;
 }
 
 body.dark .history-container:hover::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.15);
+    background-color: rgba(255, 255, 255, 0.15) !important;
 }
 
 .history-label {
@@ -919,12 +957,13 @@ body.dark .history-container:hover::-webkit-scrollbar-thumb {
     align-items: center;
     gap: 0.75rem;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .user-profile:hover {
     background: rgba(255, 255, 255, 0.72);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(240, 132, 155, 0.12);
 }
 
 .header {
@@ -1024,7 +1063,12 @@ body.dark .history-container:hover::-webkit-scrollbar-thumb {
     line-height: 1.7;
     font-size: 0.96rem;
     box-shadow: 0 14px 30px rgba(206, 150, 169, 0.09);
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s;
+}
 
+.message-wrapper:hover .message {
+    transform: translateY(-1px);
+    box-shadow: 0 16px 36px rgba(206, 150, 169, 0.12);
 }
 
 .user .message {
@@ -1074,8 +1118,14 @@ body.dark .history-container:hover::-webkit-scrollbar-thumb {
     padding: 0.95rem 0.95rem 0.95rem 1.25rem;
     box-shadow: 0 18px 30px rgba(222, 158, 177, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.8);
 
-
+    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
     transform: translateY(-2px);
+}
+
+.input-wrapper:hover {
+    box-shadow: 0 22px 36px rgba(222, 158, 177, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.9);
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.95);
 }
 
 .input-wrapper:focus-within {
@@ -1096,10 +1146,14 @@ body.dark .history-container:hover::-webkit-scrollbar-thumb {
     cursor: pointer;
     color: white;
     border: none;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .btn-send:hover:not(:disabled) {
-    transform: translateY(-2px) scale(1.02);
+    transform: translateY(-2px) scale(1.05);
     box-shadow: var(--btn-send-hover-shadow, 0 18px 28px rgba(244, 124, 142, 0.34));
+}
+.btn-send:active:not(:disabled) {
+    transform: translateY(1px) scale(0.98);
 }
 
 .empty-state {
@@ -1878,10 +1932,10 @@ body.dark { background-color: var(--bg); background-image: none;
     --secondary: #9b8cff;
     --text-main: #f9fafb;
     --text-muted: #9ca3af;
-    --border: #1f2937;
+    --border: rgba(255, 255, 255, 0.15);
     --user-msg: linear-gradient(135deg, #f47c8e 0%, #8b7cf6 100%);
     --bot-msg: #1f2937;
-    --bot-border: #374151;
+    --bot-border: rgba(255, 255, 255, 0.12);
     --success: #34d399;
     --shadow: 0 25px 55px rgba(0, 0, 0, 0.38);
 }
@@ -2073,6 +2127,15 @@ body.dark .input-area::before {
 
 body.dark .input-wrapper {
     background: transparent !important;
+    box-shadow: none !important;
+}
+
+body.dark .input-wrapper:hover {
+    transform: translateY(-4px);
+}
+
+body.dark .input-wrapper:focus-within {
+    transform: translateY(-4px);
 }
 
 body.dark textarea {
@@ -2122,6 +2185,8 @@ body.dark .user-profile {
 
 body.dark .user-profile:hover {
     background: rgba(255,255,255,0.05) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4) !important;
 }
 
 body.dark .enterprise-badge {
@@ -2280,16 +2345,15 @@ body.dark .sidebar-header {
     transition: background 0.2s, border-color 0.2s !important;
 }
 
-/* 2. 优化 Light/Dark 转换卡顿：
-   直接对全局变量应用 transition，而不是对每一个 property，
-   同时减少会导致重排的属性转换。 */
-:root {
-    transition: background-color 0.2s ease, color 0.15s ease !important;
-}
-
-*, *::before, *::after {
-    /* 禁止在主题切换时对会导致卡顿的属性（如 blur, shadows）进行过度过渡 */
-    transition-duration: 0.2s !important;
+/* 2. 优化 Light/Dark 切换质感：
+   平滑过渡颜色相关的属性，放弃粗暴的 !important 以免破换组件交互动画，
+   并且将持续时间适当延长以产生“昼夜交替”的沉浸褪色体验。 */
+body, body *, body::before, body::after {
+    transition: background-color 0.5s cubic-bezier(0.25, 0.8, 0.25, 1),
+                background 0.5s cubic-bezier(0.25, 0.8, 0.25, 1),
+                color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+                border-color 0.5s cubic-bezier(0.25, 0.8, 0.25, 1),
+                box-shadow 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 /* 3. 修改 AI 头像问题：

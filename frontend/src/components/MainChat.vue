@@ -38,7 +38,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, watch } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import HeaderBar from './HeaderBar.vue'
 import MessageItem from './MessageItem.vue'
 import FooterInput from './FooterInput.vue'
@@ -49,10 +49,11 @@ const chatBox = ref(null)
 const messages = ref([])
 const input = ref('')
 const isStreaming = ref(false)
+let currentAbortController = null
 
 // 关键：监听 Pinia 中历史消息的变化，将其应用到组件内部 messages
 watch(() => store.currentMessages, (newMsgs) => {
-  messages.value = [...newMsgs]
+  messages.value = newMsgs || []
   scrollToBottom()
 }, { deep: true, immediate: true })
 
@@ -88,6 +89,12 @@ async function send() {
   // 2. 推送助手占位，此时其 text 为空，HTML 同步渲染逻辑显示 loading 动画
   messages.value.push({ role: 'assistant', text: '', rag: false })
   const assistantIndex = messages.value.length - 1
+  const requestConversationId = store.activeConversationId
+  
+  if (currentAbortController) {
+    currentAbortController.abort()
+  }
+  currentAbortController = new AbortController()
 
   try {
     const headers = { 'Content-Type': 'application/json' }
@@ -99,9 +106,10 @@ async function send() {
     const response = await fetch('/ai/chat', {
       method: 'POST',
       headers: headers,
+      signal: currentAbortController.signal,
       body: JSON.stringify({ 
         message: userText, 
-        conversationId: store.activeConversationId, // 显式传递对话 ID
+        conversationId: requestConversationId, // 显式传递对话 ID
         userId: store.currentUser?.id
       })
     })
@@ -114,6 +122,12 @@ async function send() {
     let buffer = '' // 添加缓冲区
 
     while (!done) {
+      if (store.activeConversationId !== requestConversationId) {
+        console.warn('--- [DEBUG] Conversation switched, aborting stream process.')
+        if (currentAbortController) currentAbortController.abort()
+        break
+      }
+
       const { value, done: readerDone } = await reader.read()
       done = readerDone
       if (value) {
@@ -137,11 +151,30 @@ async function send() {
       processSSELine(buffer, assistantIndex)
     }
   } catch (error) {
-    console.error('Chat Error:', error)
-    messages.value[assistantIndex].text = '消息发送失败，请检查后端服务是否启动。'
+    if (error.name === 'AbortError') {
+      console.log('--- [DEBUG] Request aborted purposefully.')
+    } else {
+      console.error('Chat Error:', error)
+      if (messages.value[assistantIndex] && store.activeConversationId === requestConversationId) {
+        messages.value[assistantIndex].text = '消息发送失败，请检查后端服务是否启动。'
+      }
+    }
   } finally {
     isStreaming.value = false
     scrollToBottom()
+
+    // 仅在对话未被切换时同步当前状态
+    if (store.activeConversationId === requestConversationId) {
+      store.currentMessages = [...messages.value]
+      const convId = store.activeConversationId
+      store.conversationCache[convId] = store.currentMessages
+      localStorage.setItem('conversationCache', JSON.stringify(store.conversationCache))
+
+      // 如果是首轮对话，刷新侧边栏的历史记录列表
+      if (messages.value.length === 2 && store.currentUser && store.currentUser.id) {
+          store.fetchHistory(true)
+      }
+    }
   }
 }
 
@@ -163,6 +196,12 @@ function processSSELine(line, assistantIndex) {
 onMounted(() => {
   const savedTheme = localStorage.getItem('theme')
   if (savedTheme === 'dark') document.body.classList.add('dark')
+})
+
+onUnmounted(() => {
+  if (currentAbortController) {
+    currentAbortController.abort()
+  }
 })
 </script>
 

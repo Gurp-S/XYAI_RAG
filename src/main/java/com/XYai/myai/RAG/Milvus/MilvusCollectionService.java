@@ -229,7 +229,7 @@ public class MilvusCollectionService {
     /**
      * 对齐 Spring AI 默认 Schema 的显式建表 milvus collection，并按当前项目配置创建索引。
      */
-    private void createCollectionIfAbsent(String collectionName) {
+    public void createCollectionIfAbsent(String collectionName) {
         if (milvusService.exists(collectionName)) {
             return;
         }
