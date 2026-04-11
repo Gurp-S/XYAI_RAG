@@ -10,7 +10,6 @@ import io.milvus.param.dml.QueryParam;
 import io.milvus.response.QueryResultsWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.vectorstore.milvus.MilvusVectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -33,8 +32,6 @@ public class MilvusService {
     private final ReentrantLock refreshLock = new ReentrantLock();
     // 缓存 TTL，单位毫秒。可按需调整（例如 5 秒或 10 秒）
     private final long ttlMillis = Duration.ofSeconds(10).toMillis();
-    @Resource
-    private MilvusVectorStore milvusVectorStore;
     @Value("${spring.ai.vectorstore.milvus.databaseName:default}")
     private String databaseName;
     // 缓存相关
@@ -98,6 +95,9 @@ public class MilvusService {
      */
     public boolean exists(String collectionName) {
         String resolved = collectionName == null ? null : collectionName.trim();
+        if (resolved == null || resolved.isBlank()) {
+            resolved = "my_ai";
+        }
         try {
             return milvusClient.hasCollection(
                     HasCollectionParam.newBuilder()
@@ -120,6 +120,7 @@ public class MilvusService {
         if (collectionName == null || collectionName.trim().isEmpty()) {
             return Collections.emptyList();
         }
+
 
         try {
             // 1. 构建查询参数

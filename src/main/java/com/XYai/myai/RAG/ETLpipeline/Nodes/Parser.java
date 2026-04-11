@@ -30,7 +30,6 @@ public class Parser implements Ingestion {
         return "parser";
     }
 
-    @Override
     public NodeResult execute(IngestionContext context, NodeConfig config) {
         Document document = context.getDocument();
         if (document == null) {

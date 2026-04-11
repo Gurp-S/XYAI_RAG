@@ -43,7 +43,6 @@ public class Enricher implements Ingestion {
      * @param config 节点配置（mode、字数限制等）
      * @return 节点执行结果
      */
-    @Override
     public NodeResult execute(IngestionContext context, NodeConfig config) {
         // 1. 获取文档，判空
         Document document = context.getDocument();

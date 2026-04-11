@@ -1,6 +1,5 @@
 package com.XYai.myai.RAG.ETLpipeline;
 
-import com.XYai.myai.RAG.Aop.Annotation.TrackETLJob;
 import com.XYai.myai.RAG.ETLpipeline.Nodes.Ingestion;
 import com.XYai.myai.RAG.ETLpipeline.POJO.IngestionContext;
 import com.XYai.myai.RAG.ETLpipeline.POJO.NodeConfig;
@@ -9,6 +8,7 @@ import com.XYai.myai.RAG.ETLpipeline.POJO.NodeResult;
 import com.XYai.myai.RAG.ETLpipeline.POJO.PipelineDefinition;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -31,11 +31,12 @@ public class IngestionEngine {
 
     private final List<Ingestion> nodeHandlers;
     private final ConditionEvaluator conditionEvaluator;
+    @Resource
+    private UploadTaskStore uploadTaskStore;
 
     /**
      * 按节点顺序执行单条文档的 ETL 管道。
      */
-    @TrackETLJob
     public IngestionContext execute(PipelineDefinition pipeline,
             IngestionContext context) {
         Objects.requireNonNull(pipeline, "pipeline must not be null");
@@ -60,12 +61,7 @@ public class IngestionEngine {
         return map;
     }
 
-    /**
-     * 节点映射
-     * 
-     * @param nodes
-     * @return
-     */
+    /** 节点映射。 */
     private Map<String, NodeConfig> buildNodeConfigMap(List<NodeConfig> nodes) {
         if (nodes == null || nodes.isEmpty()) {
             throw new IllegalArgumentException("管道节点不能为空");
@@ -83,12 +79,7 @@ public class IngestionEngine {
         return map;
     }
 
-    /**
-     * 判断合法性
-     * 
-     * @param nodeConfigMap
-     * @return
-     */
+    /** 判断管道合法性。 */
     private String validatePipeline(Map<String, NodeConfig> nodeConfigMap) {
         // 判断是否有未知的后节点
         for (NodeConfig nodeConfig : nodeConfigMap.values()) {
@@ -167,19 +158,13 @@ public class IngestionEngine {
         return startNodes.iterator().next();
     }
 
-    /**
-     * 链式执行节点
-     * 
-     * @param nodeId
-     * @param configMap
-     * @param nodeMap
-     * @param context
-     */
+    /** 链式执行节点。 */
     private void executeChain(String nodeId,
             Map<String, NodeConfig> configMap,
             Map<String, Ingestion> nodeMap,
             IngestionContext context) {
         Set<String> seen = new HashSet<>();
+        String taskId = context == null ? null : context.getTaskId();
         while (nodeId != null) {
             if (!seen.add(nodeId)) {
                 throw new IllegalStateException("执行到重复节点: " + nodeId);
@@ -194,6 +179,9 @@ public class IngestionEngine {
             boolean executed = false;
             NodeResult result;
             try {
+                if (taskId != null && !taskId.isBlank()) {
+                    uploadTaskStore.node(taskId, config.getNodeType());
+                }
                 // 检查执行条件（满足条件才执行）
                 if (conditionEvaluator.evaluate(config.getCondition(), context)) {
                     // 获得节点
@@ -214,21 +202,18 @@ public class IngestionEngine {
             // 花费时间
             long costMs = (System.nanoTime() - startNanos) / 1_000_000;
             // 添加节点日志
-            context.getLogs().add(buildNodeLog(config, result, executed, costMs));
+            List<NodeLog> logs = context.getLogs();
+            if (logs == null) {
+                logs = new java.util.ArrayList<>();
+                context.setLogs(logs);
+            }
+            logs.add(buildNodeLog(config, result, executed, costMs));
             // 执行下一个节点
             nodeId = config.getNextNodeId();
         }
     }
 
-    /**
-     * 创建节点日志
-     * 
-     * @param config
-     * @param result
-     * @param executed
-     * @param costMs
-     * @return
-     */
+    /** 创建节点日志。 */
     private NodeLog buildNodeLog(NodeConfig config, NodeResult result, boolean executed, long costMs) {
         Map<String, Object> extra = new HashMap<>();
         extra.put("nodeId", config.getNodeId());

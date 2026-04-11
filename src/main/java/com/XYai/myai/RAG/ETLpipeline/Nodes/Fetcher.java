@@ -27,7 +27,6 @@ public class Fetcher implements Ingestion {
         return "fetcher";
     }
 
-    @Override
     public NodeResult execute(IngestionContext context, NodeConfig config) {
         Document document = context.getDocument();
         if (document == null) {
@@ -64,12 +63,6 @@ public class Fetcher implements Ingestion {
         return value == null ? null : String.valueOf(value);
     }
 
-    /**
-     * 规范类型
-     * @param type
-     * @param uri
-     * @return
-     */
     private String normalizeType(String type, String uri) {
         if (StringUtils.hasText(type)) {
             return type.trim().toLowerCase();
@@ -77,13 +70,6 @@ public class Fetcher implements Ingestion {
         return uri.startsWith("http://") || uri.startsWith("https://") ? "http" : "file";
     }
 
-    /**
-     * 文件类型处理
-     * @param document
-     * @param uri
-     * @return
-     * @throws IOException
-     */
     private NodeResult fetchFile(Document document, String uri) throws IOException {
         //文件地址
         Path path = Path.of(uri);
@@ -95,14 +81,6 @@ public class Fetcher implements Ingestion {
         return NodeResult.ok("fetched bytes=" + bytes.length);
     }
 
-    /**
-     * 网页文件
-     * @param document
-     * @param uri
-     * @return
-     * @throws IOException
-     * @throws InterruptedException
-     */
     private NodeResult fetchHttp(Document document, String uri) throws IOException, InterruptedException {
         //向网页请求
         HttpRequest request = HttpRequest.newBuilder(URI.create(uri)).GET().build();
@@ -116,12 +94,6 @@ public class Fetcher implements Ingestion {
         return NodeResult.ok("fetched bytes=" + response.body().length);
     }
 
-    /**
-     * line
-     * @param document
-     * @param content
-     * @return
-     */
     private NodeResult fetchInline(Document document, String content) {
         document.getMetadata().put(IngestionContext.META_RAW_BYTES, content.getBytes(StandardCharsets.UTF_8));
         document.getMetadata().put(IngestionContext.META_MIME_TYPE, "text/plain");

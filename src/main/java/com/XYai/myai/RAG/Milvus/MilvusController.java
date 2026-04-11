@@ -20,7 +20,7 @@ public class MilvusController {
 
     /**
      * 查看数据库的数据
-     * 
+     *
      * @return 返回数据库集合列表
      */
     @GetMapping("/list")
@@ -31,6 +31,7 @@ public class MilvusController {
 
     @GetMapping("/metadata")
     public Result<List<Map<String,Object>>> getCollectionsMetadata(String collectionName) {
+        if(!milvusCollectionService.isLoaded(collectionName))return Result.error(404,"集合未加载");
         List<Map<String, Object>> collectionNameMetadata = milvusService.getCollectionNameMetadata(collectionName);
         return Result.success(collectionNameMetadata);
     }
@@ -44,6 +45,22 @@ public class MilvusController {
     @PutMapping("/create")
     public Result<String> createCollection(String collectionName){
         milvusCollectionService.createCollectionIfAbsent(collectionName);
+        return Result.success();
+    }
+
+    @GetMapping("/status")
+    public Result<Boolean> getStatus(String collectionName){
+        boolean isLoad = milvusCollectionService.isLoaded(collectionName);
+        return Result.success(isLoad);
+    }
+
+    @PostMapping("/loadOrunload")
+    public Result<String> unloadCollection(String collectionName) throws Exception {
+        if(!milvusCollectionService.isLoaded(collectionName)){
+            milvusCollectionService.loadCollection(collectionName);
+        }else{
+            milvusCollectionService.unloadCollection(collectionName);
+        }
         return Result.success();
     }
 

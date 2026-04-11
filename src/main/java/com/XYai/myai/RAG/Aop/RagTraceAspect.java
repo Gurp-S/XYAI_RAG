@@ -13,7 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 /**
  * RAG 全链路追踪切面类。
@@ -27,7 +31,6 @@ public class RagTraceAspect {
 
     @Resource
     private TraceRecordService traceRecordService;
-
     /**
      * 环绕通知：在带 {@link RagTraceRoot} 注解的方法执行前后进行全链路 traceId 管理与记录。
      *
@@ -37,8 +40,11 @@ public class RagTraceAspect {
      */
     @Around("@annotation(traceRoot)")
     public Object aroundRoot(ProceedingJoinPoint joinPoint, RagTraceRoot traceRoot) throws Throwable {
-        // 1. 生成全局唯一traceId（雪花算法）
-        String traceId = IdUtil.getSnowflakeNextIdStr();
+        // 1. 优先复用外部已经放入上下文的 traceId/taskId
+        String traceId = resolveTaskId(joinPoint, traceRoot.taskIdArg(), RagTraceContext.getTraceId());
+        if (traceId == null || traceId.isBlank()) {
+            traceId = IdUtil.getSnowflakeNextIdStr();
+        }
         // 2. 记录链路开始信息（存入数据库）
         traceRecordService.startRun(traceId, traceRoot.name());
         // 3. 将traceId存入上下文（ThreadLocal，保证线程安全）
@@ -66,7 +72,7 @@ public class RagTraceAspect {
     @Around("@annotation(traceNode)")
     public Object aroundNode(ProceedingJoinPoint joinPoint, RagTraceNode traceNode) throws Throwable {
         // 1. 从上下文获取当前traceId（若没有则不追踪，避免空指针）
-        String traceId = RagTraceContext.getTraceId();
+        String traceId = resolveTaskId(joinPoint, traceNode.taskIdArg(), RagTraceContext.getTraceId());
         if (traceId == null || traceId.trim().isEmpty()) {
             return joinPoint.proceed();
         }
@@ -90,6 +96,80 @@ public class RagTraceAspect {
         } finally {
             // 8. 节点出栈，恢复上下文
             RagTraceContext.popNode();
+        }
+    }
+
+    private String resolveTaskId(ProceedingJoinPoint joinPoint, String taskIdArg, String fallback) {
+        String resolved = resolveValue(joinPoint, taskIdArg);
+        return (resolved == null || resolved.isBlank()) ? fallback : resolved;
+    }
+
+    private String resolveValue(ProceedingJoinPoint joinPoint, String expression) {
+        if (expression == null || expression.isBlank()) {
+            return null;
+        }
+        Object[] args = joinPoint.getArgs();
+        String[] parts = expression.split("\\.");
+
+        // 先尝试按参数名匹配（如果编译保留了参数名）
+        String[] parameterNames = null;
+        if (joinPoint.getSignature() instanceof MethodSignature methodSignature) {
+            parameterNames = methodSignature.getParameterNames();
+        }
+
+        for (int i = 0; i < args.length; i++) {
+            Object arg = args[i];
+            if (arg == null) {
+                continue;
+            }
+            if (parameterNames != null && i < parameterNames.length && expression.equals(parameterNames[i])) {
+                return String.valueOf(arg);
+            }
+            if (parts.length > 0) {
+                Object current = arg;
+                boolean matched = true;
+                for (String part : parts) {
+                    current = readProperty(current, part);
+                    if (current == null) {
+                        matched = false;
+                        break;
+                    }
+                }
+                if (matched) {
+                    return String.valueOf(current);
+                }
+            }
+        }
+
+        if (parts.length > 1) {
+            String leaf = parts[parts.length - 1];
+            for (Object arg : args) {
+                Object leafValue = readProperty(arg, leaf);
+                if (leafValue != null) {
+                    return String.valueOf(leafValue);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private Object readProperty(Object target, String name) {
+        if (target == null || name == null || name.isBlank()) {
+            return null;
+        }
+        try {
+            String getterName = "get" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
+            Method getter = target.getClass().getMethod(getterName);
+            return getter.invoke(target);
+        } catch (Exception ignored) {
+            try {
+                Field field = target.getClass().getDeclaredField(name);
+                field.setAccessible(true);
+                return field.get(target);
+            } catch (Exception ignoredToo) {
+                return null;
+            }
         }
     }
 }

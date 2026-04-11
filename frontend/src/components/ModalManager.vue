@@ -96,7 +96,9 @@ const uploadFileName = ref('')
 const collectionName = ref('default_collection')
 const kbId = ref('')
 
-let pollInterval = null
+let pollTimer = null
+let currentTaskId = null
+let taskFinished = false
 
 watch(() => ui.activeModal, (val) => {
     if (val === 'upload' && ui.uploadTargetCollection) {
@@ -115,62 +117,6 @@ function handleFileDrop(e) {
     e.preventDefault()
     const files = e.dataTransfer.files
     if (files.length > 0) startUpload(files)
-}
-
-function startPollingTask(fileName) {
-    if (pollInterval) clearInterval(pollInterval)
-    console.log('开始轮询任务:', fileName)
-    pollInterval = setInterval(async () => {
-        try {
-            const res = await fetch(`/upload/Task?fileName=${encodeURIComponent(fileName)}`)
-            
-            const contentType = res.headers.get("content-type")
-            if (!contentType || !contentType.includes("application/json")) {
-                return
-            }
-
-            const data = await res.json()
-            console.log('轮询原始数据:', data)
-            
-            if (data.code === 200 && data.data) {
-                const info = data.data
-                ui.uploadProgress = info.progress || 0
-                
-                const statusStr = (info.status || '').toUpperCase().trim()
-                
-                if (statusStr === 'WAITING') {
-                    ui.uploadStatusText = '任务排队中...'
-                } else if (statusStr.includes('FAILED')) {
-                    ui.uploadStatusText = `解析失败: ${info.status}`
-                    clearInterval(pollInterval)
-                    finishUpload()
-                } else if (statusStr === 'COMPLETED' || info.progress === 100) {
-                    ui.uploadStatusText = '入库完成'
-                    ui.uploadProgress = 100
-                    clearInterval(pollInterval)
-                    finishUpload()
-                } else if (statusStr.includes('PROCESSING:')) {
-                    // 更加鲁棒的字符串截取
-                    const nodeType = statusStr.split(':')[1]?.trim() || ''
-                    const nodeMap = {
-                        'FETCHER': '获取源文件',
-                        'PARSER': '解析文档',
-                        'ENRICHER': '语义增强',
-                        'CHUNKER': '内容分块',
-                        'INDEXER': '向量入库'
-                    }
-                    ui.uploadStatusText = `正在${nodeMap[nodeType] || nodeType}...`
-                } else {
-                    ui.uploadStatusText = info.status
-                }
-            } else if (data.code === 404) {
-                clearInterval(pollInterval)
-                finishUpload()
-            }
-        } catch (err) {
-            console.error('轮询出错', err)
-        }
-    }, 1000)
 }
 
 function startUpload(files, inputTarget = null) {
@@ -197,6 +143,9 @@ function startUpload(files, inputTarget = null) {
     const xhr = new XMLHttpRequest()
     xhr.open('POST', '/upload/up', true)
 
+    // 只要前端一接收到文件并开始提交，就立即关闭模态框
+    ui.closeModal()
+
     xhr.upload.onprogress = (e) => {
         if (e.lengthComputable) {
             const networkProgress = Math.round((e.loaded / e.total) * 20)
@@ -206,14 +155,21 @@ function startUpload(files, inputTarget = null) {
 
     xhr.onload = () => {
         if (xhr.status >= 200 && xhr.status < 300) {
-            ui.uploadStatusText = '上传成功，正在送入 ETL 队列解析...'
-            // 强制关闭模态框
-            ui.activeModal = null
-            // 确保同步给 Pinia 的状态是 false，彻底关掉遮罩
-            const overlay = document.getElementById('uploadModalOverlay')
-            if (overlay) overlay.classList.remove('active')
-            
-            startPollingTask(firstFileName)
+            try {
+                const payload = JSON.parse(xhr.responseText || '{}')
+                const taskId = typeof payload.data === 'string' ? payload.data : payload?.data?.taskId
+                if (!taskId) {
+                    ui.uploadStatusText = '解析任务ID失败'
+                    finishUpload(inputTarget)
+                    return
+                }
+                ui.uploadStatusText = '准备开始注入知识库...'
+                ui.closeModal()
+                startPollingTask(taskId)
+            } catch (err) {
+                ui.uploadStatusText = '上传成功，但解析任务ID失败'
+                finishUpload(inputTarget)
+            }
         } else {
             ui.uploadStatusText = '上传失败，服务器返回异常（' + xhr.status + '）。'
             finishUpload(inputTarget)
@@ -228,15 +184,113 @@ function startUpload(files, inputTarget = null) {
     xhr.send(formData)
 }
 
-function finishUpload(inputTarget) {
-    if (pollInterval) {
-        clearInterval(pollInterval)
-        pollInterval = null
+function startPollingTask(taskId) {
+    currentTaskId = taskId
+    taskFinished = false
+    if (pollTimer) {
+        clearTimeout(pollTimer)
+        pollTimer = null
+    }
+    console.log('开始通过 JSON 轮询接收 ETL 任务状态...')
+    pollTaskStatus(taskId)
+}
+
+async function pollTaskStatus(taskId) {
+    try {
+        const response = await fetch(`/upload/Task?taskId=${encodeURIComponent(taskId)}`)
+        const payload = await response.json()
+        if (payload.code !== 200) {
+            ui.uploadStatusText = payload.msg || '任务查询失败'
+            if (!taskFinished) {
+                pollTimer = setTimeout(() => pollTaskStatus(taskId), 400)
+            }
+            return
+        }
+
+        const snapshot = payload.data || {}
+        renderTaskSnapshot(snapshot)
+
+        if (String(snapshot.status || '').toUpperCase() === 'SUCCESS' || String(snapshot.status || '').toUpperCase() === 'ERROR') {
+            taskFinished = true
+            if (String(snapshot.status || '').toUpperCase() === 'ERROR') {
+                ui.uploadStatusText = snapshot.displayText || snapshot.message || snapshot.errorMessage || '处理失败'
+            } else {
+                ui.uploadStatusText = snapshot.displayText || '处理完成'
+                ui.uploadProgress = typeof snapshot.progress === 'number' ? snapshot.progress : 100
+            }
+            finishUpload()
+            return
+        }
+
+        pollTimer = setTimeout(() => pollTaskStatus(taskId), 400)
+    } catch (err) {
+        if (!taskFinished) {
+            ui.uploadStatusText = '任务状态查询失败，正在重试...'
+            pollTimer = setTimeout(() => pollTaskStatus(taskId), 800)
+        }
+    }
+}
+
+function renderTaskSnapshot(snapshot) {
+    const status = String(snapshot.status || '').toUpperCase()
+    const nodeType = snapshot.currentNodeType || snapshot.message || ''
+    const displayText = snapshot.displayText || ''
+    const progress = typeof snapshot.progress === 'number' ? snapshot.progress : null
+
+    if (status === 'WAITING') {
+        ui.uploadStatusText = displayText || snapshot.message || '任务准备中...'
+        ui.uploadProgress = progress ?? 5
+        return
+    }
+
+    if (status === 'ERROR') {
+        ui.uploadStatusText = displayText || snapshot.message || snapshot.errorMessage || '处理失败'
+        ui.uploadProgress = progress ?? 100
+        return
+    }
+
+    const nodeMap = {
+        fetcher: '获取源文件',
+        parser: '解析文档',
+        enricher: '语义增强',
+        chunker: '内容分块',
+        indexer: '向量入库',
+        start: '任务启动中',
+    }
+
+    const lowerType = String(nodeType).toLowerCase()
+    ui.uploadStatusText = displayText || `正在执行: ${nodeMap[lowerType] || nodeType}...`
+    if (progress !== null) {
+        ui.uploadProgress = progress
+    } else {
+        const nodeOrder = ['fetcher', 'parser', 'enricher', 'chunker', 'indexer']
+        const idx = nodeOrder.indexOf(lowerType)
+        if (idx !== -1) {
+            ui.uploadProgress = 20 + Math.round((idx / (nodeOrder.length - 1)) * 75)
+        }
+    }
+}
+
+async function fetchTaskSuccess() {
+    // 任务成功后，如果当前在数据库管理视图，自动刷新列表
+    if (useUiStore().currentView === 'db') {
+        // 这里只是一个提示，具体的刷新可以由父组件或对应的管理器监听
+    }
+}
+
+function finishUpload() {
+    if (pollTimer) {
+        clearTimeout(pollTimer)
+        pollTimer = null
     }
     setTimeout(() => {
-        ui.isUploading = false
-        if (inputTarget) inputTarget.value = ''
-    }, 1500)
+        ui.isUploading = false;
+        // 重置文件输入框，确保下次选择相同文件也能触发 change 事件
+        const fileInput = document.getElementById('fileInput');
+        if (fileInput) {
+            fileInput.value = '';
+        }
+    }, 1500);
 }
 </script>
 

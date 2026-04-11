@@ -33,7 +33,7 @@
         <milvus-sdk.version>2.5.4</milvus-sdk.version>
         <spring-ai.version>1.0.0</spring-ai.version>
         <mybatis-plus.version>3.5.7</mybatis-plus.version>
-        <tika.version>2.9.2</tika.version>
+        <tika.version>3.0.0</tika.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -84,7 +84,7 @@
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-core</artifactId>
-            <version>5.8.21</version>
+            <version>5.8.35</version>
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>org.springframework.ai</groupId>-->

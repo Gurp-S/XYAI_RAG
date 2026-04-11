@@ -25,4 +25,6 @@ public interface TraceRecordService {
      * 记录当前节点的执行情况
      */
     void recordNode(String traceId, String nodeId, Object name, Object type, long costTime);
+
+
 }

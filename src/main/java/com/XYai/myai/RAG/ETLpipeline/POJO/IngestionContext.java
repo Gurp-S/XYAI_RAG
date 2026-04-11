@@ -55,9 +55,14 @@ public class IngestionContext implements Serializable {
      */
     @Builder.Default
     private List<Document> chunks = new ArrayList<>();
-    // ChunkerNode分块后的文档块
 
+    // ChunkerNode分块后的文档块
     @Builder.Default
     private List<NodeLog> logs = new ArrayList<>();
+
+    /**
+     * 本次 ETL 任务的 taskId / traceId。
+     */
+    private String taskId;
 
 }

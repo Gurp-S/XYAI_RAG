@@ -105,7 +105,6 @@ public class Indexer implements Ingestion {
      * @param config 节点配置信息
      * @return 节点执行结果（成功/失败 + 描述信息）
      */
-    @Override
     public NodeResult execute(IngestionContext context, NodeConfig config) {
         // 1. 获取分块列表，判空保护
         List<Document> chunks = context.getChunks();

@@ -18,4 +18,6 @@ public @interface RagTraceNode {
     String name();
 
     String type();
+
+    String taskIdArg() default "";
 }

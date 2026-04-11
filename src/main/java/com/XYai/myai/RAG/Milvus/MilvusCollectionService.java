@@ -3,12 +3,12 @@ package com.XYai.myai.RAG.Milvus;
 import com.XYai.myai.Config.Result;
 import io.milvus.client.MilvusServiceClient;
 import io.milvus.grpc.DataType;
-import io.milvus.param.collection.CreateCollectionParam;
-import io.milvus.param.collection.DropCollectionParam;
-import io.milvus.param.collection.FlushParam;
-import io.milvus.param.collection.LoadCollectionParam;
-import io.milvus.param.collection.FieldType;
+import io.milvus.param.collection.*;
+import io.milvus.param.index.CreateIndexParam;
+import io.milvus.param.IndexType;
+import io.milvus.param.MetricType;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentMap;
  * 功能：负责创建、删除、重建、查询 Milvus 集合，并缓存 VectorStore 实例
  * 用于 RAG 系统中的向量库多集合隔离管理（例如：不同业务/不同文件使用独立集合）
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MilvusCollectionService {
@@ -69,6 +70,15 @@ public class MilvusCollectionService {
 
     @Value("${spring.ai.vectorstore.milvus.embeddingDimension:4096}")
     private int embeddingDimension;
+
+    @Value("${spring.ai.vectorstore.milvus.index-type:ivf_flat}")
+    private String indexType;
+
+    @Value("${spring.ai.vectorstore.milvus.metricType:COSINE}")
+    private String metricType;
+
+    @Value("${spring.ai.vectorstore.milvus.index-params.nlist:1024}")
+    private int indexNList;
 
     @Value("${spring.ai.vectorstore.milvus.databaseName:default}")
     private String databaseName;
@@ -177,6 +187,7 @@ public class MilvusCollectionService {
             }
             // 显式创建
             createCollectionIfAbsent(collectionName);
+            loadCollection(collectionName);
             milvusService.refreshCache();
             if (!milvusService.exists(collectionName)) {
                 return Result.error(0, "重建集合失败：创建后仍不存在 -> " + collectionName);
@@ -224,11 +235,9 @@ public class MilvusCollectionService {
 
     // ====================== 显示创建加载和刷盘 ======================
     /**
-     *
-     */
-    /**
      * 对齐 Spring AI 默认 Schema 的显式建表 milvus collection，并按当前项目配置创建索引。
      */
+    @SuppressWarnings("deprecation")
     public void createCollectionIfAbsent(String collectionName) {
         if (milvusService.exists(collectionName)) {
             return;
@@ -272,11 +281,10 @@ public class MilvusCollectionService {
                     .build();
 
             milvusClient.createCollection(createCollectionParam);
-
+            createEmbeddingIndexIfAbsent(collectionName);
             // 清空缓存防止使用旧缓存
             storeCache.remove(collectionName);
-            loadedCache.remove(collectionName);
-
+            loadCollection(collectionName);
         } catch (Exception e) {
             throw new IllegalStateException("Milvus collection 显式创建失败: " + collectionName, e);
         }
@@ -288,14 +296,68 @@ public class MilvusCollectionService {
      */
     public void loadCollection(String collectionName) {
         String resolved = resolveCollectionName(collectionName);
-        //加载
+        // 显式加载后统一同步本地缓存，避免各个调用点重复写缓存
         milvusClient.loadCollection(
                 LoadCollectionParam.newBuilder()
                         .withDatabaseName(databaseName)
                         .withCollectionName(resolved)
                         .build()
         );
+        loadedCache.put(resolved, Boolean.TRUE);
+        storeCache.computeIfAbsent(resolved, this::createVectorStore);
+        milvusService.refreshCache();
     }
+
+    /**
+     * 显式卸载 collection，释放内存中的已加载集合。
+     */
+    public void unloadCollection(String collectionName) throws Exception {
+        String resolved = resolveCollectionName(collectionName);
+        try {
+            milvusClient.releaseCollection(
+                    ReleaseCollectionParam.newBuilder()
+                            .withDatabaseName(databaseName)
+                            .withCollectionName(resolved)
+                            .build()
+            );
+            loadedCache.remove(resolved);
+            storeCache.remove(resolved);
+            milvusService.refreshCache();
+        } catch (Exception e) {
+            throw  new Exception("取消加载失败");
+        }
+    }
+
+    public boolean isLoaded(String collectionName) {
+        String resolved = resolveCollectionName(collectionName);
+
+        if (!milvusService.exists(resolved)) {
+            return false;
+        }
+
+        if (loadedCache.containsKey(resolved)) {
+            return Boolean.TRUE.equals(loadedCache.get(resolved));
+        }
+
+        try {
+            var response = milvusClient.getLoadState(
+                    GetLoadStateParam.newBuilder()
+                            .withDatabaseName(databaseName)
+                            .withCollectionName(resolved)
+                            .build()
+            );
+
+            if (response == null || response.getData() == null) {
+                return false;
+            }
+            // 这里按“Loaded”判断，具体枚举名以你 IDE 自动补全结果为准
+            return response.getData().getState().toString().equalsIgnoreCase("LoadStateLoaded");
+
+        } catch (Exception e) {
+            throw new IllegalStateException("查询 Milvus collection 加载状态失败: " + resolved, e);
+        }
+    }
+
 
     /**
      * 显式刷盘，让新写入尽快对外可见。
@@ -307,6 +369,32 @@ public class MilvusCollectionService {
                         .addCollectionName(resolved)
                         .build()
         );
+    }
+
+    private void createEmbeddingIndexIfAbsent(String collectionName) {
+        try {
+            milvusClient.createIndex(CreateIndexParam.newBuilder()
+                    .withDatabaseName(databaseName)
+                    .withCollectionName(collectionName)
+                    .withFieldName("embedding")
+                    .withIndexType(IndexType.valueOf(normalizeEnumName(indexType)))
+                    .withMetricType(MetricType.valueOf(normalizeEnumName(metricType)))
+                    .withExtraParam("{\"nlist\":" + indexNList + "}")
+                    .build());
+        } catch (Exception e) {
+            String message = e.getMessage() == null ? "" : e.getMessage().toLowerCase();
+            if (message.contains("exist")) {
+                return;
+            }
+            throw new IllegalStateException("Milvus collection 索引创建失败: " + collectionName, e);
+        }
+    }
+
+    private String normalizeEnumName(String value) {
+        if (!StringUtils.hasText(value)) {
+            return "";
+        }
+        return value.trim().toUpperCase().replace('-', '_');
     }
 
 }

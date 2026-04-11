@@ -43,7 +43,6 @@ public class Chunker implements Ingestion {
      * @param config 节点配置（chunkSize、overlapSize）
      * @return 执行结果
      */
-    @Override
     public NodeResult execute(IngestionContext context, NodeConfig config) {
         // 1. 获取源文档，判空
         Document sourceDoc = context.getDocument();
@@ -60,7 +59,7 @@ public class Chunker implements Ingestion {
         // 3. 读取节点配置：分块大小、重叠大小
         JsonNode settings = config == null ? null : config.getSettings();
         int chunkSize = readInt(settings, "chunkSize", 512);          // 默认分块 512 字符
-        int overlapSize = Math.min(readInt(settings, "overlapSize", 50), Math.max(0, chunkSize / 2)); // 重叠不超过一半
+        int overlapSize = resolveOverlapSize(settings, chunkSize);
 
         // 4. 优先使用阿里云 SentenceSplitter；如果不可用或失败，则使用本地窗口分块兜底
         List<Document> chunks = splitWithAliyun(sourceDoc, text);
@@ -103,6 +102,15 @@ public class Chunker implements Ingestion {
             log.warn("调用 SentenceSplitter 失败，回退到本地分块", ex);
         }
         return null;
+    }
+
+    private int resolveOverlapSize(JsonNode settings, int chunkSize) {
+        int overlapSize = readInt(settings, "overlapSize", 50);
+        int maxOverlap = Math.max(0, chunkSize / 2);
+        if (overlapSize < 0) {
+            return 0;
+        }
+        return Math.min(overlapSize, maxOverlap);
     }
 
     /**

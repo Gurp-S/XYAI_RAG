@@ -29,4 +29,9 @@ public class UpLoadAccumulator {
      * 处理失败的文件名列表（或标识），用于返回给前端或日志记录。
      */
     private List<String> failedFiles = new ArrayList<>();
+
+    /**
+     * 本次请求的任务ID（traceId）。
+     */
+    private String taskId;
 }

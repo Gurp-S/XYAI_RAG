@@ -19,5 +19,8 @@ public @interface RagTraceRoot {
 
     String conversationIdArg();
 
+    /**
+     * 任务ID在方法参数中的来源路径，支持 context.taskId 这类写法。
+     */
     String taskIdArg();
 }
