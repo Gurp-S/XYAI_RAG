@@ -2,6 +2,8 @@ package com.XYai.myai.User;
 
 // import com.alibaba.ttl.TransmittableThreadLocal; // not used currently
 
+import com.XYai.myai.User.POJO.User;
+
 /**
  * 管理当前线程（或可传递线程）中的登录用户信息的工具类。
  * 该类使用 ThreadLocal 存储当前请求的 User 对象，提供便捷的 get/set/remove 操作。

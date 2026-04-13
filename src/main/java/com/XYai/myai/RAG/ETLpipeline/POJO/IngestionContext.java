@@ -44,6 +44,8 @@ public class IngestionContext implements Serializable {
     public static final String META_FILE_SIZE = "fileSize";
     public static final String META_FILE_CONTENT_TYPE = "fileContentType";
     public static final String META_CHUNK_SIZE = "chunkSize";
+    public static final String META_FILE_ID = "fileId";
+    public static final String META_TIME_CREATE = "createTime";
 
     // 主文档：文本在 text，其他信息在 metadata
     @Builder.Default

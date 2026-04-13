@@ -1,11 +1,13 @@
 package com.XYai.myai.RAG.Milvus;
 
 import io.milvus.client.MilvusServiceClient;
+import io.milvus.grpc.MutationResult;
 import io.milvus.grpc.QueryResults;
 import io.milvus.grpc.ShowCollectionsResponse;
 import io.milvus.param.R;
 import io.milvus.param.collection.HasCollectionParam;
 import io.milvus.param.collection.ShowCollectionsParam;
+import io.milvus.param.dml.DeleteParam;
 import io.milvus.param.dml.QueryParam;
 import io.milvus.response.QueryResultsWrapper;
 import jakarta.annotation.Resource;
@@ -127,8 +129,6 @@ public class MilvusService {
             QueryParam queryParam = QueryParam.newBuilder()
                     .withDatabaseName(databaseName)
                     .withCollectionName(collectionName)
-                    // 修复点 1: 如果要查询全部，expr 设为 "id != -1" (假设主键是 id)
-                    // 或者在 expr 为空时一定要加 limit
                     .withExpr("")
                     .withLimit(100L) // 必须加上 limit，否则空 expr 会报错
                     .withOutFields(Collections.singletonList("*")) // 返回所有字段
@@ -169,6 +169,28 @@ public class MilvusService {
         } catch (Exception e) {
             log.error("获取集合 {} 数据异常: ", collectionName, e);
             return Collections.emptyList();
+        }
+    }
+
+    /**
+     * 删除指定的文档/分块
+     */
+    public void deleteDocument(String collectionName, String kbId, String fileName, String chunkId) {
+        // 构建表达式：metadata["kbId"] == "xxx" && metadata["fileName"] == "yyy" && metadata["chunkId"] == 123
+        String safeKbId = kbId == null ? "" : kbId.replace("\\", "\\\\").replace("\"", "\\\"");
+        String safeFileName = fileName == null ? "" : fileName.replace("\\", "\\\\").replace("\"", "\\\"");
+        String expr = String.format(
+                "metadata[\"kbId\"] == \"%s\" && metadata[\"fileName\"] == \"%s\" && metadata[\"chunkId\"] == %s",
+                safeKbId, safeFileName, chunkId);
+
+        DeleteParam deleteParam = DeleteParam.newBuilder()
+                .withDatabaseName(databaseName)
+                .withCollectionName(collectionName)
+                .withExpr(expr)
+                .build();
+        R<MutationResult> response = milvusClient.delete(deleteParam);
+        if (response.getStatus() != R.Status.Success.getCode()) {
+            throw new RuntimeException("删除 Milvus 数据失败: " + response.getMessage());
         }
     }
 

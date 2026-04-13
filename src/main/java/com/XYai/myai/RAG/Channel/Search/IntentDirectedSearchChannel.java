@@ -1,13 +1,11 @@
 package com.XYai.myai.RAG.Channel.Search;
 
-import java.util.*;
-
 import cn.hutool.core.collection.CollUtil;
 import com.XYai.myai.RAG.Aop.Annotation.RagTraceNode;
 import com.XYai.myai.RAG.Channel.POJO.RetrievedChunk;
+import com.XYai.myai.RAG.Channel.POJO.SearchChannel;
 import com.XYai.myai.RAG.Channel.POJO.SearchChannelResult;
 import com.XYai.myai.RAG.Channel.POJO.SearchContext;
-import com.XYai.myai.RAG.Channel.POJO.SearchChannel;
 import com.XYai.myai.RAG.Milvus.MilvusCollectionService;
 import com.XYai.myai.RAG.intent.POJO.IntentNode;
 import com.XYai.myai.RAG.intent.POJO.SubQuestionIntent;
@@ -15,7 +13,10 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Slf4j
 @Component
@@ -84,8 +85,8 @@ public class IntentDirectedSearchChannel implements SearchChannel {
     }
 
     // 并行检索多个Collection
-    private Map<String, Integer> extractCollectionTopK(List<SubQuestionIntent> kbIntents){
-        Map<String,Integer> result = new LinkedHashMap<>();
+    private Map<String, Integer> extractCollectionTopK(List<SubQuestionIntent> kbIntents) {
+        Map<String, Integer> result = new LinkedHashMap<>();
         if (CollUtil.isEmpty(kbIntents)) {
             return result;
         }
@@ -113,8 +114,13 @@ public class IntentDirectedSearchChannel implements SearchChannel {
     private List<RetrievedChunk> searchOneCollection(String collectionName, String query, int topK) {
         int effectiveTopK = Math.max(topK, 1);
         try {
-            // 显式 load 后再查
-            List<Document> documents = milvusCollectionService.ensureReadyForRead(collectionName)
+            // 先判断是否加载再查
+            VectorStore vectorStore = milvusCollectionService.ensureReadyForRead(collectionName);
+            if (vectorStore == null) {
+                log.info("集合未加载:{}",collectionName);
+                return List.of();
+            }
+            List<Document> documents = vectorStore
                     .similaritySearch(SearchRequest.builder()
                             .query(query)
                             .topK(effectiveTopK)
@@ -172,7 +178,6 @@ public class IntentDirectedSearchChannel implements SearchChannel {
 
         return null;
     }
-
 
 
 }

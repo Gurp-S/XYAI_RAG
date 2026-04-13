@@ -1,7 +1,7 @@
 package com.XYai.myai.Config;
 
 import com.XYai.myai.User.LoginUserInfoManager;
-import com.XYai.myai.User.User;
+import com.XYai.myai.User.POJO.User;
 import com.XYai.myai.mapper.UserMapper;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,4 +1,4 @@
-package com.XYai.myai.Chat;
+package com.XYai.myai.RAG.Chat.POJO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

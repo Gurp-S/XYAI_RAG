@@ -17,13 +17,6 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div style="margin-bottom: 1rem; display: flex; gap: 10px;">
-                    <div style="flex: 1;">
-                        <label style="display: block; font-size: 13px; color: #94a3b8; margin-bottom: 8px;">知识库 ID (可选，建议留空由系统自动生成)</label>
-                        <input type="text" v-model="kbId" placeholder="例如: kb_001" 
-                               style="width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: white; outline: none; transition: border-color 0.2s;">
-                    </div>
-                </div>
                 <div class="upload-zone" id="uploadZone" @dragover.prevent @drop.prevent="handleFileDrop">
                     <input type="file" class="file-input" id="fileInput" accept=".pdf,.doc,.docx,.txt" multiple @change="handleFileSelect" title="" />
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"

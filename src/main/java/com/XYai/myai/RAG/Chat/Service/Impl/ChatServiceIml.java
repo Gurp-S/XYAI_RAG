@@ -1,6 +1,6 @@
-package com.XYai.myai.Service.iml;
+package com.XYai.myai.RAG.Chat.Service.Impl;
 
-import com.XYai.myai.Chat.ChatMessage;
+import com.XYai.myai.RAG.Chat.POJO.ChatMessage;
 import com.XYai.myai.RAG.Aop.Annotation.RagTraceNode;
 import com.XYai.myai.RAG.Channel.MultiChannelRetrievalEngine;
 import com.XYai.myai.RAG.Channel.POJO.RetrievedChunk;
@@ -10,9 +10,8 @@ import com.XYai.myai.RAG.intent.IntentResult;
 import com.XYai.myai.RAG.intent.POJO.SubQuestionIntent;
 import com.XYai.myai.RAG.rewrite.POJO.RewriteResult;
 import com.XYai.myai.RAG.rewrite.QueryRewriter;
-import com.XYai.myai.Service.ChatService;
+import com.XYai.myai.RAG.Chat.Service.ChatService;
 import com.alibaba.fastjson2.JSON;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

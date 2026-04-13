@@ -1,9 +1,10 @@
-package com.XYai.myai.Service;
+package com.XYai.myai.User.Service;
 
 import com.XYai.myai.RAG.Memory.POJO.ChatConversation;
 import com.XYai.myai.RAG.Memory.POJO.ChatSessionRecord;
 import com.XYai.myai.Config.Result;
-import com.XYai.myai.User.User;
+import com.XYai.myai.User.POJO.Group;
+import com.XYai.myai.User.POJO.User;
 
 import java.util.List;
 
@@ -49,4 +50,18 @@ public interface UserService {
 
 
     Result<String> register(User user,String Verification);
+
+
+    Group getGroup(Long userId);
+
+
+    List<User> getFriend(Long userId);
+
+
+    Result<String> addFriend(Long userId, Long friendId);
+
+
+    Result<String> deleteFriend(Long userId, Long friendId);
+
+    Result<String> update(User user);
 }

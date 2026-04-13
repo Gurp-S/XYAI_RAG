@@ -3,10 +3,10 @@ package com.XYai.myai.RAG.Milvus;
 import com.XYai.myai.Config.Result;
 import io.milvus.client.MilvusServiceClient;
 import io.milvus.grpc.DataType;
-import io.milvus.param.collection.*;
-import io.milvus.param.index.CreateIndexParam;
 import io.milvus.param.IndexType;
 import io.milvus.param.MetricType;
+import io.milvus.param.collection.*;
+import io.milvus.param.index.CreateIndexParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
@@ -17,8 +17,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -84,10 +84,12 @@ public class MilvusCollectionService {
     private String databaseName;
 
     // ====================== 生命周期,添加创建,删除,重构 ======================
+
     /**
      * 向指定 Milvus 集合添加文档（自动向量化）
+     *
      * @param collectionName 目标集合名
-     * @param documents 文档列表（Spring AI Document 对象）
+     * @param documents      文档列表（Spring AI Document 对象）
      * @return 执行结果
      */
     public Result<String> add(String collectionName, List<Document> documents) {
@@ -130,7 +132,7 @@ public class MilvusCollectionService {
 
     /**
      * 确保集合已显式加载后再用于检索。
-     * 仅在首次访问时执行 load，后续复用本地加载标记。
+     * 加载就可以用于查询,未加载返回NULL
      */
     public VectorStore ensureReadyForRead(String collectionName) {
         String resolved = resolveCollectionName(collectionName);
@@ -138,16 +140,15 @@ public class MilvusCollectionService {
             throw new IllegalStateException("Milvus collection 不存在: " + resolved);
         }
 
-        loadedCache.computeIfAbsent(resolved, key -> {
-            loadCollection(key);
-            return Boolean.TRUE;
-        });
-        return getVectorStore(resolved);
+        if (isLoaded(resolved)) {
+            return storeCache.get(collectionName);
+        }
+        return null;
     }
-
 
     /**
      * 删除 Milvus 集合
+     *
      * @param collectionName 集合名
      * @return 删除结果
      */
@@ -159,8 +160,7 @@ public class MilvusCollectionService {
                     DropCollectionParam.newBuilder()
                             .withDatabaseName(databaseName)
                             .withCollectionName(collectionName)
-                            .build()
-            );
+                            .build());
             // 同步清除缓存
             storeCache.remove(collectionName);
             loadedCache.remove(collectionName);
@@ -174,6 +174,7 @@ public class MilvusCollectionService {
     /**
      * 重建集合 = 先删除 + 再创建
      * 注意：会清空该集合下所有向量数据
+     *
      * @param collectionName 集合名
      * @return 重建结果
      */
@@ -197,9 +198,12 @@ public class MilvusCollectionService {
             return Result.error(0, "重建集合失败：" + e.getMessage());
         }
     }
+
     // ====================== 创建和获取 ======================
+
     /**
      * 规范集合名
+     *
      * @param collectionName 集合名
      * @return 规范名
      */
@@ -234,6 +238,7 @@ public class MilvusCollectionService {
     }
 
     // ====================== 显示创建加载和刷盘 ======================
+
     /**
      * 对齐 Spring AI 默认 Schema 的显式建表 milvus collection，并按当前项目配置创建索引。
      */
@@ -290,7 +295,6 @@ public class MilvusCollectionService {
         }
     }
 
-
     /**
      * 显式加载 collection，确保 Attu / 搜索侧能够立即看到并使用数据。
      */
@@ -301,8 +305,7 @@ public class MilvusCollectionService {
                 LoadCollectionParam.newBuilder()
                         .withDatabaseName(databaseName)
                         .withCollectionName(resolved)
-                        .build()
-        );
+                        .build());
         loadedCache.put(resolved, Boolean.TRUE);
         storeCache.computeIfAbsent(resolved, this::createVectorStore);
         milvusService.refreshCache();
@@ -318,13 +321,12 @@ public class MilvusCollectionService {
                     ReleaseCollectionParam.newBuilder()
                             .withDatabaseName(databaseName)
                             .withCollectionName(resolved)
-                            .build()
-            );
+                            .build());
             loadedCache.remove(resolved);
             storeCache.remove(resolved);
             milvusService.refreshCache();
         } catch (Exception e) {
-            throw  new Exception("取消加载失败");
+            throw new Exception("取消加载失败");
         }
     }
 
@@ -332,6 +334,8 @@ public class MilvusCollectionService {
         String resolved = resolveCollectionName(collectionName);
 
         if (!milvusService.exists(resolved)) {
+            loadedCache.remove(resolved);
+            storeCache.remove(resolved);
             return false;
         }
 
@@ -344,20 +348,25 @@ public class MilvusCollectionService {
                     GetLoadStateParam.newBuilder()
                             .withDatabaseName(databaseName)
                             .withCollectionName(resolved)
-                            .build()
-            );
+                            .build());
 
             if (response == null || response.getData() == null) {
+                loadedCache.remove(resolved);
                 return false;
             }
             // 这里按“Loaded”判断，具体枚举名以你 IDE 自动补全结果为准
-            return response.getData().getState().toString().equalsIgnoreCase("LoadStateLoaded");
+            boolean loaded = response.getData().getState().toString().equalsIgnoreCase("LoadStateLoaded");
+            if (loaded) {
+                loadedCache.put(resolved, Boolean.TRUE);
+            } else {
+                loadedCache.remove(resolved);
+            }
+            return loaded;
 
         } catch (Exception e) {
             throw new IllegalStateException("查询 Milvus collection 加载状态失败: " + resolved, e);
         }
     }
-
 
     /**
      * 显式刷盘，让新写入尽快对外可见。
@@ -367,8 +376,7 @@ public class MilvusCollectionService {
         milvusClient.flush(
                 FlushParam.newBuilder()
                         .addCollectionName(resolved)
-                        .build()
-        );
+                        .build());
     }
 
     private void createEmbeddingIndexIfAbsent(String collectionName) {

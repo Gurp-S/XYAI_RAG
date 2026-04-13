@@ -4,12 +4,16 @@ import com.XYai.myai.RAG.Aop.Annotation.RagTraceRoot;
 import com.XYai.myai.Config.Result;
 import com.XYai.myai.RAG.Memory.POJO.ChatConversation;
 import com.XYai.myai.RAG.Memory.POJO.ChatSessionRecord;
-import com.XYai.myai.Service.UserService;
+import com.XYai.myai.User.POJO.Group;
+import com.XYai.myai.User.POJO.User;
+import com.XYai.myai.User.Service.UserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -77,5 +81,49 @@ public class UserController {
     @PostMapping("/logout")
     public Result<String> logout(Long userId) {
         return userService.logout(userId);
+    }
+
+    /**
+     * 查看组信息
+     * @return 用户所属组
+     */
+    @GetMapping("/group")
+    public Result<Group> getGroup(@RequestParam("userId") Long userId){
+        Group userGroup = userService.getGroup(userId);
+        return Result.success(userGroup);
+    }
+
+    /**
+     * 查看好友信息
+     * @return 用户的好友列表
+     */
+    @GetMapping("/friend")
+    public Result<List<User>> getFriend(@RequestParam("userId") Long userId){
+        List<User> userFriend = userService.getFriend(userId);
+        return Result.success(userFriend);
+    }
+
+    /**
+     * 添加好友
+     */
+    @PostMapping("/friend/add")
+    public Result<String> addFriend(@RequestParam("userId") Long userId,
+                                    @RequestParam("friendId") Long friendId) {
+        return userService.addFriend(userId, friendId);
+    }
+
+    /**
+     * 删除好友
+     */
+    @DeleteMapping("/friend/delete")
+    public Result<String> deleteFriend(@RequestParam("userId") Long userId,
+                                       @RequestParam("friendId") Long friendId) {
+        return userService.deleteFriend(userId, friendId);
+    }
+
+    @PostMapping("/update")
+    public Result<String> updateUser(User user) {
+
+        return userService.update(user);
     }
 }

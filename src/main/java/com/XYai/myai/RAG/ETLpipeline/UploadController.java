@@ -54,8 +54,7 @@ public class UploadController {
     @PostMapping("up")
     public Result<String> upLoad(
             @RequestParam("file") List<MultipartFile> files,
-            @RequestParam("collectionName") String collectionName,
-            @RequestParam(value = "kbId", required = false) String kbId) {
+            @RequestParam("collectionName") String collectionName) {
         if (!uploadProperties.getUpLoadEnabled()) {
             return Result.success("上传未开启");
         }
@@ -72,7 +71,7 @@ public class UploadController {
         CompletableFuture.runAsync(() -> {
             try {
                 for (MultipartFile file : files) {
-                    processSingleFile(file, accumulator, collectionName, kbId);
+                    processSingleFile(file, accumulator, collectionName);
                 }
                 uploadTaskStore.success(taskId, "上传任务已完成");
             } catch (Exception ex) {
@@ -170,8 +169,7 @@ public class UploadController {
         return buildUploadResult(accumulator);
     }
 
-    private void processSingleFile(MultipartFile file, UpLoadAccumulator accumulator, String collectionName,
-                                   String kbId) {
+    private void processSingleFile(MultipartFile file, UpLoadAccumulator accumulator, String collectionName) {
         // 判断错误文件
         if (file == null || file.isEmpty()) {
             accumulator.getFailedFiles().add("unknown(empty)");
@@ -186,7 +184,7 @@ public class UploadController {
                 uploadToOss(file, accumulator, fileName);
             }
             // 构建管道所需对象
-            IngestionContext inputContext = uploadIngestionContextFactory.create(file, collectionName, kbId);
+            IngestionContext inputContext = uploadIngestionContextFactory.create(file, collectionName);
             inputContext.setTaskId(accumulator.getTaskId());
             var pipeline = pipelineDefinitionFactory.createUploadPipeline(fileName, file);
             // 进行管道处理

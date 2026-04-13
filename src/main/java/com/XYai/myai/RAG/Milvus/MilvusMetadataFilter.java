@@ -1,5 +1,6 @@
 package com.XYai.myai.RAG.Milvus;
 
+import com.XYai.myai.RAG.Milvus.POJO.MilvusMetadata;
 import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Component;
 
@@ -14,14 +15,7 @@ public final class MilvusMetadataFilter {
 
     private static final int MAX_STRING_LENGTH = 2000;
 
-    private static final Set<String> ALLOWED_METADATA_KEYS = Set.of(
-            "chunkId",
-            "fileName",
-            "score",
-            "collectionName",
-            "fileSize",
-            "chunkSize"
-    );
+    private static final Set<String> ALLOWED_METADATA_KEYS = MilvusMetadata.metadata;
 
     /**
      * 过滤单个 metadata
@@ -53,7 +47,7 @@ public final class MilvusMetadataFilter {
 
         Map<String, Object> cleanedMetadata = filter(document.getMetadata());
 
-        // Spring AI 的 Document 一般可直接用这个构造方式
+        // Spring AI Document
         return new Document(document.getText(), cleanedMetadata);
     }
 

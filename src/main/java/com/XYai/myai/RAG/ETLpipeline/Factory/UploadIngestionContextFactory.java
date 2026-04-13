@@ -1,5 +1,6 @@
 package com.XYai.myai.RAG.ETLpipeline.Factory;
 
+import cn.hutool.core.util.IdUtil;
 import com.XYai.myai.RAG.ETLpipeline.POJO.IngestionContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.document.Document;
@@ -8,9 +9,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * 上传文件 摄取上下文工厂
@@ -26,14 +28,16 @@ public class UploadIngestionContextFactory {
      *
      * @param file           前端上传的文件对象
      * @param collectionName 向量数据库集合名（用于区分不同知识库存储）
-     * @param kbId           知识库ID（业务库唯一标识）
      * @return 封装完成的 IngestionContext 上下文对象
      * @throws IOException 文件读取IO异常
      */
-    public IngestionContext create(MultipartFile file, String collectionName, String kbId) throws IOException {
+    public IngestionContext create(MultipartFile file, String collectionName) throws IOException {
         // 获取安全文件名（防止文件名为空）
         String fileName = safeFileName(file);
+        String fileId = IdUtil.getSnowflakeNextIdStr();
+        String kbId = IdUtil.getSnowflakeNextIdStr();
         return createContext(
+                fileId,
                 fileName,
                 "upload",
                 file.getBytes(),
@@ -52,7 +56,7 @@ public class UploadIngestionContextFactory {
                                              String sourceType,
                                              String collectionName,
                                              String kbId) {
-        return createContext(sourceUri, sourceType, null, null, collectionName, kbId, null, null);
+        return createContext("1",sourceUri, sourceType, null, null, collectionName, kbId, null, null);
     }
 
     /**
@@ -60,21 +64,11 @@ public class UploadIngestionContextFactory {
      */
     public IngestionContext createInline(String content, String collectionName, String kbId) {
         byte[] rawBytes = content == null ? new byte[0] : content.getBytes(StandardCharsets.UTF_8);
-        return createContext("inline", "inline", rawBytes, "text/plain", collectionName, kbId, "inline", (long) rawBytes.length);
-    }
-    /**
-     * 安全获取文件名
-     * 处理：文件名为null 或 空字符串时，返回默认值 unknown
-     *
-     * @param file 上传文件
-     * @return 安全的文件名
-     */
-    private String safeFileName(MultipartFile file) {
-        String original = file.getOriginalFilename();
-        return (original == null || original.isBlank()) ? "unknown" : original;
+        return createContext("1","inline", "inline", rawBytes, "text/plain", collectionName, kbId, "inline", (long) rawBytes.length);
     }
 
-    private IngestionContext createContext(String sourceUri,
+    private IngestionContext createContext(String fileId,
+                                           String sourceUri,
                                            String sourceType,
                                            byte[] rawBytes,
                                            String mimeType,
@@ -84,17 +78,19 @@ public class UploadIngestionContextFactory {
                                            Long fileSize) {
         // 构建文档元数据（文件信息 + 业务信息）
         Map<String, Object> metadata = new HashMap<>();
+        metadata.put(IngestionContext.META_FILE_ID, fileId);  //文件ID雪花算法递增
         metadata.put(IngestionContext.META_SOURCE_URI, sourceUri);                // 文件来源URI
         metadata.put(IngestionContext.META_SOURCE_TYPE, sourceType);              // 数据来源类型：上传/外部/inline
         metadata.put(IngestionContext.META_RAW_BYTES, rawBytes);                  // 文件原始字节流
         metadata.put(IngestionContext.META_MIME_TYPE, mimeType);                  // 文件MIME类型
         metadata.put(IngestionContext.META_COLLECTION_NAME, collectionName);      // 向量数据库collectionName
-        // 示例：确保 kbId 不为 null 才能 put
-        metadata.put("kbId", Objects.requireNonNullElse(kbId, ""));
-        // 知识库编号
+        metadata.put(IngestionContext.META_KB_ID, kbId); //知识库编号
         metadata.put(IngestionContext.META_FILE_NAME, fileName == null ? sourceUri : fileName); // 文件名
         metadata.put(IngestionContext.META_FILE_SIZE, fileSize);                   // 文件大小
         metadata.put(IngestionContext.META_FILE_CONTENT_TYPE, mimeType);          // 文件内容类型
+        metadata.put(IngestionContext.META_TIME_CREATE,
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+        );  //文件创建时间
 
         // 构建 Spring AI 标准 Document
         Document document = Document.builder()
@@ -106,5 +102,17 @@ public class UploadIngestionContextFactory {
         return IngestionContext.builder()
                 .document(document)
                 .build();
+    }
+
+    /**
+     * 安全获取文件名
+     * 处理：文件名为null 或 空字符串时，返回默认值 unknown
+     *
+     * @param file 上传文件
+     * @return 安全的文件名
+     */
+    private String safeFileName(MultipartFile file) {
+        String original = file.getOriginalFilename();
+        return (original == null || original.isBlank()) ? "unknown" : original;
     }
 }

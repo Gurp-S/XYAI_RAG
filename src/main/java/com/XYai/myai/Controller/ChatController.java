@@ -1,13 +1,10 @@
 package com.XYai.myai.Controller;
 
-import com.XYai.myai.Config.Result;
 import com.XYai.myai.RAG.Aop.Annotation.RagTraceRoot;
-import com.XYai.myai.Service.UserService;
-import com.XYai.myai.User.User;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.XYai.myai.Service.ChatService;
+import com.XYai.myai.RAG.Chat.Service.ChatService;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.MediaType;

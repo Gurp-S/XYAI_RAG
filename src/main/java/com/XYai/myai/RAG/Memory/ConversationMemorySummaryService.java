@@ -1,14 +1,12 @@
 package com.XYai.myai.RAG.Memory;
 
-import com.XYai.myai.Chat.ChatMessage;
+import com.XYai.myai.RAG.Chat.POJO.ChatMessage;
 import com.XYai.myai.RAG.Memory.POJO.ChatConversation;
 import com.XYai.myai.RAG.Memory.POJO.ChatSessionRecord;
 import com.XYai.myai.RAG.Memory.POJO.LoadSession;
 import com.XYai.myai.RAG.Memory.POJO.MemoryProperties;
-import com.XYai.myai.RAG.intent.POJO.IntentNode;
 import com.XYai.myai.mapper.ChatConversationMapper;
 import com.XYai.myai.mapper.ChatSessionRecordMapper;
-import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

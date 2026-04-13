@@ -12,6 +12,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -153,7 +154,11 @@ public class VectorGlobalSearchChannel implements SearchChannel {
 
         try {
             // 显式 load 后再查
-            var vectorStore = milvusCollectionService.ensureReadyForRead(collectionName);
+            VectorStore vectorStore = milvusCollectionService.ensureReadyForRead(collectionName);
+            if (vectorStore == null) {
+                log.info("集合未加载:{}",collectionName);
+                return List.of();
+            }
             // 执行相似度检索
             List<Document> documents = vectorStore.similaritySearch(SearchRequest.builder()
                     .query(context.getQuestion())       // 用户问题

@@ -1,4 +1,4 @@
-package com.XYai.myai.Service;
+package com.XYai.myai.RAG.Chat.Service;
 
 import reactor.core.publisher.Flux;
 
