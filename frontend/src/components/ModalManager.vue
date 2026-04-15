@@ -1,7 +1,7 @@
 ﻿<template>
   <div>
     <!-- Upload Modal -->
-    <div class="modal-overlay" id="uploadModalOverlay" :class="{ active: ui.activeModal === 'upload' }" @click.self="ui.closeModal()">
+    <div id="uploadModalOverlay" class="modal-overlay" :class="{ active: ui.activeModal === 'upload' }" @click.self="ui.closeModal()">
         <div class="modal">
             <div class="modal-header">
                 <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -9,7 +9,7 @@
                         <polyline points="17 8 12 3 7 8"></polyline>
                         <line x1="12" y1="3" x2="12" y2="15"></line>
                     </svg> 知识库训练入库</h3>
-                <button class="modal-close" id="closeUploadModal" @click="ui.closeModal()">
+                <button id="closeUploadModal" class="modal-close" @click="ui.closeModal()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -17,9 +17,10 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="upload-zone" id="uploadZone" @dragover.prevent @drop.prevent="handleFileDrop">
-                    <input type="file" class="file-input" id="fileInput" accept=".pdf,.doc,.docx,.txt" multiple @change="handleFileSelect" title="" />
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                <div id="uploadZone" class="upload-zone" @dragover.prevent @drop.prevent="handleFileDrop">
+                    <input id="fileInput" ref="uploadFileInput" type="file" class="file-input" accept=".pdf,.doc,.docx,.txt" multiple title="" @click="resetUploadFileInput" @change="handleFileSelect" />
+                    <svg
+viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
                         stroke-linejoin="round">
                         <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
                         <polyline points="13 2 13 9 20 9"></polyline>
@@ -28,16 +29,17 @@
                     <span>支持 PDF, DOCX, TXT 格式，单文件最大 50MB</span>
                 </div>
 
-                <div class="upload-progress-container" id="uploadProgressContainer" v-show="ui.isUploading">
+                <div v-show="ui.isUploading" id="uploadProgressContainer" class="upload-progress-container">
                     <div class="upload-doc-info">
                         <span id="uploadFileName">{{ uploadFileName }}</span>
                         <!-- 隐藏不必要的百分号进度数字 -->
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill" id="uploadProgressBar" :style="{ width: ui.uploadProgress + '%' }"></div>
+                        <div id="uploadProgressBar" class="progress-fill" :style="{ width: ui.uploadProgress + '%' }"></div>
                     </div>
-                    <div class="upload-status" id="uploadStatusText">
-                        <svg v-if="ui.uploadProgress < 100" class="spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    <div id="uploadStatusText" class="upload-status">
+                        <svg
+v-if="ui.uploadProgress < 100" class="spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
                         </svg>
@@ -49,7 +51,7 @@
     </div>
 
     <!-- DB Modal -->
-    <div class="modal-overlay" id="dbModalOverlay" :class="{ active: ui.activeModal === 'db' }" @click.self="ui.closeModal()">
+    <div id="dbModalOverlay" class="modal-overlay" :class="{ active: ui.activeModal === 'db' }" @click.self="ui.closeModal()">
         <div class="modal" style="max-width: 800px;">
             <div class="modal-header">
                 <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -57,7 +59,7 @@
                         <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
                         <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
                     </svg> 向量数据库管理 (Milvus/ES)</h3>
-                <button class="modal-close" id="closeDbModal" @click="ui.closeModal()">
+                <button id="closeDbModal" class="modal-close" @click="ui.closeModal()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -80,18 +82,21 @@
 <script setup>
 import { ref, watch } from 'vue'
 import Login from './Login.vue'
-import MilvusManager from './MilvusManager.vue'
 import { useUiStore } from '../store/index'
+import { ensureAccessToken } from '../services/auth'
 
 const ui = useUiStore()
 
 const uploadFileName = ref('')
 const collectionName = ref('default_collection')
 const kbId = ref('')
+const uploadFileInput = ref(null)
 
 let pollTimer = null
 let currentTaskId = null
 let taskFinished = false
+let taskPollRetryCount = 0
+const MAX_TASK_POLL_RETRIES = 6
 
 watch(() => ui.activeModal, (val) => {
     if (val === 'upload' && ui.uploadTargetCollection) {
@@ -106,13 +111,19 @@ function handleFileSelect(e) {
     if (files.length > 0) startUpload(files, e.target)
 }
 
+function resetUploadFileInput(event) {
+    if (event?.target) {
+        event.target.value = ''
+    }
+}
+
 function handleFileDrop(e) {
     e.preventDefault()
     const files = e.dataTransfer.files
     if (files.length > 0) startUpload(files)
 }
 
-function startUpload(files, inputTarget = null) {
+async function startUpload(files, inputTarget = null) {
     if (!collectionName.value.trim()) {
         alert('没有指定所属集合名称，无法上传。请切换合集后再试。')
         return
@@ -120,6 +131,16 @@ function startUpload(files, inputTarget = null) {
 
     ui.isUploading = true
     ui.uploadProgress = 0
+    ui.uploadStatusText = '正在校验登录状态...'
+
+    const accessToken = await ensureAccessToken()
+    if (!accessToken) {
+        ui.isUploading = false
+        ui.uploadProgress = 0
+        ui.uploadStatusText = '登录状态已失效，请重新登录后再上传。'
+        return
+    }
+
     ui.uploadStatusText = '正在上传文件...'
     
     const fileArray = Array.from(files)
@@ -135,9 +156,8 @@ function startUpload(files, inputTarget = null) {
 
     const xhr = new XMLHttpRequest()
     xhr.open('POST', '/upload/up', true)
-
-    // 只要前端一接收到文件并开始提交，就立即关闭模态框
-    ui.closeModal()
+    xhr.withCredentials = true
+    xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`)
 
     xhr.upload.onprogress = (e) => {
         if (e.lengthComputable) {
@@ -175,11 +195,13 @@ function startUpload(files, inputTarget = null) {
     }
 
     xhr.send(formData)
+    ui.closeModal()
 }
 
 function startPollingTask(taskId) {
     currentTaskId = taskId
     taskFinished = false
+    taskPollRetryCount = 0
     if (pollTimer) {
         clearTimeout(pollTimer)
         pollTimer = null
@@ -188,18 +210,40 @@ function startPollingTask(taskId) {
     pollTaskStatus(taskId)
 }
 
+function scheduleTaskPoll(taskId, delay = 450) {
+    if (taskFinished || taskId !== currentTaskId) return
+    if (pollTimer) {
+        clearTimeout(pollTimer)
+    }
+    pollTimer = setTimeout(() => pollTaskStatus(taskId), delay)
+}
+
+function stopPollingWithError(message) {
+    taskFinished = true
+    ui.uploadStatusText = message
+    finishUpload()
+}
+
 async function pollTaskStatus(taskId) {
+    if (taskFinished || taskId !== currentTaskId) return
+
     try {
-        const response = await fetch(`/upload/Task?taskId=${encodeURIComponent(taskId)}`)
+        const response = await fetch(`/upload/Task?taskId=${encodeURIComponent(taskId)}`, {
+            method: 'POST'
+        })
         const payload = await response.json()
         if (payload.code !== 200) {
-            ui.uploadStatusText = payload.msg || '任务查询失败'
-            if (!taskFinished) {
-                pollTimer = setTimeout(() => pollTaskStatus(taskId), 400)
+            taskPollRetryCount += 1
+            if (taskPollRetryCount > MAX_TASK_POLL_RETRIES) {
+                stopPollingWithError(payload.msg || '任务查询失败，请稍后重试。')
+                return
             }
+            ui.uploadStatusText = `${payload.msg || '任务查询失败'}（重试 ${taskPollRetryCount}/${MAX_TASK_POLL_RETRIES}）`
+            scheduleTaskPoll(taskId, Math.min(1400, 450 + taskPollRetryCount * 150))
             return
         }
 
+        taskPollRetryCount = 0
         const snapshot = payload.data || {}
         renderTaskSnapshot(snapshot)
 
@@ -215,12 +259,18 @@ async function pollTaskStatus(taskId) {
             return
         }
 
-        pollTimer = setTimeout(() => pollTaskStatus(taskId), 400)
+        scheduleTaskPoll(taskId, 450)
     } catch (err) {
-        if (!taskFinished) {
-            ui.uploadStatusText = '任务状态查询失败，正在重试...'
-            pollTimer = setTimeout(() => pollTaskStatus(taskId), 800)
+        if (taskFinished || taskId !== currentTaskId) return
+
+        taskPollRetryCount += 1
+        if (taskPollRetryCount > MAX_TASK_POLL_RETRIES) {
+            stopPollingWithError('任务状态查询失败，请检查服务后重试。')
+            return
         }
+
+        ui.uploadStatusText = `任务状态查询失败，正在重试（${taskPollRetryCount}/${MAX_TASK_POLL_RETRIES}）...`
+        scheduleTaskPoll(taskId, Math.min(1600, 700 + taskPollRetryCount * 180))
     }
 }
 
@@ -276,12 +326,12 @@ function finishUpload() {
         clearTimeout(pollTimer)
         pollTimer = null
     }
+    currentTaskId = null
+    taskPollRetryCount = 0
     setTimeout(() => {
         ui.isUploading = false;
-        // 重置文件输入框，确保下次选择相同文件也能触发 change 事件
-        const fileInput = document.getElementById('fileInput');
-        if (fileInput) {
-            fileInput.value = '';
+        if (uploadFileInput.value) {
+            uploadFileInput.value.value = '';
         }
     }, 1500);
 }

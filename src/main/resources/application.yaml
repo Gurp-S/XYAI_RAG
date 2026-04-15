@@ -27,6 +27,7 @@ spring:
         options:
           model: qwen3-max
           temperature: 0.1
+          maxTokens: 4096
     ollama:
       base-url: http://localhost:11434
       embedding:
@@ -46,6 +47,31 @@ spring:
         index-params:
           nlist: 1024
 
+
+
+jwt:
+  issuer: XYai
+  access-token-exp-sec: 900
+  refresh-token-exp-sec: 1209600
+  refresh-cookie-name: refresh_token
+  header: Authorization
+  prefix: Bearer
+  http-secure: false
+  rsa-private-key-path: D:/lea/xyai/config/keys/private_pkcs8.pem
+  rsa-public-key-path: D:/lea/xyai/config/keys/public_x509.pem
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      searchChannel:
+        slidingWindowSize: 10       # 最近10次调用统计
+        failureRateThreshold: 50    # 失败率≥50% 开启熔断
+        waitDurationInOpenState: 10s # 熔断10秒后半开重试
+        permittedNumberOfCallsInHalfOpenState: 3
+  timelimiter:
+    instances:
+      searchChannel:
+        timeoutDuration: 3s   # 接口超时时间
 
 app:
   memory:

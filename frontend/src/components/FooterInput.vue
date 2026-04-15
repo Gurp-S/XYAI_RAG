@@ -2,12 +2,13 @@
   <footer class="input-area">
     <div class="input-wrapper">
         <label class="sr-only" for="message">消息输入</label>
-        <textarea id="message" rows="1"
-            placeholder="输入你想咨询的问题，或要求查询企业知识库... (按 Enter 发送，Shift+Enter 换行)"
-            :value="modelValue" 
+        <textarea
+id="message" ref="textareaRef"
+            rows="1"
+            placeholder="输入你想咨询的问题，或要求查询企业知识库... (按 Enter 发送，Shift+Enter 换行)" 
+            :value="modelValue"
             @input="onInput"
             @keydown.enter="handleEnter"
-            ref="textareaRef"
             ></textarea>
         <button id="send" class="btn-send" title="发送消息" @click="$emit('send')">
             <svg viewBox="0 0 24 24">

@@ -1,5 +1,5 @@
 ﻿<template>
-  <aside class="sidebar" id="sidebar" :class="{ collapsed: store.isSidebarCollapsed }">
+  <aside id="sidebar" class="sidebar" :class="{ collapsed: store.isSidebarCollapsed }">
     <div class="sidebar-header">
         <svg viewBox="0 0 24 24">
             <path
@@ -8,14 +8,14 @@
         <span>XY-AI 引擎</span>
     </div>
     <div class="menu">
-        <div class="history-label">功能菜单</div>
-        <div class="menu-item" id="navChat" title="聊天会话" @click="store.setView('chat')" :class="{ active: store.currentView === 'chat' }">
+        <div class="history-label">工作区</div>
+        <div id="navChat" class="menu-item" title="聊天会话" :class="{ active: isChatHomeActive }" @click="switchToChat">
             <svg viewBox="0 0 24 24">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
             </svg>
             <span>聊天会话</span>
         </div>
-        <div class="menu-item" id="navDB" title="向量数据库" @click="store.setView('db')" :class="{ active: store.currentView === 'db' }">
+        <div id="navDB" class="menu-item" title="向量数据库" :class="{ active: store.currentView === 'db' }" @click="switchToDb">
             <svg viewBox="0 0 24 24">
                 <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
                 <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
@@ -26,17 +26,22 @@
     </div>
 
     <div class="history-container">
-        <HistoryList :history="store.chatHistory" @select="store.selectConversation" />
+        <div v-if="!store.isSidebarCollapsed" class="history-label">历史对话</div>
+        <HistoryList
+            :history="store.chatHistory"
+            :active-conversation-id="store.activeConversationId"
+            @select="handleSelectConversation"
+        />
     </div>
 
-    <div class="user-profile" title="用户中心">
-        <div class="user-profile-main" @click="!store.currentUser && store.openLogin()" style="display: flex; align-items: center; gap: 12px; flex: 1; cursor: pointer; min-width: 0;">
-            <div class="user-avatar-inner" :style="avatarStyle">
-                {{ store.currentUser ? store.currentUser.name.substring(0,2).toUpperCase() : '?' }}
+    <div class="user-profile" title="用户中心" @click.stop="toggleUserCenter()">
+        <div class="user-profile-main">
+            <div class="user-avatar-inner" :class="{ offline: !store.currentUser }">
+                {{ store.currentUser ? store.userAvatarText : '?' }}
             </div>
             <div class="user-info">
-                <div class="user-name">{{ store.currentUser ? store.currentUser.name : '未登录' }}</div>
-                <div class="user-status" :style="{ color: store.currentUser ? '#00e5ff' : '#94a3b8' }">
+                <div class="user-name">{{ store.currentUser ? store.userDisplayName : '未登录' }}</div>
+                <div class="user-status" :class="{ offline: !store.currentUser }">
                     {{ store.currentUser ? 'Online' : 'Offline' }}
                 </div>
             </div>
@@ -50,41 +55,70 @@
             </svg>
         </button>
     </div>
+    <UserCenter :is-open="showUserCenter" @close="showUserCenter = false" />
   </aside>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUiStore } from '../store/index'
 import HistoryList from './HistoryList.vue'
+import UserCenter from './UserCenter.vue'
 
 const store = useUiStore()
 const router = useRouter()
+const showUserCenter = ref(false)
 
-const avatarStyle = computed(() => {
-  if (!store.currentUser) return { background: '#334155', color: '#94a3b8', border: 'none' }
-  return { background: '#00e5ff', color: '#fff', border: 'none' }
-})
+const isChatHomeActive = computed(() =>
+    store.currentView === 'chat',
+)
 
-function navigateTo(path) {
-  router.push(path)
+function toggleUserCenter() {
+    if (!store.currentUser) {
+        store.openLogin()
+        return
+    }
+    showUserCenter.value = !showUserCenter.value
+}
+
+function switchToChat() {
+    store.setAiChatContext()
+    store.setView('chat')
+    if (router.currentRoute.value.path !== '/') {
+        router.push('/')
+    }
+}
+
+function switchToDb() {
+    store.setView('db')
+    if (router.currentRoute.value.path !== '/') {
+        router.push('/')
+    }
+}
+
+function handleSelectConversation(session) {
+    store.setView('chat')
+    if (router.currentRoute.value.path !== '/') {
+        router.push('/')
+    }
+    store.selectConversation(session)
 }
 
 function handleLogout() {
-  store.confirmLogout()
+    showUserCenter.value = false
+    store.confirmLogout()
 }
 </script>
 
 <style scoped>
-.user-profile {
-    margin-top: auto;
-    padding: 1.5rem;
-    border-top: 1px solid var(--sidebar-border);
+.user-profile-main {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    transition: all 0.2s ease;
+    gap: 12px;
+    flex: 1;
+    cursor: pointer;
+    min-width: 0;
 }
 
 .user-avatar-inner {
@@ -94,9 +128,18 @@ function handleLogout() {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
+    font-weight: 700;
     font-size: 14px;
     flex-shrink: 0;
+    color: #fff;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    box-shadow: 0 8px 16px rgba(22, 42, 86, 0.22);
+}
+
+.user-avatar-inner.offline {
+    background: color-mix(in srgb, var(--surface-solid) 78%, #3f4f73);
+    color: var(--text-muted);
+    box-shadow: none;
 }
 
 .user-info {
@@ -104,34 +147,21 @@ function handleLogout() {
     flex: 1;
 }
 
-.logout-btn {
-    background: rgba(255, 255, 255, 0.05); /* 增加一点底色 */
-    border: 1px solid rgba(255, 255, 255, 0.1);
+.user-status.offline {
     color: #94a3b8;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    position: relative;
-    z-index: 50; /* 极高层级 */
-    flex-shrink: 0;
 }
 
-.logout-btn:hover {
-    background: rgba(239, 68, 68, 0.15);
-    color: #ff4d4f;
-    border-color: rgba(239, 68, 68, 0.3);
+.logout-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
 }
 
 .sidebar.collapsed .logout-btn {
-    display: none;
+    margin-left: 0;
 }
 
-
-body.dark .user-profile {
-    border-top-color: rgba(255,255,255,0.05);
+.sidebar.collapsed .history-label {
+    display: none;
 }
 </style>

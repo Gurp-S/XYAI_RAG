@@ -22,3 +22,14 @@ spring:
   ai:
     openai:
       api-key: sk-37744335322d444d90d4111bd932837c
+jwt:
+  issuer: XYai
+  access-token-exp-sec: 900
+  refresh-token-exp-sec: 1209600
+  refresh-cookie-name: refresh_token
+  header: Authorization
+  prefix: Bearer
+  http-secure: false
+  # 下面使用你刚才放置的绝对路径
+  rsa-private-key-path: D:/lea/xyai/config/keys/private_pkcs8.pem
+  rsa-public-key-path: D:/lea/xyai/config/keys/public_x509.pem

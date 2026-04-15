@@ -1,6 +1,6 @@
 package com.XYai.myai.mapper;
 
-import com.XYai.myai.User.POJO.User;
+import com.XYai.myai.user.POJO.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -17,15 +17,15 @@ import java.util.List;
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
 
-		@Select("select case when user_id = #{userId} then friend_id else user_id end as friend_id " +
-				"from t_user_friend where user_id = #{userId} or friend_id = #{userId}")
+	@Select("select case when user_id = #{userId} then friend_id else user_id end as friend_id " +
+			"from xy_user_friend where user_id = #{userId} or friend_id = #{userId}")
 	List<Long> selectFriendIds(@Param("userId") Long userId);
 
-		@Insert("insert ignore into t_user_friend(user_id, friend_id, create_time) " +
-				"values(LEAST(#{userId}, #{friendId}), GREATEST(#{userId}, #{friendId}), now())")
+	@Insert("insert ignore into xy_user_friend(user_id, friend_id, create_time) " +
+			"values(LEAST(#{userId}, #{friendId}), GREATEST(#{userId}, #{friendId}), now())")
 	int insertFriendRelation(@Param("userId") Long userId, @Param("friendId") Long friendId);
 
-		@Delete("delete from t_user_friend where pair_low_id = LEAST(#{userId}, #{friendId}) " +
-				"and pair_high_id = GREATEST(#{userId}, #{friendId})")
+	@Delete("delete from xy_user_friend where pair_low_id = LEAST(#{userId}, #{friendId}) " +
+			"and pair_high_id = GREATEST(#{userId}, #{friendId})")
 	int deleteFriendRelation(@Param("userId") Long userId, @Param("friendId") Long friendId);
 }
