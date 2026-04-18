@@ -131,11 +131,9 @@ width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 
 <script setup>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
 import { useUiStore } from '../store/index'
 
 const store = useUiStore()
-const router = useRouter()
 const isDark = computed(() => store.darkMode)
 const showAppearancePanel = ref(false)
 const appearanceAnchor = ref(null)
@@ -163,8 +161,6 @@ const sidebarStyleOptions = [
 function handleNewChat() {
     showAppearancePanel.value = false
     store.newConversation();
-    store.setView('chat');
-    router.push('/');
 }
 
 function toggleThemeLocally() {

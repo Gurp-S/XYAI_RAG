@@ -150,9 +150,14 @@ const uploadProgress = ref(0)
 const uploadStatusText = ref('')
 const uploadStage = ref('empty')
 const MAX_FILE_SIZE = 50 * 1024 * 1024
+const INITIAL_POLL_DELAY_MS = 100
+
 
 let pollTimer = null
 let activeTaskId = ''
+let taskFinished = false
+let taskPollRetryCount = 0
+const MAX_TASK_POLL_RETRIES = 6
 
 const canUpload = computed(
   () =>
@@ -297,22 +302,12 @@ function clearPollingTimer() {
 
 function renderTaskSnapshot(snapshot) {
   const status = String(snapshot.status || '').toUpperCase()
-  const nodeType = String(snapshot.currentNodeType || '').toLowerCase()
+  const nodeType = snapshot.currentNodeType || snapshot.message || ''
   const displayText = snapshot.displayText || ''
-  const progress =
-    typeof snapshot.progress === 'number' ? Math.max(0, Math.min(100, Math.round(snapshot.progress))) : null
-
-  const nodeMap = {
-    fetcher: '获取源文件',
-    parser: '解析文档',
-    enricher: '语义增强',
-    chunker: '内容分块',
-    indexer: '向量入库',
-    start: '任务启动中',
-  }
+  const progress = typeof snapshot.progress === 'number' ? snapshot.progress : null
 
   if (status === 'WAITING') {
-    uploadStatusText.value = displayText || snapshot.message || '任务排队中...'
+    uploadStatusText.value = displayText || snapshot.message || '任务准备中...'
     uploadProgress.value = progress ?? 5
     return
   }
@@ -320,33 +315,79 @@ function renderTaskSnapshot(snapshot) {
   if (status === 'ERROR') {
     uploadStage.value = 'error'
     uploadStatusText.value = displayText || snapshot.message || snapshot.errorMessage || '处理失败'
-    uploadProgress.value = progress ?? Math.max(uploadProgress.value, 88)
+    uploadProgress.value = progress ?? 100
     return
   }
 
-  uploadStatusText.value =
-    displayText ||
-    `正在执行：${nodeMap[nodeType] || snapshot.currentNodeType || '处理任务'}...`
+  const nodeMap = {
+    fetcher: '获取源文件',
+    parser: '解析文档',
+    enricher: '语义增强',
+    chunker: '内容分块',
+    indexer: '向量入库',
+    copy: '跨集合复用',
+    start: '任务启动中',
+  }
 
+  const lowerType = String(nodeType).toLowerCase()
+  uploadStatusText.value = displayText || `正在执行：${nodeMap[lowerType] || nodeType}...`
   if (progress !== null) {
     uploadProgress.value = progress
+  } else {
+    const nodeOrder = ['fetcher', 'parser', 'enricher', 'chunker', 'indexer']
+    const idx = nodeOrder.indexOf(lowerType)
+    if (idx !== -1) {
+      uploadProgress.value = 20 + Math.round((idx / (nodeOrder.length - 1)) * 75)
+    }
   }
 }
 
+async function startPollingTask(taskId) {
+  activeTaskId = taskId
+  taskFinished = false
+  taskPollRetryCount = 0
+  if (pollTimer) {
+    clearTimeout(pollTimer)
+    pollTimer = null
+  }
+  // 首次快速拉取一次
+  pollTaskStatus(taskId)
+}
+
+function scheduleTaskPoll(taskId, delay = 450) {
+  if (taskFinished || taskId !== activeTaskId) return
+  if (pollTimer) clearTimeout(pollTimer)
+  pollTimer = setTimeout(() => pollTaskStatus(taskId), delay)
+}
+
+function stopPollingWithError(message) {
+  taskFinished = true
+  uploadStage.value = 'error'
+  uploadStatusText.value = message
+  isUploading.value = false
+  clearPollingTimer()
+}
+
 async function pollTaskStatus(taskId) {
-    try {
+  if (taskFinished || taskId !== activeTaskId) return
+
+  try {
     const response = await fetch(`/upload/Task?taskId=${encodeURIComponent(taskId)}`, {
       method: 'POST'
     })
     const payload = await response.json()
-
     if (payload.code !== 200) {
-      uploadStage.value = 'error'
-      uploadStatusText.value = payload.msg || '任务状态查询失败'
-      isUploading.value = false
+      taskPollRetryCount += 1
+      if (taskPollRetryCount > MAX_TASK_POLL_RETRIES) {
+        stopPollingWithError(payload.msg || '任务查询失败，请稍后重试。')
+        return
+      }
+      uploadStatusText.value = `${payload.msg || '任务查询失败'}（重试 ${taskPollRetryCount}/${MAX_TASK_POLL_RETRIES}）`
+      scheduleTaskPoll(taskId, Math.min(1400, 450 + taskPollRetryCount * 150))
       return
     }
 
+    taskPollRetryCount = 0
     const snapshot = payload.data || {}
     renderTaskSnapshot(snapshot)
 
@@ -354,22 +395,31 @@ async function pollTaskStatus(taskId) {
     if (status === 'SUCCESS') {
       uploadStage.value = 'success'
       uploadStatusText.value = snapshot.displayText || '上传完成，知识库已更新'
-      uploadProgress.value =
-        typeof snapshot.progress === 'number' ? Math.min(100, Math.round(snapshot.progress)) : 100
+      uploadProgress.value = typeof snapshot.progress === 'number' ? Math.min(100, Math.round(snapshot.progress)) : 100
       isUploading.value = false
+      clearPollingTimer()
       return
     }
 
     if (status === 'ERROR') {
+      uploadStage.value = 'error'
       isUploading.value = false
+      clearPollingTimer()
       return
     }
 
-    pollTimer = setTimeout(() => pollTaskStatus(taskId), 420)
+    scheduleTaskPoll(taskId, 450)
   } catch (error) {
-    uploadStage.value = 'error'
-    uploadStatusText.value = '任务状态查询失败，请稍后重试'
-    isUploading.value = false
+    if (taskFinished || taskId !== activeTaskId) return
+
+    taskPollRetryCount += 1
+    if (taskPollRetryCount > MAX_TASK_POLL_RETRIES) {
+      stopPollingWithError('任务状态查询失败，请稍后重试。')
+      return
+    }
+
+    uploadStatusText.value = `任务状态查询失败，正在重试（${taskPollRetryCount}/${MAX_TASK_POLL_RETRIES}）...`
+    scheduleTaskPoll(taskId, Math.min(1600, 700 + taskPollRetryCount * 180))
   }
 }
 
@@ -435,7 +485,8 @@ async function startUpload() {
       activeTaskId = taskId
       uploadStatusText.value = '上传完成，正在执行知识入库任务...'
       uploadProgress.value = Math.max(uploadProgress.value, 24)
-      pollTaskStatus(activeTaskId)
+      clearPollingTimer()
+      startPollingTask(activeTaskId)
     } catch (error) {
       uploadStage.value = 'error'
       uploadStatusText.value = '上传响应解析失败'

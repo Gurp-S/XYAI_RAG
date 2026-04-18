@@ -140,6 +140,15 @@ watch(assistantMarkdownHtml, () => {
 .assistant-markdown {
   white-space: normal;
   color: var(--text-main);
+  font-size: 0.98rem;
+  line-height: 1.82;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--bot-msg) 96%, var(--surface-solid)),
+    color-mix(in srgb, var(--bot-msg) 90%, var(--surface-solid))
+  );
+  border-color: color-mix(in srgb, var(--panel-border) 86%, transparent);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
 }
 
 .assistant-markdown :deep(*:first-child) {
@@ -177,7 +186,9 @@ watch(assistantMarkdownHtml, () => {
   border-radius: 6px;
   font-family: "JetBrains Mono", "Consolas", monospace;
   font-size: 0.86em;
-  background: color-mix(in srgb, var(--bg-hover) 62%, transparent);
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface-solid));
+  border: 1px solid color-mix(in srgb, var(--panel-border) 68%, transparent);
+  color: var(--text-main);
 }
 
 .assistant-markdown :deep(pre.code-block) {
@@ -187,7 +198,7 @@ watch(assistantMarkdownHtml, () => {
   border-radius: 16px;
   border: 1px solid color-mix(in srgb, var(--panel-border) 74%, transparent);
   background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(2, 6, 23, 0.98)),
+    linear-gradient(180deg, rgba(10, 15, 28, 0.98), rgba(5, 10, 20, 0.98)),
     color-mix(in srgb, var(--bg-hover) 74%, transparent);
   box-shadow:
     0 18px 34px rgba(2, 6, 23, 0.20),
@@ -221,7 +232,7 @@ watch(assistantMarkdownHtml, () => {
   pointer-events: none;
   background:
     linear-gradient(90deg, rgba(96, 165, 250, 0.12), transparent 26%, transparent 74%, rgba(167, 139, 250, 0.12));
-  opacity: 0.9;
+  opacity: 0.34;
 }
 
 .assistant-markdown :deep(pre.code-block code) {
@@ -232,7 +243,7 @@ watch(assistantMarkdownHtml, () => {
   background: transparent;
   color: inherit;
   font-family: "JetBrains Mono", "Consolas", monospace;
-  font-size: 0.88rem;
+  font-size: 0.92rem;
   line-height: 1.72;
   white-space: pre;
 }

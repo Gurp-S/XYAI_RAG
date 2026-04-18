@@ -15,7 +15,7 @@
             </svg>
             <span>聊天会话</span>
         </div>
-        <div id="navDB" class="menu-item" title="向量数据库" :class="{ active: store.currentView === 'db' }" @click="switchToDb">
+        <div id="navDB" class="menu-item" title="向量数据库" :class="{ active: isDbRoute }" @click="switchToDb">
             <svg viewBox="0 0 24 24">
                 <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
                 <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
@@ -61,18 +61,19 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useUiStore } from '../store/index'
 import HistoryList from './HistoryList.vue'
 import UserCenter from './UserCenter.vue'
 
 const store = useUiStore()
-const router = useRouter()
+const route = useRoute()
 const showUserCenter = ref(false)
 
 const isChatHomeActive = computed(() =>
-    store.currentView === 'chat',
+    route.path === '/' || route.path.startsWith('/chat'),
 )
+const isDbRoute = computed(() => route.path.startsWith('/db'))
 
 function toggleUserCenter() {
     if (!store.currentUser) {
@@ -84,24 +85,14 @@ function toggleUserCenter() {
 
 function switchToChat() {
     store.setAiChatContext()
-    store.setView('chat')
-    if (router.currentRoute.value.path !== '/') {
-        router.push('/')
-    }
 }
 
 function switchToDb() {
     store.setView('db')
-    if (router.currentRoute.value.path !== '/') {
-        router.push('/')
-    }
 }
 
 function handleSelectConversation(session) {
     store.setView('chat')
-    if (router.currentRoute.value.path !== '/') {
-        router.push('/')
-    }
     store.selectConversation(session)
 }
 

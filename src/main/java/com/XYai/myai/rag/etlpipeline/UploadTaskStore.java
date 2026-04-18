@@ -6,20 +6,27 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.redisson.api.RedissonClient;
+import org.redisson.api.RMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import java.util.concurrent.TimeUnit;
+import com.XYai.myai.rag.milvus.MilvusCollectionService;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.ConcurrentHashMap;
+// ...existing code...
 
 @Component
 public class UploadTaskStore {
 
     private static final String TASK_KEY_PREFIX = "UploadTask:";
 
-    private final ConcurrentHashMap<String, TaskState> memory = new ConcurrentHashMap<>();
-
     @Resource
-    private StringRedisTemplate stringRedisTemplate;
+    private RedissonClient redissonClient;
+
+    @Autowired(required = false)
+    private MilvusCollectionService milvusCollectionService;
+
+    private static final String REDIS_TASK_MAP = "xyai:upload:tasks";
 
     public TaskState start(String taskId) {
         TaskState state = TaskState.builder()
@@ -51,11 +58,74 @@ public class UploadTaskStore {
         return put(taskId, state);
     }
 
+    public TaskState copy(String taskId, String sourceCollection, String targetCollection) {
+        // 如果注入了 MilvusCollectionService，则在上传层进行短轮询等待，避免直接发起冲突操作
+        boolean ready = true;
+        if (milvusCollectionService != null) {
+            ready = waitForUnlock(targetCollection, 30000L, 500L);
+        }
+
+        if (!ready) {
+            // 目标集合仍被占用，记录等待态并返回
+            TaskState waiting = TaskState.builder()
+                    .taskId(taskId)
+                    .status("WAITING")
+                    .currentNodeType("copy")
+                    .nodeLabel("跨集合复用")
+                    .displayText("目标集合忙，已加入等待队列：" + targetCollection)
+                    .message("等待目标集合解锁")
+                    .progress(50)
+                    .eventType("snapshot")
+                    .startTime(existingStartTime(taskId))
+                    .build();
+            return put(taskId, waiting);
+        }
+
+        TaskState state = TaskState.builder()
+                .taskId(taskId)
+                .status("RUNNING")
+                .currentNodeType("copy")
+                .nodeLabel("跨集合复用")
+                .displayText("检测到相同内容已存在于集合 [" + sourceCollection + "]，正在复制到当前集合 [" + targetCollection + "]")
+                .message("跨集合复制")
+                .progress(70)
+                .eventType("snapshot")
+                .startTime(existingStartTime(taskId))
+                .build();
+        return put(taskId, state);
+    }
+
+    /**
+     * 等待目标集合解锁（通过 milvusCollectionService.getModifyWaitState 查询），
+     * 超时时间内轮询，返回 true 表示已解锁可以继续。
+     */
+    private boolean waitForUnlock(String collectionName, long timeoutMillis, long pollIntervalMillis) {
+        long deadline = System.currentTimeMillis() + timeoutMillis;
+        while (System.currentTimeMillis() < deadline) {
+            try {
+                var state = milvusCollectionService.getModifyWaitState(collectionName);
+                Object lockedObj = state.getOrDefault("locked", Boolean.FALSE);
+                boolean locked = Boolean.TRUE.equals(lockedObj);
+                if (!locked) return true;
+            } catch (Exception ignored) {
+                // 如果查询失败，短暂等待后重试
+            }
+            try {
+                Thread.sleep(pollIntervalMillis);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+        return false;
+    }
+
     public TaskState success(String taskId, String message) {
+        String displayText = (message == null || message.isBlank()) ? "任务已完成" : message;
         TaskState state = TaskState.builder()
                 .taskId(taskId)
                 .status("SUCCESS")
-                .displayText("任务已完成")
+            .displayText(displayText)
                 .message(message)
                 .progress(100)
                 .eventType("complete")
@@ -81,47 +151,55 @@ public class UploadTaskStore {
     }
 
     public TaskState get(String taskId) {
-        TaskState state = memory.get(taskId);
-        if (state != null) {
-            return state;
-        }
-        if (stringRedisTemplate != null) {
-            String json = stringRedisTemplate.opsForValue().get(redisKey(taskId));
+        // Primary store is Redisson map
+        try {
+            RMap<String, String> map = redissonClient.getMap(REDIS_TASK_MAP);
+            String json = map.get(taskId);
             if (json != null && !json.isBlank()) {
                 try {
                     return JSON.parseObject(json, TaskState.class);
                 } catch (Exception ignored) {
-                    return null;
                 }
             }
+        } catch (Exception ignored) {
         }
         return null;
     }
 
     public void remove(String taskId) {
-        memory.remove(taskId);
+        try {
+            RMap<String, String> map = redissonClient.getMap(REDIS_TASK_MAP);
+            map.remove(taskId);
+        } catch (Exception ignored) {
+        }
     }
 
     private TaskState put(String taskId, TaskState state) {
-        memory.put(taskId, state);
-        if (stringRedisTemplate != null) {
-            try {
-                stringRedisTemplate.opsForValue().set(redisKey(taskId), JSON.toJSONString(state));
-            } catch (Exception ignored) {
-                // Redis is just a mirror.
-            }
+        try {
+            RMap<String, String> map = redissonClient.getMap(REDIS_TASK_MAP);
+            map.put(taskId, JSON.toJSONString(state));
+        } catch (Exception ignored) {
         }
         return state;
     }
 
     private Long existingStartTime(String taskId) {
-        TaskState current = memory.get(taskId);
-        return current == null ? System.currentTimeMillis() : current.getStartTime();
+        try {
+            RMap<String, String> map = redissonClient.getMap(REDIS_TASK_MAP);
+            String json = map.get(taskId);
+            if (json != null) {
+                try {
+                    TaskState ts = JSON.parseObject(json, TaskState.class);
+                    if (ts != null && ts.getStartTime() != null) return ts.getStartTime();
+                } catch (Exception ignored) {
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return System.currentTimeMillis();
     }
 
-    private String redisKey(String taskId) {
-        return TASK_KEY_PREFIX + taskId;
-    }
+    // redisKey method no longer used; kept for historical reference
 
     private String labelFor(String nodeType) {
         if (nodeType == null) {
@@ -133,6 +211,7 @@ public class UploadTaskStore {
             case "enricher" -> "语义增强";
             case "chunker" -> "内容分块";
             case "indexer" -> "向量入库";
+            case "copy" -> "跨集合复用";
             default -> nodeType;
         };
     }
@@ -147,6 +226,7 @@ public class UploadTaskStore {
             case "enricher" -> 60;
             case "chunker" -> 80;
             case "indexer" -> 95;
+            case "copy" -> 70;
             default -> 10;
         };
     }

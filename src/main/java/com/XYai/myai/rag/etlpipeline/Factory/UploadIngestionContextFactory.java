@@ -15,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * 上传文件 摄取上下文工厂
@@ -31,17 +32,17 @@ public class UploadIngestionContextFactory {
      * @param file           前端上传的文件对象
      * @param collectionName 向量数据库集合名（用于区分不同知识库存储）
      * @param user           当前登录用户
+     * @param fileHashId     fileId
      * @return 封装完成的 IngestionContext 上下文对象
      * @throws IOException 文件读取IO异常
      */
-    public IngestionContext create(MultipartFile file, String collectionName, User user) throws IOException {
+    public IngestionContext create(MultipartFile file, String collectionName, User user, String fileHashId)
+            throws IOException {
         String fileName = safeFileName(file);
-        String fileId = IdUtil.getSnowflakeNextIdStr();
         String kbId = IdUtil.getSnowflakeNextIdStr();
-
         // ========== 传入用户信息，用于权限注入 ==========
         return createContext(
-                fileId,
+                fileHashId,
                 fileName,
                 "upload",
                 file.getBytes(),
@@ -50,7 +51,7 @@ public class UploadIngestionContextFactory {
                 kbId,
                 fileName,
                 file.getSize(),
-                user  // 传入用户
+                user // 传入用户
         );
     }
 
@@ -58,10 +59,10 @@ public class UploadIngestionContextFactory {
      * 外部来源入口：URL、本地文件路径都可以统一走这里。
      */
     public IngestionContext createFromSource(String sourceUri,
-                                             String sourceType,
-                                             String collectionName,
-                                             String kbId,
-                                             User user) { // 加 user
+            String sourceType,
+            String collectionName,
+            String kbId,
+            User user) { // 加 user
         return createContext("1", sourceUri, sourceType, null, null, collectionName, kbId, null, null, user);
     }
 
@@ -70,24 +71,25 @@ public class UploadIngestionContextFactory {
      */
     public IngestionContext createInline(String content, String collectionName, String kbId, User user) {
         byte[] rawBytes = content == null ? new byte[0] : content.getBytes(StandardCharsets.UTF_8);
-        return createContext("1", "inline", "inline", rawBytes, "text/plain", collectionName, kbId, "inline", (long) rawBytes.length, user);
+        return createContext("1", "inline", "inline", rawBytes, "text/plain", collectionName, kbId, "inline",
+                (long) rawBytes.length, user);
     }
 
     /**
      * 核心：创建上下文（已加入权限）
      */
-    private IngestionContext createContext(String fileId,
-                                           String sourceUri,
-                                           String sourceType,
-                                           byte[] rawBytes,
-                                           String mimeType,
-                                           String collectionName,
-                                           String kbId,
-                                           String fileName,
-                                           Long fileSize,
-                                           User user) { // 这里加入 User
+    private IngestionContext createContext(String fileHashId,
+            String sourceUri,
+            String sourceType,
+            byte[] rawBytes,
+            String mimeType,
+            String collectionName,
+            String kbId,
+            String fileName,
+            Long fileSize,
+            User user) { // 这里加入 User
         Map<String, Object> metadata = new HashMap<>();
-        metadata.put(IngestionContext.META_FILE_ID, fileId);
+        metadata.put(IngestionContext.META_FILE_ID, fileHashId);
         metadata.put(IngestionContext.META_SOURCE_URI, sourceUri);
         metadata.put(IngestionContext.META_SOURCE_TYPE, sourceType);
         metadata.put(IngestionContext.META_RAW_BYTES, rawBytes);
@@ -98,8 +100,7 @@ public class UploadIngestionContextFactory {
         metadata.put(IngestionContext.META_FILE_SIZE, fileSize);
         metadata.put(IngestionContext.META_FILE_CONTENT_TYPE, mimeType);
         metadata.put(IngestionContext.META_TIME_CREATE,
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-        );
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
         // ====================== 【自动注入权限字段】 ======================
         if (user != null) {

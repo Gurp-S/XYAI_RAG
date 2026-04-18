@@ -10,10 +10,7 @@
   >
     <Sidebar v-if="ui.currentUser" />
     <main v-if="ui.currentUser" class="main-content-wrapper">
-      <router-view v-if="ui.currentView === 'chat'" key="chat-view" />
-      <div v-else-if="ui.currentView === 'db'" key="db-view" class="db-manager-view">
-        <MilvusManager />
-      </div>
+      <router-view />
     </main>
     <ModalManager v-if="ui.currentUser" />
     
@@ -39,53 +36,22 @@ import Sidebar from './components/Sidebar.vue'
 import ModalManager from './components/ModalManager.vue'
 import Login from './components/Login.vue'
 import { useUiStore } from './store/index'
-import { onMounted, watch, defineAsyncComponent } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-
-const loadMilvusManager = () => import('./components/MilvusManager.vue')
-const MilvusManager = defineAsyncComponent(loadMilvusManager)
+import { onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 
 const ui = useUiStore()
 const route = useRoute()
-const router = useRouter()
-const chatRouteSet = new Set(['/'])
-
-function preloadDbViewComponent() {
-  const preload = () => {
-    loadMilvusManager().catch(() => {})
-  }
-
-  if (typeof window === 'undefined') return
-  if (typeof window.requestIdleCallback === 'function') {
-    window.requestIdleCallback(preload, { timeout: 1200 })
-    return
-  }
-  setTimeout(preload, 220)
-}
-
-function syncChatRoute() {
-  if (ui.currentView === 'chat' && !chatRouteSet.has(route.path)) {
-    router.replace('/')
-  }
-}
 
 onMounted(() => {
   // 如果已登录但没有历史记录，初始化拉取一次
   if (ui.currentUser && ui.chatHistory.length === 0) {
     ui.fetchHistory()
   }
-  if (ui.currentUser) {
-    preloadDbViewComponent()
-  }
-  syncChatRoute()
-})
-
-watch(() => ui.currentView, () => {
-  syncChatRoute()
+  ui.syncViewFromRoute(route.path)
 })
 
 watch(() => route.path, () => {
-  syncChatRoute()
+  ui.syncViewFromRoute(route.path)
 })
 </script>
 

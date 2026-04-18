@@ -77,15 +77,23 @@ let currentAbortController = null;
 let scrollRafId = 0;
 let streamFlushRafId = 0;
 let streamFlushTimer = 0;
+let streamHeartbeatTimer = 0;
 let pendingChunkText = "";
 let pendingChunkAssistantIndex = -1;
 let lastStreamFlushTs = 0;
+let streamLastActivityTs = 0;
+let streamHeartbeatTimedOut = false;
+let streamAutoRetryTimer = 0;
 let contactPollingTimer = null;
 let isContactSyncing = false;
 let greetingTimer = null;
 const greetingClockTick = ref(Date.now());
 const STREAM_FLUSH_MIN_INTERVAL = 24;
 const STREAM_FLUSH_FORCE_CHARS = 320;
+const STREAM_HEARTBEAT_TIMEOUT_MS = 18000;
+const STREAM_HEARTBEAT_CHECK_MS = 4000;
+const STREAM_AUTO_RETRY_DELAY_MS = 1200;
+const STREAM_MAX_AUTO_RETRIES = 1;
 
 const isAiChat = computed(() => store.chatMode === "ai");
 const chatTargetName = computed(() =>
@@ -162,6 +170,53 @@ function scrollToBottom() {
   });
 }
 
+function clearStreamHeartbeatMonitor() {
+  if (streamHeartbeatTimer) {
+    clearInterval(streamHeartbeatTimer);
+    streamHeartbeatTimer = 0;
+  }
+}
+
+function clearStreamAutoRetryTimer() {
+  if (streamAutoRetryTimer) {
+    clearTimeout(streamAutoRetryTimer);
+    streamAutoRetryTimer = 0;
+  }
+}
+
+function markStreamActivity() {
+  streamLastActivityTs = Date.now();
+}
+
+function startStreamHeartbeatMonitor() {
+  clearStreamHeartbeatMonitor();
+  markStreamActivity();
+  streamHeartbeatTimer = setInterval(() => {
+    if (!isStreaming.value || !currentAbortController) {
+      return;
+    }
+
+    if (Date.now() - streamLastActivityTs >= STREAM_HEARTBEAT_TIMEOUT_MS) {
+      streamHeartbeatTimedOut = true;
+      currentAbortController.abort();
+    }
+  }, STREAM_HEARTBEAT_CHECK_MS);
+}
+
+function scheduleAutoRetry(message, userMsgIndex, attemptCount, conversationId, messageCount) {
+  clearStreamAutoRetryTimer();
+  streamAutoRetryTimer = setTimeout(() => {
+    streamAutoRetryTimer = 0;
+    if (
+      store.activeConversationId !== conversationId ||
+      messages.value.length !== messageCount
+    ) {
+      return;
+    }
+    performAiChat(message, userMsgIndex, { attemptCount });
+  }, STREAM_AUTO_RETRY_DELAY_MS);
+}
+
 function flushPendingChunk() {
   if (!pendingChunkText || pendingChunkAssistantIndex < 0) return;
 
@@ -174,6 +229,7 @@ function flushPendingChunk() {
   pendingChunkAssistantIndex = -1;
   lastStreamFlushTs =
     typeof performance !== "undefined" ? performance.now() : Date.now();
+  markStreamActivity();
   scrollToBottom();
 }
 
@@ -368,8 +424,12 @@ async function sendContactMessage(messageText) {
   }
 }
 
-async function performAiChat(message, userMsgIndex) {
+async function performAiChat(message, userMsgIndex, options = {}) {
+  const attemptCount = Number(options?.attemptCount || 0);
   isStreaming.value = true;
+  streamHeartbeatTimedOut = false;
+  clearStreamAutoRetryTimer();
+  let autoRetryPending = false;
 
   // 推送或重用助手占位
   let assistantIndex = messages.value.findIndex(
@@ -380,8 +440,10 @@ async function performAiChat(message, userMsgIndex) {
       role: "assistant",
       text: "",
       rag: false,
+      ragData: null,
       error: false,
       canRetry: false,
+      errorMessage: "",
       mcpStatus: "",
     });
     assistantIndex = messages.value.length - 1;
@@ -391,6 +453,9 @@ async function performAiChat(message, userMsgIndex) {
     messages.value[assistantIndex].error = false;
     messages.value[assistantIndex].canRetry = false;
     messages.value[assistantIndex].mcpStatus = "";
+    messages.value[assistantIndex].errorMessage = "";
+    messages.value[assistantIndex].rag = false;
+    messages.value[assistantIndex].ragData = null;
   }
 
   const requestConversationId = store.activeConversationId;
@@ -398,6 +463,7 @@ async function performAiChat(message, userMsgIndex) {
     currentAbortController.abort();
   }
   currentAbortController = new AbortController();
+  startStreamHeartbeatMonitor();
 
   try {
     const requestBody = {
@@ -441,6 +507,7 @@ async function performAiChat(message, userMsgIndex) {
       const { value, done: readerDone } = await reader.read();
       done = readerDone;
       if (value) {
+        markStreamActivity();
         sseBuffer += decoder.decode(value, { stream: true }).replace(/\r\n/g, "\n");
 
         let boundaryIndex = sseBuffer.indexOf("\n\n");
@@ -456,11 +523,34 @@ async function performAiChat(message, userMsgIndex) {
       processSSEEvent(sseBuffer, assistantIndex);
     }
   } catch (error) {
+    const shouldRetryAuto =
+      store.activeConversationId === requestConversationId &&
+      attemptCount < STREAM_MAX_AUTO_RETRIES &&
+      (streamHeartbeatTimedOut || error?.name !== "AbortError");
+
     const hasPartialReply = Boolean(
       String(messages.value[assistantIndex]?.text || "").trim() ||
         (pendingChunkAssistantIndex === assistantIndex &&
           String(pendingChunkText || "").trim()),
     );
+
+    if (shouldRetryAuto) {
+      autoRetryPending = true;
+      if (messages.value[assistantIndex]) {
+        messages.value[assistantIndex].error = false;
+        messages.value[assistantIndex].canRetry = false;
+        messages.value[assistantIndex].errorMessage =
+          streamHeartbeatTimedOut ? "网络较弱，正在重连..." : "连接中断，正在重试...";
+      }
+      scheduleAutoRetry(
+        message,
+        userMsgIndex,
+        attemptCount + 1,
+        requestConversationId,
+        messages.value.length,
+      );
+      return;
+    }
 
     if (error?.name === "AbortError") {
       console.log("--- [DEBUG] Request aborted.");
@@ -486,10 +576,11 @@ async function performAiChat(message, userMsgIndex) {
     }
   } finally {
     flushPendingChunk();
+    clearStreamHeartbeatMonitor();
     isStreaming.value = false;
     scrollToBottom();
 
-    if (store.activeConversationId === requestConversationId) {
+    if (!autoRetryPending && store.activeConversationId === requestConversationId) {
       store.updateCurrentMessages(messages.value);
 
       if (store.currentUser?.id && store.shouldRefreshHistoryTitle(requestConversationId)) {
@@ -629,6 +720,8 @@ onUnmounted(() => {
   if (typeof document !== "undefined") {
     document.removeEventListener("visibilitychange", handleVisibilityChange);
   }
+  clearStreamHeartbeatMonitor();
+  clearStreamAutoRetryTimer();
 });
 </script>
 

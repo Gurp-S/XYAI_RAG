@@ -6,7 +6,7 @@ import { useUiStore } from "./store";
 import { installAuthFetch } from "./services/api";
 import "./styles.css";
 import "./styles_minimal.css";
-import "highlight.js/styles/github.css";
+import "highlight.js/styles/github-dark.css";
 import "katex/dist/katex.css";
 
 const app = createApp(App);
@@ -19,6 +19,7 @@ const ui = useUiStore(pinia);
 installAuthFetch();
 
 async function bootstrap() {
+  ui.initAuthSession();
   ui.initAppearance();
   app.mount("#app");
   await ui.bootstrapAuth();

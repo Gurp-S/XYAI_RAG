@@ -7,7 +7,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint --ext .js,.vue src --fix",
-    "sync:dist": "powershell -Command \"Remove-Item -Recurse -Force ..\\src\\main\\resources\\static\\* -ErrorAction SilentlyContinue; Copy-Item -Path dist\\* -Destination ..\\src\\main\\resources\\static -Recurse -Force\"",
+    "sync:dist": "node ./scripts/sync-dist.mjs",
     "build:sync": "npm run build && npm run sync:dist"
   },
   "dependencies": {

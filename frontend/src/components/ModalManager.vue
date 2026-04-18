@@ -81,11 +81,13 @@ v-if="ui.uploadProgress < 100" class="spin" width="14" height="14" viewBox="0 0 
 
 <script setup>
 import { ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import Login from './Login.vue'
 import { useUiStore } from '../store/index'
 import { ensureAccessToken } from '../services/auth'
 
 const ui = useUiStore()
+const route = useRoute()
 
 const uploadFileName = ref('')
 const collectionName = ref('default_collection')
@@ -316,7 +318,7 @@ function renderTaskSnapshot(snapshot) {
 
 async function fetchTaskSuccess() {
     // 任务成功后，如果当前在数据库管理视图，自动刷新列表
-    if (useUiStore().currentView === 'db') {
+    if (route.path.startsWith('/db')) {
         // 这里只是一个提示，具体的刷新可以由父组件或对应的管理器监听
     }
 }

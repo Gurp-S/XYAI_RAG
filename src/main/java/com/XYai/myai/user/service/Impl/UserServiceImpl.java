@@ -4,6 +4,7 @@ import com.XYai.myai.rag.aop.Annotation.RagTraceNode;
 import com.XYai.myai.config.Result;
 import com.XYai.myai.rag.memory.POJO.ChatConversation;
 import com.XYai.myai.rag.memory.POJO.ChatSessionRecord;
+import com.XYai.myai.redis.RedisKeyConfig;
 import com.XYai.myai.security.JwtUtil;
 import com.XYai.myai.security.POJO.JwtProperties;
 import com.XYai.myai.security.service.JwtService;
@@ -24,6 +25,8 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RSet;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -52,6 +55,8 @@ public class UserServiceImpl implements UserService {
     private ChatConversationMapper chatConversationMapper;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+    @Resource
+    private RedissonClient redissonClient;
     @Resource
     private PasswordEncoder passwordEncoder;
     @Resource
@@ -227,6 +232,18 @@ public class UserServiceImpl implements UserService {
         BeanUtils.copyProperties(userDTO, user);
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         userMapper.insert(user);
+
+        // 注册后初始化用户“分区”缓存：先创建空的可访问集合列表
+        Long userId = user.getId() != null ? user.getId() : userDTO.getId();
+        if (userId != null) {
+            try {
+                // userCollectionsKey 在 Milvus ACL 中按 RSet<String> 使用，这里保持同一 Redis 结构
+                RSet<String> set = redissonClient.getSet(RedisKeyConfig.userCollectionsKey(userId));
+                set.clear();
+            } catch (Exception e) {
+                log.warn("初始化用户分区缓存失败, userId={}", userId, e);
+            }
+        }
     }
 
     @Override

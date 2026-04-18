@@ -29,7 +29,7 @@ public class rateLimitAspect {
     /**
      * 匹配所有使用 {@link rateLimit} 注解的方法。
      */
-    @Pointcut("@annotation(com.XYai.myai.RAG.Aop.Annotation.rateLimit)")
+    @Pointcut("@annotation(com.XYai.myai.rag.aop.Annotation.rateLimit)")
     public void pointCut(){}
 
     /**

@@ -2,17 +2,28 @@
 import { authFetch, safeReadJson } from "../services/api";
 import {
   clearAccessToken,
+  getAccessToken,
+  getAccessTokenExpMs,
   refreshAccessToken,
   setAccessToken,
 } from "../services/auth";
+import router from "../router";
 
 const THEME_KEY = "themeName";
 const DARK_KEY = "theme";
 const BG_KEY = "userBackgroundImage";
 const BG_BLUR_KEY = "userBackgroundBlur";
 const SIDEBAR_STYLE_KEY = "sidebarStyle";
+const CONVERSATION_CACHE_KEY = "conversationCache";
+const CONVERSATION_CACHE_ORDER_KEY = "conversationCacheOrder";
 const USER_CHAT_SESSIONS_KEY = "userChatSessions";
 const LAST_AI_CONVERSATION_KEY = "lastAiConversationId";
+const AUTH_TOKEN_CHANGE_EVENT = "xyai:auth-token-change";
+const MAX_CONVERSATION_CACHE_ITEMS = 18;
+const MAX_CONVERSATION_MESSAGE_COUNT = 60;
+const MAX_CONVERSATION_TEXT_LENGTH = 4000;
+const MAX_CONVERSATION_ERROR_LENGTH = 2000;
+const MAX_CONVERSATION_RAG_ITEMS = 12;
 const SIDEBAR_STYLES = new Set(["orbit", "outline"]);
 const THEME_NAMES = new Set([
   "deep-space",
@@ -24,6 +35,9 @@ let sidebarAnimationTimer = null;
 let sidebarAnimating = false;
 let themeTransitionCleanupTimer = null;
 let themeTransitionFrame = 0;
+let sessionExpiryTimer = null;
+let authTokenListenerInstalled = false;
+let authTokenListenerCallback = null;
 
 function clampBackgroundBlur(value) {
   const num = Number(value);
@@ -71,6 +85,190 @@ function readJsonStorage(key, fallback) {
   }
 }
 
+function trimText(value, maxLength = MAX_CONVERSATION_TEXT_LENGTH) {
+  const text = String(value || "");
+  if (text.length <= maxLength) return text;
+  return `${text.slice(0, Math.max(0, maxLength - 3))}...`;
+}
+
+function normalizeRagEntry(entry) {
+  if (entry === null || entry === undefined) return entry;
+  if (typeof entry !== "object") {
+    return trimText(entry, MAX_CONVERSATION_TEXT_LENGTH);
+  }
+
+  const normalized = {};
+  const keyList = [
+    "title",
+    "name",
+    "source",
+    "url",
+    "type",
+    "fileName",
+    "chunkId",
+    "score",
+    "content",
+    "snippet",
+    "summary",
+  ];
+
+  keyList.forEach((key) => {
+    if (entry[key] === undefined) return;
+    normalized[key] =
+      typeof entry[key] === "string"
+        ? trimText(entry[key], MAX_CONVERSATION_TEXT_LENGTH)
+        : entry[key];
+  });
+
+  if (Object.keys(normalized).length > 0) {
+    return normalized;
+  }
+
+  try {
+    return trimText(JSON.stringify(entry), MAX_CONVERSATION_TEXT_LENGTH);
+  } catch {
+    return {};
+  }
+}
+
+function normalizeConversationMessage(message) {
+  if (!message || typeof message !== "object") {
+    return null;
+  }
+
+  const normalized = { ...message };
+  if ("text" in normalized) {
+    normalized.text = trimText(normalized.text, MAX_CONVERSATION_TEXT_LENGTH);
+  }
+  if ("errorMessage" in normalized) {
+    normalized.errorMessage = trimText(
+      normalized.errorMessage,
+      MAX_CONVERSATION_ERROR_LENGTH,
+    );
+  }
+  if ("pendingSendText" in normalized) {
+    normalized.pendingSendText = trimText(
+      normalized.pendingSendText,
+      MAX_CONVERSATION_TEXT_LENGTH,
+    );
+  }
+  if ("fromName" in normalized) {
+    normalized.fromName = trimText(normalized.fromName, 120);
+  }
+  if (Array.isArray(normalized.ragData)) {
+    normalized.ragData = normalized.ragData
+      .slice(0, MAX_CONVERSATION_RAG_ITEMS)
+      .map((entry) => normalizeRagEntry(entry));
+  }
+
+  return normalized;
+}
+
+function normalizeConversationMessages(messages) {
+  if (!Array.isArray(messages)) return [];
+  return messages
+    .map((message) => normalizeConversationMessage(message))
+    .filter(Boolean)
+    .slice(-MAX_CONVERSATION_MESSAGE_COUNT);
+}
+
+function readConversationCache() {
+  const rawCache = readJsonStorage(CONVERSATION_CACHE_KEY, {});
+  if (!rawCache || typeof rawCache !== "object" || Array.isArray(rawCache)) {
+    return {};
+  }
+
+  const normalized = {};
+  Object.entries(rawCache).forEach(([conversationId, messages]) => {
+    const safeConversationId = String(conversationId || "").trim();
+    if (!safeConversationId) return;
+    const safeMessages = normalizeConversationMessages(messages);
+    if (safeMessages.length > 0) {
+      normalized[safeConversationId] = safeMessages;
+    }
+  });
+  return normalized;
+}
+
+function readConversationCacheOrder(cache) {
+  const storedOrder = readJsonStorage(CONVERSATION_CACHE_ORDER_KEY, []);
+  const normalizedOrder = [];
+  const rawOrder = Array.isArray(storedOrder)
+    ? storedOrder
+        .map((conversationId) => String(conversationId || "").trim())
+        .filter((conversationId) => conversationId && cache[conversationId])
+    : [];
+
+  rawOrder.forEach((conversationId) => {
+    if (!normalizedOrder.includes(conversationId)) {
+      normalizedOrder.push(conversationId);
+    }
+  });
+
+  Object.keys(cache).forEach((conversationId) => {
+    if (!normalizedOrder.includes(conversationId)) {
+      normalizedOrder.push(conversationId);
+    }
+  });
+
+  return normalizedOrder;
+}
+
+function persistConversationCache(cache, order) {
+  try {
+    localStorage.setItem(CONVERSATION_CACHE_KEY, JSON.stringify(cache || {}));
+    localStorage.setItem(
+      CONVERSATION_CACHE_ORDER_KEY,
+      JSON.stringify(Array.isArray(order) ? order : []),
+    );
+  } catch (error) {
+    console.warn("Failed to persist conversation cache:", error);
+  }
+}
+
+function resolveViewFromPath(path) {
+  return String(path || "").startsWith("/db") ? "db" : "chat";
+}
+
+function ensureSessionExpiryTimer(store) {
+  if (sessionExpiryTimer) {
+    clearTimeout(sessionExpiryTimer);
+    sessionExpiryTimer = null;
+  }
+
+  const token = getAccessToken();
+  const expMs = getAccessTokenExpMs();
+  if (!token || !expMs) {
+    return;
+  }
+
+  const remaining = expMs - Date.now();
+  if (remaining <= 0) {
+    return;
+  }
+
+  sessionExpiryTimer = setTimeout(async () => {
+    sessionExpiryTimer = null;
+    if (!store.currentUser) {
+      return;
+    }
+
+    try {
+      await store.logout({ localOnly: false, reason: "session-expired" });
+    } catch (error) {
+      console.warn("Auto logout failed:", error);
+      clearAccessToken();
+      store.setUser(null);
+    }
+  }, remaining);
+}
+
+function clearSessionExpiryTimer() {
+  if (!sessionExpiryTimer) return;
+  clearTimeout(sessionExpiryTimer);
+  sessionExpiryTimer = null;
+}
+
 function normalizeThemeName(themeName) {
   const next = String(themeName || "").trim();
   if (THEME_NAMES.has(next)) return next;
@@ -112,6 +310,17 @@ function buildContactConversationId(type, currentUserId, targetId) {
   return current <= normalizedTargetId
     ? `user:${current}:${normalizedTargetId}`
     : `user:${normalizedTargetId}:${current}`;
+}
+
+function createConversationId() {
+  if (
+    typeof crypto !== "undefined" &&
+    typeof crypto.randomUUID === "function"
+  ) {
+    return crypto.randomUUID();
+  }
+
+  return `conv_${Date.now()}_${Math.random().toString(16).slice(2)}`;
 }
 
 function toCssUrl(value) {
@@ -265,7 +474,7 @@ export const useUiStore = defineStore("ui", {
     chatTarget: null,
     chatHistory: JSON.parse(localStorage.getItem("chatHistory")) || [],
     loadingHistory: false,
-    activeConversationId: crypto.randomUUID(),
+    activeConversationId: createConversationId(),
     lastAiConversationId:
       localStorage.getItem(LAST_AI_CONVERSATION_KEY) || null,
     currentMessages: [],
@@ -275,8 +484,8 @@ export const useUiStore = defineStore("ui", {
     sidebarStyle: readSidebarStyle(),
     backgroundImage: readBackgroundImage(),
     backgroundBlur: readBackgroundBlur(),
-    conversationCache:
-      JSON.parse(localStorage.getItem("conversationCache")) || {}, // 持久化缓存内容
+    conversationCache: readConversationCache(),
+    conversationCacheOrder: readConversationCacheOrder(readConversationCache()),
     userChatSessions: readJsonStorage(USER_CHAT_SESSIONS_KEY, {}),
   }),
   getters: {
@@ -291,6 +500,7 @@ export const useUiStore = defineStore("ui", {
   actions: {
     async bootstrapAuth() {
       try {
+        this.initAuthSession();
         const token = await refreshAccessToken(true);
         if (!token) {
           clearAccessToken();
@@ -307,6 +517,7 @@ export const useUiStore = defineStore("ui", {
 
         this.setUser(profile);
         this.showLogin = false;
+        this.initAuthSession();
         this.fetchHistory(true);
       } catch (error) {
         console.error("Auth bootstrap failed:", error);
@@ -334,6 +545,7 @@ export const useUiStore = defineStore("ui", {
       }
 
       setAccessToken(token);
+      this.initAuthSession();
 
       const profile = await this.fetchCurrentUserInfo();
       if (profile) {
@@ -481,10 +693,6 @@ export const useUiStore = defineStore("ui", {
       this.showLogoutConfirm = false;
     },
     setAiChatContext() {
-      if (this.chatMode === "ai" && !this.chatTarget) {
-        return;
-      }
-
       let nextConversationId = this.lastAiConversationId;
       if (!nextConversationId) {
         nextConversationId = this.chatHistory.find(
@@ -492,7 +700,7 @@ export const useUiStore = defineStore("ui", {
         )?.conversationId;
       }
       if (!nextConversationId) {
-        nextConversationId = crypto.randomUUID();
+        nextConversationId = createConversationId();
       }
 
       this.chatMode = "ai";
@@ -500,9 +708,14 @@ export const useUiStore = defineStore("ui", {
       this.activeConversationId = nextConversationId;
       this.lastAiConversationId = nextConversationId;
       localStorage.setItem(LAST_AI_CONVERSATION_KEY, this.lastAiConversationId);
-      this.currentMessages = this.conversationCache[nextConversationId]
-        ? [...this.conversationCache[nextConversationId]]
-        : [];
+      this.setView("chat");
+      if (this.conversationCache[nextConversationId]) {
+        this.currentMessages = [...this.conversationCache[nextConversationId]];
+        this.touchConversationCache(nextConversationId);
+        this.persistConversationCache();
+      } else {
+        this.currentMessages = [];
+      }
     },
     openContactChat(type, target) {
       const targetType = type === "group" ? "group" : "user";
@@ -547,7 +760,7 @@ export const useUiStore = defineStore("ui", {
 
       this.chatMode = targetType;
       this.chatTarget = normalizedTarget;
-      this.currentView = "chat";
+      this.setView("chat");
 
       if (existing?.conversationId) {
         this.activeConversationId =
@@ -569,7 +782,7 @@ export const useUiStore = defineStore("ui", {
         return;
       }
 
-      const nextConversationId = stableConversationId || crypto.randomUUID();
+      const nextConversationId = stableConversationId || createConversationId();
       this.activeConversationId = nextConversationId;
       this.currentMessages = [];
       this.userChatSessions[key] = {
@@ -596,11 +809,7 @@ export const useUiStore = defineStore("ui", {
           this.lastAiConversationId,
         );
 
-        this.conversationCache[this.activeConversationId] = safeMessages;
-        localStorage.setItem(
-          "conversationCache",
-          JSON.stringify(this.conversationCache),
-        );
+        this.setConversationCacheEntry(this.activeConversationId, safeMessages);
         return;
       }
 
@@ -608,7 +817,7 @@ export const useUiStore = defineStore("ui", {
 
       const key = `${this.chatMode}:${this.chatTarget.id}`;
       this.userChatSessions[key] = {
-        conversationId: this.activeConversationId || crypto.randomUUID(),
+        conversationId: this.activeConversationId || createConversationId(),
         target: this.chatTarget,
         messages: safeMessages,
         updatedAt: new Date().toISOString(),
@@ -627,28 +836,119 @@ export const useUiStore = defineStore("ui", {
         localStorage.removeItem("currentUser");
       }
     },
-    async logout() {
-      try {
-        await authFetch("/user/logout", { method: "POST" });
-      } catch (error) {
-        console.warn("Logout request failed:", error);
+    initAuthSession() {
+      if (typeof window !== "undefined" && !authTokenListenerInstalled) {
+        const store = this;
+        authTokenListenerCallback = (event) => {
+          store.handleAuthTokenChange(event);
+        };
+        window.addEventListener(
+          AUTH_TOKEN_CHANGE_EVENT,
+          authTokenListenerCallback,
+        );
+        authTokenListenerInstalled = true;
       }
 
-      clearAccessToken();
+      ensureSessionExpiryTimer(this);
+    },
+    handleAuthTokenChange() {
+      if (!getAccessToken()) {
+        clearSessionExpiryTimer();
+        if (
+          this.currentUser ||
+          this.chatHistory.length ||
+          this.currentMessages.length
+        ) {
+          this.resetAuthState();
+        }
+        return;
+      }
+
+      ensureSessionExpiryTimer(this);
+    },
+    syncViewFromRoute(path) {
+      this.currentView = resolveViewFromPath(path);
+    },
+    setConversationCacheEntry(conversationId, messages) {
+      const safeConversationId = String(conversationId || "").trim();
+      if (!safeConversationId) return;
+
+      const safeMessages = normalizeConversationMessages(messages);
+      this.conversationCache[safeConversationId] = safeMessages;
+      this.touchConversationCache(safeConversationId);
+      this.pruneConversationCache();
+      this.persistConversationCache();
+    },
+    touchConversationCache(conversationId) {
+      const safeConversationId = String(conversationId || "").trim();
+      if (!safeConversationId) return;
+
+      const currentOrder = Array.isArray(this.conversationCacheOrder)
+        ? this.conversationCacheOrder.filter((item) => {
+            const next = String(item || "").trim();
+            return next && next !== safeConversationId;
+          })
+        : [];
+      currentOrder.push(safeConversationId);
+      this.conversationCacheOrder = currentOrder;
+    },
+    pruneConversationCache() {
+      if (!Array.isArray(this.conversationCacheOrder)) {
+        this.conversationCacheOrder = [];
+      }
+
+      while (
+        this.conversationCacheOrder.length > MAX_CONVERSATION_CACHE_ITEMS
+      ) {
+        const oldestConversationId = this.conversationCacheOrder.shift();
+        if (oldestConversationId) {
+          delete this.conversationCache[oldestConversationId];
+        }
+      }
+    },
+    persistConversationCache() {
+      persistConversationCache(
+        this.conversationCache,
+        this.conversationCacheOrder,
+      );
+    },
+    resetAuthState() {
       this.setUser(null);
       this.chatHistory = [];
       this.currentMessages = [];
       this.conversationCache = {};
+      this.conversationCacheOrder = [];
       this.userChatSessions = {};
       this.chatMode = "ai";
       this.chatTarget = null;
       this.lastAiConversationId = null;
-      localStorage.removeItem("chatHistory");
-      localStorage.removeItem("conversationCache");
-      localStorage.removeItem(USER_CHAT_SESSIONS_KEY);
-      localStorage.removeItem(LAST_AI_CONVERSATION_KEY);
       this.activeConversationId = null;
       this.showLogoutConfirm = false;
+      this.showLogin = false;
+      this.currentView = "chat";
+      localStorage.removeItem("chatHistory");
+      localStorage.removeItem(CONVERSATION_CACHE_KEY);
+      localStorage.removeItem(CONVERSATION_CACHE_ORDER_KEY);
+      localStorage.removeItem(USER_CHAT_SESSIONS_KEY);
+      localStorage.removeItem(LAST_AI_CONVERSATION_KEY);
+      if (router.currentRoute.value.path !== "/") {
+        router.push("/").catch(() => {});
+      }
+    },
+    async logout(options = {}) {
+      const { localOnly = false } = options || {};
+      clearSessionExpiryTimer();
+
+      if (!localOnly) {
+        try {
+          await authFetch("/user/logout", { method: "POST" });
+        } catch (error) {
+          console.warn("Logout request failed:", error);
+        }
+      }
+
+      clearAccessToken();
+      this.resetAuthState();
     },
     async selectConversation(session) {
       if (!session || !session.conversationId) return;
@@ -669,13 +969,16 @@ export const useUiStore = defineStore("ui", {
       }
 
       this.activeConversationId = convId;
+      this.setView("chat");
 
       // 2. 检查 Pinia 内存缓存
       if (
         this.conversationCache[convId] &&
         this.conversationCache[convId].length > 0
       ) {
-        this.currentMessages = this.conversationCache[convId];
+        this.currentMessages = [...this.conversationCache[convId]];
+        this.touchConversationCache(convId);
+        this.persistConversationCache();
         return;
       }
 
@@ -710,11 +1013,7 @@ export const useUiStore = defineStore("ui", {
 
           // 保存并持久化缓存
           this.currentMessages = messages;
-          this.conversationCache[convId] = messages;
-          localStorage.setItem(
-            "conversationCache",
-            JSON.stringify(this.conversationCache),
-          );
+          this.setConversationCacheEntry(convId, messages);
         }
       } catch (err) {
         console.error("Failed to fetch conversation detail:", err);
@@ -811,7 +1110,7 @@ export const useUiStore = defineStore("ui", {
     },
     openModal(modalName) {
       if (modalName === "db") {
-        this.currentView = "db";
+        this.setView("db");
         return;
       }
 
@@ -827,7 +1126,13 @@ export const useUiStore = defineStore("ui", {
       this.activeModal = modalName;
     },
     setView(view) {
-      this.currentView = view;
+      const nextView = view === "db" ? "db" : "chat";
+      this.currentView = nextView;
+
+      const targetPath = nextView === "db" ? "/db" : "/";
+      if (router.currentRoute.value.path !== targetPath) {
+        router.push(targetPath).catch(() => {});
+      }
     },
     closeModal() {
       this.activeModal = null;
@@ -921,11 +1226,31 @@ export const useUiStore = defineStore("ui", {
       this.chatMode = "ai";
       this.chatTarget = null;
 
-      const nextConversationId = crypto.randomUUID();
+      const cleanedHistory = this.chatHistory.filter((item) => {
+        if (!item?.optimistic) return true;
+
+        const title = String(item.title || "").trim();
+        const summary = String(item.summaryText || "").trim();
+        const isPlaceholderTitle =
+          !title ||
+          title === "新对话" ||
+          title === "新会话" ||
+          /^对话\s*\d+$/i.test(title);
+
+        return !(isPlaceholderTitle && !summary);
+      });
+
+      if (cleanedHistory.length !== this.chatHistory.length) {
+        this.chatHistory = cleanedHistory;
+        localStorage.setItem("chatHistory", JSON.stringify(this.chatHistory));
+      }
+
+      const nextConversationId = createConversationId();
       this.activeConversationId = nextConversationId;
       this.lastAiConversationId = nextConversationId;
       localStorage.setItem(LAST_AI_CONVERSATION_KEY, this.lastAiConversationId);
       this.currentMessages = [];
+      this.setView("chat");
     },
   },
 });

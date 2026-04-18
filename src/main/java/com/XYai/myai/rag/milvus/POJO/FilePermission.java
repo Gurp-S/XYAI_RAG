@@ -5,17 +5,28 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
- * 数据库存储：文件-权限关联
- * 可扩展用户权限、过期时间、读写权限
+ * 集合全局权限配置
+ * 作用：控制【整个集合】的开放策略、默认可见规则
+ * 业务前提：一个集合 存储 多用户数据，靠 metadata 行级隔离
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class FilePermission {
-    private Long fileId;            // 文件ID
-    private String userId;          // 授权用户ID
-    private String permissionType;  // read/write
-    private Long expireTime;        // 过期时间
+
+    private String collectionName;
+
+    private String fileId;
+
+    private List<Long> userIds;
+
+    /**
+     * 集合默认可见级别
+     * private / public / group
+     */
+    private String visibility;
 }

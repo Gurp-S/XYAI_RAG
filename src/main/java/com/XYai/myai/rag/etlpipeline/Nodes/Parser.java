@@ -9,6 +9,7 @@ import org.apache.tika.parser.ParseContext;
 import org.apache.tika.sax.BodyContentHandler;
 import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Component;
+import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
@@ -67,6 +68,7 @@ public class Parser implements Ingestion {
         if (!StringUtils.hasText(text)) {
             return NodeResult.fail("parsed text is empty");
         }
+
         // 设置文件的类型信息到元数据
         Map<String, Object> docMeta = new HashMap<>();
         for (String name : metadata.names()) {

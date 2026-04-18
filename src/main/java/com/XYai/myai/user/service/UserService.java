@@ -19,7 +19,7 @@ public interface UserService {
     /**
      * 用户登出处理。
      *
-     * @return Result<String> 登出结果
+     * @return metadataResult<String> 登出结果
      */
     Result<String> logout(HttpServletRequest request, HttpServletResponse response);
 
@@ -27,7 +27,7 @@ public interface UserService {
      * 用户登录认证。
      *
      * @param password 密码
-     * @return Result<String> 登录结果
+     * @return metadataResult<String> 登录结果
      */
     // now accepts HttpServletResponse so the service implementation can set refresh
     // token cookie

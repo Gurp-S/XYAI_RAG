@@ -60,12 +60,14 @@ public class ThreadPoolConfig {
     public ThreadPoolTaskExecutor uploadExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         int cpuCount = Runtime.getRuntime().availableProcessors();
-        executor.setCorePoolSize(Math.min(cpuCount, DEFAULT_MAX_POOL_SIZE));
-        executor.setMaxPoolSize(DEFAULT_MAX_POOL_SIZE);
-        executor.setQueueCapacity(200);
+        int core = Math.clamp(cpuCount / 2, 1, 4);
+        int max = Math.clamp(core, cpuCount * 2, 32);
+        executor.setCorePoolSize(core);
+        executor.setMaxPoolSize(max);
+        executor.setQueueCapacity(100);
         executor.setKeepAliveSeconds(DEFAULT_KEEP_ALIVE_SECONDS);
         executor.setThreadNamePrefix("upload-thread-");
-        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
 
         // 上下文传递
         executor.setTaskDecorator(userContextDecorator());
@@ -91,6 +93,8 @@ public class ThreadPoolConfig {
         executor.initialize();
         return executor;
     }
+
+
 
     /**
      * 为了避免 Spring 在启用异步时找不到名为 `taskExecutor` 的默认 bean，提供一个别名指向 `userExecutor`。

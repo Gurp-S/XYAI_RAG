@@ -110,6 +110,8 @@ aliyun:
     access-key-id: ${ALIOSS_ACCESS_KEY_ID:}
     access-key-secret: ${ALIOSS_ACCESS_KEY_SECRET:}
     bucket: ${ALIOSS_BUCKET_NAME:}
+    basePath: optional/base/path/
+    publicRead: true
 
 # Text splitter configuration (used by AdvancedTextSplitter)
 splitter:

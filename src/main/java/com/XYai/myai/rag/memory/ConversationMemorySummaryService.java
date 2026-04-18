@@ -19,14 +19,17 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.redisson.api.RScoredSortedSet;
+import org.redisson.api.RBucket;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Executor;
+import java.util.LinkedHashSet;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -38,8 +41,6 @@ import java.util.concurrent.TimeUnit;
 public class ConversationMemorySummaryService {
     @Resource
     private MemoryProperties memoryProperties;
-    @Resource
-    private StringRedisTemplate stringRedisTemplate;
     @Resource
     private ObjectMapper objectMapper;
     @Resource
@@ -108,36 +109,42 @@ public class ConversationMemorySummaryService {
         try {
             // ========== 步骤3：先保存再判断是否需要压缩 ==========
             String chatMessageKey = "chatMessage:" + conversationId;
-            // 先保存新消息（每轮都保存）
-            String messageJson = objectMapper.writeValueAsString(message);
-            stringRedisTemplate.opsForZSet().add(chatMessageKey, messageJson, System.currentTimeMillis());
+            // 先保存新消息（每轮都保存） -- Redis 统一存 JSON 字符串
+            RScoredSortedSet<String> scoredSet = redissonClient.getScoredSortedSet(chatMessageKey);
+            scoredSet.add((double) System.currentTimeMillis(), objectMapper.writeValueAsString(message));
             // 持久化到 DB 使用受管线程池执行，避免使用 CompletableFuture.runAsync 造成线程不可控
             memoryCompactExecutor.execute(() -> recordSessionDB(conversationId, message));
             // 再判断是否需要压缩
-            Long total = stringRedisTemplate.opsForZSet().size(chatMessageKey);
-            if (total == null || total < maxTurns) {
+            long total = scoredSet.size();
+            if (total < maxTurns) {
                 return;
             }
 
             // ========== 步骤4：获取已有的摘要 ==========
             String summaryKey = "summary:" + conversationId;
-            String latestSummary = stringRedisTemplate.opsForValue().get(summaryKey);
+            RBucket<String> summaryBucket = redissonClient.getBucket(summaryKey);
+            String latestSummary = summaryBucket.get();
 
             // ========== 步骤5：提取要压缩的消息,并删除 ==========
             // 保留最近 4 轮，压缩更早的消息
-            Set<String> firstBatch = stringRedisTemplate.opsForZSet().range(chatMessageKey, 0, 0);
+            Collection<String> firstBatch = scoredSet.valueRange(0, 0);
             if (firstBatch == null || firstBatch.isEmpty()) {
                 return;
             }
-            String toSummary = firstBatch.iterator().next();
-            stringRedisTemplate.opsForZSet().popMin(chatMessageKey);
+            String firstMsg = firstBatch.iterator().next();
+            String toSummary = firstMsg;
+            // 移除已弹出的最小元素
+            try {
+                scoredSet.remove(firstMsg);
+            } catch (Exception ignore) {
+            }
 
             // ========== 步骤7：调用 LLM 生成摘要 ==========
             String existingSummary = latestSummary == null ? "无" : latestSummary;
             String summary = summarizeMessages(existingSummary, toSummary);
 
             // ========== 步骤8：存储摘要 ==========
-            stringRedisTemplate.opsForValue().set(summaryKey, summary);
+            summaryBucket.set(summary);
             // 使用受管线程池异步更新 DB
             memoryCompactExecutor.execute(() -> upsetSummary(conversationId, summary));
         } catch (JsonProcessingException e) {
@@ -238,11 +245,24 @@ public class ConversationMemorySummaryService {
     public LoadSession load(String conversationId) {
         // 获取上下文对话和摘要
         String conversationKey = "chatMessage:" + conversationId;
-        // NOTE: previously had an unused intersect call here — removed because it had
-        // no effect
         String summaryKey = "summary:" + conversationId;
-        Set<String> conversations = stringRedisTemplate.opsForZSet().range(conversationKey, 0, -1);
-        String summary = stringRedisTemplate.opsForValue().get(summaryKey);
-        return LoadSession.builder().summary(summary).conversation(conversations).build();
+        RScoredSortedSet<String> scoredSet = redissonClient.getScoredSortedSet(conversationKey);
+        Collection<String> convoObjs = scoredSet.valueRange(0, -1);
+        Set<ChatMessage> conversations;
+        if (convoObjs == null || convoObjs.isEmpty()) {
+            conversations = Collections.emptySet();
+        } else {
+            Set<ChatMessage> tmp = new LinkedHashSet<>();
+            for (String convoJson : convoObjs) {
+                try {
+                    tmp.add(objectMapper.readValue(convoJson, ChatMessage.class));
+                } catch (Exception ignored) {
+                }
+            }
+            conversations = tmp;
+        }
+        RBucket<String> summaryBucket = redissonClient.getBucket(summaryKey);
+        String summary = summaryBucket.get();
+        return LoadSession.fromCollection(summary, conversations);
     }
 }

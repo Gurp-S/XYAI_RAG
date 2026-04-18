@@ -49,7 +49,6 @@ public class IngestionContext implements Serializable {
     public static final String META_CHUNK_SIZE = "chunkSize";
     public static final String META_FILE_ID = "fileId";
     public static final String META_TIME_CREATE = "createTime";
-
     public static final String META_OWNER_ID = "ownerId";         // 上传者用户ID
     public static final String META_GROUP_ID = "groupId";         // 组/部门ID
     public static final String META_VISIBILITY = "visibility";   // 可见范围 private/group/public

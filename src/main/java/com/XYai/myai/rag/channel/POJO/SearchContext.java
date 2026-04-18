@@ -18,23 +18,36 @@ import java.util.Map;
 @AllArgsConstructor
 public class SearchContext {
 
-    /** 原始或重写后的查询文本（用于向量检索/LLM） */
+    /**
+     * 查询文本（原始或重写后）。
+     * 所有检索通道与 Rerank 阶段都会读取该字段。
+     */
     private String question;
 
-    /** 来自意图识别的 KB 意图候选 （每个 SubQuestionIntent 包含多个 IntentNode） */
+    /**
+     * 意图候选列表。
+     * 通道启停（isEnabled）常基于该字段判断是否做定向检索或全局兜底检索。
+     */
     @Builder.Default
     private List<SubQuestionIntent> kbIntents = new ArrayList<>();
 
-    /** 来自意图识别或融合后的节点置信度列表（用于判断是否需全局检索） */
+    /**
+     * 节点置信度信息。
+     * 可用于动态调节召回策略（例如低置信度时扩大召回范围）。
+     */
     @Builder.Default
     private NodesScore intents = new NodesScore();
 
-    /** 额外元数据（例如 sessionId/userId/请求标记等） */
+    /**
+     * 扩展元数据。
+     * 建议放 sessionId/userId/role/groupId/requestId 等，供过滤与审计使用。
+     */
     private Map<String, String> metadata;
 
-    /** 每个通道默认的 topK，通道可以根据需要覆盖 */
+    /**
+     * 默认 topK。
+     * 通道可按自身策略覆盖（例如向量通道 topK=10，全文通道 topK=20）。
+     */
     private Integer topK;
 
 }
-
-

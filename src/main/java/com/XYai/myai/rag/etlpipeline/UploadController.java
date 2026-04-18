@@ -5,21 +5,33 @@ import com.XYai.myai.config.Result;
 import com.XYai.myai.rag.etlpipeline.Factory.PipelineDefinitionFactory;
 import com.XYai.myai.rag.etlpipeline.Factory.UploadIngestionContextFactory;
 import com.XYai.myai.rag.etlpipeline.Oss.OssService;
-import com.XYai.myai.rag.etlpipeline.POJO.IngestionContext;
-import com.XYai.myai.rag.etlpipeline.POJO.UpLoadAccumulator;
-import com.XYai.myai.rag.etlpipeline.POJO.UploadProperties;
+import com.XYai.myai.rag.etlpipeline.POJO.*;
+import com.XYai.myai.rag.etlpipeline.UploadTaskStore;
+import com.XYai.myai.rag.milvus.MilvusFileManager;
 import com.XYai.myai.user.LoginUserInfoManager;
 import com.XYai.myai.user.POJO.User;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.util.StreamUtils;
+import com.XYai.myai.rag.aop.Annotation.rateLimit;
+import java.util.concurrent.RejectedExecutionException;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.*;
 
 /**
  * 上传控制器：只负责接收文件、构造 ETL 输入、调用 IngestionEngine、汇总结果。
@@ -28,6 +40,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/upload")
 public class UploadController {
+
+    private static final long MAX_IN_MEMORY_FILE_BYTES = 10L * 1024L * 1024L;
 
     @Resource
     private ObjectProvider<OssService> ossServiceProvider;
@@ -41,25 +55,13 @@ public class UploadController {
     private UploadIngestionContextFactory uploadIngestionContextFactory;
     @Resource
     private UploadTaskStore uploadTaskStore;
-
+    @Resource
+    private MilvusFileManager milvusFileManager;
     @Resource(name = "uploadExecutor")
     private ThreadPoolTaskExecutor uploadExecutor;
 
-    // 最大重试次数（处理单个文件时）
-    private static final int MAX_RETRIES = 3;
-
-    /**
-     * 接收前端上传的文件列表并处理。
-     * 步骤：
-     * 1. 验证文件列表非空
-     * 2. 逐个文件处理（上传到 OSS、构造 Document、执行 ETL 管道）
-     * 3. 如果启用了 RAG（向量检索），则将所有分块加入 VectorStore
-     * 4. 返回处理结果信息
-     *
-     * @param files 前端上传的文件列表，参数名为 "file"
-     * @return Result<String> 包含处理结果的消息（成功/失败统计）
-     */
     @PostMapping("up")
+    @rateLimit(limit = 10, rateName = "upload_up", windowMs = 1000)
     public Result<String> upLoad(
             @RequestParam("file") List<MultipartFile> files,
             @RequestParam("collectionName") String collectionName) {
@@ -68,37 +70,101 @@ public class UploadController {
         }
         if (files == null || files.isEmpty()) {
             return Result.error(400, "文件不能为空");
-        }log.info("上传开始");
+        }
+        log.info("上传开始");
+
         UpLoadAccumulator accumulator = new UpLoadAccumulator();
-        // 任务ID：前端轮询当前 ETL 节点时使用
         String taskId = IdUtil.getSnowflakeNextIdStr();
         accumulator.setTaskId(taskId);
         uploadTaskStore.start(taskId);
-        // 异步处理，不阻塞上传响应；使用受管线程池执行任务
-        uploadExecutor.execute(() -> {
-            try {
-                User user = LoginUserInfoManager.get();
-                for (MultipartFile file : files) {
-                    processSingleFile(file, accumulator, collectionName,user);
-                }
-                uploadTaskStore.success(taskId, "上传任务已完成");
-            } catch (Exception ex) {
-                log.error("处理上传任务失败: {}", taskId, ex);
-                uploadTaskStore.error(taskId, ex.getMessage());
-            }
-        });
+        User user = LoginUserInfoManager.get();
 
-        // 立即把任务号返回给前端，前端再通过 SSE 订阅状态
+        List<MultipartFile> safeFiles = new ArrayList<>(files.size());
+        List<File> tempFilesToCleanup = new ArrayList<>();
+
+        for (MultipartFile f : files) {
+            if (f == null || f.isEmpty()) {
+                log.warn("上传列表中存在空文件，跳过");
+                continue;
+            }
+            long size = f.getSize();
+            if (size <= 0) {
+                return Result.error(400, "上传文件大小非法: " + safeFileName(f));
+            }
+
+            try {
+                if (size <= MAX_IN_MEMORY_FILE_BYTES) {
+                    byte[] bytes;
+                    try (InputStream is = f.getInputStream()) {
+                        bytes = StreamUtils.copyToByteArray(is);
+                    }
+                    InMemoryMultipartFile mem = new InMemoryMultipartFile(f.getName(), f.getOriginalFilename(), f.getContentType(), bytes);
+                    safeFiles.add(mem);
+                } else {
+                    String safeName = safeFileName(f).replaceAll("[^a-zA-Z0-9_.-]", "_");
+                    Path tmpPath = Files.createTempFile("upload_", "_" + safeName);
+                    try (InputStream is = f.getInputStream()) {
+                        Files.copy(is, tmpPath, StandardCopyOption.REPLACE_EXISTING);
+                    }
+                    File tmp = tmpPath.toFile();
+                    tempFilesToCleanup.add(tmp);
+                    FileBackedMultipartFile fb = new FileBackedMultipartFile(f.getName(), f.getOriginalFilename(), f.getContentType(), tmp);
+                    safeFiles.add(fb);
+                }
+            } catch (IOException e) {
+                for (File t : tempFilesToCleanup) {
+                    try {
+                        Files.deleteIfExists(t.toPath());
+                    } catch (Exception ignored) {}
+                }
+                log.error("准备上传文件失败: {}", safeFileName(f), e);
+                return Result.error(500, "准备上传文件失败: " + safeFileName(f));
+            }
+        }
+
+        try {
+            uploadExecutor.execute(() -> {
+                long skipFile = 0L;
+                try {
+                    for (MultipartFile file : safeFiles) {
+                        SkipFileInfo skipFileInfo = milvusFileManager.generateFile(file, collectionName, taskId);
+                        skipFile += skipFileInfo.getSkipStatus();
+                        if (skipFileInfo.getSkipStatus() == 0L) {
+                            boolean ok = processSingleFile(file, accumulator, collectionName, user, skipFileInfo.getFileHashId());
+                            if (ok) {
+                                try {
+                                    milvusFileManager.saveFileHashId(collectionName, skipFileInfo.getFileHashId());
+                                } catch (Exception e) {
+                                    log.warn("保存 fileHashId 映射失败，fileHashId={} collection={} ", skipFileInfo.getFileHashId(), collectionName, e);
+                                }
+                            }
+                        }
+                    }
+                    uploadTaskStore.success(taskId, skipFile == 0L ? "上传完成" : "上传完成，重复命中文件: " + skipFile + " 个");
+                } catch (Exception ex) {
+                    log.error("处理上传任务失败: {}", taskId, ex);
+                    uploadTaskStore.error(taskId, ex.getMessage());
+                } finally {
+                    for (File t : tempFilesToCleanup) {
+                        try {
+                            Files.deleteIfExists(t.toPath());
+                        } catch (Exception ignored) {}
+                    }
+                }
+            });
+        } catch (RejectedExecutionException rex) {
+            log.warn("uploadExecutor saturated, rejecting upload task {}", taskId);
+            for (File t : tempFilesToCleanup) {
+                try {
+                    Files.deleteIfExists(t.toPath());
+                } catch (Exception ignored) {}
+            }
+            return Result.error(503, "服务器繁忙，请稍后重试");
+        }
+
         return Result.success(taskId);
     }
 
-    /**
-     * 获取实时的 ETL 执行任务（JSON 轮询版本）。
-     * 有参数的接口改为 POST
-     * 
-     * @param taskId 任务 ID
-     * @return 当前任务快照
-     */
     @PostMapping("/Task")
     public Result<UploadTaskStore.TaskState> getJob(@RequestParam("taskId") String taskId) {
         if (!StringUtils.hasText(taskId)) {
@@ -111,9 +177,6 @@ public class UploadController {
         return Result.success(current);
     }
 
-    /**
-     * 外部来源入口：URL / 本地文件路径。
-     */
     @PostMapping("source")
     public Result<String> upLoadSource(
             @RequestParam("sourceUri") String sourceUri,
@@ -129,12 +192,10 @@ public class UploadController {
 
         UpLoadAccumulator accumulator = new UpLoadAccumulator();
         try {
-            // 构建管道所需对象
             User user = LoginUserInfoManager.get();
             IngestionContext inputContext = uploadIngestionContextFactory.createFromSource(
-                sourceUri, sourceType, collectionName, kbId, user);
+                    sourceUri, sourceType, collectionName, kbId, user);
             var pipeline = pipelineDefinitionFactory.createSourcePipeline(sourceUri, sourceType);
-            // 进行管道处理
             IngestionContext outputContext = ingestionEngine.execute(pipeline, inputContext);
             if (outputContext.getChunks() != null && !outputContext.getChunks().isEmpty()) {
                 accumulator.getAllChunks().addAll(outputContext.getChunks());
@@ -146,9 +207,6 @@ public class UploadController {
         return buildUploadResult(accumulator);
     }
 
-    /**
-     * inline 文本入口：直接把文本转成字节并走同一条 ETL 管道。
-     */
     @PostMapping("inline")
     public Result<String> upLoadInline(
             @RequestParam("content") String content,
@@ -163,12 +221,10 @@ public class UploadController {
 
         UpLoadAccumulator accumulator = new UpLoadAccumulator();
         try {
-            // 构建管道所需对象
             User user = LoginUserInfoManager.get();
             IngestionContext inputContext = uploadIngestionContextFactory.createInline(
                     content, collectionName, kbId, user);
             var pipeline = pipelineDefinitionFactory.createInlinePipeline("inline");
-            // 进行管道处理
             IngestionContext outputContext = ingestionEngine.execute(pipeline, inputContext);
             if (outputContext.getChunks() != null && !outputContext.getChunks().isEmpty()) {
                 accumulator.getAllChunks().addAll(outputContext.getChunks());
@@ -180,62 +236,74 @@ public class UploadController {
         return buildUploadResult(accumulator);
     }
 
-    private void processSingleFile(MultipartFile file, UpLoadAccumulator accumulator, String collectionName, User user) {
-        // 判断错误文件
+    private boolean processSingleFile(MultipartFile file, UpLoadAccumulator accumulator, String collectionName, User user, String fileHashId) {
         if (file == null || file.isEmpty()) {
             accumulator.getFailedFiles().add("unknown(empty)");
-            return;
+            return false;
         }
-        // 安全名
         String fileName = safeFileName(file);
 
         try {
-            // 上传OSS
             if (uploadProperties.getOssEnabled()) {
                 uploadToOss(file, accumulator, fileName);
             }
-            // 构建管道所需对象
-            IngestionContext inputContext = uploadIngestionContextFactory.create(file, collectionName,user);
+
+            IngestionContext inputContext = uploadIngestionContextFactory.create(file, collectionName, user, fileHashId);
             inputContext.setTaskId(accumulator.getTaskId());
             var pipeline = pipelineDefinitionFactory.createUploadPipeline(fileName, file);
-            // 进行管道处理
             IngestionContext outputContext = ingestionEngine.execute(pipeline, inputContext);
-            // 判断是否成功
+
             if (outputContext.getChunks() != null && !outputContext.getChunks().isEmpty()) {
                 accumulator.getAllChunks().addAll(outputContext.getChunks());
+                return true;
             }
+            return false;
         } catch (Exception ex) {
             log.warn("处理文件失败，已跳过: {}", fileName, ex);
             accumulator.getFailedFiles().add(fileName);
+            return false;
         }
     }
 
-    /**
-     * 上传文件到OSS
-     *
-     * @param file        文件
-     * @param accumulator 上传对象
-     * @param fileName    文件名
-     * @throws IOException 报错
-     */
     private void uploadToOss(MultipartFile file, UpLoadAccumulator accumulator, String fileName) throws IOException {
         OssService ossService = ossServiceProvider.getIfAvailable();
         if (ossService == null) {
             log.warn("upload.oss.enabled=true 但未找到 OssService，跳过 OSS 上传");
-        } else {
-            String ossUrl = ossService.upload(file);
-            if (ossUrl != null) {
-                accumulator.getUploadedUrls().add(fileName + " -> " + ossUrl);
+            return;
+        }
+
+        final int maxAttempts = 3;
+        long baseDelayMs = 200L;
+        boolean success = false;
+        String ossUrl = null;
+
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                ossUrl = ossService.upload(file);
+                success = true;
+                break;
+            } catch (Exception ex) {
+                if (attempt == maxAttempts) {
+                    log.warn("OSS 上传失败（最终尝试）: {} attempts, file={}", attempt, fileName, ex);
+                    throw new IOException("OSS 上传失败: " + ex.getMessage(), ex);
+                }
+                long jitter = (long) (Math.random() * 100);
+                long backoff = baseDelayMs * (1L << (attempt - 1)) + jitter;
+                log.warn("OSS 上传失败，准备重试 (attempt={}): {}, backoff={}ms", attempt, fileName, backoff);
+                try {
+                    Thread.sleep(backoff);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new IOException("OSS 上传被中断", ie);
+                }
             }
+        }
+
+        if (success && ossUrl != null) {
+            accumulator.getUploadedUrls().add(fileName + " -> " + ossUrl);
         }
     }
 
-    /**
-     * 根据累积器信息构建最终返回给前端的处理结果消息。
-     *
-     * @param accumulator 上传处理累积器，包含已上传 URL、失败文件列表、所有分块等
-     * @return Result<String> 包含处理统计信息或错误信息
-     */
     private Result<String> buildUploadResult(UpLoadAccumulator accumulator) {
         if (accumulator.getAllChunks().isEmpty() && accumulator.getUploadedUrls().isEmpty()) {
             return Result.error(400, "没有可处理成功的文件，失败文件: " + String.join(",", accumulator.getFailedFiles()));
@@ -250,12 +318,6 @@ public class UploadController {
         return Result.success(msg);
     }
 
-    /**
-     * 设置安全名,防止空名
-     *
-     * @param file 上传文件
-     * @return 安全文件名
-     */
     private String safeFileName(MultipartFile file) {
         String original = file.getOriginalFilename();
         return (original == null || original.isBlank()) ? "unknown" : original;

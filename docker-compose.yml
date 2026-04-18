@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: xyai-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: changeme
+      MYSQL_DATABASE: my_ai
+      MYSQL_USER: xyai
+      MYSQL_PASSWORD: changeme
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  redis:
+    image: redis:7-alpine
+    container_name: xyai-redis
+    ports:
+      - "6379:6379"
+
+  # Milvus: pick a tag that matches your milvus-sdk-java compatibility.
+  # If you are unsure, change the image tag to a stable standalone image like v2.2.x-standalone
+  milvus:
+    image: milvusdb/milvus:v2.2.11-standalone
+    container_name: xyai-milvus
+    ports:
+      - "19530:19530"
+      - "19121:19121"
+    # for simple setups standalone image is easiest. For clustered deployments follow Milvus docs.
+
+  backend:
+    build: .
+    container_name: xyai-backend
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./.env
+    depends_on:
+      - mysql
+      - redis
+      - milvus
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: xyai-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+
+# Notes:
+# - The Milvus image tag above is a suggestion. Use the server tag compatible with your Milvus Java SDK (or change to redis streams / external Milvus service).
+# - For production, consider adding healthchecks, persistent volumes for Milvus, and separate networks/security.
+
