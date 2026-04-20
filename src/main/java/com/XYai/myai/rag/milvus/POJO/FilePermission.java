@@ -15,14 +15,12 @@ import java.util.List;
 @Data
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor//用于文件去重,并存储文件权限(redis)
 public class FilePermission {
 
     private String collectionName;
 
     private String fileId;
-
-    private List<Long> userIds;
 
     /**
      * 集合默认可见级别

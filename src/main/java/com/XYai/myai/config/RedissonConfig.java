@@ -2,6 +2,7 @@ package com.XYai.myai.config;
 
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
+import org.redisson.client.codec.StringCodec;
 import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +32,8 @@ public class RedissonConfig {
     public RedissonClient redissonClient() {
         // 创建 RedissonClient 并在容器销毁时关闭
         Config config = new Config();
+        // 使用 StringCodec 作为全局默认序列化器（多数场景以字符串为主，避免 Json 解析错误）
+        config.setCodec(new StringCodec());
         String addr = "redis://" + redisHost + ":" + redisPort;
         config.useSingleServer().setAddress(addr);
         if (redisPassword != null && !redisPassword.isBlank()) {

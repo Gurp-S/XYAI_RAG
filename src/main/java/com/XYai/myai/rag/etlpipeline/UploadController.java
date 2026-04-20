@@ -127,17 +127,11 @@ public class UploadController {
                 long skipFile = 0L;
                 try {
                     for (MultipartFile file : safeFiles) {
-                        SkipFileInfo skipFileInfo = milvusFileManager.generateFile(file, collectionName, taskId);
+                        String fileHash = milvusFileManager.calculateFileHash(file);
+                        SkipFileInfo skipFileInfo = milvusFileManager.generateFile(fileHash, collectionName, taskId);
                         skipFile += skipFileInfo.getSkipStatus();
-                        if (skipFileInfo.getSkipStatus() == 0L) {
-                            boolean ok = processSingleFile(file, accumulator, collectionName, user, skipFileInfo.getFileHashId());
-                            if (ok) {
-                                try {
-                                    milvusFileManager.saveFileHashId(collectionName, skipFileInfo.getFileHashId());
-                                } catch (Exception e) {
-                                    log.warn("保存 fileHashId 映射失败，fileHashId={} collection={} ", skipFileInfo.getFileHashId(), collectionName, e);
-                                }
-                            }
+                        if (skipFileInfo.getSkipStatus().equals(SkipFileInfo.UP_FILE)) {
+                            processSingleFile(file, accumulator, collectionName, user, fileHash);
                         }
                     }
                     uploadTaskStore.success(taskId, skipFile == 0L ? "上传完成" : "上传完成，重复命中文件: " + skipFile + " 个");

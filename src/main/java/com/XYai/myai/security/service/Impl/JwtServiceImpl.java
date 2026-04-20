@@ -120,17 +120,24 @@ public class JwtServiceImpl implements JwtService {
     public String generateAccessToken(UserDetails user, String jti) {
         Date now = new Date();
         Date exp = new Date(now.getTime() + props.getAccessTokenExpSec() * 1000L);
+
+        // 新版 JJWT 链式构建（无任何过时方法）
         return Jwts.builder()
-                // subject 一般为用户名或用户 id（本项目中使用 username 字段）
-                .setSubject(user.getUsername())
-                .setId(jti)
-                .setIssuer(props.getIssuer())
-                .setIssuedAt(now)
-                .setExpiration(exp)
-                // 自定义 claim：将角色以字符串数组的形式保存，便于在下游鉴权使用
+                // 主题：用户名/用户ID
+                .subject(user.getUsername())
+                // JWT ID
+                .id(jti)
+                // 签发者
+                .issuer(props.getIssuer())
+                // 签发时间
+                .issuedAt(now)
+                // 过期时间
+                .expiration(exp)
+                // 自定义角色声明
                 .claim("roles", collectRoles(user))
-                // 使用私钥按 RS256 算法进行签名，返回 compact 表示的 JWT 字符串
-                .signWith(privateKey, SignatureAlgorithm.RS256)
+                // 新版签名方式（无过时）
+                .signWith(privateKey, Jwts.SIG.RS256)
+                // 生成token
                 .compact();
     }
 

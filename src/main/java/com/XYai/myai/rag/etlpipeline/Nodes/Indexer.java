@@ -4,8 +4,9 @@ import com.XYai.myai.rag.etlpipeline.POJO.IngestionContext;
 import com.XYai.myai.rag.etlpipeline.POJO.NodeConfig;
 import com.XYai.myai.rag.etlpipeline.POJO.NodeResult;
 import com.XYai.myai.rag.etlpipeline.POJO.UploadProperties;
-import com.XYai.myai.rag.milvus.MilvusCollectionService;
+import com.XYai.myai.rag.milvus.MilvusAclManager;
 import com.XYai.myai.rag.milvus.MilvusMetadataFilter;
+import com.esotericsoftware.minlog.Log;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.milvus.client.MilvusServiceClient;
 import io.milvus.param.IndexType;
@@ -14,6 +15,7 @@ import io.milvus.param.index.CreateIndexParam;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
+import com.XYai.myai.rag.milvus.MilvusFileManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -39,11 +41,11 @@ public class Indexer implements Ingestion {
     @Resource
     private UploadProperties uploadProperties;
 
-    /**
-     * Milvus 集合管理工具（创建、判断、加载、写入）
-     */
     @Resource
-    private MilvusCollectionService milvusCollectionService;
+    private MilvusAclManager milvusAclManager;
+
+    @Resource
+    private MilvusFileManager milvusFileManager;
 
     /**
      * Milvus 原始客户端，用于创建索引
@@ -70,7 +72,7 @@ public class Indexer implements Ingestion {
     private String databaseName;
 
     /**
-     * 向量索引类型（如 IVF_FLAT、HNSW）
+     * 向量索引类型（IVF_FLAT）
      */
     @Value("${spring.ai.vectorstore.milvus.index-type:ivf_flat}")
     private String indexType;
@@ -122,20 +124,16 @@ public class Indexer implements Ingestion {
         }
 
         try {
-            // 确保集合存在并准备好可写入
-            milvusCollectionService.ensureReadyForWrite(collectionName);
-
+            // 确保集合存在用户权限并准备好可写入
+            if (!Boolean.TRUE.equals(milvusAclManager.getCollectionAcl(collectionName))) {
+                log.warn("当前用户无权限写入集合: {}", collectionName);
+                return NodeResult.fail("当前用户无权限写入集合: " + collectionName);
+            }
             //过滤metadata数据
             List<Document> filterChunks = milvusMetadataFilter.filter(chunks);
 
-            // 为向量字段创建索引（不存在才创建）
-            ensureEmbeddingIndex(collectionName);
-
             // 执行向量库批量写入
-            milvusCollectionService.add(collectionName, filterChunks);
-
-            // 强制刷盘，确保数据立即落盘
-            milvusCollectionService.flush(collectionName);
+            milvusFileManager.add(collectionName, filterChunks);
 
             log.info("向量入库成功 → 集合名: {}, 分块数量: {}", collectionName, chunks.size());
             return NodeResult.ok("向量入库完成，集合名=" + collectionName + "，分块数量=" + chunks.size());
@@ -251,25 +249,5 @@ public class Indexer implements Ingestion {
             return "";
         }
         return value.trim().toUpperCase().replace('-', '_');
-    }
-
-    /**
-     * 确保向量索引存在（幂等：已存在则不创建）
-     * @param collectionName 目标集合名
-     */
-    private void ensureEmbeddingIndex(String collectionName) {
-        // 规范化集合名（防止空、特殊字符等）
-        String resolved = milvusCollectionService.resolveCollectionName(collectionName);
-        try {
-            milvusClient.createIndex(buildEmbeddingIndexParam(resolved));
-        } catch (Exception e) {
-            String message = e.getMessage() == null ? "" : e.getMessage().toLowerCase();
-            // 如果是索引已存在，直接忽略
-            if (message.contains("exist")) {
-                return;
-            }
-            // 其他异常直接抛出
-            throw e;
-        }
     }
 }

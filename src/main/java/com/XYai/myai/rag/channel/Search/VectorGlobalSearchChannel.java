@@ -1,13 +1,12 @@
 package com.XYai.myai.rag.channel.Search;
 
-import com.XYai.myai.rag.milvus.MilvusService;
-import com.XYai.myai.rag.milvus.MilvusCollectionService;
 import com.XYai.myai.rag.channel.POJO.RetrievedChunk;
 import com.XYai.myai.rag.channel.POJO.SearchChannel;
 import com.XYai.myai.rag.channel.POJO.SearchChannelResult;
 import com.XYai.myai.rag.channel.POJO.SearchContext;
 import com.XYai.myai.rag.intent.POJO.NodeScore;
 import com.XYai.myai.rag.intent.POJO.SubQuestionIntent;
+import com.XYai.myai.rag.milvus.MilvusCollectionService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
@@ -34,14 +33,11 @@ import java.util.concurrent.Executors;
 public class VectorGlobalSearchChannel implements SearchChannel {
 
     /**
-     * 注入 Milvus 工具服务：用于查询所有集合、判断集合是否存在
-     */
-    @Resource
-    private MilvusService milvusService;
-
-    /**
      * 注入集合动态路由的向量存储服务：根据 collectionName 获取对应的 VectorStore
      */
+    @Resource
+    private VectorStore vectorStore;
+
     @Resource
     private MilvusCollectionService milvusCollectionService;
 
@@ -119,7 +115,7 @@ public class VectorGlobalSearchChannel implements SearchChannel {
     @Override
     public SearchChannelResult search(SearchContext context) {
         // 1. 获取系统中所有 Milvus 集合名称
-        List<String> allCollectionNames = milvusService.getAllCollectionNames();
+        List<String> allCollectionNames = milvusCollectionService.getAllCollectionNames();
 
         // 2. 并行检索所有集合 → 合并结果 → 排序 → 截断
         List<RetrievedChunk> allChunks = allCollectionNames.stream()
@@ -154,7 +150,6 @@ public class VectorGlobalSearchChannel implements SearchChannel {
 
         try {
             // 显式 load 后再查
-            VectorStore vectorStore = milvusCollectionService.ensureReadyForRead(collectionName);
             if (vectorStore == null) {
                 log.info("集合未加载:{}",collectionName);
                 return List.of();

@@ -3,6 +3,7 @@ package com.XYai.myai.rag.etlpipeline.POJO;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -54,19 +55,20 @@ public class FileBackedMultipartFile implements MultipartFile {
         return file == null ? 0L : file.length();
     }
 
+    @NotNull
     @Override
     public byte[] getBytes() throws IOException {
         return Files.readAllBytes(file.toPath());
     }
 
+    @NotNull
     @Override
     public InputStream getInputStream() throws IOException {
         return new FileInputStream(file);
     }
 
     @Override
-    public void transferTo(File dest) throws IOException {
-        if (dest == null) throw new IllegalArgumentException("Destination file is null");
+    public void transferTo(@NotNull File dest) throws IOException {
         Files.copy(file.toPath(), dest.toPath());
     }
 }

@@ -29,13 +29,13 @@ public class PipelineDefinitionFactory {
 
     public PipelineDefinition createSourcePipeline(String sourceLabel, String sourceType) {
         boolean includeFetcher = true;
-        int chunkSize = "inline".equalsIgnoreCase(sourceType) ? 800 : 900;
-        int overlapSize = 120;
+        int chunkSize = pipelineProperties.getDefaultChunkSize();
+        int overlapSize = pipelineProperties.getDefaultOverlapSize();
         return buildPipeline(sourceLabel, includeFetcher, chunkSize, overlapSize);
     }
 
     public PipelineDefinition createInlinePipeline(String sourceLabel) {
-        return buildPipeline(sourceLabel, false, 800, 120);
+        return buildPipeline(sourceLabel, false, pipelineProperties.getDefaultChunkSize(), pipelineProperties.getDefaultOverlapSize());
     }
 
     private PipelineDefinition buildPipeline(String pipelineName,
@@ -111,9 +111,9 @@ public class PipelineDefinitionFactory {
             return 1000;
         }
         if (type.contains("plain") || fileName.endsWith(".txt") || fileName.endsWith(".md")) {
-            return 800;
+            return pipelineProperties.getDefaultChunkSize();
         }
-        return 900;
+        return pipelineProperties.getDefaultChunkSize();
     }
 
     /**

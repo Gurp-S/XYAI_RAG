@@ -25,7 +25,7 @@ public class IntentDirectedSearchChannel implements SearchChannel {
     //根据节点ID在向量数据库中直接检索
 
     @Resource
-    private MilvusCollectionService milvusCollectionService;
+    private VectorStore vectorStore;
 
     @Override
     public String getName() {
@@ -115,7 +115,6 @@ public class IntentDirectedSearchChannel implements SearchChannel {
         int effectiveTopK = Math.max(topK, 1);
         try {
             // 先判断是否加载再查
-            VectorStore vectorStore = milvusCollectionService.ensureReadyForRead(collectionName);
             if (vectorStore == null) {
                 log.info("集合未加载:{}",collectionName);
                 return List.of();

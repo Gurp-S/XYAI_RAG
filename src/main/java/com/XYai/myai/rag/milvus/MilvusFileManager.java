@@ -1,218 +1,177 @@
 package com.XYai.myai.rag.milvus;
 
-import com.XYai.myai.mapper.FileRecordMapper;
+import com.XYai.myai.config.Result;
 import com.XYai.myai.rag.etlpipeline.POJO.SkipFileInfo;
 import com.XYai.myai.rag.etlpipeline.UploadTaskStore;
-import com.XYai.myai.rag.milvus.POJO.FilePermission;
-import com.XYai.myai.rag.milvus.POJO.FileRecord;
 import com.XYai.myai.redis.RedisKeyConfig;
-import com.alibaba.fastjson2.JSON;
-// ...existing code...
+import com.XYai.myai.user.LoginUserInfoManager;
 import io.milvus.client.MilvusClient;
+import io.milvus.client.MilvusServiceClient;
 import io.milvus.grpc.QueryResults;
 import io.milvus.param.R;
-import io.milvus.param.dml.InsertParam;
 import io.milvus.param.dml.QueryParam;
 import io.milvus.response.QueryResultsWrapper;
 import jakarta.annotation.Resource;
+import kotlin.Metadata;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RBucket;
-import org.redisson.api.RLock;
+import org.jetbrains.annotations.NotNull;
 import org.redisson.api.RedissonClient;
-import org.springframework.beans.BeanUtils;
+import org.springframework.ai.document.Document;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
 public class MilvusFileManager {
 
-    private static volatile Method insertFieldFactoryMethod;
-
     @Resource
     private RedissonClient redissonClient;
     @Resource
-    private UploadTaskStore uploadTaskStore;
-    @Resource
-    private FileRecordMapper fileRecordMapper;
-    @Resource
     private MilvusAclManager milvusAclManager;
     @Resource
-    private MilvusClient milvusClient;
+    private UploadTaskStore uploadTaskStore;
+    @Value("${spring.ai.vectorstore.milvus.collectionName:my_ai}")
+    private String physicalCollectionName;
     @Value("${spring.ai.vectorstore.milvus.databaseName:default}")
     private String databaseName;
+    @Resource
+    private MilvusClient milvusClient;
+    @Resource
+    private VectorStore vectorStore;
+    @Resource
+    private MilvusCollectionService milvusCollectionService;
+
+    @Autowired
+    public MilvusFileManager(MilvusServiceClient milvusClient) {
+        this.milvusClient = milvusClient;
+    }
+
+    /**
+     * 解析结果
+     */
+    @NotNull
+    private static List<Map<String, Object>> getMetadataResultByMilvusClient(R<QueryResults> response) {
+        QueryResultsWrapper wrapper = new QueryResultsWrapper(response.getData());
+        List<QueryResultsWrapper.RowRecord> rowRecords = wrapper.getRowRecords();
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (QueryResultsWrapper.RowRecord rowRecord : rowRecords) {
+            //取消googleJSON
+            Map<String, Object> original = rowRecord.getFieldValues();
+            Map<String, Object> cleanMap = new HashMap<>();
+            original.forEach((key, value) -> {
+                if (value != null && value.getClass().getName().contains("google.gson")) {
+                    cleanMap.put(key, value.toString());
+                } else {
+                    cleanMap.put(key, value);
+                }
+            });
+            list.add(cleanMap);
+        }
+        return list;
+    }
 
     /**
      * 文件去重判断入口
      */
-    public SkipFileInfo generateFile(MultipartFile file, String collectionName, String taskId) {
+    public SkipFileInfo generateFile(String fileHash, String collectionName, String taskId) {
         try {
             SkipFileInfo result = new SkipFileInfo();
             reportFetchTask(taskId);
 
-            // 1. 计算文件哈希
-            String fileHash = calculateFileHash(file);
-            result.setFileHashId(fileHash);
+//            // 1. 计算文件哈希
+//            String fileHash = calculateFileHash(file);
+//            result.setFileHashId(fileHash);废弃直接传
+            Long userId = LoginUserInfoManager.get().getId();
 
-            // 2. 构建文件记录
-            String fileName = safeFileName(file);
-            FileRecord newRecord = buildFileRecord(fileHash, fileName, collectionName);
+            // 2. 构建文件记录查找
             String redisKey = RedisKeyConfig.fileHashKey(fileHash);
 
-            // 3. 检查是否已存在
-            FileRecord existing = getExistingFileRecord(redisKey, newRecord);
+            boolean existing = redissonClient.getKeys().countExists(redisKey) > 0;
+            log.info("文件是否存在:{}", existing);
 
-            // 4. 不存在则按新文件处理
-            if (existing == null) {
-                //插入redis
-                milvusAclManager.addFileUserACl(fileHash ,collectionName);
-                //插入DB
-                fileRecordMapper.insert(newRecord);
-                result.setSkipStatus(SkipFileInfo.UP_FILE);
+            // 上传文件：没有文件记录
+            if (!existing) {
+                redissonClient.getSet(redisKey).add(collectionName);
+                result.skipStatus = SkipFileInfo.UP_FILE;
                 return result;
             }
 
-            // 5. 已存在：判断集合是否相同
-            if (Objects.equals(existing.getCollectionName(), collectionName)) {
-                log.info("collectionName:{} 已存在相同文件，跳过上传", collectionName);
-                result.setSkipStatus(SkipFileInfo.SKIP_FILE);
+            // 跳过文件上传，同一用户，同一集合，同一文件
+            if (redissonClient.getSet(redisKey).contains(collectionName) &&//文件存在当前集合
+                    milvusCollectionService.getAllCollectionNames().contains(collectionName) &&//当前集合属于用户
+                    milvusAclManager.getFileAcl(fileHash)) {//当前文件属于当前用户
+                result.skipStatus = SkipFileInfo.SKIP_FILE;
+                log.info("跳过文件上传:{}", existing);
                 return result;
             }
-
-            // 6. 跨集合复制向量
-            reportTaskCopy(taskId, existing.getCollectionName(), collectionName);
-            SkipFileInfo copyResult = copyToNewCollection(collectionName, existing.getCollectionName(), existing.getFileId(), result);
-            if (!Objects.equals(copyResult.getSkipStatus(), SkipFileInfo.COPY_FILE)) {
-                return copyResult;
-            }
-
-            // 7. 复制后更新集合信息
-            saveFileHashId(collectionName, existing.getFileId());//集合下文件
-
-            return copyResult;
-        } catch (IOException e) {
-            throw new RuntimeException("提取文件字节失败", e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("计算文件哈希失败", e);
+            // 复制：不知道用户,同文件，不同集合   同一用户，不同集合，同一文件(需要获取分块数据)
+            // 从redis中的人任意集合查出分了几块
+            Long chunkSize = Long.valueOf(redissonClient.getSet(redisKey).stream().toList().getFirst().toString().split(":")[1]);
+            // 集合添加分块条目格式 fileId:chunkSize 存入user:fileId
+            milvusAclManager.addFileUserACl(fileHash,collectionName,chunkSize);
+            result.skipStatus = SkipFileInfo.COPY_FILE;
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException("检查文件状态失败", e);
         }
     }
 
     /**
-     * 计算文件SHA256
+     * 向指定 Milvus 集合添加文档（自动向量化）
+     *
+     * @param collectionName 目标集合名
+     * @param documents      文档列表（Spring AI Document 对象）
+     * @return 执行结果
      */
-    private String calculateFileHash(MultipartFile file) throws IOException, NoSuchAlgorithmException {
+    public Result<String> add(String collectionName, List<Document> documents) {
+        // 空值判断
+        if (documents == null || documents.isEmpty()) {
+            return Result.error(400, "文档为空");
+        }
+        // 确保集合存在用户的权限集合中
+        Boolean existsCollectionAcl = milvusCollectionService.exists(collectionName);
+        log.info("milvusCollectionService:添加文件,当前集合:{}", collectionName);
+        if (existsCollectionAcl) {//添加到默认集合
+            // 首先记录 ACL（依赖 Document.metadata 中的 fileId/chunkId），
+            milvusAclManager.addFileUserACl(documents, collectionName);
+            // 再将文档交给 VectorStore 进行 embedding & 写入 Milvus
+            vectorStore.add(documents);
+            log.info("milvusCollectionService:添加文件成功,当前集合:{}", collectionName);
+        }
+        return Result.success("添加成功");
+    }
+
+    public void deleteDocument(Long chunkId, String fileId, String collectionName) {
+        // 删除权限
+        milvusAclManager.deleteDocumentAcl(chunkId, fileId, collectionName);
+    }
+
+    /**
+     * 流式计算文件SHA256
+     */
+    public String calculateFileHash(MultipartFile file) throws IOException, NoSuchAlgorithmException {
         try (InputStream in = file.getInputStream()) {
-            return sha256Hex(in);
-        }
-    }
-
-    /**
-     * 构建文件记录
-     */
-    private FileRecord buildFileRecord(String fileId, String fileName, String collectionName) {
-        return FileRecord.builder()
-                .fileId(fileId)
-                .fileName(fileName)
-                .collectionName(collectionName)
-                .createTime(LocalDateTime.now())
-                .build();
-    }
-
-    /**
-     * 获取已存在的文件记录（Redis + DB）
-     */
-    private FileRecord getExistingFileRecord(String redisKey, FileRecord newRecord) {
-        // redis检验 (权限文件名)
-        RBucket<String> filePermission = redissonClient.getBucket(redisKey);
-        String permissionJson = filePermission.get();
-        FilePermission permission = (permissionJson == null || permissionJson.isBlank())
-                ? null
-                : JSON.parseObject(permissionJson, FilePermission.class);
-        // 存在返回
-        if (permission != null) {
-            return toFileRecord(permission, newRecord.getFileId());
-        }
-
-        // 缓存不存在查DB
-        FileRecord existing = fileRecordMapper.selectById(newRecord.getFileId());
-        // DB存在
-        if (existing != null) {
-            return existing;
-        }
-        // Redis DB都不存在第一次遇到文件
-        return null;
-    }
-
-    /**
-     * 跨集合复制向量数据
-     */
-    private SkipFileInfo copyToNewCollection(String targetCollection, String sourceCollection,
-                                             String fileId, SkipFileInfo result) {
-        // 查询源集合
-        R<QueryResults> queryRsp = milvusClient.query(
-                QueryParam.newBuilder()
-                        .withDatabaseName(databaseName)
-                        .withCollectionName(sourceCollection)
-                        .withExpr(String.format("metadata[\"fileId\"] == \"%s\"", fileId))
-                        .withOutFields(List.of("*"))
-                        .build()
-        );
-
-        if (queryRsp == null || queryRsp.getStatus() != R.Status.Success.getCode() || queryRsp.getData() == null) {
-            log.error("查询源集合失败");
-            result.setSkipStatus(SkipFileInfo.SKIP_ERROR);
-            return result;
-        }
-
-        // 转换结构
-        QueryResultsWrapper wrapper = new QueryResultsWrapper(queryRsp.getData());
-        if (wrapper.getRowRecords().isEmpty()) {
-            log.warn("源集合无可复制向量: sourceCollection={}, fileId={}", sourceCollection, fileId);
-            result.setSkipStatus(SkipFileInfo.SKIP_ERROR);
-            return result;
-        }
-
-        Map<String, List<Object>> columns = new LinkedHashMap<>();
-        for (var row : wrapper.getRowRecords()) {
-            for (var entry : row.getFieldValues().entrySet()) {
-                columns.computeIfAbsent(entry.getKey(), key -> new ArrayList<>()).add(entry.getValue());
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] buffer = new byte[8192];
+            int len;
+            while ((len = in.read(buffer)) != -1) {
+                digest.update(buffer, 0, len);
             }
+            StringBuilder sb = new StringBuilder();
+            for (byte b : digest.digest()) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
         }
-
-        // 构建插入字段
-        List<InsertParam.Field> fields = new ArrayList<>();
-        for (var entry : columns.entrySet()) {
-            fields.add(buildInsertField(entry.getKey(), entry.getValue()));
-        }
-
-        // 复制修改权限 同时修改集合名
-        fields = milvusAclManager.copyFilePermission(sourceCollection, fields);
-
-        // 插入目标集合
-        R<?> insertRsp = milvusClient.insert(InsertParam.newBuilder()
-                .withDatabaseName(databaseName)
-                .withCollectionName(targetCollection)
-                .withFields(fields)
-                .build());
-        if (insertRsp == null || insertRsp.getStatus() != R.Status.Success.getCode()) {
-            log.error("写入目标集合失败: targetCollection={}, fileId={}", targetCollection, fileId);
-            result.setSkipStatus(SkipFileInfo.SKIP_ERROR);
-            return result;
-        }
-
-
-        result.setSkipStatus(SkipFileInfo.COPY_FILE);
-        return result;
     }
 
     private void reportFetchTask(String taskId) {
@@ -238,126 +197,64 @@ public class MilvusFileManager {
     }
 
     /**
-     * 反射构造Field（兼容异常）
+     * 获取集合内的用户数据（模拟查看 metadata）
+     *
+     * @param collectionName 集合名
+     * @return 每一行记录的 Map 列表
      */
-    private InsertParam.Field buildFieldWithReflection(String name, List<Object> values) {
-        try {
-            Method method = insertFieldFactoryMethod;
-            if (method == null) {
-                Class<?> fieldClass = Class.forName("io.milvus.param.dml.InsertParam$Field");
-                method = fieldClass.getMethod("of", String.class, List.class);
-                insertFieldFactoryMethod = method;
-            }
-            return (InsertParam.Field) method.invoke(null, name, values);
-        } catch (Throwable t) {
-            throw new RuntimeException("构造Field失败: " + name, t);
+    public List<Map<String, Object>> getUserCollectionNameMetadata(String collectionName) {
+        if (collectionName == null || collectionName.trim().isEmpty()) {
+            return Collections.emptyList();
         }
-    }
 
-    private InsertParam.Field buildInsertField(String name, List<Object> values) {
-        try {
-            return new InsertParam.Field(name, values);
-        } catch (Exception e) {
-            return buildFieldWithReflection(name, values);
+        // 权限过滤：获取当前用户可读的 fileId:chunkId 列表
+        List<String> fileChunkIds = milvusAclManager.getCollectionMetadata(collectionName);
+        if (fileChunkIds == null || fileChunkIds.isEmpty()) {
+            return Collections.emptyList();
         }
-    }
-
-    /**
-     * 统一更新复制文件所属集合（合并后 唯一入口）
-     */
-    public void saveFileHashId(String collectionName, String fileId) {
-        String redisKey = RedisKeyConfig.fileHashKey(fileId);
-
-        // 加分布式锁（防止并发更新导致数据错乱）
-        RLock lock = redissonClient.getLock(redisKey + ":lock");
-        boolean locked = false;
-
-        try {
-            // 尝试加锁，5 秒等待，10 秒自动释放
-            locked = lock.tryLock(5, 10, TimeUnit.SECONDS);
-            if (!locked) {
-                log.warn("获取分布式锁超时，跳过更新: fileId={}", fileId);
-                return;
-            }
-
-            // 先查redis获取最新记录
-            FileRecord record = null;
-            RBucket<String> filePermission = redissonClient.getBucket(redisKey);
-            String permissionJson = filePermission.get();
-            FilePermission permission = (permissionJson == null || permissionJson.isBlank())
-                    ? null
-                    : JSON.parseObject(permissionJson, FilePermission.class);
-            if (permission != null) {
-                permission.setCollectionName(collectionName);
-                // 同步更新 redis 中的集合名，保证缓存与DB一致
-                filePermission.set(JSON.toJSONString(permission));
-                record = toFileRecord(permission, fileId);
-            }
-
-            // 没有再查DB
-            if (record == null) {
-                record = fileRecordMapper.selectById(fileId);
-                if (record == null) {
-                    log.warn("未找到文件记录，无法更新集合: fileId={}", fileId);
-                    return;
-                }
-            }
-            //更新目标复制集合
-
-            // 更新 DB（先持久化，保证数据不丢）
-            record.setCollectionName(collectionName);
-            fileRecordMapper.updateById(record);
-            log.debug("DB 更新成功: fileId={}, collectionName={}", fileId, collectionName);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            log.warn("更新文件集合时被中断: fileId={}", fileId, e);
-        } catch (Exception e) {
-            log.error("更新文件集合异常: fileId={}", fileId, e);
-        } finally {
-            // 确保锁一定被释放
-            if (locked && lock.isHeldByCurrentThread()) {
-                try {
-                    lock.unlock();
-                } catch (Exception e) {
-                    log.warn("释放分布式锁异常: fileId={}", fileId, e);
-                }
-            }
+        // 构建 Milvus 查询表达式
+        List<String> clauses = fileChunkIds.stream()
+                .filter(fc -> fc != null && !fc.isBlank())
+                .filter(fc -> fc.contains(":"))
+                .map(fc -> {
+                    try {
+                        String[] parts = fc.split(":", 2);
+                        String fileId = parts[0];
+                        String chunkId = parts[1];
+                        // 转义
+                        String escFid = fileId.replace("\"", "\\\"").replace("'", "''");
+                        String escCid = chunkId.replace("\"", "\\\"").replace("'", "''");
+                        // 构建
+                        return String.format(
+                                "(metadata[\"fileId\"] == \"%s\" AND (metadata['chunkId'] == '%s' OR metadata['chunkId'] == %s))",
+                                escFid, escCid, escCid
+                        );
+                    } catch (Exception e) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .toList();
+        if (clauses.isEmpty()) {
+            return Collections.emptyList();
         }
-    }
 
-    // ...existing code...
-
-    private FileRecord toFileRecord(FilePermission permission, String defaultFileId) {
-        FileRecord record = new FileRecord();
-        BeanUtils.copyProperties(permission, record);
-        if (record.getFileId() == null || record.getFileId().isBlank()) {
-            record.setFileId(defaultFileId);
+        // 最终表达式
+        String expr = "(" + String.join(" OR ", clauses) + ")";
+        QueryParam queryParam = QueryParam.newBuilder()
+                .withDatabaseName(databaseName)
+                .withCollectionName(physicalCollectionName)
+                .withExpr(expr)
+                .withOutFields(Arrays.asList("doc_id", "content", "metadata"))
+                .withLimit(16384L)
+                .build();
+        R<QueryResults> response = milvusClient.query(queryParam);
+        if (response == null || response.getStatus() != R.Status.Success.getCode() || response.getData() == null) {
+            String message = response == null ? "response is null" : response.getMessage();
+            log.warn("查询集合数据空或失败, collection={}, reason={}", collectionName, message);
+            return Collections.emptyList();
         }
-        return record;
-    }
-
-    /**
-     * 流式SHA256
-     */
-    private String sha256Hex(InputStream in) throws NoSuchAlgorithmException, IOException {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] buffer = new byte[8192];
-        int len;
-        while ((len = in.read(buffer)) != -1) {
-            digest.update(buffer, 0, len);
-        }
-        StringBuilder sb = new StringBuilder();
-        for (byte b : digest.digest()) {
-            sb.append(String.format("%02x", b));
-        }
-        return sb.toString();
-    }
-
-    /**
-     * 安全文件名
-     */
-    private String safeFileName(MultipartFile file) {
-        String name = file.getOriginalFilename();
-        return (name == null || name.isBlank()) ? "unknown" : name;
+        //返回
+        return getMetadataResultByMilvusClient(response);
     }
 }

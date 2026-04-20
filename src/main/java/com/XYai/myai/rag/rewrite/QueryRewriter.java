@@ -20,7 +20,7 @@ public class QueryRewriter{
     private QueryReweiterService queryReweiterService;
     @Resource
     private ChatModel chatModel;
-    @Autowired
+    @Resource
     private RewriterProperties rewriterProperties;
 
     /**

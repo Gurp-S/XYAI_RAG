@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("xy_file_record")
+@TableName("xy_file_record")//用于记录文件
 public class FileRecord {
 
     @TableId(value = "file_id", type = IdType.INPUT)

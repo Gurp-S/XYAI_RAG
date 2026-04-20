@@ -61,9 +61,6 @@ public class UploadTaskStore {
     public TaskState copy(String taskId, String sourceCollection, String targetCollection) {
         // 如果注入了 MilvusCollectionService，则在上传层进行短轮询等待，避免直接发起冲突操作
         boolean ready = true;
-        if (milvusCollectionService != null) {
-            ready = waitForUnlock(targetCollection, 30000L, 500L);
-        }
 
         if (!ready) {
             // 目标集合仍被占用，记录等待态并返回
@@ -93,31 +90,6 @@ public class UploadTaskStore {
                 .startTime(existingStartTime(taskId))
                 .build();
         return put(taskId, state);
-    }
-
-    /**
-     * 等待目标集合解锁（通过 milvusCollectionService.getModifyWaitState 查询），
-     * 超时时间内轮询，返回 true 表示已解锁可以继续。
-     */
-    private boolean waitForUnlock(String collectionName, long timeoutMillis, long pollIntervalMillis) {
-        long deadline = System.currentTimeMillis() + timeoutMillis;
-        while (System.currentTimeMillis() < deadline) {
-            try {
-                var state = milvusCollectionService.getModifyWaitState(collectionName);
-                Object lockedObj = state.getOrDefault("locked", Boolean.FALSE);
-                boolean locked = Boolean.TRUE.equals(lockedObj);
-                if (!locked) return true;
-            } catch (Exception ignored) {
-                // 如果查询失败，短暂等待后重试
-            }
-            try {
-                Thread.sleep(pollIntervalMillis);
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
-                break;
-            }
-        }
-        return false;
     }
 
     public TaskState success(String taskId, String message) {

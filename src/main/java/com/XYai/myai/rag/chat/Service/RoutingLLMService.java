@@ -26,11 +26,11 @@ public class RoutingLLMService implements LLMService {
 
     private  Map<String, ChatClient> clientsByProvider;  // 各提供商客户端（key：provider，value：客户端）
 
-    public RoutingLLMService(ModelSelector selector, ModelHealthStore modelHealthStore,
-                             ModelRoutingExecutor modelRoutingExecutor, Map<String, ChatClient> clientsByProvider){
-        this.selector = selector;this.healthStore=modelHealthStore;
-        this.executor=modelRoutingExecutor;this.clientsByProvider = clientsByProvider;
-    }
+//    public RoutingLLMService(ModelSelector selector, ModelHealthStore modelHealthStore,
+//                             ModelRoutingExecutor modelRoutingExecutor, Map<String, ChatClient> clientsByProvider){
+//        this.selector = selector;this.healthStore=modelHealthStore;
+//        this.executor=modelRoutingExecutor;this.clientsByProvider = clientsByProvider;
+//    }
 
 
     /**

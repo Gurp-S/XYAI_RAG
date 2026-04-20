@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 文档分块节点（ETL 流程 chunker 环节）
@@ -66,13 +67,15 @@ public class Chunker implements Ingestion {
         } else {
             log.info("Spring AI 官方自动分块完成，chunks={}", chunks.size());
         }
-
+        // 将实际分块数量写入上下文元数据（META_CHUNK_SIZE 用于记录 chunk 相关信息）
+        Document updatedDoc = context.getDocument().mutate()
+                .metadata("chunk_size", chunks.size())
+                .build();
+        context.setDocument(updatedDoc);
         // 5. 将分块结果存入上下文，供后续节点使用
-        chunks = enrichChunkMetadata(chunks, chunkSize);
+        chunks = enrichChunkMetadata(chunks, chunks.size());
         context.setChunks(chunks);
-        int sizeOfChunks = chunks.size();
-        context.getDocument().getMetadata().put(IngestionContext.META_CHUNK_SIZE, chunkSize);
-        return NodeResult.ok("分块数量=" + sizeOfChunks);
+        return NodeResult.ok("分块数量=" + chunks.size());
     }
 
     /**
@@ -93,8 +96,11 @@ public class Chunker implements Ingestion {
             // 3. 高性能自增ID赋值（ArrayList 预分配容量 + 原生for循环，比 stream 快 30%+）
             List<Document> result = new ArrayList<>(chunks.size());
             for (int i = 0; i < chunks.size(); i++) {
+                // 保留源文档的 metadata（例如 fileId/fileHash 等），避免分块时丢失权限/追踪信息
+                HashMap<String, Object> inherited = new HashMap<>(sourceDoc.getMetadata() == null ? Map.of() : sourceDoc.getMetadata());
                 result.add(chunks.get(i).mutate()
                         .id(String.valueOf(i + 1))
+                        .metadata(inherited)
                         .build());
             }
 
@@ -163,7 +169,6 @@ public class Chunker implements Ingestion {
             if (chunk == null || !StringUtils.hasText(chunk.getText())) {
                 continue;
             }
-
             HashMap<String, Object> metadata = new HashMap<>(chunk.getMetadata());
             metadata.put("chunkId", i + 1);
             metadata.put("chunkSize", chunkSize);

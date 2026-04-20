@@ -45,7 +45,7 @@ public class UserController {
     @Resource
     private UserMapper userMapper;
 
-    @Autowired
+    @Resource
     private JwtProperties jwtProperties;
 
     // ================================ 登录 / 注册 / 登出

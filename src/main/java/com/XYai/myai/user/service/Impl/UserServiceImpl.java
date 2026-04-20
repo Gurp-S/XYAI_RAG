@@ -205,7 +205,6 @@ public class UserServiceImpl implements UserService {
         if (userId == null || userId < 0)
             return Result.error(500, "id非法");
         List<ChatSessionRecord> conversations = getConversationId(userId);
-        log.info("查询历史");
         return Result.success(conversations);
     }
 
@@ -237,8 +236,7 @@ public class UserServiceImpl implements UserService {
         Long userId = user.getId() != null ? user.getId() : userDTO.getId();
         if (userId != null) {
             try {
-                // userCollectionsKey 在 Milvus ACL 中按 RSet<String> 使用，这里保持同一 Redis 结构
-                RSet<String> set = redissonClient.getSet(RedisKeyConfig.userCollectionsKey(userId));
+                RSet<String> set = redissonClient.getSet(RedisKeyConfig.userLoadCollectionsKey(userId));
                 set.clear();
             } catch (Exception e) {
                 log.warn("初始化用户分区缓存失败, userId={}", userId, e);

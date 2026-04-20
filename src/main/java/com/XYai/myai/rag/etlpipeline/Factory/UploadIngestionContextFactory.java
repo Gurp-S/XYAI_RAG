@@ -107,20 +107,13 @@ public class UploadIngestionContextFactory {
             // 上传者ID（Long）
             metadata.put(IngestionContext.META_OWNER_ID, user.getId());
 
-            // 组ID（Long）
-            metadata.put(IngestionContext.META_GROUP_ID, user.getGroupId());
-
             // 默认私有
             metadata.put(IngestionContext.META_VISIBILITY, "private");
 
-            // 默认空共享列表（JSON array）
-            metadata.put(IngestionContext.META_SHARED_WITH, List.of());
         } else {
             // 无用户时的安全默认值
             metadata.put(IngestionContext.META_OWNER_ID, 0L);
-            metadata.put(IngestionContext.META_GROUP_ID, 0L);
             metadata.put(IngestionContext.META_VISIBILITY, "private");
-            metadata.put(IngestionContext.META_SHARED_WITH, List.of());
         }
 
         // 构建文档

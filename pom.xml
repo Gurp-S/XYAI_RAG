@@ -30,7 +30,7 @@
         <grpc.version>1.68.0</grpc.version>
         <java.version>21</java.version>
         <lombok.version>1.18.38</lombok.version>
-        <milvus-sdk.version>2.5.4</milvus-sdk.version>
+        <milvus-sdk.version>2.6.13</milvus-sdk.version>
         <spring-ai.version>1.0.0</spring-ai.version>
         <mybatis-plus.version>3.5.7</mybatis-plus.version>
         <tika.version>3.0.0</tika.version>
@@ -157,6 +157,12 @@
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-vector-store-milvus</artifactId>
+        </dependency>
+        <!-- Explicit Milvus Java SDK to control the exact version used by the project -->
+        <dependency>
+            <groupId>io.milvus</groupId>
+            <artifactId>milvus-sdk-java</artifactId>
+            <version>${milvus-sdk.version}</version>
         </dependency>
         <dependency>
             <groupId>com.aliyun.oss</groupId>

@@ -21,6 +21,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Stream;
 
 /**
  * 多路召回检索引擎。
@@ -94,7 +95,7 @@ public class MultiChannelRetrievalEngine {
 		List<RetrievedChunk> merged = futures.stream()
 				.map(CompletableFuture::join)
 				.filter(Objects::nonNull)
-				.flatMap(res -> res.getChunks() == null ? List.<RetrievedChunk>of().stream() : res.getChunks().stream())
+				.flatMap(res -> res.getChunks() == null ? Stream.<RetrievedChunk>of() : res.getChunks().stream())
 				.toList();
 
 		// 进行后处理返回chunks

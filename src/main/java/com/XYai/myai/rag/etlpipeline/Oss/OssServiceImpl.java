@@ -23,7 +23,6 @@ public class OssServiceImpl implements OssService {
 
     @Autowired
     public OssServiceImpl(OSS ossClient, com.XYai.myai.config.OssConfig ossConfig) {
-        // Use the OSS bean provided by OssConfig (singleton managed by Spring)
         this.ossClient = ossClient;
         this.ossConfig = ossConfig;
         this.bucket = ossConfig.getBucket();
@@ -32,7 +31,6 @@ public class OssServiceImpl implements OssService {
 
     @Override
     public String upload(MultipartFile file) throws IOException {
-        // delegate to stream overload
         try (InputStream in = file.getInputStream()) {
             return upload(in, file.getSize(), file.getOriginalFilename(), file.getContentType());
         }
@@ -48,10 +46,8 @@ public class OssServiceImpl implements OssService {
     @Override
     public String upload(InputStream in, long size, String objectKey, String contentType) throws IOException {
         if (size <= DEFAULT_PART_SIZE) {
-            // small file -> single PutObject
             ObjectMetadata meta = new ObjectMetadata();
             if (contentType != null) meta.setContentType(contentType);
-            // set content length to avoid chunked transfer if possible
             meta.setContentLength(size);
             PutObjectRequest putReq = new PutObjectRequest(bucket, objectKey, in, meta);
             PutObjectResult putRes = ossClient.putObject(putReq);
@@ -64,7 +60,6 @@ public class OssServiceImpl implements OssService {
 
     @Override
     public String multipartUpload(InputStream in, long size, String objectKey, String contentType) throws IOException {
-        // read input stream by partSize chunks and upload parts (concurrently)
         long partSize = DEFAULT_PART_SIZE; // 可配置
         int partCount = (int) ((size + partSize - 1) / partSize);
         if (partCount > 10000) {
@@ -119,7 +114,7 @@ public class OssServiceImpl implements OssService {
                             attempt++;
                             if (attempt > MAX_RETRY) throw ex;
                             // backoff
-                            Thread.sleep(500L * attempt);
+                            Thread.sleep(50L * attempt);
                         }
                     }
                     return null;
@@ -139,7 +134,7 @@ public class OssServiceImpl implements OssService {
             }
 
             // Complete
-            Collections.sort(partETags, Comparator.comparingInt(PartETag::getPartNumber));
+            partETags.sort(Comparator.comparingInt(PartETag::getPartNumber));
             CompleteMultipartUploadRequest completeRequest = new CompleteMultipartUploadRequest(bucket, objectKey, uploadId, partETags);
             CompleteMultipartUploadResult completeResult = ossClient.completeMultipartUpload(completeRequest);
             return buildUrl(objectKey);

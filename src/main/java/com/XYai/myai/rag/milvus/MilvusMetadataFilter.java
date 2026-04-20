@@ -58,7 +58,6 @@ public final class MilvusMetadataFilter {
         if (documents == null || documents.isEmpty()) {
             return List.of();
         }
-
         List<Document> result = new ArrayList<>(documents.size());
         for (Document document : documents) {
             Document cleaned = filter(document);
