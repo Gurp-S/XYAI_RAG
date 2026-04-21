@@ -203,13 +203,13 @@ public class MilvusFileManager {
      * @param collectionName 集合名
      * @return 每一行记录的 Map 列表
      */
-    public List<Map<String, Object>> getUserCollectionNameMetadata(String collectionName) {
+    public List<Map<String, Object>> getUserCollectionFiles(String collectionName) {
         if (collectionName == null || collectionName.trim().isEmpty()) {
             return Collections.emptyList();
         }
 
         // 权限过滤：获取当前用户可读的 fileId:chunkId 列表
-        List<String> fileChunkIds = milvusAclManager.getCollectionMetadata(collectionName);
+        List<String> fileChunkIds = milvusAclManager.getCollectionFiles(collectionName);
         if (fileChunkIds == null || fileChunkIds.isEmpty()) {
             return Collections.emptyList();
         }

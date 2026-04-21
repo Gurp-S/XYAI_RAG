@@ -48,7 +48,6 @@ spring:
           nlist: 1024
 
 
-
 jwt:
   issuer: XYai
   access-token-exp-sec: 900
@@ -120,3 +119,7 @@ splitter:
   chinese-tokenize: true
 pipeline:
   enricher-enable: false
+milvus:
+  delete-count-collection-threshold: 1
+  delete-count-file-threshold: 1
+  delete-count-threshold: 3

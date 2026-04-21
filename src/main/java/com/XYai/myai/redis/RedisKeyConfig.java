@@ -8,6 +8,8 @@ import java.util.Locale;
 public final class RedisKeyConfig {
 
     public static final String PREFIX = "xyai:";
+    // 单个文件最大分片数
+    public static final long MAX_CHUNK_PER_FILE = 1000L;
 
     private RedisKeyConfig() {
     }
@@ -19,6 +21,7 @@ public final class RedisKeyConfig {
     public static String userUnloadCollectionsKey(Long userId) {
         return PREFIX + String.format(Locale.ROOT, "user:collections:unloaded:%d", userId);
     }
+
     //集合下文件:fileId:chunkSize
     public static String collectionFileIds(String collectionName) {
         return PREFIX + String.format(Locale.ROOT, "collection:files:%s", collectionName);
@@ -36,9 +39,12 @@ public final class RedisKeyConfig {
         return PREFIX + "metrics:" + metricName;
     }
 
-    // 单个文件最大分片数
-    public static final long MAX_CHUNK_PER_FILE = 1000L;
 
-    // BitMap 最大偏移量
-    public static final long REDIS_BIT_MAX_OFFSET = (1L << 31) - 1;  // 21亿
+    public static String deletionMonitor() {
+        return PREFIX + "deletionMonitor:total";
+    }
+
+    public static String deletionMonitorByType(String type) {
+        return PREFIX + "deletionMonitor:type:" + type;
+    }
 }

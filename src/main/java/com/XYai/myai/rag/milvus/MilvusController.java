@@ -5,10 +5,7 @@ import com.XYai.myai.redis.RedisKeyConfig;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RSet;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -63,7 +60,7 @@ public class MilvusController {
      * @return 元数据列表
      */
     @PostMapping("/metadata")
-    public Result<List<Map<String, Object>>> getCollectionsMetadata(String collectionName) {// TODO懒加载
+    public Result<List<Map<String, Object>>> getCollectionsFiles(String collectionName) {// TODO懒加载
         //是否有权限（若没有权限则返回错误）
         if (!milvusAclManager.getCollectionAcl(collectionName)) {
             log.info("getCollectionsMetadataNoACl:{}", collectionName);
@@ -72,7 +69,7 @@ public class MilvusController {
         if (!milvusAclManager.userCollectionLoadAcl(collectionName)) {
             return Result.error(1, "未加载");
         }
-        return Result.success(milvusFileManager.getUserCollectionNameMetadata(collectionName));
+        return Result.success(milvusFileManager.getUserCollectionFiles(collectionName));
     }
 
     /**
@@ -147,7 +144,7 @@ public class MilvusController {
      * @return 结果
      */
     @PostMapping("/delete")
-    public Result<String> dropCollection(String collectionName) {
+    public Result<String> dropCollection(@RequestParam String collectionName) {
         if (!milvusAclManager.getCollectionAcl(collectionName)) {
             log.info("dropCollectionNoACl:{}", collectionName);
             return Result.error(1, "无权限访问");
@@ -155,14 +152,11 @@ public class MilvusController {
         return milvusCollectionService.drop(collectionName);
     }
 
-    /**
-     * 删除指定文档（有参数，使用 POST）
-     *
-     * @return 结果
-     */
     @PostMapping("/delete/doc")
-    public Result<String> dropDocument(Long chunkId, String fileId, String collectionName) {
-        //验证权限
+    public Result<String> dropFileChunk(
+            @RequestParam Long chunkId,
+            @RequestParam String fileId,
+            @RequestParam String collectionName) {
         log.info("文件:{}集合:{}", fileId, collectionName);
         if (!milvusAclManager.getCollectionAcl(collectionName) || !milvusAclManager.getFileAcl(fileId)) {
             log.info("dropDocumentNoACl:{}", collectionName);
@@ -172,14 +166,8 @@ public class MilvusController {
         return Result.success("删除成功");
     }
 
-    /**
-     * 重建集合（有参数，使用 POST）
-     *
-     * @param collectionName 集合名称
-     * @return 结果
-     */
     @PostMapping("/rebuild")
-    public Result<String> rebuildCollection(String collectionName) {
+    public Result<String> rebuildCollection(@RequestParam String collectionName) {
         if (!milvusAclManager.getCollectionAcl(collectionName)) {
             log.info("rebuildCollectionNoACl:{}", collectionName);
             return Result.error(1, "无权限访问");
