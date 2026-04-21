@@ -30,8 +30,10 @@ public class MilvusMetadata {
     // 必须包含：所有用于过滤查询的字段
     public static final Set<String> METADATA_SHOW = Set.of(
             "fileName",
+            "fileId",
             "chunkSize",
             "chunkId",
+            "visibility",
             "createTime"
     );
 }

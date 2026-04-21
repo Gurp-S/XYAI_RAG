@@ -36,9 +36,14 @@
 
     <div class="user-profile" title="用户中心" @click.stop="toggleUserCenter()">
         <div class="user-profile-main">
-            <div class="user-avatar-inner" :class="{ offline: !store.currentUser }">
-                {{ store.currentUser ? store.userAvatarText : '?' }}
-            </div>
+                        <div class="user-avatar-inner" :class="{ offline: !store.currentUser }">
+                                <template v-if="store.currentUser && store.currentUser.avatar">
+                                    <img :src="store.currentUser.avatar" alt="avatar" class="avatar-img" />
+                                </template>
+                                <template v-else>
+                                    {{ store.currentUser ? store.userAvatarText : '?' }}
+                                </template>
+                        </div>
             <div class="user-info">
                 <div class="user-name">{{ store.currentUser ? store.userDisplayName : '未登录' }}</div>
                 <div class="user-status" :class="{ offline: !store.currentUser }">
@@ -125,6 +130,14 @@ function handleLogout() {
     color: #fff;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     box-shadow: 0 8px 16px rgba(22, 42, 86, 0.22);
+}
+
+.user-avatar-inner .avatar-img {
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: cover;
+    display: block;
 }
 
 .user-avatar-inner.offline {

@@ -1,6 +1,13 @@
 ﻿<template>
   <div class="message-wrapper" :class="role">
-    <div class="avatar">{{ avatarText }}</div>
+    <div class="avatar">
+      <template v-if="avatarUrl">
+        <img :src="avatarUrl" alt="avatar" class="avatar-img" />
+      </template>
+      <template v-else>
+        {{ avatarText }}
+      </template>
+    </div>
     <div class="message-content">
       <div v-if="role === 'assistant' && fromName" class="sender-name">{{ fromName }}</div>
 
@@ -80,6 +87,7 @@
 
 <script setup>
 import { computed, ref, onMounted, watch, nextTick } from "vue";
+import { useUiStore } from '../store'
 import { renderAssistantMarkdown, attachImageZoom } from "../services/markdown";
 
 const props = defineProps({
@@ -103,6 +111,12 @@ const avatarText = computed(() =>
         .substring(0, 2)
         .toUpperCase(),
 );
+
+const store = useUiStore()
+const avatarUrl = computed(() => {
+  if (props.role === 'user') return store.currentUser?.avatar || ''
+  return ''
+})
 
 const mcpStatusText = computed(() => {
   if (props.mcpStatus === "running") return "正在调用插件工具...";
@@ -377,6 +391,14 @@ watch(assistantMarkdownHtml, () => {
 .retry-icon {
   width: 14px;
   height: 14px;
+}
+
+.avatar-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  object-fit: cover;
+  display: block;
 }
 
 @keyframes spin {

@@ -114,7 +114,7 @@ public class VectorGlobalSearchChannel implements SearchChannel {
      */
     @Override
     public SearchChannelResult search(SearchContext context) {
-        // 1. 获取系统中所有 Milvus 集合名称
+        // 1. 获取用户权限中所有 Milvus 集合名称
         List<String> allCollectionNames = milvusCollectionService.getAllCollectionNames();
 
         // 2. 并行检索所有集合 → 合并结果 → 排序 → 截断

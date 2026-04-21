@@ -1,6 +1,7 @@
 package com.XYai.myai.rag.milvus;
 
 import com.XYai.myai.rag.milvus.POJO.MilvusMetadata;
+import io.jsonwebtoken.lang.Collections;
 import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +34,33 @@ public final class MilvusMetadataFilter {
             if (allowMetadataKey(key, value)) {
                 result.put(key, normalizeValue(value));
             }
+        }
+        return result;
+    }
+
+    /**
+     * 最终数据过滤：只保留允许显示的字段 + 字符串超长截断 + 清洗数据
+     */
+    public List<Map<String, Object>> showFilter(List<Map<String, Object>> rawList) {
+        if (rawList == null || rawList.isEmpty()) return List.of();
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Map<String, Object> raw : rawList) {
+            if (raw == null) continue;
+            Map<String, Object> filtered = new HashMap<>();
+            // 白名单字段
+            MilvusMetadata.METADATA_SHOW.forEach(key -> {
+                Object val = raw.get(key);
+                if (val != null) {
+                    filtered.put(key, val instanceof String s
+                            ? s.length() > MAX_STRING_LENGTH ? s.substring(0, MAX_STRING_LENGTH) + "..." : s
+                            : val);
+                }
+            });
+            // 保留必要字段
+            filtered.put("doc_id", raw.get("doc_id"));
+            filtered.put("content", raw.get("content"));
+            filtered.put("metadata", raw.get("metadata"));
+            result.add(filtered);
         }
         return result;
     }

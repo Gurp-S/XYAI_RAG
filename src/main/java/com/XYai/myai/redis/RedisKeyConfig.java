@@ -19,19 +19,11 @@ public final class RedisKeyConfig {
     public static String userUnloadCollectionsKey(Long userId) {
         return PREFIX + String.format(Locale.ROOT, "user:collections:unloaded:%d", userId);
     }
-    //用户下文件:fileId:bitMap(chunkId)
-    public static String userFileIdsKey(Long userId) {
-        return PREFIX + String.format(Locale.ROOT, "user:files:%d", userId);
-    }
     //集合下文件:fileId:chunkSize
     public static String collectionFileIds(String collectionName) {
         return PREFIX + String.format(Locale.ROOT, "collection:files:%s", collectionName);
     }
 
-    /**
-     * 用户-文件位图键（用于按位存储 chunk 权限）
-     * 格式: xyai:user:filebits:{userId}:{fileId}
-     */
     public static String userFileBitKey(Long userId, String fileId) {
         return PREFIX + String.format(Locale.ROOT, "user:filebits:%d:%s", userId, fileId);
     }

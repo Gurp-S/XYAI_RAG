@@ -8,10 +8,12 @@ import com.XYai.myai.rag.etlpipeline.Oss.OssService;
 import com.XYai.myai.rag.etlpipeline.POJO.*;
 import com.XYai.myai.rag.etlpipeline.UploadTaskStore;
 import com.XYai.myai.rag.milvus.MilvusFileManager;
+import com.XYai.myai.redis.RedisKeyConfig;
 import com.XYai.myai.user.LoginUserInfoManager;
 import com.XYai.myai.user.POJO.User;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -50,6 +52,8 @@ public class UploadController {
     @Resource
     private IngestionEngine ingestionEngine;
     @Resource
+    private RedissonClient redissonClient;
+    @Resource
     private PipelineDefinitionFactory pipelineDefinitionFactory;
     @Resource
     private UploadIngestionContextFactory uploadIngestionContextFactory;
@@ -59,6 +63,7 @@ public class UploadController {
     private MilvusFileManager milvusFileManager;
     @Resource(name = "uploadExecutor")
     private ThreadPoolTaskExecutor uploadExecutor;
+
 
     @PostMapping("up")
     @rateLimit(limit = 10, rateName = "upload_up", windowMs = 1000)
@@ -131,7 +136,10 @@ public class UploadController {
                         SkipFileInfo skipFileInfo = milvusFileManager.generateFile(fileHash, collectionName, taskId);
                         skipFile += skipFileInfo.getSkipStatus();
                         if (skipFileInfo.getSkipStatus().equals(SkipFileInfo.UP_FILE)) {
-                            processSingleFile(file, accumulator, collectionName, user, fileHash);
+                            boolean upStatus = processSingleFile(file, accumulator, collectionName, user, fileHash);
+                            if(upStatus) {
+                                redissonClient.getSet(RedisKeyConfig.fileHashKey(fileHash)).add(collectionName);
+                            }
                         }
                     }
                     uploadTaskStore.success(taskId, skipFile == 0L ? "上传完成" : "上传完成，重复命中文件: " + skipFile + " 个");

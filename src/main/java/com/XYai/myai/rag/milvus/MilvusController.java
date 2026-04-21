@@ -1,8 +1,10 @@
 package com.XYai.myai.rag.milvus;
 
 import com.XYai.myai.config.Result;
+import com.XYai.myai.redis.RedisKeyConfig;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RSet;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,7 +52,7 @@ public class MilvusController {
      * @return 返回数据库集合列表
      */
     @GetMapping("/list")
-    public Result<List<String>> listCollections() {
+    public Result<List<String>> listCollections() {// TODO懒加载
         return Result.success(milvusCollectionService.getAllCollectionNames());
     }
 
@@ -61,7 +63,7 @@ public class MilvusController {
      * @return 元数据列表
      */
     @PostMapping("/metadata")
-    public Result<List<Map<String, Object>>> getCollectionsMetadata(String collectionName) {
+    public Result<List<Map<String, Object>>> getCollectionsMetadata(String collectionName) {// TODO懒加载
         //是否有权限（若没有权限则返回错误）
         if (!milvusAclManager.getCollectionAcl(collectionName)) {
             log.info("getCollectionsMetadataNoACl:{}", collectionName);
@@ -166,7 +168,7 @@ public class MilvusController {
             log.info("dropDocumentNoACl:{}", collectionName);
             return Result.error(1, "无权限访问");
         }
-        milvusFileManager.deleteDocument(chunkId, fileId, collectionName);
+        milvusFileManager.deleteDocument(chunkId, fileId);
         return Result.success("删除成功");
     }
 

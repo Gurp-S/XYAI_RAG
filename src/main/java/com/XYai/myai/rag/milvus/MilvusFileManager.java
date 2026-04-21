@@ -15,6 +15,8 @@ import jakarta.annotation.Resource;
 import kotlin.Metadata;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.redisson.api.RBitSet;
+import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -49,6 +51,8 @@ public class MilvusFileManager {
     private VectorStore vectorStore;
     @Resource
     private MilvusCollectionService milvusCollectionService;
+    @Resource
+    private MilvusMetadataFilter milvusMetadataFilter;
 
     @Autowired
     public MilvusFileManager(MilvusServiceClient milvusClient) {
@@ -86,36 +90,44 @@ public class MilvusFileManager {
         try {
             SkipFileInfo result = new SkipFileInfo();
             reportFetchTask(taskId);
-
-//            // 1. 计算文件哈希
-//            String fileHash = calculateFileHash(file);
-//            result.setFileHashId(fileHash);废弃直接传
-            Long userId = LoginUserInfoManager.get().getId();
-
-            // 2. 构建文件记录查找
+            // 1. 构建文件记录查找
+            long userId = LoginUserInfoManager.get().getId();
             String redisKey = RedisKeyConfig.fileHashKey(fileHash);
-
+            // 2. 文件是否存在
             boolean existing = redissonClient.getKeys().countExists(redisKey) > 0;
-            log.info("文件是否存在:{}", existing);
-
-            // 上传文件：没有文件记录
+            // 不存在 -> 上传文件
             if (!existing) {
                 redissonClient.getSet(redisKey).add(collectionName);
                 result.skipStatus = SkipFileInfo.UP_FILE;
                 return result;
             }
-
-            // 跳过文件上传，同一用户，同一集合，同一文件
+            // 从redis中的人任意集合查出分了几块  fileId -> collectionNames -> collectionName -> fileId:chunkSize
+            long chunkSize = redissonClient.getSet(redisKey).stream().findFirst()
+                    .map(fileHashCollectionName -> redissonClient.getSet(RedisKeyConfig.collectionFileIds(fileHashCollectionName.toString())))
+                    .flatMap(set -> set.stream().findFirst())
+                    .map(Object::toString)
+                    .filter(s -> s.contains(":"))
+                    .map(s -> Long.valueOf(s.split(":")[1]))
+                    .orElse(0L);
+            // 存在 -> 同一用户，同一集合，同一文件 -> 跳过
             if (redissonClient.getSet(redisKey).contains(collectionName) &&//文件存在当前集合
                     milvusCollectionService.getAllCollectionNames().contains(collectionName) &&//当前集合属于用户
-                    milvusAclManager.getFileAcl(fileHash)) {//当前文件属于当前用户
-                result.skipStatus = SkipFileInfo.SKIP_FILE;
-                log.info("跳过文件上传:{}", existing);
-                return result;
+                        milvusAclManager.getFileAcl(fileHash)) {//当前文件属于当前用户
+                // 判断用户拥有的分块数==集合分块总数
+                RBitSet userFileChunkCount = redissonClient.getBitSet(RedisKeyConfig.userFileBitKey(userId, fileHash));
+                // 不缺分块跳过
+                if(userFileChunkCount.size() == chunkSize) {
+                    result.skipStatus = SkipFileInfo.SKIP_FILE;
+                    return result;
+                }else{// 缺补分块
+                    for (long i = 1; i <= chunkSize; i++) {
+                        if(!userFileChunkCount.get(i)){
+                            userFileChunkCount.set(i, true);
+                        }
+                    }
+                }
             }
-            // 复制：不知道用户,同文件，不同集合   同一用户，不同集合，同一文件(需要获取分块数据)
-            // 从redis中的人任意集合查出分了几块
-            Long chunkSize = Long.valueOf(redissonClient.getSet(redisKey).stream().toList().getFirst().toString().split(":")[1]);
+            // 存在 -> 不知道用户,同文件，不同集合 OR 同一用户，不同集合，同一文件 -> 复制整个文件
             // 集合添加分块条目格式 fileId:chunkSize 存入user:fileId
             milvusAclManager.addFileUserACl(fileHash,collectionName,chunkSize);
             result.skipStatus = SkipFileInfo.COPY_FILE;
@@ -150,9 +162,9 @@ public class MilvusFileManager {
         return Result.success("添加成功");
     }
 
-    public void deleteDocument(Long chunkId, String fileId, String collectionName) {
+    public void deleteDocument(Long chunkId, String fileId) {
         // 删除权限
-        milvusAclManager.deleteDocumentAcl(chunkId, fileId, collectionName);
+        milvusAclManager.deleteDocumentAcl(chunkId, fileId);
     }
 
     /**
@@ -182,17 +194,6 @@ public class MilvusFileManager {
             uploadTaskStore.node(taskId, "fetcher");
         } catch (Exception e) {
             log.debug("上报任务节点失败 taskId={}, nodeType=fetcher", taskId, e);
-        }
-    }
-
-    private void reportTaskCopy(String taskId, String sourceCollection, String targetCollection) {
-        if (taskId == null || taskId.isBlank()) {
-            return;
-        }
-        try {
-            uploadTaskStore.copy(taskId, sourceCollection, targetCollection);
-        } catch (Exception e) {
-            log.debug("上报任务复制状态失败 taskId={}, source={}, target={}", taskId, sourceCollection, targetCollection, e);
         }
     }
 
@@ -254,7 +255,9 @@ public class MilvusFileManager {
             log.warn("查询集合数据空或失败, collection={}, reason={}", collectionName, message);
             return Collections.emptyList();
         }
-        //返回
-        return getMetadataResultByMilvusClient(response);
+        // 解析
+        List<Map<String, Object>> metadataResultByMilvusClient = getMetadataResultByMilvusClient(response);
+        // 过滤返回
+        return milvusMetadataFilter.showFilter(metadataResultByMilvusClient);
     }
 }

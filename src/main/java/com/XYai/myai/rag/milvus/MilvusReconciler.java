@@ -21,8 +21,27 @@ import java.util.Set;
 /**
  * 后台 Reconciler：异步清理 Redis 索引与 Milvus 元数据不一致的项，
  * 并对 Redis 中过期/丢失的 fileId 做轻量级回收。
- *
  * 设计原则：非破坏性、幂等、低频执行。仅清理 Redis 层的垃圾引用，避免误删 Milvus 原始数据。
  */
+@Slf4j
+@Service
+public class MilvusReconciler{
 
+    public void reconciler(){
+        // 1. 删除集合
 
+        // 获取redis中所有的collection(key)
+
+        // 遍历所有的用户->collection
+
+        // 没有归属用户的删除
+
+        // 2. 删除文件
+
+        // 获取milvus下的所有文件分块
+
+        // 遍历所有的用户->文件分块
+
+        // 没有归属用户的删除
+    }
+}
