@@ -7,8 +7,6 @@ import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
-import org.springframework.ai.document.Document;
-import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -68,6 +66,7 @@ public class MilvusCollectionService {
         // 添加集合权限给当前用户(创建同时加载给用户)
         Long userId = LoginUserInfoManager.get().getId();
         redissonClient.getSet(RedisKeyConfig.userLoadCollectionsKey(userId)).add(collectionName);
+        redissonClient.getAtomicLong(RedisKeyConfig.collectionUserCountKey(collectionName)).incrementAndGet();
     }
 
     /**

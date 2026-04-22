@@ -4,17 +4,22 @@ import cn.hutool.core.util.StrUtil;
 import com.XYai.myai.redis.RedisKeyConfig;
 import com.XYai.myai.user.LoginUserInfoManager;
 import com.XYai.myai.user.POJO.User;
+import io.milvus.client.MilvusClient;
+import io.milvus.param.dml.DeleteParam;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RAtomicLong;
 import org.redisson.api.RBitSet;
 import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.ai.document.Document;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
-import jakarta.annotation.Resource;
+
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -26,6 +31,15 @@ public class MilvusAclManager {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+
+    @Resource
+    private MilvusClient milvusClient;
+
+    @Value("${spring.ai.vectorstore.milvus.collectionName:my_ai}")
+    private String physicalCollectionName;
+
+    @Value("${spring.ai.vectorstore.milvus.databaseName:default}")
+    private String databaseName;
 
     /**
      * 获取当前用户可见的集合列表（跨实例共享，Redis 优先）。
@@ -61,9 +75,6 @@ public class MilvusAclManager {
             RBitSet bitSet = redissonClient.getBitSet(RedisKeyConfig.userFileBitKey(userId, fileId));
             if (!bitSet.isExists()) continue;
 
-            // =====================
-            // 1-based 遍历
-            // =====================
             for (int i = 1; i <= maxChunkSize; i++) {
                 if (bitSet.get(i)) {
                     result.add(fileId + ":" + i);
@@ -130,29 +141,71 @@ public class MilvusAclManager {
         Long userId = user.getId();
 
         RBitSet bitSet = redissonClient.getBitSet(RedisKeyConfig.userFileBitKey(userId, fileId));
+        boolean hadAcl = false;
         if (bitSet != null) {
             try {
-                // =====================
-                // 1-based：直接使用 chunkId，不 -1
-                // =====================
-                bitSet.set(chunkId, false);
+                hadAcl = bitSet.get(chunkId); // 读取原值（1-based）
+            } catch (Exception ignored) {
+            }
+            try {
+                if (hadAcl) {
+                    bitSet.set(chunkId, false);
+                    if (bitSet.cardinality() == 0) {
+                        try {
+                            bitSet.delete();
+                        } catch (Exception ignore) {
+                        }
+                    }
+                }
             } catch (Exception e) {
                 log.error("更新chunk权限失败", e);
+                return;
+            }
+        }
+
+        // 原来确实有权限 TODO该用户只有一个集合拥有此文件分块才计数器 - 1
+        if (hadAcl) {
+            RAtomicLong cnt = redissonClient.getAtomicLong(RedisKeyConfig.fileChunkUserCountKey(fileId, chunkId));
+            long fileChunkUserCount = 0;
+            try {
+                fileChunkUserCount = cnt.decrementAndGet();
+                if (fileChunkUserCount <= 0) {
+                    // 负数判断
+                    if (fileChunkUserCount < 0) {
+                        cnt.set(0);
+                    }
+                    // 当计数为0时执行删除动作
+                    deleteNoAclFileChunk(fileId, chunkId);
+                    // 删除计数器 key
+                    try {
+                        redissonClient.getKeys().delete(RedisKeyConfig.fileChunkUserCountKey(fileId, chunkId));
+                    } catch (Exception ignore) {
+                    }
+                }
+            } catch (Exception e) {
+                log.error("更新 fileChunk 计数器失败 fileId={} chunkId={}", fileId, chunkId, e);
             }
         }
     }
 
-    // =============================
-    // 【1-based】添加全量权限
-    // =============================
+    public void deleteNoAclFileChunk(String fileId, Long chunkId) {
+        fileId = fileId.replace("\"", "\\\"").replace("'", "''");
+        // 构建
+        String expr = String.format(
+                "(metadata[\"fileId\"] == \"%s\" AND metadata['chunkId'] == %s)",
+                fileId, chunkId);
+        milvusClient.delete(DeleteParam.newBuilder()
+                .withDatabaseName(databaseName)
+                .withCollectionName(physicalCollectionName)
+                .withExpr(expr)
+                .build());
+    }
+
     public void addFileUserACl(String fileId, String collectionName, Long chunkSize) {
         Long userId = LoginUserInfoManager.get().getId();
         int cap = (int) Math.min(chunkSize, RedisKeyConfig.MAX_CHUNK_PER_FILE);
 
-        // =====================
-        // 1-based：1 ~ cap
-        // =====================
-        List<Integer> all = IntStream.rangeClosed(1, cap)
+        List<Long> all = LongStream.rangeClosed(1, cap)
                 .boxed()
                 .collect(Collectors.toList());
 
@@ -163,15 +216,15 @@ public class MilvusAclManager {
     public void addFileUserACl(List<Document> documents, String collectionName) {
         if (documents == null || documents.isEmpty()) return;
         Long userId = LoginUserInfoManager.get().getId();
-        Document firstDoc = documents.get(0);
+        Document firstDoc = documents.getFirst();
         String fileId = firstDoc.getMetadata().get("fileId").toString();
         long chunkSize = Long.parseLong(firstDoc.getMetadata().get("chunkSize").toString());
 
-        List<Integer> chunkIds = documents.stream()
+        List<Long> chunkIds = documents.stream()
                 .map(doc -> doc.getMetadata().get("chunkId"))
                 .filter(Objects::nonNull)
                 .map(Object::toString)
-                .map(Integer::parseInt)
+                .map(Long::parseLong)
                 .toList();
 
         setUserFileChunks(userId, fileId, chunkIds, chunkSize);
@@ -181,17 +234,21 @@ public class MilvusAclManager {
     /**
      * 设置用户对某文件的 chunk 权限位（1-based）
      */
-    private void setUserFileChunks(Long userId, String fileId, Collection<Integer> chunkIds, long chunkSize) {
+    private void setUserFileChunks(Long userId, String fileId, Collection<Long> chunkIds, long chunkSize) {
         RBitSet bitSet = redissonClient.getBitSet(RedisKeyConfig.userFileBitKey(userId, fileId));
         int cap = (int) Math.min(chunkSize, RedisKeyConfig.MAX_CHUNK_PER_FILE);
         if (cap <= 0) return;
 
         chunkIds.stream()
                 .filter(Objects::nonNull)
-                .mapToInt(Integer::intValue)
                 .filter(id -> id >= 1 && id <= cap)
-                .forEach(id -> bitSet.set(id, true));
-
+                .forEach(id -> {
+                            if (!bitSet.get(id)) {
+                                bitSet.set(id, true);
+                                redissonClient.getAtomicLong(RedisKeyConfig.fileChunkUserCountKey(fileId, id)).incrementAndGet();
+                            }
+                        }
+                );
         log.info("保存用户分块权: fileId={} bitcount={}", fileId, bitSet.cardinality());
     }
 
@@ -262,13 +319,32 @@ public class MilvusAclManager {
         User user = LoginUserInfoManager.get();
         if (user == null) return;
         Long userId = user.getId();
-        String loadKey = RedisKeyConfig.userLoadCollectionsKey(userId);
-        String unloadKey = RedisKeyConfig.userUnloadCollectionsKey(userId);
         try {
-            redissonClient.getSet(loadKey).remove(collectionName);
-            redissonClient.getSet(unloadKey).remove(collectionName);
+            // 全局用户计数器 - 减 1
+            RAtomicLong collectionUserCount = redissonClient.getAtomicLong(RedisKeyConfig.collectionUserCountKey(collectionName));
+            long newCount = collectionUserCount.addAndGet(-1);
+
+            // 清理当前用户的 load/unload set 中该 collection
+            try {
+                RSet<Object> loadCollection = redissonClient.getSet(RedisKeyConfig.userLoadCollectionsKey(userId));
+                RSet<Object> unLoadCollection = redissonClient.getSet(RedisKeyConfig.userUnloadCollectionsKey(userId));
+                loadCollection.remove(collectionName);
+                unLoadCollection.remove(collectionName);
+            } catch (Exception ignore) {
+            }
+
+            // 如果全局计数为 0 清理 collection 相关的全局数据
+            if (newCount <= 0) {
+                try {
+                    // 删除集合下文件索引及计数器
+                    redissonClient.getKeys().delete(RedisKeyConfig.collectionFileIds(collectionName));
+                    redissonClient.getKeys().delete(RedisKeyConfig.collectionUserCountKey(collectionName));
+                } catch (Exception ex) {
+                    log.warn("删除: {} 集合失败", collectionName, ex);
+                }
+            }
         } catch (Exception e) {
-            log.error("删除文件权限失败", e);
+            log.error("删除集合失败", e);
         }
     }
 }

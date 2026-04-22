@@ -51,6 +51,7 @@ public class IngestionContext implements Serializable {
     public static final String META_TIME_CREATE = "createTime";
     public static final String META_OWNER_ID = "ownerId";         // 上传者用户ID
     public static final String META_VISIBILITY = "visibility";   // 可见范围 private/group/public
+    public static final String META_COPY_CHUNK = "copy_chunk";   // 可见范围 private/group/public
     // 主文档：文本在 text，其他信息在 metadata
     @Builder.Default
     private Document document = Document.builder().text("").metadata(new HashMap<>()).build();

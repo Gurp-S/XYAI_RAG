@@ -12,11 +12,9 @@ import io.milvus.param.R;
 import io.milvus.param.dml.QueryParam;
 import io.milvus.response.QueryResultsWrapper;
 import jakarta.annotation.Resource;
-import kotlin.Metadata;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.redisson.api.RBitSet;
-import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -97,8 +95,7 @@ public class MilvusFileManager {
             boolean existing = redissonClient.getKeys().countExists(redisKey) > 0;
             // 不存在 -> 上传文件
             if (!existing) {
-                redissonClient.getSet(redisKey).add(collectionName);
-                result.skipStatus = SkipFileInfo.UP_FILE;
+                result.setSkipStatus(SkipFileInfo.UP_FILE);
                 return result;
             }
             // 从redis中的人任意集合查出分了几块  fileId -> collectionNames -> collectionName -> fileId:chunkSize
@@ -109,28 +106,41 @@ public class MilvusFileManager {
                     .filter(s -> s.contains(":"))
                     .map(s -> Long.valueOf(s.split(":")[1]))
                     .orElse(0L);
-            // 存在 -> 同一用户，同一集合，同一文件 -> 跳过
+            // 存在 -> 同一用户，同一集合，同一文件 -> 有没有分块 -> 跳过,只上传分块
             if (redissonClient.getSet(redisKey).contains(collectionName) &&//文件存在当前集合
                     milvusCollectionService.getAllCollectionNames().contains(collectionName) &&//当前集合属于用户
                         milvusAclManager.getFileAcl(fileHash)) {//当前文件属于当前用户
-                // 判断用户拥有的分块数==集合分块总数
+                // 判断用户拥有的分块数 == 集合分块总数
                 RBitSet userFileChunkCount = redissonClient.getBitSet(RedisKeyConfig.userFileBitKey(userId, fileHash));
                 // 不缺分块跳过
-                if(userFileChunkCount.size() == chunkSize) {
-                    result.skipStatus = SkipFileInfo.SKIP_FILE;
-                    return result;
-                }else{// 缺补分块
+                if (userFileChunkCount.cardinality() == chunkSize) {
+                    result.setSkipStatus(SkipFileInfo.SKIP_FILE);
+                } else {// 缺补分块 如果有该文档分块补权限
                     for (long i = 1; i <= chunkSize; i++) {
-                        if(!userFileChunkCount.get(i)){
-                            userFileChunkCount.set(i, true);
+                        if (!userFileChunkCount.get(i)) {
+                            boolean hasFileChunk = redissonClient.getKeys().countExists(RedisKeyConfig.fileChunkUserCountKey(fileHash, i)) > 0;
+                            if (hasFileChunk) {
+                                log.info("generateFile 权限复制");
+                                userFileChunkCount.set(i, true);
+                            } else {
+                                log.info("generateFile 仅复制分块");
+                                result.getCopyChunks().add(i);
+                            }
                         }
                     }
+                    if (result.getCopyChunks().isEmpty()) {
+                        result.setSkipStatus(SkipFileInfo.SKIP_FILE);
+                    } else {
+                        result.setSkipStatus(SkipFileInfo.COPY_CHUNK);
+                    }
                 }
+                return result;
             }
-            // 存在 -> 不知道用户,同文件，不同集合 OR 同一用户，不同集合，同一文件 -> 复制整个文件
+            // 存在 -> 不知道用户,同文件，不同集合 OR 同一用户，不同集合，同一文件 -> 复制整个文件或者复制分块
             // 集合添加分块条目格式 fileId:chunkSize 存入user:fileId
-            milvusAclManager.addFileUserACl(fileHash,collectionName,chunkSize);
-            result.skipStatus = SkipFileInfo.COPY_FILE;
+            milvusAclManager.addFileUserACl(fileHash, collectionName, chunkSize);
+            redissonClient.getSet(RedisKeyConfig.fileHashKey(fileHash)).add(collectionName);
+            result.setSkipStatus(SkipFileInfo.COPY_FILE);
             return result;
         } catch (Exception e) {
             throw new RuntimeException("检查文件状态失败", e);

@@ -6,7 +6,6 @@ import com.XYai.myai.rag.etlpipeline.Factory.PipelineDefinitionFactory;
 import com.XYai.myai.rag.etlpipeline.Factory.UploadIngestionContextFactory;
 import com.XYai.myai.rag.etlpipeline.Oss.OssService;
 import com.XYai.myai.rag.etlpipeline.POJO.*;
-import com.XYai.myai.rag.etlpipeline.UploadTaskStore;
 import com.XYai.myai.rag.milvus.MilvusFileManager;
 import com.XYai.myai.redis.RedisKeyConfig;
 import com.XYai.myai.user.LoginUserInfoManager;
@@ -15,7 +14,6 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StringUtils;
 import org.springframework.util.StreamUtils;
@@ -66,7 +64,7 @@ public class UploadController {
 
 
     @PostMapping("up")
-    @rateLimit(limit = 10, rateName = "upload_up", windowMs = 1000)
+    @rateLimit(limit = 10, rateName = "upload_up")
     public Result<String> upLoad(
             @RequestParam("file") List<MultipartFile> files,
             @RequestParam("collectionName") String collectionName) {
@@ -129,20 +127,23 @@ public class UploadController {
 
         try {
             uploadExecutor.execute(() -> {
-                long skipFile = 0L;
                 try {
                     for (MultipartFile file : safeFiles) {
                         String fileHash = milvusFileManager.calculateFileHash(file);
                         SkipFileInfo skipFileInfo = milvusFileManager.generateFile(fileHash, collectionName, taskId);
-                        skipFile += skipFileInfo.getSkipStatus();
                         if (skipFileInfo.getSkipStatus().equals(SkipFileInfo.UP_FILE)) {
-                            boolean upStatus = processSingleFile(file, accumulator, collectionName, user, fileHash);
+                            log.info("进行文件上传");
+                            boolean upStatus = processSingleFile(file, accumulator, collectionName, user, fileHash, List.of());
                             if(upStatus) {
                                 redissonClient.getSet(RedisKeyConfig.fileHashKey(fileHash)).add(collectionName);
                             }
                         }
+                        else if(skipFileInfo.getSkipStatus().equals(SkipFileInfo.COPY_CHUNK)){ // 在分块后删除对应的分块
+                            log.info("进行分块上传");
+                            processSingleFile(file, accumulator, collectionName, user, fileHash, skipFileInfo.getCopyChunks());
+                        }
                     }
-                    uploadTaskStore.success(taskId, skipFile == 0L ? "上传完成" : "上传完成，重复命中文件: " + skipFile + " 个");
+                    uploadTaskStore.success(taskId,  "上传完成");
                 } catch (Exception ex) {
                     log.error("处理上传任务失败: {}", taskId, ex);
                     uploadTaskStore.error(taskId, ex.getMessage());
@@ -238,7 +239,7 @@ public class UploadController {
         return buildUploadResult(accumulator);
     }
 
-    private boolean processSingleFile(MultipartFile file, UpLoadAccumulator accumulator, String collectionName, User user, String fileHashId) {
+    private boolean processSingleFile(MultipartFile file, UpLoadAccumulator accumulator, String collectionName, User user, String fileHashId, List<Long> copyChunks) {
         if (file == null || file.isEmpty()) {
             accumulator.getFailedFiles().add("unknown(empty)");
             return false;
@@ -250,7 +251,7 @@ public class UploadController {
                 uploadToOss(file, accumulator, fileName);
             }
 
-            IngestionContext inputContext = uploadIngestionContextFactory.create(file, collectionName, user, fileHashId);
+            IngestionContext inputContext = uploadIngestionContextFactory.create(file, collectionName, user, fileHashId ,copyChunks);
             inputContext.setTaskId(accumulator.getTaskId());
             var pipeline = pipelineDefinitionFactory.createUploadPipeline(fileName, file);
             IngestionContext outputContext = ingestionEngine.execute(pipeline, inputContext);

@@ -39,12 +39,12 @@ public final class RedisKeyConfig {
         return PREFIX + "metrics:" + metricName;
     }
 
-
-    public static String deletionMonitor() {
-        return PREFIX + "deletionMonitor:total";
+    // per-file-chunk count
+    public static String fileChunkUserCountKey(String fileId, Long chunkId) {
+        return PREFIX + "fileChunk:count:" + fileId + ":" + chunkId;
     }
 
-    public static String deletionMonitorByType(String type) {
-        return PREFIX + "deletionMonitor:type:" + type;
+    public static String collectionUserCountKey(String collection) {
+        return PREFIX + "collection:users:" + collection;
     }
 }

@@ -10,10 +10,7 @@ import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 文档分块节点（ETL 流程 chunker 环节）
@@ -75,8 +72,93 @@ public class Chunker implements Ingestion {
         // 5. 将分块结果存入上下文，供后续节点使用
         chunks = enrichChunkMetadata(chunks, chunks.size());
         context.setChunks(chunks);
+        Object chunkCopy = context.getDocument().getMetadata().get(IngestionContext.META_COPY_CHUNK);
+        skipChunkCopy(chunkCopy,context);
         return NodeResult.ok("分块数量=" + chunks.size());
     }
+
+    private void skipChunkCopy(Object chunkCopy,IngestionContext context){
+        try {
+            if (chunkCopy != null) {
+                // 规范化为 List<Long>（只保留能成功解析为 long 的项）
+                List<Long> keepList = new ArrayList<>();
+                if (chunkCopy instanceof Collection<?> col) {
+                    for (Object item : col) {
+                        if (item == null) continue;
+                        if (item instanceof Number n) {
+                            keepList.add(n.longValue());
+                        } else {
+                            String s = String.valueOf(item).trim();
+                            if (s.isEmpty()) continue;
+                            try {
+                                keepList.add(Long.parseLong(s));
+                            } catch (Exception ignored) {
+                            }
+                        }
+                    }
+                } else if (chunkCopy instanceof Number n) {
+                    keepList.add(n.longValue());
+                } else {
+                    String raw = String.valueOf(chunkCopy).trim();
+                    if (!raw.isEmpty()) {
+                        String[] parts = raw.split("[,\\s]+");
+                        for (String p : parts) {
+                            if (p == null || p.isEmpty()) continue;
+                            try {
+                                keepList.add(Long.parseLong(p.trim()));
+                            } catch (Exception ignored) {
+                            }
+                        }
+                    }
+                }
+
+                // 去重并按升序（保持 List<Long> 类型保证下游仅看到 List<Long>）
+                Set<Long> keepSet = new HashSet<>(keepList);
+                if (!keepSet.isEmpty()) {
+                    List<Document> original = context.getChunks();
+                    List<Document> filtered = new ArrayList<>(Math.min(original.size(), keepSet.size()));
+                    for (Document chunk : original) {
+                        Object cidObj = chunk.getMetadata() == null ? null : chunk.getMetadata().get("chunkId");
+                        long cid = -1L;
+                        if (cidObj instanceof Number) {
+                            cid = ((Number) cidObj).longValue();
+                        } else if (cidObj != null) {
+                            try {
+                                cid = Long.parseLong(String.valueOf(cidObj));
+                            } catch (Exception ignored) { }
+                        } else {
+                            try {
+                                cid = Long.parseLong(chunk.getId());
+                            } catch (Exception ignored) { }
+                        }
+                        if (cid > 0 && keepSet.contains(cid)) {
+                            filtered.add(chunk);
+                        }
+                    }
+
+                    List<Long> normalized = new ArrayList<>(keepSet);
+                    java.util.Collections.sort(normalized);
+
+                    // 写回严格的 List<Long> 到文档元数据
+                    try {
+                        Document docWithCopyMeta = context.getDocument().mutate()
+                                .metadata(IngestionContext.META_COPY_CHUNK, normalized)
+                                .build();
+                        context.setDocument(docWithCopyMeta);
+                    } catch (Exception e) {
+                        log.debug("写回 META_COPY_CHUNK 元数据失败", e);
+                    }
+
+                    context.setChunks(filtered);
+                    log.info("分块过滤: 原始分块数={}，保留分块数={}，保留id={}", original.size(), filtered.size(), normalized);
+                }
+            }
+        } catch (Exception e) {
+            // 不影响主流程，只记录调试日志
+            log.debug("解析 META_COPY_CHUNK 或过滤分块时发生异常", e);
+        }
+    }
+
 
     /**
      * springAI 分块

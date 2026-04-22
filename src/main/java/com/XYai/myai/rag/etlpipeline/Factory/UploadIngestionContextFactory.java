@@ -15,7 +15,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * 上传文件 摄取上下文工厂
@@ -33,10 +32,11 @@ public class UploadIngestionContextFactory {
      * @param collectionName 向量数据库集合名（用于区分不同知识库存储）
      * @param user           当前登录用户
      * @param fileHashId     fileId
+     * @param copyChunks
      * @return 封装完成的 IngestionContext 上下文对象
      * @throws IOException 文件读取IO异常
      */
-    public IngestionContext create(MultipartFile file, String collectionName, User user, String fileHashId)
+    public IngestionContext create(MultipartFile file, String collectionName, User user, String fileHashId, List<Long> copyChunks)
             throws IOException {
         String fileName = safeFileName(file);
         String kbId = IdUtil.getSnowflakeNextIdStr();
@@ -51,6 +51,7 @@ public class UploadIngestionContextFactory {
                 kbId,
                 fileName,
                 file.getSize(),
+                copyChunks,
                 user // 传入用户
         );
     }
@@ -63,7 +64,7 @@ public class UploadIngestionContextFactory {
             String collectionName,
             String kbId,
             User user) { // 加 user
-        return createContext("1", sourceUri, sourceType, null, null, collectionName, kbId, null, null, user);
+        return createContext("1", sourceUri, sourceType, null, null, collectionName, kbId, null, null, List.of(), user);
     }
 
     /**
@@ -72,22 +73,23 @@ public class UploadIngestionContextFactory {
     public IngestionContext createInline(String content, String collectionName, String kbId, User user) {
         byte[] rawBytes = content == null ? new byte[0] : content.getBytes(StandardCharsets.UTF_8);
         return createContext("1", "inline", "inline", rawBytes, "text/plain", collectionName, kbId, "inline",
-                (long) rawBytes.length, user);
+                (long) rawBytes.length, List.of(), user);
     }
 
     /**
      * 核心：创建上下文（已加入权限）
      */
     private IngestionContext createContext(String fileHashId,
-            String sourceUri,
-            String sourceType,
-            byte[] rawBytes,
-            String mimeType,
-            String collectionName,
-            String kbId,
-            String fileName,
-            Long fileSize,
-            User user) { // 这里加入 User
+                                           String sourceUri,
+                                           String sourceType,
+                                           byte[] rawBytes,
+                                           String mimeType,
+                                           String collectionName,
+                                           String kbId,
+                                           String fileName,
+                                           Long fileSize,
+                                           List<Long> copyChunks,
+                                           User user) {
         Map<String, Object> metadata = new HashMap<>();
         metadata.put(IngestionContext.META_FILE_ID, fileHashId);
         metadata.put(IngestionContext.META_SOURCE_URI, sourceUri);
@@ -99,6 +101,7 @@ public class UploadIngestionContextFactory {
         metadata.put(IngestionContext.META_FILE_NAME, fileName == null ? sourceUri : fileName);
         metadata.put(IngestionContext.META_FILE_SIZE, fileSize);
         metadata.put(IngestionContext.META_FILE_CONTENT_TYPE, mimeType);
+        metadata.put(IngestionContext.META_COPY_CHUNK, copyChunks);
         metadata.put(IngestionContext.META_TIME_CREATE,
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
