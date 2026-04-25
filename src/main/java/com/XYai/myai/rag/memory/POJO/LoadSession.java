@@ -15,10 +15,14 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoadSession {
-    /** 历史摘要文本 */
+    /**
+     * 历史摘要文本
+     */
     String summary;
 
-    /** 会话上下文消息集合（按时间排序的 ChatMessage 对象集合） */
+    /**
+     * 会话上下文消息集合（按时间排序的 ChatMessage 对象集合）
+     */
     Set<ChatMessage> conversation;
 
     public static LoadSession fromCollection(String summary, Collection<ChatMessage> conv) {

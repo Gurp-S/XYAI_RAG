@@ -5,24 +5,19 @@ import com.XYai.myai.security.service.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.KeyFactory;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
@@ -31,7 +26,7 @@ import java.util.stream.Collectors;
 
 /**
  * JWT 服务实现（基于 RSA 签名的 JWT）：
- *
+ * <p>
  * 实现要点：
  * - 应用启动时从配置的 PEM 文件加载私钥/公钥（PKCS#8 / X.509 格式），用于签名/验签；
  * - generateAccessToken：为用户生成包含 subject（用户名或用户 ID）、jti、issuer、issuedAt、expiration 和角色列表的 JWT；
@@ -42,11 +37,9 @@ import java.util.stream.Collectors;
 public class JwtServiceImpl implements JwtService {
 
     private static final Logger log = LoggerFactory.getLogger(JwtServiceImpl.class);
-
+    private final JwtProperties props;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
-
-    private final JwtProperties props;
     private PrivateKey privateKey;
     private PublicKey publicKey;
 

@@ -2,14 +2,11 @@ package com.XYai.myai.rag.aop;
 
 import cn.hutool.core.util.IdUtil;
 import com.XYai.myai.monitorEndpoint.service.TraceRecordService;
+import com.XYai.myai.rag.RagTraceContext;
 import com.XYai.myai.rag.aop.Annotation.RagTraceNode;
 import com.XYai.myai.rag.aop.Annotation.RagTraceRoot;
-import com.XYai.myai.rag.RagTraceContext;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-// REMARK: 注意不要把注解类型和 DTO 同名（例如 RagTraceRoot 既可能是 DTO 也可能被期望为注解）。
-// 如果这里的意图是拦截带注解的方法（读取注解属性），需要创建一个注解接口（@interface）并使用该注解类型，
-// 而不是使用 DTO。若同时存在同名 DTO，请重命名其中之一以避免混淆。
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -18,6 +15,10 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+
+// REMARK: 注意不要把注解类型和 DTO 同名（例如 RagTraceRoot 既可能是 DTO 也可能被期望为注解）。
+// 如果这里的意图是拦截带注解的方法（读取注解属性），需要创建一个注解接口（@interface）并使用该注解类型，
+// 而不是使用 DTO。若同时存在同名 DTO，请重命名其中之一以避免混淆。
 
 /**
  * RAG 全链路追踪切面类。
@@ -31,6 +32,7 @@ public class RagTraceAspect {
 
     @Resource
     private TraceRecordService traceRecordService;
+
     /**
      * 环绕通知：在带 {@link RagTraceRoot} 注解的方法执行前后进行全链路 traceId 管理与记录。
      *

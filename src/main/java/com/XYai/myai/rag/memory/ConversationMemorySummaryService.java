@@ -1,35 +1,33 @@
 package com.XYai.myai.rag.memory;
 
+import com.XYai.myai.mapper.ChatConversationMapper;
+import com.XYai.myai.mapper.ChatSessionRecordMapper;
 import com.XYai.myai.rag.chat.POJO.ChatMessage;
 import com.XYai.myai.rag.memory.POJO.ChatConversation;
 import com.XYai.myai.rag.memory.POJO.ChatSessionRecord;
 import com.XYai.myai.rag.memory.POJO.LoadSession;
 import com.XYai.myai.rag.memory.POJO.MemoryProperties;
-import com.XYai.myai.mapper.ChatConversationMapper;
-import com.XYai.myai.mapper.ChatSessionRecordMapper;
+import com.XYai.myai.redis.RedisKeyConfig;
+import com.XYai.myai.user.LoginUserInfoManager;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RBucket;
 import org.redisson.api.RLock;
+import org.redisson.api.RScoredSortedSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.dao.DuplicateKeyException;
-import org.redisson.api.RScoredSortedSet;
-import org.redisson.api.RBucket;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Set;
-import java.util.UUID;
-import java.util.LinkedHashSet;
-import java.util.Collections;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -51,12 +49,12 @@ public class ConversationMemorySummaryService {
     private ChatConversationMapper chatConversationMapper;
     @Resource
     private RedissonClient redissonClient;
-
     // 使用统一的内存压缩执行器（在 ThreadPoolConfig 中定义为 memoryCompactExecutor）
     @Resource(name = "memeryExecutor")
     private ThreadPoolTaskExecutor memoryCompactExecutor;
 
     // TODO streamLLM
+
     /**
      * 根据会话 ID 与新消息判断是否需要触发摘要压缩。
      * 该方法为异步入口：当满足条件且开启摘要功能时，会在后台异步执行压缩流程，避免阻塞主线程。
@@ -71,15 +69,33 @@ public class ConversationMemorySummaryService {
             return;
         }
 
-        // 异步执行压缩，不阻塞主流程（关键：避免影响用户交互响应速)
-        memoryCompactExecutor.execute(() -> {
+        log.info("compressIfNeeded: {}", message);
+
+        // 优先使用传入 message 中的 userId（调用方在请求线程中已知 userId）
+        // 作为回退再尝试从线程上下文获取（ThreadLocal）。这样可以避免在异步/流式
+        // 执行中因为 SecurityContext 被清理而导致无法获取到用户信息的问题。
+        Long userId;
+        if (message != null && message.getUserId() != null) {
+            userId = message.getUserId();
+        } else {
+            var loginUser = LoginUserInfoManager.get();
+            if (loginUser != null) {
+                userId = loginUser.getId();
+            } else {
+                userId = null;
+            }
+        }
+
+        if (userId == null) {
+            log.warn("compressIfNeeded: 用户没有登录且 message.userId 为空,当前对话={}", conversationId);
+            return;
+        }
+        // 执行压缩
+        memoryCompactExecutor.execute(()->{
             try {
-                doCompressIfNeeded(conversationId, message);
+                doCompressIfNeeded(conversationId, message, userId);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                log.error("compressIfNeeded interrupted", e);
-            } catch (Exception e) {
-                log.error("compressIfNeeded failed: {}", e.getMessage(), e);
             }
         });
     }
@@ -94,26 +110,26 @@ public class ConversationMemorySummaryService {
      *
      * @param conversationId 会话 ID
      * @param message        待处理的聊天消息
+     * @param userId
      */
-    private void doCompressIfNeeded(String conversationId, ChatMessage message) throws InterruptedException {
-
+    private void doCompressIfNeeded(String conversationId, ChatMessage message, Long userId) throws InterruptedException {
         // ========== 步骤1：前置条件检查 ==========
         int maxTurns = memoryProperties.getSummaryStartTurns(); // 达到该轮数才开始压缩
 
         // ========== 步骤2：分布式锁（防止并发压缩，避免数据冲突） ==========
-        String lockKey = "summary:lock:" + conversationId;
+        String lockKey = "summary:lock:" + userId + conversationId;
         RLock lock = redissonClient.getLock(lockKey);
         if (!lock.tryLock(0, 30, TimeUnit.SECONDS))
             return;
 
         try {
             // ========== 步骤3：先保存再判断是否需要压缩 ==========
-            String chatMessageKey = "chatMessage:" + conversationId;
+            String chatMessageKey = RedisKeyConfig.userConversationRecord(userId, conversationId);
             // 先保存新消息（每轮都保存） -- Redis 统一存 JSON 字符串
             RScoredSortedSet<String> scoredSet = redissonClient.getScoredSortedSet(chatMessageKey);
             scoredSet.add((double) System.currentTimeMillis(), objectMapper.writeValueAsString(message));
             // 持久化到 DB 使用受管线程池执行，避免使用 CompletableFuture.runAsync 造成线程不可控
-            memoryCompactExecutor.execute(() -> recordSessionDB(conversationId, message));
+            recordSessionDB(conversationId, message);
             // 再判断是否需要压缩
             long total = scoredSet.size();
             if (total < maxTurns) {
@@ -121,7 +137,7 @@ public class ConversationMemorySummaryService {
             }
 
             // ========== 步骤4：获取已有的摘要 ==========
-            String summaryKey = "summary:" + conversationId;
+            String summaryKey = RedisKeyConfig.userSummaryRecord(userId, conversationId);
             RBucket<String> summaryBucket = redissonClient.getBucket(summaryKey);
             String latestSummary = summaryBucket.get();
 
@@ -132,8 +148,6 @@ public class ConversationMemorySummaryService {
                 return;
             }
             String firstMsg = firstBatch.iterator().next();
-            String toSummary = firstMsg;
-            // 移除已弹出的最小元素
             try {
                 scoredSet.remove(firstMsg);
             } catch (Exception ignore) {
@@ -141,12 +155,12 @@ public class ConversationMemorySummaryService {
 
             // ========== 步骤7：调用 LLM 生成摘要 ==========
             String existingSummary = latestSummary == null ? "无" : latestSummary;
-            String summary = summarizeMessages(existingSummary, toSummary);
+            String summary = summarizeMessages(existingSummary, firstMsg);
 
             // ========== 步骤8：存储摘要 ==========
             summaryBucket.set(summary);
             // 使用受管线程池异步更新 DB
-            memoryCompactExecutor.execute(() -> upsetSummary(conversationId, summary));
+            upsetSummary(conversationId, summary);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         } finally {
@@ -179,10 +193,10 @@ public class ConversationMemorySummaryService {
     }
 
     /**
-     * 将新的聊天消息与会话元信息持久化到数据库：
+     * 将新地聊天消息与会话元信息持久化到数据库：
      * 1. 若会话元信息不存在则创建 ChatSessionRecord；
      * 2. 将聊天消息插入 ChatConversation 表；
-     * 3. 保持每个会话只保留有限条数的历史记录（超出则删除最旧）。
+     * 3. 保持每个会话只保留有限条数的历史记录（超出则删除最旧）
      *
      * @param ConversationId 会话 ID
      * @param message        要保存的聊天消息
@@ -213,7 +227,7 @@ public class ConversationMemorySummaryService {
             conversation.setCreatedAt(LocalDateTime.now().withNano(0));
             conversation.setChatMessageId(UUID.randomUUID().toString());
             chatConversationMapper.insert(conversation);
-            // 每个会话最多保留最近记录，超出自动删除最旧记录TODO删除对话
+            // 每个会话最多保留最近记录，超出自动删除最旧记录
             long total = chatSessionRecordMapper.countByConversationId(ConversationId);
             int deleteCount = (int) Math.max(0, total - 10);
             if (deleteCount > 0) {

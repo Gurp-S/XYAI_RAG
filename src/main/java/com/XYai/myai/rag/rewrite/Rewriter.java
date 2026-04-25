@@ -10,7 +10,6 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,10 +21,11 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class Rewriter implements QueryReweiterService {
+public class Rewriter implements QueryRewriterService {
 
     @Resource
     private ChatModel chatModel;
+
     @Resource
     private ObjectMapper objectMapper;
 
@@ -36,59 +36,77 @@ public class Rewriter implements QueryReweiterService {
      * @return 重写并拆分后的 RewriteResult，失败时返回输入的 userMessage
      */
     public RewriteResult callLLMRewriteAndSplit(RewriteResult userMessage, LoadSession load) {
-        String userQuestion = userMessage.getRewrittenQuery();
-        if (userQuestion == null) {
-            return null;
+        // 1. 空值安全判断（修复：原代码直接 return null 导致上游报错）
+        if (userMessage == null || userMessage.getRewrittenQuery() == null) {
+            log.warn("输入的查询内容为空，直接返回原始对象");
+            return userMessage;
         }
-        BeanOutputConverter<RewriteResult> outputConverter = new BeanOutputConverter<>(RewriteResult.class);
-        Prompt prompt = getPrompt(userQuestion, outputConverter,load);
+
+        String userQuestion = userMessage.getRewrittenQuery();
+        String formatJson;
         try {
+            // 2. 修复：正确生成 JSON 格式示例给大模型
+            formatJson = objectMapper.writeValueAsString(RewriteResult.builder().build());
+        } catch (JsonProcessingException e) {
+            log.error("生成JSON格式失败", e);
+            return userMessage;
+        }
+
+        // 3. 构建提示词
+        Prompt prompt = getPrompt(userQuestion, formatJson, load);
+
+        try {
+            // 4. 调用模型
             String rewrittenMessage = chatModel.call(prompt).getResult().getOutput().getText();
-            // 正常输出用 debug/info，而不是 error
-            RewriteResult message = objectMapper.readValue(rewrittenMessage,RewriteResult.class);
-            log.debug("LLM raw output for rewrite: {}", rewrittenMessage);
+            log.debug("LLM原始返回内容：{}", rewrittenMessage);
+
+            // 5. 空返回判断
             if (rewrittenMessage == null || rewrittenMessage.isBlank()) {
-                log.warn("LLM returned empty output for userQuestion='{}'", userQuestion);
+                log.warn("LLM返回空内容，使用原始查询");
                 return userMessage;
             }
-            return message;
+
+            // 6. JSON解析
+            RewriteResult result = objectMapper.readValue(rewrittenMessage, RewriteResult.class);
+            log.info("重写解析成功：{}", result);
+            return result;
+
         } catch (Exception e) {
-            // 调用模型或其它环节异常，返回默认结果以保证上游可用性
-            log.error("口语标准化失败，用户输入: {}", userQuestion, e);
+            log.error("LLM调用/解析失败，用户输入：{}", userQuestion, e);
             return userMessage;
         }
     }
 
-
-    private Prompt getPrompt(String userQuestion, BeanOutputConverter<RewriteResult> outputConverter, LoadSession load) {
-        // 返回 JSON 格式的 Prompt
-        String format = outputConverter.getFormat();
+    /**
+     * 构建提示词（修复：提示词更清晰、模型更容易返回正确JSON）
+     */
+    private Prompt getPrompt(String userQuestion, String formatJson, LoadSession load) {
         String context;
         try {
-            context = objectMapper.writeValueAsString(load);
+            context = load == null ? "无上下文" : objectMapper.writeValueAsString(load);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("上下文转化失败");
+            throw new RuntimeException("上下文序列化失败", e);
         }
+
+        // 核心优化：提示词更明确，强制返回JSON
         String systemText = """
-                你是查询重写与子问题拆分器，不是问答助手。
-                你的唯一任务是根据用户上下文,处理用户问题输出结构化 JSON，严格遵守给定 schema。
-                规则:
-                1. 如果是闲聊，保持原样。
-                2. 如果用户的问题包含多个问题，必须拆分为多个子问题数组。
-                3. 如果是知识检索，给出适合检索的语句。
-                4. 根据语义将人称具体化,例如"我"->用户
-                5. 将口语标准化,例如"天气怎么样"->天气查询
-                JSON格式:
+                你是专业的查询重写与子问题拆分助手。
+                严格遵守以下规则：
+                1. 将用户口语化查询标准化为正式查询句。
+                2. 如果包含多个问题，必须拆分为subQuery数组。
+                3. 只返回JSON，不要解释、不要多余文字、不要markdown。
+                4. 必须严格按照以下JSON结构返回：
                 %s
-                """.formatted(format);
-        // 3. 将 format 嵌入到提示词中，告知模型应该返回什么结构
-        String promptText = """
-                上下文: <<< %s >>>
-                当前用户输入：<<< %s >>>
-                """.formatted(context==null?"无":context, userQuestion);
+                """.formatted(formatJson);
+
+        String userText = """
+                上下文：%s
+                用户问题：%s
+                """.formatted(context, userQuestion);
+
         return new Prompt(List.of(
                 new SystemMessage(systemText),
-                new UserMessage(promptText)
+                new UserMessage(userText)
         ));
     }
 }

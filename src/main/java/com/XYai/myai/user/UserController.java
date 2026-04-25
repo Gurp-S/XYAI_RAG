@@ -1,7 +1,8 @@
 package com.XYai.myai.user;
 
-import com.XYai.myai.rag.aop.Annotation.RagTraceRoot;
 import com.XYai.myai.config.Result;
+import com.XYai.myai.mapper.UserMapper;
+import com.XYai.myai.rag.aop.Annotation.RagTraceRoot;
 import com.XYai.myai.rag.memory.POJO.ChatConversation;
 import com.XYai.myai.rag.memory.POJO.ChatSessionRecord;
 import com.XYai.myai.security.JwtUtil;
@@ -11,13 +12,11 @@ import com.XYai.myai.user.POJO.User;
 import com.XYai.myai.user.POJO.UserDTO;
 import com.XYai.myai.user.POJO.UserVO;
 import com.XYai.myai.user.service.UserService;
-import com.XYai.myai.mapper.UserMapper;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;

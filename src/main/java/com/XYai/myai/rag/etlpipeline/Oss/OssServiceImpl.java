@@ -1,4 +1,5 @@
 package com.XYai.myai.rag.etlpipeline.Oss;
+
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,14 +13,13 @@ import java.util.concurrent.*;
 @Service
 public class OssServiceImpl implements OssService {
 
+    private static final long DEFAULT_PART_SIZE = 10L * 1024L * 1024L; // 10MB (>=5MB)
+    private static final int DEFAULT_PART_CONCURRENCY = 4;
+    private static final int MAX_RETRY = 3;
     private final OSS ossClient;
     private final com.XYai.myai.config.OssConfig ossConfig;
     private final String bucket;
     private final ExecutorService partUploadExecutor;
-
-    private static final long DEFAULT_PART_SIZE = 10L * 1024L * 1024L; // 10MB (>=5MB)
-    private static final int DEFAULT_PART_CONCURRENCY = 4;
-    private static final int MAX_RETRY = 3;
 
     @Autowired
     public OssServiceImpl(OSS ossClient, com.XYai.myai.config.OssConfig ossConfig) {
@@ -85,7 +85,7 @@ public class OssServiceImpl implements OssService {
             while (partNumber <= partCount) {
                 // read up to partSize
                 int read = 0;
-                int toRead = (int) Math.min(partSize, size - (long)(partNumber - 1) * partSize);
+                int toRead = (int) Math.min(partSize, size - (long) (partNumber - 1) * partSize);
                 int offset = 0;
                 while (offset < toRead) {
                     int n = in.read(buffer, offset, toRead - offset);
@@ -142,7 +142,8 @@ public class OssServiceImpl implements OssService {
             // on error abort multipart
             try {
                 ossClient.abortMultipartUpload(new AbortMultipartUploadRequest(bucket, objectKey, uploadId));
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
             throw new IOException("Multipart upload failed", e);
         }
     }

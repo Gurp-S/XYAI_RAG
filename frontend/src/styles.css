@@ -2227,3 +2227,19 @@ body.theme-switching .theme-transition-overlay {
     scroll-behavior: auto !important;
   }
 }
+
+/* Fix: 保证输入区和发送按钮在复杂交互后仍可点击 */
+.input-area {
+  position: relative;
+  z-index: 30;
+  pointer-events: auto;
+}
+.input-area .input-wrapper {
+  position: relative;
+  z-index: 31;
+}
+.input-area .btn-send {
+  position: relative;
+  z-index: 32;
+  pointer-events: auto;
+}

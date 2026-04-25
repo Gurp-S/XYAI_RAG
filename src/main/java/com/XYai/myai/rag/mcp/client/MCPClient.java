@@ -9,6 +9,8 @@ import com.XYai.myai.rag.mcp.tools.POJO.MCPResponse;
  */
 public interface MCPClient {
 
-    /** 发起 MCP 工具调用请求至远端 Server */
+    /**
+     * 发起 MCP 工具调用请求至远端 Server
+     */
     MCPResponse call(MCPRequest request);
 }

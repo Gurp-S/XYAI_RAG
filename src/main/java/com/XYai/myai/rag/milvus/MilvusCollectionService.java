@@ -74,7 +74,7 @@ public class MilvusCollectionService {
      */
     public void loadCollection(String collectionName) {
         // 简单实现：把 collection 标记为 loaded（从 unloaded 移到 loaded），不触及 MySQL
-            milvusAclManager.moveCollectionToLoaded(collectionName);
+        milvusAclManager.moveCollectionToLoaded(collectionName);
     }
 
     /**
@@ -82,7 +82,7 @@ public class MilvusCollectionService {
      */
     public void unloadCollection(String collectionName) throws Exception {
         // 简单实现：把 collection 标记为 unloaded（从 loaded 移到 unloaded），不触及 MySQL
-            milvusAclManager.moveCollectionToUnloaded(collectionName);
+        milvusAclManager.moveCollectionToUnloaded(collectionName);
     }
 
     /**

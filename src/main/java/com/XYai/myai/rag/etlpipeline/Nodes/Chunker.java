@@ -73,11 +73,11 @@ public class Chunker implements Ingestion {
         chunks = enrichChunkMetadata(chunks, chunks.size());
         context.setChunks(chunks);
         Object chunkCopy = context.getDocument().getMetadata().get(IngestionContext.META_COPY_CHUNK);
-        skipChunkCopy(chunkCopy,context);
+        skipChunkCopy(chunkCopy, context);
         return NodeResult.ok("分块数量=" + chunks.size());
     }
 
-    private void skipChunkCopy(Object chunkCopy,IngestionContext context){
+    private void skipChunkCopy(Object chunkCopy, IngestionContext context) {
         try {
             if (chunkCopy != null) {
                 // 规范化为 List<Long>（只保留能成功解析为 long 的项）
@@ -125,11 +125,13 @@ public class Chunker implements Ingestion {
                         } else if (cidObj != null) {
                             try {
                                 cid = Long.parseLong(String.valueOf(cidObj));
-                            } catch (Exception ignored) { }
+                            } catch (Exception ignored) {
+                            }
                         } else {
                             try {
                                 cid = Long.parseLong(chunk.getId());
-                            } catch (Exception ignored) { }
+                            } catch (Exception ignored) {
+                            }
                         }
                         if (cid > 0 && keepSet.contains(cid)) {
                             filtered.add(chunk);

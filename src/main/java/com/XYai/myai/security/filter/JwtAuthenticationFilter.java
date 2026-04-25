@@ -1,22 +1,23 @@
 package com.XYai.myai.security.filter;
 
+import com.XYai.myai.mapper.UserMapper;
 import com.XYai.myai.security.POJO.JwtProperties;
 import com.XYai.myai.security.service.JwtService;
 import com.XYai.myai.user.LoginUserInfoManager;
 import com.XYai.myai.user.POJO.User;
-import com.XYai.myai.mapper.UserMapper;
 import com.XYai.myai.user.service.CustomUserDetailsService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.lang.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -53,7 +54,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         // 线程可能被复用，先清理旧请求残留
         LoginUserInfoManager.remove();
-        SecurityContextHolder.clearContext();
 
         // 1) 读取 header 并去除前缀（例如："Bearer <token>"）
         String header = request.getHeader(jwtProperties.getHeader());
@@ -75,27 +75,40 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         // 4) 将 domain 层的 User 放入线程上下文（LoginUserInfoManager）以便业务层直接取用
                         //    统一以 UserDetails.username（本项目为用户 id）反查 domain user
                         try {
+                            // Username in UserDetails is set to the numeric user id by CustomUserDetailsService
                             Long uid = Long.parseLong(ud.getUsername());
                             User domain = userMapper.selectById(uid);
                             if (domain != null) {
                                 LoginUserInfoManager.set(domain);
+                                log.debug("LoginUserInfoManager set by id: {}", uid);
                             }
                         } catch (NumberFormatException ignore) {
-                            // 如果 subject 不是数字 id，忽略此步
+                            // 如果 UserDetails.username 不是数字（异常情况），尝试通过原始 token subject（username）去查找
+                            try {
+                                LambdaQueryWrapper<User> q = new LambdaQueryWrapper<>();
+                                q.eq(User::getName, username).or().eq(User::getPhone, username).or().eq(User::getEmail, username);
+                                User domain = userMapper.selectOne(q);
+                                if (domain != null) {
+                                    LoginUserInfoManager.set(domain);
+                                    log.debug("LoginUserInfoManager set by username/email/phone: {}", username);
+                                } else {
+                                    log.debug("No domain user found for token subject: {}", username);
+                                }
+                            } catch (Exception e) {
+                                log.warn("lookup domain user by username failed: {}", e.getMessage());
+                            }
                         }
                     }
                 }
             } catch (Exception e) {
                 log.warn("JWT 验证失败: {}", e.getMessage());
-                LoginUserInfoManager.remove();
-                SecurityContextHolder.clearContext();
             }
         }
 
         try {
             chain.doFilter(request, response);
         } finally {
-            // 请求完成后统一清理，防止线程复用时串号
+            // 请求完成后统一清理避免线程复用污染。
             LoginUserInfoManager.remove();
             SecurityContextHolder.clearContext();
         }

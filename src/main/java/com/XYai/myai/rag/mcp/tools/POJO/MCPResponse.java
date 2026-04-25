@@ -14,18 +14,28 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MCPResponse {
-    /** 执行状态码 */
+    /**
+     * 执行状态码
+     */
     private int code;
-    
-    /** 错误或结果的描述消息 */
+
+    /**
+     * 错误或结果的描述消息
+     */
     private String message;
-    
-    /** 实际的数据输出内容（通常是 JSON 结构） */
+
+    /**
+     * 实际的数据输出内容（通常是 JSON 结构）
+     */
     private Object data;
-    
-    /** 是否执行成功 */
+
+    /**
+     * 是否执行成功
+     */
     private boolean success;
-    
-    /** 建议 LLM 下一步的操作内容（可选） */
+
+    /**
+     * 建议 LLM 下一步的操作内容（可选）
+     */
     private String suggestion;
 }

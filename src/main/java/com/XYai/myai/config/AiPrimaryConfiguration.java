@@ -1,5 +1,6 @@
 package com.XYai.myai.config;
 
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.ollama.OllamaEmbeddingModel;
@@ -7,6 +8,8 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * AI 相关组件的主配置类。
@@ -14,6 +17,12 @@ import org.springframework.context.annotation.Primary;
  */
 @Configuration
 public class AiPrimaryConfiguration {
+
+    @Value("${spring.ai.openai.api-key}")
+    private String apiKey;
+
+    @Value("${spring.ai.openai.base-url}")
+    private String baseUrl;
 
     @Bean
     @Primary
@@ -26,4 +35,15 @@ public class AiPrimaryConfiguration {
     public EmbeddingModel embeddingModel(OllamaEmbeddingModel ollamaEmbeddingModel) {
         return ollamaEmbeddingModel;
     }
+
+    @Bean
+    public WebClient rerankWebClient() {
+        return WebClient.builder()
+                .baseUrl(baseUrl)
+                .defaultHeader("Authorization", "Bearer " + apiKey)
+                .defaultHeader("Content-Type", "application/json")
+                .build();
+    }
+
 }
+

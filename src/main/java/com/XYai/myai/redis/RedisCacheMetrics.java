@@ -1,10 +1,9 @@
 package com.XYai.myai.redis;
 
+import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-
-import jakarta.annotation.Resource;
 
 /**
  * Simple Redis-backed metrics helper for cache-related statistics and basic memory inspection.

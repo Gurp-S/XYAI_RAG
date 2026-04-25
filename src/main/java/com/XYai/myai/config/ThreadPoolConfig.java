@@ -2,10 +2,14 @@ package com.XYai.myai.config;
 
 import com.XYai.myai.user.LoginUserInfoManager;
 import com.XYai.myai.user.POJO.User;
+import com.alibaba.ttl.TtlRunnable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskDecorator;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -86,14 +90,11 @@ public class ThreadPoolConfig {
         executor.setKeepAliveSeconds(DEFAULT_KEEP_ALIVE_SECONDS);
         executor.setThreadNamePrefix("search-channel-thread-");
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-
         // 上下文传递
         executor.setTaskDecorator(userContextDecorator());
-
         executor.initialize();
         return executor;
     }
-
 
 
     /**
@@ -110,20 +111,30 @@ public class ThreadPoolConfig {
      */
     private TaskDecorator userContextDecorator() {
         return runnable -> {
-            // 拿到主线程的用户
-            User user = LoginUserInfoManager.get();
+            // 捕获主线程的上下文（JWT 用户 + Security）
+            User appUser = LoginUserInfoManager.get();
+            SecurityContext securityContext = SecurityContextHolder.getContext();
+            // 用 TTL 包装 runnable，自动处理 TransmittableThreadLocal 的传递
+            Runnable ttlRunnable = TtlRunnable.get(runnable);
 
             return () -> {
+                // 备份子线程原有 SecurityContext（防止污染）
+                SecurityContext originalContext = SecurityContextHolder.getContext();
                 try {
-                    // 塞入异步线程上下文
-                    if (user != null) {
-                        LoginUserInfoManager.set(user);
+                    // 设置 Spring Security 上下文（关键！权限校验依赖它）
+                    if (securityContext != null && securityContext.getAuthentication() != null) {
+                        SecurityContextHolder.setContext(securityContext);
                     }
-                    // 执行任务
-                    runnable.run();
+                    // 设置 LoginUserInfoManager（把主线程的用户显式传递到子线程）
+                    if (appUser != null) {
+                        LoginUserInfoManager.set(appUser);
+                    }
+                    // 执行被 TTL 包装的任务（会自动传递 TransmittableThreadLocal，但显式设置更稳健）
+                    ttlRunnable.run();
                 } finally {
-                    // 必须清理，防止线程复用导致串用户
-                    LoginUserInfoManager.remove();
+                    // 清理：恢复原子性，防止线程复用导致串用户/串权限
+                    LoginUserInfoManager.remove(); // TTL 会自动清理，但显式调用更安全
+                    SecurityContextHolder.setContext(originalContext);
                 }
             };
         };

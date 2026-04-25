@@ -1,8 +1,8 @@
 package com.XYai.myai.rag.intent;
 
 
-import com.XYai.myai.rag.memory.POJO.LoadSession;
 import com.XYai.myai.rag.intent.POJO.SubQuestionIntent;
+import com.XYai.myai.rag.memory.POJO.LoadSession;
 import com.XYai.myai.rag.rewrite.POJO.RewriteResult;
 
 import java.util.List;

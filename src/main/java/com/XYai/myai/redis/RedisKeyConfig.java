@@ -27,6 +27,10 @@ public final class RedisKeyConfig {
         return PREFIX + String.format(Locale.ROOT, "collection:files:%s", collectionName);
     }
 
+    public static String collectionFileChunkBitKey(String collectionName,String fileId) {
+        return PREFIX + String.format(Locale.ROOT, "collection:files:%s:%s", collectionName,fileId);
+    }
+
     public static String userFileBitKey(Long userId, String fileId) {
         return PREFIX + String.format(Locale.ROOT, "user:filebits:%d:%s", userId, fileId);
     }
@@ -42,6 +46,14 @@ public final class RedisKeyConfig {
     // per-file-chunk count
     public static String fileChunkUserCountKey(String fileId, Long chunkId) {
         return PREFIX + "fileChunk:count:" + fileId + ":" + chunkId;
+    }
+
+    public static String userConversationRecord(Long userId,String conversationId){
+        return PREFIX + "summary:lock:" + userId + ":" + conversationId;
+    }
+
+    public static String userSummaryRecord(Long userId,String conversationId){
+        return PREFIX + "summary:" + userId + ":" + conversationId;
     }
 
     public static String collectionUserCountKey(String collection) {

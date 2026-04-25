@@ -1,10 +1,6 @@
 package com.XYai.myai.rag.aop.Annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * RAG 链路追踪子节点注解。

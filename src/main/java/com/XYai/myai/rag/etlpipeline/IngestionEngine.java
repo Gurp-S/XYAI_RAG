@@ -1,24 +1,15 @@
 package com.XYai.myai.rag.etlpipeline;
 
 import com.XYai.myai.rag.etlpipeline.Nodes.Ingestion;
-import com.XYai.myai.rag.etlpipeline.POJO.IngestionContext;
-import com.XYai.myai.rag.etlpipeline.POJO.NodeConfig;
-import com.XYai.myai.rag.etlpipeline.POJO.NodeLog;
-import com.XYai.myai.rag.etlpipeline.POJO.NodeResult;
-import com.XYai.myai.rag.etlpipeline.POJO.PipelineDefinition;
+import com.XYai.myai.rag.etlpipeline.POJO.*;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 数据摄入 (Ingestion) 引擎类。
@@ -38,7 +29,7 @@ public class IngestionEngine {
      * 按节点顺序执行单条文档的 ETL 管道。
      */
     public IngestionContext execute(PipelineDefinition pipeline,
-            IngestionContext context) {
+                                    IngestionContext context) {
         Objects.requireNonNull(pipeline, "pipeline must not be null");
         // 判空
         IngestionContext targetContext = context == null ? IngestionContext.builder().build() : context;
@@ -61,7 +52,9 @@ public class IngestionEngine {
         return map;
     }
 
-    /** 节点映射。 */
+    /**
+     * 节点映射。
+     */
     private Map<String, NodeConfig> buildNodeConfigMap(List<NodeConfig> nodes) {
         if (nodes == null || nodes.isEmpty()) {
             throw new IllegalArgumentException("管道节点不能为空");
@@ -79,7 +72,9 @@ public class IngestionEngine {
         return map;
     }
 
-    /** 判断管道合法性。 */
+    /**
+     * 判断管道合法性。
+     */
     private String validatePipeline(Map<String, NodeConfig> nodeConfigMap) {
         // 判断是否有未知的后节点
         for (NodeConfig nodeConfig : nodeConfigMap.values()) {
@@ -99,16 +94,16 @@ public class IngestionEngine {
 
     /**
      * 递归检测节点链路中是否存在循环依赖（死循环）
-     * 
+     *
      * @param nodeId        当前正在检查的节点ID
      * @param nodeConfigMap 所有节点的配置映射表
      * @param visiting      正在遍历中的节点集合（标记当前递归栈里的节点，用于检测环）
      * @param visited       已经遍历完成的节点集合（避免重复处理）
      */
     private void detectCycle(String nodeId,
-            Map<String, NodeConfig> nodeConfigMap,
-            Set<String> visiting,
-            Set<String> visited) {
+                             Map<String, NodeConfig> nodeConfigMap,
+                             Set<String> visiting,
+                             Set<String> visited) {
         // 节点已经处理完成，返回
         if (visited.contains(nodeId)) {
             return;
@@ -135,7 +130,7 @@ public class IngestionEngine {
 
     /**
      * 找起始节点
-     * 
+     *
      * @param nodeConfigMap 节点映射
      * @return 唯一起始节点的 nodeId
      */
@@ -158,11 +153,13 @@ public class IngestionEngine {
         return startNodes.iterator().next();
     }
 
-    /** 链式执行节点。 */
+    /**
+     * 链式执行节点。
+     */
     private void executeChain(String nodeId,
-            Map<String, NodeConfig> configMap,
-            Map<String, Ingestion> nodeMap,
-            IngestionContext context) {
+                              Map<String, NodeConfig> configMap,
+                              Map<String, Ingestion> nodeMap,
+                              IngestionContext context) {
         Set<String> seen = new HashSet<>();
         String taskId = context == null ? null : context.getTaskId();
         while (nodeId != null) {
@@ -213,7 +210,9 @@ public class IngestionEngine {
         }
     }
 
-    /** 创建节点日志。 */
+    /**
+     * 创建节点日志。
+     */
     private NodeLog buildNodeLog(NodeConfig config, NodeResult result, boolean executed, long costMs) {
         Map<String, Object> extra = new HashMap<>();
         extra.put("nodeId", config.getNodeId());

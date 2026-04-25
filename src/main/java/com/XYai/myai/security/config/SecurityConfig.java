@@ -14,6 +14,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.DelegatingSecurityContextRepository;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
 
 @Configuration
 /**
@@ -37,6 +40,12 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .securityContext(securityContext -> securityContext
+                        .securityContextRepository(new DelegatingSecurityContextRepository(
+                                new RequestAttributeSecurityContextRepository(),
+                                new HttpSessionSecurityContextRepository()
+                        ))
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/user/login", "/user/registry", "/user/reset-password", "/user/refresh",
                                 "/static/**", "/public/**", "/error")
@@ -47,6 +56,9 @@ public class SecurityConfig {
         // 尝试从 Authorization header 中解析并验证 token，再设置 SecurityContext
         log.info("jwt验证");
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        // 使用自定义的 AccessDeniedHandler，避免在 response 已经被提交时尝试 forward/redirect 导致二次提交错误
+        http.exceptionHandling(ex -> ex.accessDeniedHandler(new com.XYai.myai.security.handler.CustomAccessDeniedHandler()));
 
         return http.build();
     }

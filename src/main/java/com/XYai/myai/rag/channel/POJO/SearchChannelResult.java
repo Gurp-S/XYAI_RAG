@@ -15,12 +15,18 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SearchChannelResult {
-	/** 通道名称 */
-	private String channelName;
+    /**
+     * 通道名称
+     */
+    private String channelName;
 
-	/** 检索到的片段列表 */
-	private List<RetrievedChunk> chunks;
+    /**
+     * 检索到的片段列表
+     */
+    private List<RetrievedChunk> chunks;
 
-	/** 任意通道级元数据 */
-	private Object metadata;
+    /**
+     * 任意通道级元数据
+     */
+    private Object metadata;
 }

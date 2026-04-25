@@ -2,7 +2,7 @@ package com.XYai.myai.rag.channel.POJO;
 
 import com.XYai.myai.rag.intent.POJO.NodesScore;
 import com.XYai.myai.rag.intent.POJO.SubQuestionIntent;
-import lombok.AllArgsConstructor;
+import com.XYai.myai.rag.rewrite.POJO.RewriteResult;import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,10 +19,23 @@ import java.util.Map;
 public class SearchContext {
 
     /**
+     * 原始问题
+     */
+    private String originalQuery;
+
+
+    /**
      * 查询文本（原始或重写后）。
      * 所有检索通道与 Rerank 阶段都会读取该字段。
      */
-    private String question;
+    private RewriteResult rewriteQuestion;
+
+
+    /**
+     * 对话ID
+     * 对话的唯一标识
+     */
+    private String conversationId;
 
     /**
      * 意图候选列表。

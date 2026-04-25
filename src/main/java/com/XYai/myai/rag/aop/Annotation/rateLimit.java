@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface rateLimit{
+public @interface rateLimit {
 
     /**
      * 限流阈值，表示时间窗口内允许的最大请求次数。

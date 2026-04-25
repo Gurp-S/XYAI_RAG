@@ -29,7 +29,7 @@ public class ChatSessionRecord {
 
     @TableField("summary_text")
     private String summaryText;
-    
+
     @TableField("created_at")
     private LocalDateTime createdAt;
 }

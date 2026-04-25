@@ -1,8 +1,8 @@
 package com.XYai.myai.config;
 
+import com.XYai.myai.mapper.UserMapper;
 import com.XYai.myai.user.LoginUserInfoManager;
 import com.XYai.myai.user.POJO.User;
-import com.XYai.myai.mapper.UserMapper;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,7 +19,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class LoginHandlerInterceptor implements HandlerInterceptor {
     /**
      * 登录拦截器：从请求头提取 userId 并加载用户信息到线程上下文（LoginUserInfoManager）。
-     *
+     * <p>
      * 注：当前实现假定在网关层已经验证 token 并将 userId 放入请求头中。
      */
     private static final String USER_ID = "userId";

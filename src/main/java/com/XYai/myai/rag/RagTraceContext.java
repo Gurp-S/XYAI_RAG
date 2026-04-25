@@ -15,11 +15,6 @@ public class RagTraceContext {
     // 使用 Deque 或 LinkedList：
     private static final ThreadLocal<Deque<String>> NODE_STACK = ThreadLocal.withInitial(LinkedList::new);
 
-    public static void setTraceId(String traceId) {
-        // 将 traceId 放到 TRACE_ID_HOLDER 中
-        TRACE_ID_HOLDER.set(traceId);
-    }
-
     public static void clear() {
         // 清除由当前线程保存的 TRACE_ID_HOLDER 和 NODE_STACK 的内容，调用 remove() 防止内存泄露
         TRACE_ID_HOLDER.remove();
@@ -29,6 +24,11 @@ public class RagTraceContext {
     public static String getTraceId() {
         // 从 TRACE_ID_HOLDER 中获取当前的 traceId 并返回
         return TRACE_ID_HOLDER.get();
+    }
+
+    public static void setTraceId(String traceId) {
+        // 将 traceId 放到 TRACE_ID_HOLDER 中
+        TRACE_ID_HOLDER.set(traceId);
     }
 
     public static void pushNode(String nodeId) {

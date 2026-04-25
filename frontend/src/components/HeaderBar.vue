@@ -161,6 +161,15 @@ const sidebarStyleOptions = [
 function handleNewChat() {
     showAppearancePanel.value = false
     store.newConversation();
+    // Ensure input is focused after starting a new conversation so send remains responsive
+    setTimeout(() => {
+        try {
+            const el = document.getElementById('message');
+            if (el && typeof el.focus === 'function') el.focus();
+        } catch (e) {
+            // ignore
+        }
+    }, 0);
 }
 
 function toggleThemeLocally() {

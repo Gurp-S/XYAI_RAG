@@ -60,10 +60,10 @@ public class UploadIngestionContextFactory {
      * 外部来源入口：URL、本地文件路径都可以统一走这里。
      */
     public IngestionContext createFromSource(String sourceUri,
-            String sourceType,
-            String collectionName,
-            String kbId,
-            User user) { // 加 user
+                                             String sourceType,
+                                             String collectionName,
+                                             String kbId,
+                                             User user) { // 加 user
         return createContext("1", sourceUri, sourceType, null, null, collectionName, kbId, null, null, List.of(), user);
     }
 

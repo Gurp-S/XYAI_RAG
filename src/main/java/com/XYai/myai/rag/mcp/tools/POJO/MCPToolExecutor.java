@@ -13,7 +13,7 @@ public interface MCPToolExecutor {
 
     /**
      * 执行具体的工具操作
-     * 
+     *
      * @param request 封装后的 MCP 请求（带参数）
      * @return 业务结果响应
      */

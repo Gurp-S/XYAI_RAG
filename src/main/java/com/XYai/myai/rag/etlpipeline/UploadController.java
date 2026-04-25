@@ -2,6 +2,7 @@ package com.XYai.myai.rag.etlpipeline;
 
 import cn.hutool.core.util.IdUtil;
 import com.XYai.myai.config.Result;
+import com.XYai.myai.rag.aop.Annotation.rateLimit;
 import com.XYai.myai.rag.etlpipeline.Factory.PipelineDefinitionFactory;
 import com.XYai.myai.rag.etlpipeline.Factory.UploadIngestionContextFactory;
 import com.XYai.myai.rag.etlpipeline.Oss.OssService;
@@ -15,10 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.util.StringUtils;
 import org.springframework.util.StreamUtils;
-import com.XYai.myai.rag.aop.Annotation.rateLimit;
-import java.util.concurrent.RejectedExecutionException;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,7 +30,9 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
 
 /**
  * 上传控制器：只负责接收文件、构造 ETL 输入、调用 IngestionEngine、汇总结果。
@@ -118,7 +119,8 @@ public class UploadController {
                 for (File t : tempFilesToCleanup) {
                     try {
                         Files.deleteIfExists(t.toPath());
-                    } catch (Exception ignored) {}
+                    } catch (Exception ignored) {
+                    }
                 }
                 log.error("准备上传文件失败: {}", safeFileName(f), e);
                 return Result.error(500, "准备上传文件失败: " + safeFileName(f));
@@ -134,16 +136,15 @@ public class UploadController {
                         if (skipFileInfo.getSkipStatus().equals(SkipFileInfo.UP_FILE)) {
                             log.info("进行文件上传");
                             boolean upStatus = processSingleFile(file, accumulator, collectionName, user, fileHash, List.of());
-                            if(upStatus) {
+                            if (upStatus) {
                                 redissonClient.getSet(RedisKeyConfig.fileHashKey(fileHash)).add(collectionName);
                             }
-                        }
-                        else if(skipFileInfo.getSkipStatus().equals(SkipFileInfo.COPY_CHUNK)){ // 在分块后删除对应的分块
+                        } else if (skipFileInfo.getSkipStatus().equals(SkipFileInfo.COPY_CHUNK)) { // 在分块后删除对应的分块
                             log.info("进行分块上传");
                             processSingleFile(file, accumulator, collectionName, user, fileHash, skipFileInfo.getCopyChunks());
                         }
                     }
-                    uploadTaskStore.success(taskId,  "上传完成");
+                    uploadTaskStore.success(taskId, "上传完成");
                 } catch (Exception ex) {
                     log.error("处理上传任务失败: {}", taskId, ex);
                     uploadTaskStore.error(taskId, ex.getMessage());
@@ -151,7 +152,8 @@ public class UploadController {
                     for (File t : tempFilesToCleanup) {
                         try {
                             Files.deleteIfExists(t.toPath());
-                        } catch (Exception ignored) {}
+                        } catch (Exception ignored) {
+                        }
                     }
                 }
             });
@@ -160,7 +162,8 @@ public class UploadController {
             for (File t : tempFilesToCleanup) {
                 try {
                     Files.deleteIfExists(t.toPath());
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
             return Result.error(503, "服务器繁忙，请稍后重试");
         }
@@ -251,7 +254,7 @@ public class UploadController {
                 uploadToOss(file, accumulator, fileName);
             }
 
-            IngestionContext inputContext = uploadIngestionContextFactory.create(file, collectionName, user, fileHashId ,copyChunks);
+            IngestionContext inputContext = uploadIngestionContextFactory.create(file, collectionName, user, fileHashId, copyChunks);
             inputContext.setTaskId(accumulator.getTaskId());
             var pipeline = pipelineDefinitionFactory.createUploadPipeline(fileName, file);
             IngestionContext outputContext = ingestionEngine.execute(pipeline, inputContext);

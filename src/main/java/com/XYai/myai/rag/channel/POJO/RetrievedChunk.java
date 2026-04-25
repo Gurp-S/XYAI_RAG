@@ -17,18 +17,33 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RetrievedChunk {
-	/** 片段唯一 id（建议稳定且可复现，如 docId + chunkIndex）。去重阶段依赖该字段。 */
-	private String id;
+    /**
+     * 片段唯一 id（建议稳定且可复现，如 docId + chunkIndex）。去重阶段依赖该字段。
+     */
+    private String id;
 
-	/** 来源集合/collection 名称（用于来源追踪、通道分析、问题排障）。 */
-	private String collectionName;
+    /**
+     * 来源集合/collection 名称（用于来源追踪、通道分析、问题排障）。
+     */
+    private String collectionName;
 
-	/** 片段文本内容（Rerank 与最终回答拼装的核心输入）。 */
-	private String content;
+    /**
+     * 片段文本内容（Rerank 与最终回答拼装的核心输入）。
+     */
+    private String content;
 
-	/** 初始检索得分（越高越相关，可能来自 BM25/向量检索/融合策略）。 */
-	private Double score;
+    /**
+     * 初始检索得分
+     */
+    private Double score;
 
-	/** 元数据（权限、版本、时间戳、来源标识等；过滤阶段通常基于该字段做规则判断）。 */
-	private Map<String, Object> metadata;
+    /**
+     * BM25得分
+     */
+    private Double bm25Score;
+
+    /**
+     * 元数据（权限、版本、时间戳、来源标识等；过滤阶段通常基于该字段做规则判断）。
+     */
+    private Map<String, Object> metadata;
 }

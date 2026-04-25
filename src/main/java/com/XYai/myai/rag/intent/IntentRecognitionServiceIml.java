@@ -3,15 +3,17 @@ package com.XYai.myai.rag.intent;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import com.XYai.myai.rag.memory.POJO.LoadSession;
-import com.XYai.myai.rag.intent.POJO.*;
-import com.XYai.myai.rag.rewrite.POJO.RewriteResult;
 import com.XYai.myai.mapper.IntentNodeMapper;
+import com.XYai.myai.rag.intent.POJO.*;
+import com.XYai.myai.rag.memory.POJO.LoadSession;
+import com.XYai.myai.rag.rewrite.POJO.RewriteResult;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.huaban.analysis.jieba.JiebaSegmenter;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -20,12 +22,14 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.wltea.analyzer.lucene.IKAnalyzer;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 /**
  * 意图识别服务实现。实现流程：
@@ -36,6 +40,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class IntentRecognitionServiceIml implements IntentRecognitionService {
+    private static final Analyzer IK_ANALYZER = new IKAnalyzer(true);
+    private static final String INTENT_NODE_NAME = "intent:tree:node:";
+    private static final String INTENT_NODE_CHILDREN_PREFIX = "intent:tree:children:";
     @Resource
     private StringRedisTemplate stringRedisTemplate;
     @Resource
@@ -47,10 +54,6 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
     @Resource
     private VectorStore vectorStore;
 
-    private static final JiebaSegmenter JIEBA = new JiebaSegmenter();
-    private static final String INTENT_NODE_NAME = "intent:tree:node:";
-    private static final String INTENT_NODE_CHILDREN_PREFIX = "intent:tree:children:";
-
     /**
      * 识别一组查询（可能包含拆分后的子问题）并返回意图列表。
      * 该方法并行识别每个子问题，最终返回最多前三个识别结果。
@@ -61,9 +64,16 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
      */
     public List<SubQuestionIntent> recognize(RewriteResult rewriteResult, LoadSession load) {
         // 加载子问题（优先使用已分解的子查询）
-        List<String> list = CollUtil.isNotEmpty(rewriteResult.getSubQuery()) ?
-                rewriteResult.getSubQuery() :
-                List.of(rewriteResult.getRewrittenQuery());
+        List<String> list;
+        if (rewriteResult == null) {
+            list = List.of();
+        } else if (CollUtil.isNotEmpty(rewriteResult.getSubQuery())) {
+            list = rewriteResult.getSubQuery();
+        } else if (!StrUtil.isBlank(rewriteResult.getRewrittenQuery())) {
+            list = List.of(rewriteResult.getRewrittenQuery());
+        } else {
+            list = List.of();
+        }
         // 并行识别每个子问题
         List<CompletableFuture<SubQuestionIntent>> tasks = list.stream().map(
                 query -> CompletableFuture.supplyAsync(
@@ -72,7 +82,8 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
         List<SubQuestionIntent> subIntent = tasks.stream().map(
                 CompletableFuture::join
         ).toList();
-        return subIntent.subList(0, Math.min(3, list.size()));
+        List<SubQuestionIntent> nonNull = subIntent.stream().filter(Objects::nonNull).toList();
+        return nonNull.subList(0, Math.min(3, nonNull.size()));
     }
 
     /**
@@ -90,7 +101,7 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
         if (query == null || StrUtil.isBlank(query)) return null;
         //TODO 同义词映射
         //分词判断
-        List<String> tokenizes = tokenizeWithJieba(query);
+        List<String> tokenizes = tokenizeWithIk(query);
         //读取redis意图树.有->返回,没有->数据库查询
         if (intentProperties.getRedisEnabled()) {
             SubQuestionIntent byRedis = matchIntentFromRedis(tokenizes);
@@ -155,7 +166,7 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
         }
         return matches.isEmpty() && list.isEmpty() ? null
                 : SubQuestionIntent.builder().subIntent(matches).nodeScore(NodesScore.builder()
-                .nodeScoreList(list).build()).build();
+                                                                           .nodeScoreList(list).build()).build();
     }
 
     /**
@@ -167,61 +178,137 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
      * @return 识别到的意图对象
      */
     private SubQuestionIntent fallback(String query, LoadSession load) {
-        //Select * form IntentNode where Son = 0
-        log.info("兜底进行");
-        //上下文转化
-        String context = com.alibaba.fastjson2.JSON.toJSONString(load);
-        //TODO加锁先查redis
+        try {
+            log.info("兜底进行: query={}", query);
 
-        List<IntentNode> leafNodesBySql = intentNodeMapper.selectList(
-                new QueryWrapper<IntentNode>().eq("children_count", 0)
-        );
+            // 1. 查叶子节点
+            List<IntentNode> leafNodes = intentNodeMapper.selectList(
+                    new QueryWrapper<IntentNode>().eq("children_count", 0)
+            );
+            if (leafNodes == null || leafNodes.isEmpty()) {
+                log.warn("无叶子节点，返回降级结果");
+                return getDegradeIntentResult(query);
+            }
 
-        //返回格式
-        String nodesScoreJSON = "{\"nodeScoreList\":[{\"intentNodeName\":,\"score\":}]}";
-        // 2. 构建标准化 System Prompt（意图名称 + 描述）
-        StringBuilder systemPrompt = new StringBuilder();
-        //加入上下文
-        systemPrompt.append("你是意图识别助手，请根据用户问题和上下文，从下面的意图列表中匹配最匹配的三个意图,并进行置信度打分\n");
-        systemPrompt.append("如果匹配的意图节点score<0.3,不返回意图节点,识别用户意图,根据JSON构建并返回,\n");
-        systemPrompt.append("上下文:\n");
-        systemPrompt.append(context);
-        systemPrompt.append("严格按照提供的JSON格式返回,每条都要有intentNodeName和score,score 必须是 0~1 的小数\n" +
-                "按降序排列,JSON格式:");
-        systemPrompt.append(nodesScoreJSON);
-        systemPrompt.append("意图列表：\n");
-        for (IntentNode node : leafNodesBySql) {
-            systemPrompt.append("- IntentName:").append(node.getName());
+            // 2. 构建 Prompt（示例用非空值）
+            String systemPrompt = buildFallbackPrompt(leafNodes);
+            Prompt prompt = new Prompt(
+                    new SystemMessage(systemPrompt),
+                    new UserMessage("用户问题: " + query)
+            );
+
+            // 3. 调用模型 + 空值校验
+            var response = chatModel.call(prompt);
+            if (response == null || response.getResult() == null) {
+                log.warn("模型返回空响应");
+                return getDegradeIntentResult(query);
+            }
+
+            String intentResult = response.getResult().getOutput().getText();
+            if (intentResult == null || intentResult.isBlank()) {
+                log.warn("模型输出为空");
+                return getDegradeIntentResult(query);
+            }
+
+            // 4. 安全解析 JSON
+            NodesScore nodeScoreLLM = safeParseNodesScore(intentResult);
+            if (nodeScoreLLM == null || nodeScoreLLM.getNodeScoreList() == null) {
+                log.warn("解析结果为空");
+                return getDegradeIntentResult(query);
+            }
+
+            // 5. 构建结果（过滤低分 + 空值保护）
+            List<IntentNode> matchedNodes = new ArrayList<>();
+            for (NodeScore score : nodeScoreLLM.getNodeScoreList()) {
+                if (score == null || score.getIntentNodeName() == null || score.getScore() == null) {
+                    continue;  // 跳过无效项
+                }
+                if (score.getScore() < 0.4) {
+                    continue;  // 低置信度过滤
+                }
+
+                // 查 Redis（加空值保护）
+                String json = stringRedisTemplate.opsForValue()
+                        .get(INTENT_NODE_NAME + score.getIntentNodeName());
+                if (json != null && !json.isBlank()) {
+                    IntentNode node = JSON.parseObject(json, IntentNode.class);
+                    if (node != null) {
+                        matchedNodes.add(node);
+                    }
+                }
+            }
+
+            // 6. 如果无有效节点，返回降级结果
+            if (matchedNodes.isEmpty()) {
+                log.debug("无有效匹配节点，返回降级结果");
+                return getDegradeIntentResult(query);
+            }
+
+            // 7. 返回
+            return SubQuestionIntent.builder()
+                    .subIntent(matchedNodes)
+                    .nodeScore(NodesScore.builder()
+                            .nodeScoreList(nodeScoreLLM.getNodeScoreList().stream()
+                                    .filter(Objects::nonNull)
+                                    .filter(s -> s.getScore() != null && s.getScore() >= 0.4)
+                                    .toList())
+                            .build())
+                    .build();
+
+        } catch (Exception e) {
+            log.error("fallback 异常: query={}", query, e);
+            return getDegradeIntentResult(query);
         }
-        // 2. 正确调用AI：系统提示词 + 用户问题
-        String fullPrompt = "用户问题：<<%s>>".formatted(query);
-        //得到结果(分数加意图节点名)
-        Prompt prompt = new Prompt(
-                new SystemMessage(String.valueOf(systemPrompt)),
-                new UserMessage(fullPrompt)
-                );
-        String intentResult = chatModel.call(prompt).getResult().getOutput().getText();
-        log.info(intentResult);
-        //转换对象
-        NodesScore nodeScoreLLM = JSON.parseObject(intentResult, NodesScore.class);
-        //构建结果
-        log.info(String.valueOf(nodeScoreLLM));
-        SubQuestionIntent intentNodes = new SubQuestionIntent();
-        intentNodes.setNodeScore(nodeScoreLLM);
-        intentNodes.setSubIntent(new ArrayList<>());
-        for (NodeScore nodeScore : nodeScoreLLM.getNodeScoreList()) {
-            String intentNodeJSON =
-                    stringRedisTemplate.opsForValue().get(INTENT_NODE_NAME + nodeScore.getIntentNodeName());
-            IntentNode intentNode =
-                    com.alibaba.fastjson2.JSON.parseObject(intentNodeJSON, IntentNode.class);
-            //添加
-            intentNodes.getSubIntent().add(intentNode);
-            //TODO添加到节点
-            //cacheNodesToRedis(intentNode);
+    }
+
+    // 解析 JSON
+    private NodesScore safeParseNodesScore(String raw) {
+        try {
+            return JSON.parseObject(raw, NodesScore.class);
+        } catch (Exception e1) {
+            try {
+                String json = extractJson(raw);
+                if (json != null) {
+                    return JSON.parseObject(json, NodesScore.class);
+                }
+            } catch (Exception e2) {
+                log.debug("JSON 解析失败: raw={}", raw);
+            }
         }
-        log.info(String.valueOf(intentNodes));
-        //返回对应树
-        return intentNodes;
+        return null;
+    }
+
+    /**
+     * 从文本中提取第一个 JSON 对象
+     */
+    private String extractJson(String raw) {
+        if (raw == null) return null;
+        int start = raw.indexOf('{');
+        int end = raw.lastIndexOf('}');
+        if (start >= 0 && end > start) {
+            return raw.substring(start, end + 1);
+        }
+        return null;
+    }
+
+    // 构建 Prompt
+    private String buildFallbackPrompt(List<IntentNode> leafNodes) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("你是意图识别助手，请从下面的意图列表中匹配最相关的 1-3 个意图，并给出 0~1 的置信度分数。\n");
+        sb.append("规则:\n");
+        sb.append("1. 只返回 JSON 格式，不要额外说明\n");
+        sb.append("2. score<0.4 的意图不要返回\n");
+        sb.append("3. 按 score 降序排列\n");
+        sb.append("4. 如果没有匹配，返回空数组 []\n");
+        sb.append("\n输出格式示例:\n");
+        sb.append("{\"nodeScoreList\":[{\"intentNodeName\":\"示例意图\",\"score\":0.95}]}\n");
+        sb.append("\n意图列表:\n");
+        for (IntentNode node : leafNodes) {
+            if (node != null && node.getName() != null) {
+                sb.append("- ").append(node.getName()).append("\n");
+            }
+        }
+        return sb.toString();
     }
 
     /**
@@ -242,7 +329,7 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
         }
         return matches.isEmpty() && list.isEmpty() ? null
                 : SubQuestionIntent.builder().subIntent(matches).nodeScore(NodesScore.builder()
-                .nodeScoreList(list).build()).build();
+                                                                           .nodeScoreList(list).build()).build();
     }
 
     /**
@@ -298,21 +385,36 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
         }
         return matches.isEmpty() && list.isEmpty() ? null
                 : SubQuestionIntent.builder().subIntent(matches).nodeScore(NodesScore.builder()
-                .nodeScoreList(list).build()).build();
+                                                                           .nodeScoreList(list).build()).build();
     }
 
     /**
-     * 使用 jieba 进行简单分词并做基础清洗（去空、trim）。
+     * 使用 IKAnalyzer（Lucene 分词器）进行中文分词并做基础清洗（去空、trim）。
      *
      * @param text 待分词文本
      * @return 处理后的 token 列表
      */
-    private List<String> tokenizeWithJieba(String text) {
+    private List<String> tokenizeWithIk(String text) {
         if (text == null || text.isBlank()) return List.of();
-        List<String> raw = JIEBA.sentenceProcess(text);
-        return raw.stream()
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .collect(Collectors.toList());
+        List<String> tokens = new ArrayList<>();
+        try (TokenStream tokenStream = IK_ANALYZER.tokenStream("", text)) {
+            CharTermAttribute termAttr = tokenStream.addAttribute(CharTermAttribute.class);
+            tokenStream.reset();
+            while (tokenStream.incrementToken()) {
+                String term = termAttr.toString().trim();
+                if (!term.isEmpty()) {
+                    tokens.add(term);
+                }
+            }
+            tokenStream.end();
+        } catch (IOException e) {
+            log.warn("IKAnalyzer 分词失败，回退返回原始文本分割", e);
+            // 回退：简单按空格拆分
+            String[] parts = text.trim().split("\\s+");
+            for (String p : parts) {
+                if (!p.isBlank()) tokens.add(p.trim());
+            }
+        }
+        return tokens;
     }
 }

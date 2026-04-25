@@ -1,10 +1,8 @@
 package com.XYai.myai.rag.milvus;
 
 import com.XYai.myai.config.Result;
-import com.XYai.myai.redis.RedisKeyConfig;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RSet;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

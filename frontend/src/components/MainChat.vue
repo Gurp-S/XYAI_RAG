@@ -271,6 +271,14 @@ async function send() {
   const userText = input.value.trim();
   input.value = "";
 
+  // Ensure there is always a conversationId when sending
+  if (!store.activeConversationId) {
+    store.activeConversationId =
+      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+        ? crypto.randomUUID()
+        : `conv_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+  }
+
   if (!isAiChat.value) {
     messages.value.push({
       role: "user",
@@ -383,9 +391,16 @@ async function loadContactMessages() {
 
 async function sendContactMessage(messageText) {
   try {
+    const convId =
+      store.activeConversationId ||
+      (store.activeConversationId =
+        typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+          ? crypto.randomUUID()
+          : `conv_${Date.now()}_${Math.random().toString(16).slice(2)}`);
+
     const requestBody = {
       message: messageText,
-      conversationId: store.activeConversationId,
+      conversationId: convId,
       targetType: store.chatMode,
       targetId: store.chatTarget?.id,
       targetName: store.chatTarget?.name,
@@ -458,7 +473,12 @@ async function performAiChat(message, userMsgIndex, options = {}) {
     messages.value[assistantIndex].ragData = null;
   }
 
-  const requestConversationId = store.activeConversationId;
+  const requestConversationId =
+    store.activeConversationId ||
+    (store.activeConversationId =
+      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+        ? crypto.randomUUID()
+        : `conv_${Date.now()}_${Math.random().toString(16).slice(2)}`);
   if (currentAbortController) {
     currentAbortController.abort();
   }

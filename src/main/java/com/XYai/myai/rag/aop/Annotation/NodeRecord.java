@@ -2,33 +2,47 @@ package com.XYai.myai.rag.aop.Annotation;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Builder;
 import lombok.Data;
-import com.baomidou.mybatisplus.annotation.TableName;
 
 @Data
 @Builder
 @TableName("node_record")
 public class NodeRecord {
-    /** 节点名称（用于可读化展示） */
+    /**
+     * 节点名称（用于可读化展示）
+     */
     private String nodeName;
-    
-    /** 节点唯一 ID */
+
+    /**
+     * 节点唯一 ID
+     */
     @TableId(value = "node_id", type = IdType.INPUT)
     private String nodeId;
-    
-    /** 所属 traceId */
+
+    /**
+     * 所属 traceId
+     */
     private String traceId;
-    
-    /** 节点类型（如 chat/retriever/aggregate） */
+
+    /**
+     * 节点类型（如 chat/retriever/aggregate）
+     */
     private String nodeType;
-    
-    /** 节点耗时（毫秒） */
+
+    /**
+     * 节点耗时（毫秒）
+     */
     private Long costTime;
 
-    /** 节点执行状态 */
+    /**
+     * 节点执行状态
+     */
     private String status;
 
-    /** 节点异常信息（若有） */
+    /**
+     * 节点异常信息（若有）
+     */
     private String errorMessage;
 }

@@ -40,7 +40,7 @@ public class CommonConfiguration {
      * @return Lua 脚本执行对象，返回类型为 Boolean
      */
     @Bean
-    public RedisScript<Boolean> loadRedisScript(){
+    public RedisScript<Boolean> loadRedisScript() {
         DefaultRedisScript<Boolean> redisLimitScript = new DefaultRedisScript<>();
         //lua脚本路径
         redisLimitScript.setLocation(new ClassPathResource("luaScript/limit.lua"));

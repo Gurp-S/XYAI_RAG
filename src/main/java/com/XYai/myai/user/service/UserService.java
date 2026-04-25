@@ -1,8 +1,8 @@
 package com.XYai.myai.user.service;
 
+import com.XYai.myai.config.Result;
 import com.XYai.myai.rag.memory.POJO.ChatConversation;
 import com.XYai.myai.rag.memory.POJO.ChatSessionRecord;
-import com.XYai.myai.config.Result;
 import com.XYai.myai.user.POJO.Group;
 import com.XYai.myai.user.POJO.UserDTO;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,10 +1,10 @@
 package com.XYai.myai.monitorEndpoint.service.iml;
 
+import com.XYai.myai.mapper.NodeRecordMapper;
+import com.XYai.myai.mapper.TraceRecordMapper;
 import com.XYai.myai.monitorEndpoint.service.TraceRecordService;
 import com.XYai.myai.rag.aop.Annotation.NodeRecord;
 import com.XYai.myai.rag.aop.Annotation.TraceRecord;
-import com.XYai.myai.mapper.NodeRecordMapper;
-import com.XYai.myai.mapper.TraceRecordMapper;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import jakarta.annotation.Resource;
@@ -19,9 +19,9 @@ import org.springframework.stereotype.Service;
  * 1. 使用 @Service 注解该实现类。
  * 2. 注入数据库的 Mapper（如 TraceRecordMapper、NodeRecordMapper），或注入 RedisTemplate。
  * 3. 实现以下各个方法，在方法中：
- *    - 构造一个包含对应数据的实体实体对象 (Entity)。
- *    - 调用 Mapper 进行 `insert()` 或 `update()` 保存数据。
- *    - 注意：记录日志的方法建议使用 @Async 异步化，以避免阻塞主干业务。
+ * - 构造一个包含对应数据的实体实体对象 (Entity)。
+ * - 调用 Mapper 进行 `insert()` 或 `update()` 保存数据。
+ * - 注意：记录日志的方法建议使用 @Async 异步化，以避免阻塞主干业务。
  */
 @Slf4j
 @Service

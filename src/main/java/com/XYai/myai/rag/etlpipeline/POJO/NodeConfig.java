@@ -17,15 +17,25 @@ public class NodeConfig implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /** 节点唯一标识 */
+    /**
+     * 节点唯一标识
+     */
     private String nodeId;
-    /** 节点类型：fetcher/parser/enricher/chunker/indexer */
+    /**
+     * 节点类型：fetcher/parser/enricher/chunker/indexer
+     */
     private String nodeType;
-    /** 节点参数 */
+    /**
+     * 节点参数
+     */
     private JsonNode settings;
-    /** 节点执行条件 */
+    /**
+     * 节点执行条件
+     */
     private JsonNode condition;
-    /** 下一节点ID */
+    /**
+     * 下一节点ID
+     */
     private String nextNodeId;
 }
 

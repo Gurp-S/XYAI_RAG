@@ -109,7 +109,7 @@ public class MilvusFileManager {
             // 存在 -> 同一用户，同一集合，同一文件 -> 有没有分块 -> 跳过,只上传分块
             if (redissonClient.getSet(redisKey).contains(collectionName) &&//文件存在当前集合
                     milvusCollectionService.getAllCollectionNames().contains(collectionName) &&//当前集合属于用户
-                        milvusAclManager.getFileAcl(fileHash)) {//当前文件属于当前用户
+                    milvusAclManager.getFileAcl(fileHash)) {//当前文件属于当前用户
                 // 判断用户拥有的分块数 == 集合分块总数
                 RBitSet userFileChunkCount = redissonClient.getBitSet(RedisKeyConfig.userFileBitKey(userId, fileHash));
                 // 不缺分块跳过
@@ -136,7 +136,7 @@ public class MilvusFileManager {
                 }
                 return result;
             }
-            // 存在 -> 不知道用户,同文件，不同集合 OR 同一用户，不同集合，同一文件 -> 复制整个文件或者复制分块
+            // 存在 -> 不知道用户,同文件，不同集合 OR 同一用户，不同集合，同一文件 -> 复制整个文件或者TODO复制分块
             // 集合添加分块条目格式 fileId:chunkSize 存入user:fileId
             milvusAclManager.addFileUserACl(fileHash, collectionName, chunkSize);
             redissonClient.getSet(RedisKeyConfig.fileHashKey(fileHash)).add(collectionName);

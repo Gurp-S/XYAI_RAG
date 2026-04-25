@@ -1,8 +1,8 @@
 package com.XYai.myai.rag.intent;
 
-import com.XYai.myai.rag.memory.POJO.LoadSession;
 import com.XYai.myai.rag.intent.POJO.IntentProperties;
 import com.XYai.myai.rag.intent.POJO.SubQuestionIntent;
+import com.XYai.myai.rag.memory.POJO.LoadSession;
 import com.XYai.myai.rag.rewrite.POJO.RewriteResult;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,7 +14,7 @@ import java.util.List;
  *
  */
 @RestController
-public class IntentResult{
+public class IntentResult {
 
     @Resource
     private IntentRecognitionService intentRecognitionService;
@@ -28,11 +28,11 @@ public class IntentResult{
      * @param load
      * @return 识别出的意图列表（可能为空）
      */
-    public List<SubQuestionIntent> recognize(RewriteResult rewriteResult, LoadSession load){
-        if(!intentProperties.getIntentEnabled()) {
+    public List<SubQuestionIntent> recognize(RewriteResult rewriteResult, LoadSession load) {
+        if (!intentProperties.getIntentEnabled()) {
             return List.of();
         }
-        return intentRecognitionService.recognize(rewriteResult,load);
+        return intentRecognitionService.recognize(rewriteResult, load);
 
     }
 }

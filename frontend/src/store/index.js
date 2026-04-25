@@ -48,7 +48,7 @@ function clampBackgroundBlur(value) {
 function normalizeUser(raw) {
   if (!raw || typeof raw !== "object") return null;
 
-  const id =
+  const rawId =
     raw.id ??
     raw.userId ??
     raw.uid ??
@@ -56,6 +56,9 @@ function normalizeUser(raw) {
     raw.accountId ??
     raw.username ??
     null;
+
+  // 保证返回的 id 始终为字符串（若存在），避免后续在应用中误用数字并丢失精度
+  const id = rawId === null || rawId === undefined ? null : String(rawId);
 
   const name =
     raw.name ??
@@ -72,7 +75,7 @@ function normalizeUser(raw) {
   return {
     ...raw,
     id: id ?? name,
-    name: name ?? String(id),
+    name: name ?? String(id ?? ""),
   };
 }
 
@@ -307,6 +310,22 @@ function buildContactConversationId(type, currentUserId, targetId) {
 
   const current = String(currentUserId || "").trim();
   if (!current) return null;
+
+  // 如果两个 id 都是纯数字字符串，优先使用 BigInt 做数值比较以避免字符串字典序带来的不一致性
+  const isNumericPair =
+    /^\d+$/.test(current) && /^\d+$/.test(normalizedTargetId);
+  if (isNumericPair) {
+    try {
+      const a = BigInt(current);
+      const b = BigInt(normalizedTargetId);
+      return a <= b
+        ? `user:${current}:${normalizedTargetId}`
+        : `user:${normalizedTargetId}:${current}`;
+    } catch (e) {
+      // 若 BigInt 不可用或转换失败，回退到字符串比较
+    }
+  }
+
   return current <= normalizedTargetId
     ? `user:${current}:${normalizedTargetId}`
     : `user:${normalizedTargetId}:${current}`;
@@ -1251,6 +1270,12 @@ export const useUiStore = defineStore("ui", {
       localStorage.setItem(LAST_AI_CONVERSATION_KEY, this.lastAiConversationId);
       this.currentMessages = [];
       this.setView("chat");
+      // 确保点击“新对话”后重新同步后端历史，防止本地历史丢失
+      try {
+        this.fetchHistory(true);
+      } catch (e) {
+        // ignore
+      }
     },
   },
 });

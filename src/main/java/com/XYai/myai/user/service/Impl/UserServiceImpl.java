@@ -1,7 +1,11 @@
 package com.XYai.myai.user.service.Impl;
 
-import com.XYai.myai.rag.aop.Annotation.RagTraceNode;
 import com.XYai.myai.config.Result;
+import com.XYai.myai.mapper.ChatConversationMapper;
+import com.XYai.myai.mapper.ChatSessionRecordMapper;
+import com.XYai.myai.mapper.GroupMapper;
+import com.XYai.myai.mapper.UserMapper;
+import com.XYai.myai.rag.aop.Annotation.RagTraceNode;
 import com.XYai.myai.rag.memory.POJO.ChatConversation;
 import com.XYai.myai.rag.memory.POJO.ChatSessionRecord;
 import com.XYai.myai.redis.RedisKeyConfig;
@@ -16,10 +20,6 @@ import com.XYai.myai.user.POJO.UserDTO;
 import com.XYai.myai.user.service.CustomUserDetailsService;
 import com.XYai.myai.user.service.RefreshTokenService;
 import com.XYai.myai.user.service.UserService;
-import com.XYai.myai.mapper.GroupMapper;
-import com.XYai.myai.mapper.ChatConversationMapper;
-import com.XYai.myai.mapper.ChatSessionRecordMapper;
-import com.XYai.myai.mapper.UserMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -223,7 +223,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 注册
-     * 
+     *
      * @param userDTO
      */
     public void register(UserDTO userDTO) {
@@ -289,7 +289,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 获取小组
-     * 
+     *
      * @param userId
      * @return
      */
@@ -336,7 +336,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 刷新token
-     * 
+     *
      * @param refreshToken
      * @param response
      * @return

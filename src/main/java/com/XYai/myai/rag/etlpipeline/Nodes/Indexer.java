@@ -5,8 +5,8 @@ import com.XYai.myai.rag.etlpipeline.POJO.NodeConfig;
 import com.XYai.myai.rag.etlpipeline.POJO.NodeResult;
 import com.XYai.myai.rag.etlpipeline.POJO.UploadProperties;
 import com.XYai.myai.rag.milvus.MilvusAclManager;
+import com.XYai.myai.rag.milvus.MilvusFileManager;
 import com.XYai.myai.rag.milvus.MilvusMetadataFilter;
-import com.esotericsoftware.minlog.Log;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.milvus.client.MilvusServiceClient;
 import io.milvus.param.IndexType;
@@ -15,7 +15,6 @@ import io.milvus.param.index.CreateIndexParam;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
-import com.XYai.myai.rag.milvus.MilvusFileManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -103,8 +102,9 @@ public class Indexer implements Ingestion {
 
     /**
      * 执行向量入库核心逻辑
+     *
      * @param context 文档摄取上下文（包含分块数据、原始文档、元数据）
-     * @param config 节点配置信息
+     * @param config  节点配置信息
      * @return 节点执行结果（成功/失败 + 描述信息）
      */
     public NodeResult execute(IngestionContext context, NodeConfig config) {
@@ -155,8 +155,8 @@ public class Indexer implements Ingestion {
      * 4. 默认配置
      *
      * @param context 摄取上下文
-     * @param chunks 分块列表
-     * @param config 节点配置
+     * @param chunks  分块列表
+     * @param config  节点配置
      * @return 最终有效的集合名
      */
     private String resolveCollectionName(IngestionContext context, List<Document> chunks, NodeConfig config) {
@@ -213,6 +213,7 @@ public class Indexer implements Ingestion {
 
     /**
      * 构建 Milvus 向量索引参数
+     *
      * @param collectionName 集合名
      */
     private CreateIndexParam buildEmbeddingIndexParam(String collectionName) {

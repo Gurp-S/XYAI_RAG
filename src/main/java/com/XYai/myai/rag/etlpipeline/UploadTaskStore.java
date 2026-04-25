@@ -1,16 +1,15 @@
 package com.XYai.myai.rag.etlpipeline;
 
+import com.XYai.myai.rag.milvus.MilvusCollectionService;
 import com.alibaba.fastjson2.JSON;
 import jakarta.annotation.Resource;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.redisson.api.RedissonClient;
 import org.redisson.api.RMap;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import java.util.concurrent.TimeUnit;
-import com.XYai.myai.rag.milvus.MilvusCollectionService;
 import org.springframework.stereotype.Component;
 
 // ...existing code...
@@ -19,14 +18,11 @@ import org.springframework.stereotype.Component;
 public class UploadTaskStore {
 
     private static final String TASK_KEY_PREFIX = "UploadTask:";
-
+    private static final String REDIS_TASK_MAP = "xyai:upload:tasks";
     @Resource
     private RedissonClient redissonClient;
-
     @Autowired(required = false)
     private MilvusCollectionService milvusCollectionService;
-
-    private static final String REDIS_TASK_MAP = "xyai:upload:tasks";
 
     public TaskState start(String taskId) {
         TaskState state = TaskState.builder()
@@ -97,7 +93,7 @@ public class UploadTaskStore {
         TaskState state = TaskState.builder()
                 .taskId(taskId)
                 .status("SUCCESS")
-            .displayText(displayText)
+                .displayText(displayText)
                 .message(message)
                 .progress(100)
                 .eventType("complete")

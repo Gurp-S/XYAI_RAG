@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 /**
  * 集合全局权限配置
  * 作用：控制【整个集合】的开放策略、默认可见规则

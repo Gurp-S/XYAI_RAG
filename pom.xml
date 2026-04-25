@@ -55,10 +55,14 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
-        <!-- explicit security modules to help IDE/static analyzers if starter isn't picked up immediately -->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>transmittable-thread-local</artifactId>
+            <version>2.14.4</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -140,15 +144,9 @@
             <version>3.40.2</version>
         </dependency>
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>transmittable-thread-local</artifactId>
-            <version>2.12.6</version>
-        </dependency>
-        <!-- 轻量中文分词：jieba-java -->
-        <dependency>
-            <groupId>com.huaban</groupId>
-            <artifactId>jieba-analysis</artifactId>
-            <version>1.0.2</version>
+            <groupId>cn.shenyanchao.ik-analyzer</groupId>
+            <artifactId>ik-analyzer</artifactId>
+            <version>9.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -244,6 +242,7 @@
             <id>spring-snapshots</id>
             <url>https://repo.spring.io/snapshot</url>
         </repository>
+
     </repositories>
 
 </project>

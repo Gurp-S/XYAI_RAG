@@ -1,15 +1,10 @@
 package com.XYai.myai.rag.milvus;
 
 import com.XYai.myai.rag.milvus.POJO.MilvusMetadata;
-import io.jsonwebtoken.lang.Collections;
 import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public final class MilvusMetadataFilter {
@@ -69,7 +64,7 @@ public final class MilvusMetadataFilter {
      * 过滤单个 Document
      */
     public Document filter(Document document) {
-        if (document == null|| document.getText()==null) {
+        if (document == null || document.getText() == null) {
             return null;
         }
 

@@ -9,9 +9,13 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "mcp.weather.amap")
 public class AmapWeatherProperties {
 
-    /** 高德天气 API Key */
+    /**
+     * 高德天气 API Key
+     */
     private String key;
 
-    /** 高德天气 API 地址 */
+    /**
+     * 高德天气 API 地址
+     */
     private String baseUrl = "https://restapi.amap.com/v3/weather/weatherInfo";
 }

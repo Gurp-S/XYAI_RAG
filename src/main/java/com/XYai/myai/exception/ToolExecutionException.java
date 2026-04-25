@@ -8,7 +8,7 @@ public class ToolExecutionException extends RuntimeException {
     /**
      * 创建带原因的工具执行异常。
      *
-     * @param msg 异常消息
+     * @param msg   异常消息
      * @param cause 原始异常
      */
     public ToolExecutionException(String msg, Throwable cause) {

@@ -14,7 +14,7 @@ public class MyAiApplication {
      *
      * @param args 启动参数
      */
-    public static void main(String[] args) {
+    static void main(String[] args) {
         SpringApplication.run(MyAiApplication.class, args);
     }
 

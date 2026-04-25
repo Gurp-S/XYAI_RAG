@@ -28,6 +28,14 @@ spring:
           model: qwen3-max
           temperature: 0.1
           maxTokens: 4096
+    dashscope:
+      api-key: ${ALIYUN_BAILIAN_API_KEY:}  # 可复用同一个 Key
+      rerank:
+        enabled: true
+        model: gte-rerank  # ✅ 正确的 rerank 模型名
+        # 可选：自定义超时/重试
+        timeout: 10s
+        max-retries: 3
     ollama:
       base-url: http://localhost:11434
       embedding:
@@ -111,8 +119,6 @@ aliyun:
     bucket: ${ALIOSS_BUCKET_NAME:}
     basePath: optional/base/path/
     publicRead: true
-
-# Text splitter configuration (used by AdvancedTextSplitter)
 splitter:
   chunk-size: 1200
   overlap: 200

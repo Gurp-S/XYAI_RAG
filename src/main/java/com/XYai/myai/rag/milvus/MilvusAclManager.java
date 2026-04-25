@@ -163,7 +163,7 @@ public class MilvusAclManager {
             }
         }
 
-        // 原来确实有权限 TODO该用户只有一个集合拥有此文件分块才计数器 - 1
+        // 原来确实有权限 TODO该用户只有一个集合拥有此文件分块才进行真正删除
         if (hadAcl) {
             RAtomicLong cnt = redissonClient.getAtomicLong(RedisKeyConfig.fileChunkUserCountKey(fileId, chunkId));
             long fileChunkUserCount = 0;

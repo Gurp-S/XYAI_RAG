@@ -1,8 +1,8 @@
 package com.XYai.myai.rag.aop;
 
 
-import com.XYai.myai.rag.aop.Annotation.rateLimit;
 import com.XYai.myai.exception.RateLimitException;
+import com.XYai.myai.rag.aop.Annotation.rateLimit;
 import jakarta.annotation.Resource;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -30,7 +30,8 @@ public class rateLimitAspect {
      * 匹配所有使用 {@link rateLimit} 注解的方法。
      */
     @Pointcut("@annotation(com.XYai.myai.rag.aop.Annotation.rateLimit)")
-    public void pointCut(){}
+    public void pointCut() {
+    }
 
     /**
      * 在目标方法执行前进行限流检查，超过阈值时抛出限流异常。
@@ -43,7 +44,7 @@ public class rateLimitAspect {
         int limit = rateLimit.limit();
         String name = rateLimit.rateName();
         long windowMs = rateLimit.windowMs();
-        
+
         // 执行 Lua 脚本进行原子限流判断。
         Boolean isAccess = stringRedisTemplate.execute(
                 redisScript,

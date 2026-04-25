@@ -14,12 +14,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatMessage {
-    /** 用户的原始输入消息 */
+    /**
+     * 用户的原始输入消息
+     */
     String userMessage;
 
-    /** 模型/助手的回复内容 */
+    /**
+     * 模型/助手的回复内容
+     */
     String assistantMessage;
 
-    /** 用户的唯一标识ID */
+    /**
+     * 用户的唯一标识ID
+     */
     Long userId;
 }

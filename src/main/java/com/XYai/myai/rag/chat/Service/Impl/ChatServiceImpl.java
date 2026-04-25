@@ -1,16 +1,17 @@
 package com.XYai.myai.rag.chat.Service.Impl;
 
-import com.XYai.myai.rag.chat.POJO.ChatMessage;
 import com.XYai.myai.rag.aop.Annotation.RagTraceNode;
 import com.XYai.myai.rag.channel.MultiChannelRetrievalEngine;
 import com.XYai.myai.rag.channel.POJO.RetrievedChunk;
-import com.XYai.myai.rag.memory.ConversationMemorySummaryService;
-import com.XYai.myai.rag.memory.POJO.LoadSession;
+import com.XYai.myai.rag.chat.POJO.ChatMessage;
+import com.XYai.myai.rag.chat.Service.ChatService;
 import com.XYai.myai.rag.intent.IntentResult;
 import com.XYai.myai.rag.intent.POJO.SubQuestionIntent;
+import com.XYai.myai.rag.memory.ConversationMemorySummaryService;
+import com.XYai.myai.rag.memory.POJO.LoadSession;
 import com.XYai.myai.rag.rewrite.POJO.RewriteResult;
 import com.XYai.myai.rag.rewrite.QueryRewriter;
-import com.XYai.myai.rag.chat.Service.ChatService;
+import com.XYai.myai.user.LoginUserInfoManager;
 import com.alibaba.fastjson2.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
@@ -22,6 +23,8 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
@@ -46,8 +49,7 @@ public class ChatServiceImpl implements ChatService {
     private IntentResult intentResult;
     @Resource
     private MultiChannelRetrievalEngine multiChannelRetrievalEngine;
-    @Resource
-    private ObjectMapper objectMapper;
+
 
     /**
      * 处理一轮对话，按会话 ID 维护上下文并返回模型回复。
@@ -57,7 +59,7 @@ public class ChatServiceImpl implements ChatService {
      * @return 模型回复文本
      */
     @RagTraceNode(name = "对话", type = "chat")
-    public Flux<String> DoChat(String message, String conversationId, Long userId) {
+    public Flux<String> DoChat(String message, String conversationId) {
         // 基础参数校验，避免空请求进入模型。
         if (message == null || message.isBlank()) {
             return Flux.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "没有输入信息"));
@@ -67,29 +69,38 @@ public class ChatServiceImpl implements ChatService {
         LoadSession load = conversationMemorySummaryService.load(conversationId);
         // 问题重写
         RewriteResult rewrittenMessage = queryRewriter.rewrite(message, load);
+        log.info("rewrittenMessage:{}", rewrittenMessage);
         // 意图识别用户消息
         List<SubQuestionIntent> questionIntents = intentResult.recognize(rewrittenMessage, load);
-        log.info(questionIntents.toString());
+        log.info("questionIntents:{}", questionIntents);
         // TODO 网页检索
 
         // 多通道召回
-        List<RetrievedChunk> retrieve = multiChannelRetrievalEngine.retrieve(questionIntents, message);
+        List<RetrievedChunk> retrieve = multiChannelRetrievalEngine.retrieve(questionIntents, rewrittenMessage, conversationId,message);
+        log.info("retrieve:{}",retrieve);
         // prompt生成
         Prompt prompt = getPrompt(message, retrieve, load);
         // 对话
         StringBuilder fullAnswer = new StringBuilder();
+        Long userId;
+        var user = LoginUserInfoManager.get();
+        if (user != null) {
+            userId = user.getId();
+        } else {
+            userId = null;
+        }
+        SecurityContext context = SecurityContextHolder.getContext();
         return chatModel.stream(prompt)
                 .map(this::extractChunkText)
                 .filter(chunk -> chunk != null && !chunk.isBlank())
                 .doOnNext(fullAnswer::append)
                 .doFinally(signal -> {
+                    SecurityContextHolder.setContext(context);
                     ChatMessage chatMessage = ChatMessage.builder()
-                            .userMessage(rewrittenMessage.getRewrittenQuery())
+                            .userMessage(message)
                             .assistantMessage(fullAnswer.toString())
                             .userId(userId)
                             .build();
-                    log.info("Stream finished with signal: {}. Triggering compressIfNeeded for conversationId={}",
-                            signal, conversationId);
                     conversationMemorySummaryService.compressIfNeeded(conversationId, chatMessage);
                 });
     }
@@ -103,7 +114,7 @@ public class ChatServiceImpl implements ChatService {
         String retrieveJSON = JSON.toJSONString(retrieve);
         String systemMessage = """
                 你是活泼且专业的 AI 助手 XY。请根据提供的文档片段和历史对话（如果有）来回答用户问题。
-                重要：如果没有可用的参考文档或历史对话，不要在回答中陈述“参考文档为空”或“历史为空”等内容；直接在可用信息范围内给出回答或说明无法确定的部分。
+                重要：如果没有可用的参考文档或历史对话，不要在回答中陈述“参考文档为空”或“历史为空”等内容。
                 如果有文档或历史，请仅使用必要的片段，不要逐字回显整个文档 JSON。
                 参考文档:<<%s>>
                 历史对话:<<%s>>

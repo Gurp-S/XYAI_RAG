@@ -39,8 +39,9 @@ public class Enricher implements Ingestion {
 
     /**
      * 执行增强节点的核心逻辑
+     *
      * @param context 文档摄取上下文（包含 document）
-     * @param config 节点配置（mode、字数限制等）
+     * @param config  节点配置（mode、字数限制等）
      * @return 节点执行结果
      */
     public NodeResult execute(IngestionContext context, NodeConfig config) {
@@ -80,7 +81,8 @@ public class Enricher implements Ingestion {
 
     /**
      * 调用大模型执行文本增强
-     * @param text 原始文本
+     *
+     * @param text   原始文本
      * @param config 节点配置
      * @return 增强后的文本（失败则返回原文）
      */
@@ -100,6 +102,7 @@ public class Enricher implements Ingestion {
 
             // 读取最大输入字符数（默认 5000）
             int maxInputChars = readInt(settings, "maxInputChars", 5000);
+
             // 读取最大输出字符数（默认 2000）
             int maxOutputChars = readInt(settings, "maxOutputChars", 2000);
 
@@ -119,7 +122,6 @@ public class Enricher implements Ingestion {
 
             // 6. 返回增强结果（去空格）
             return enhanced.trim();
-
         } catch (Exception ex) {
             // 异常捕获：调用失败 → 回退原文
             log.warn("增强节点调用失败, 回退原文", ex);
@@ -129,8 +131,9 @@ public class Enricher implements Ingestion {
 
     /**
      * 根据增强模式构建 LLM 提示词（Prompt）
-     * @param text 待处理文本
-     * @param mode 模式：summary / structure / rewrite
+     *
+     * @param text           待处理文本
+     * @param mode           模式：summary / structure / rewrite
      * @param maxOutputChars 最大输出字数
      * @return Prompt 对象
      */
@@ -161,8 +164,9 @@ public class Enricher implements Ingestion {
 
     /**
      * 安全读取配置中的 int 类型参数
-     * @param settings 配置节点
-     * @param key 配置key
+     *
+     * @param settings     配置节点
+     * @param key          配置key
      * @param defaultValue 默认值
      * @return 读取到的 int 值
      */

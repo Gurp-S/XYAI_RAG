@@ -12,7 +12,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 @RestController
 @RequestMapping("/thread-pool")
-public  class ThreadPoolMonitorEndpoint {
+public class ThreadPoolMonitorEndpoint {
 
     @Resource(name = "userExecutor")
     private ThreadPoolTaskExecutor userExecutor;

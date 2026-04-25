@@ -1,16 +1,16 @@
 package com.XYai.myai.rag.chat;
 
 import com.XYai.myai.rag.aop.Annotation.RagTraceRoot;
+import com.XYai.myai.rag.chat.Service.ChatService;
 import com.XYai.myai.user.LoginUserInfoManager;
 import com.XYai.myai.user.POJO.User;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import com.XYai.myai.rag.chat.Service.ChatService;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 
@@ -25,10 +25,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ChatController {
 
+    private final ChatModel chatModel;
     @Resource
     private ChatService chatService;
-
-    private final ChatModel chatModel;
 
     /**
      * 返回当前聊天模型的基础状态信息，用于快速健康检查。
@@ -78,16 +77,7 @@ public class ChatController {
      */
     @RagTraceRoot(name = "对话", conversationIdArg = "conversationId", taskIdArg = "taskId")
     private Flux<String> doChat(String message, String conversationId) {
-        Long userId = requireLoginUserId();
-        return chatService.DoChat(message, conversationId, userId);
-    }
-
-    private Long requireLoginUserId() {
-        User loginUser = LoginUserInfoManager.get();
-        if (loginUser == null || loginUser.getId() == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "未登录");
-        }
-        return loginUser.getId();
+        return chatService.DoChat(message, conversationId);
     }
 
     /**

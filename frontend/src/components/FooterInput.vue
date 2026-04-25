@@ -10,7 +10,7 @@ id="message" ref="textareaRef"
             @input="onInput"
             @keydown.enter="handleEnter"
             ></textarea>
-        <button id="send" class="btn-send" title="发送消息" @click="$emit('send')">
+        <button id="send" class="btn-send" title="发送消息" @click="handleClick">
             <svg viewBox="0 0 24 24">
                 <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
             </svg>
@@ -64,6 +64,23 @@ function handleEnter(e) {
     // 发送后立即手动重置一次，防止由于 nextTick 导致的视觉延迟
     setTimeout(() => adjustHeight(), 0)
   }
+}
+
+function handleClick(e) {
+  // 防御性处理：先触发发送，再重设焦点，帮助在被短暂遮挡或失焦场景中保持可交互性
+  try {
+    emit('send')
+  } catch (err) {
+    // ignore
+  }
+  nextTick(() => {
+    try {
+      const el = textareaRef.value
+      if (el && typeof el.focus === 'function') el.focus()
+    } catch (err) {
+      // ignore
+    }
+  })
 }
 </script>
 

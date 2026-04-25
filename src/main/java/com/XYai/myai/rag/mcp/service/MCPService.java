@@ -1,10 +1,6 @@
 package com.XYai.myai.rag.mcp.service;
 
-import com.XYai.myai.rag.mcp.tools.POJO.MCPRequest;
-import com.XYai.myai.rag.mcp.tools.POJO.MCPResponse;
-import com.XYai.myai.rag.mcp.tools.POJO.MCPTool;
-import com.XYai.myai.rag.mcp.tools.POJO.MCPToolExecutor;
-import com.XYai.myai.rag.mcp.tools.POJO.MCPToolRegistry;
+import com.XYai.myai.rag.mcp.tools.POJO.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

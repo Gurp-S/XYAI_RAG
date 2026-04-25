@@ -24,7 +24,7 @@ import java.util.*;
  * OSS 前端直传支持：
  * - /oss/policy: 生成短期 policy + signature 给前端（表单上传方案，快速可用）
  * - /upload/complete: 前端上传完成后调用，后端触发入库/向量化（复用现有 pipeline）
- *
+ * <p>
  * 注意：此 Controller 返回的数据会被前端使用，请不要把 AccessKeySecret 直接传给客户端。
  * 在生产推荐使用 STS（临时凭证）替代 policy 签名，详见注释末尾说明。
  */
@@ -53,7 +53,7 @@ public class OssController {
     // 1) 生成表单上传 policy（短期有效）
     @GetMapping("/policy")
     public Result<Map<String, Object>> policy(@RequestParam(value = "dir", required = false) String dir,
-            @RequestParam(value = "expireSeconds", required = false, defaultValue = "60") int expireSeconds) {
+                                              @RequestParam(value = "expireSeconds", required = false, defaultValue = "60") int expireSeconds) {
         try {
             // STEP 1: 验证并规范化 dir（object key 前缀），避免任意写 bucket
             if (dir == null || dir.isBlank()) {
@@ -174,7 +174,7 @@ public class OssController {
     // 3) 服务器端生成预签名（Presigned）PUT URL：前端可以用该 URL 直接 PUT 上传单个文件
     @GetMapping("/presign")
     public Result<Map<String, Object>> presign(@RequestParam("objectKey") String objectKey,
-            @RequestParam(value = "expireSeconds", required = false, defaultValue = "3600") int expireSeconds) {
+                                               @RequestParam(value = "expireSeconds", required = false, defaultValue = "3600") int expireSeconds) {
         if (objectKey == null || objectKey.isBlank()) {
             return Result.error(400, "objectKey 不能为空");
         }
