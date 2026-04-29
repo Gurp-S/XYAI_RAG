@@ -126,20 +126,13 @@ public class MultiChannelRetrievalEngine {
      * <p>- 重排：对保留候选重新打分排序，提升最终相关性。</p>
      */
     private List<RetrievedChunk> applyPostProcessors(List<RetrievedChunk> merged, SearchContext context) {
-        // 取出文件的metadata:
-        // ========== 文本基本信息 ==========
-        // "fileName","mimeType","chunkId","chunkSize","kbId","createTime",
-        //========== 权限字段（核心） ==========
-        // "ownerId","groupId","visibility","sharedWith","permissionType", "expireTime",
-        //========== 文本版本控制 ==========
-        // "version","updatedAt"
-        // 1) 去重：先压缩候选空间，避免重复内容进入后续阶段。
+        // 1 bm25打分
         List<RetrievedChunk> bm25Process = bm25PostProcessor.process(merged, context);//不同的collection重复文档,相似文档
-        log.info("bm25:{}",bm25Process);
-        // 2) 过滤：在重排前先做硬约束清洗（权限、版本、低质量等）。
+        log.info("bm25:{}",bm25Process.stream().map(RetrievedChunk::getBm25Score).toList());
+        // 2 过滤：在重排前先做硬约束清洗（权限、版本、低质量等）。
         List<RetrievedChunk> filterProcess = filterPostProcessor.process(bm25Process, context);//分数低,版本低,权限不足
-        log.info("filter:{}",filterProcess);
-        // 3) 重排：基于语义模型或融合策略调整最终排序。
+        log.info("filter:{}",filterProcess.stream().map(RetrievedChunk::getScore).toList());
+        // 3 重排：基于语义模型或融合策略调整最终排序。
         //return rerankPostProcessor.process(filterProcess, context);//rerank模型
         return filterProcess;
     }

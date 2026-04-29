@@ -1093,7 +1093,52 @@ export const useUiStore = defineStore("ui", {
           return cachedMessages.some((msg) => String(msg?.text || "").trim());
         });
 
-        this.chatHistory = [...optimisticLocal, ...nextHistory];
+        const normalizedHistory = nextHistory.map((item) => {
+          const entry = { ...(item || {}) };
+          let summary = String(entry.summaryText || "");
+          if (summary) {
+            // 尝试直接解析为 JSON
+            try {
+              const parsed = JSON.parse(summary);
+              if (parsed && typeof parsed === "object") {
+                summary =
+                  parsed.lastestSummary ??
+                  parsed.summary ??
+                  parsed.summaryText ??
+                  summary;
+              }
+            } catch (e) {
+              // 解析失败时，尝试从字符串中截取第一个 JSON 对象再解析
+              try {
+                const s = summary.indexOf("{");
+                const eIdx = summary.lastIndexOf("}");
+                if (s >= 0 && eIdx > s) {
+                  const sub = summary.substring(s, eIdx + 1);
+                  const parsed2 = JSON.parse(sub);
+                  if (parsed2 && typeof parsed2 === "object") {
+                    summary =
+                      parsed2.lastestSummary ??
+                      parsed2.summary ??
+                      parsed2.summaryText ??
+                      summary;
+                  }
+                }
+              } catch (ignore) {
+                // ignore
+              }
+            }
+
+            const prefix = "历史摘要（仅用于合并去重，不得作为事实新增来源):";
+            if (summary.startsWith(prefix)) {
+              summary = summary.substring(prefix.length).trim();
+            }
+          }
+
+          entry.summaryText = summary;
+          return entry;
+        });
+
+        this.chatHistory = [...optimisticLocal, ...normalizedHistory];
         localStorage.setItem("chatHistory", JSON.stringify(this.chatHistory));
       } catch (err) {
         console.error("Failed to fetch history:", err);

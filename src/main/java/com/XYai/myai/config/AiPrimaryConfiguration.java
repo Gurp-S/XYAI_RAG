@@ -5,6 +5,7 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.ollama.OllamaEmbeddingModel;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -42,6 +43,16 @@ public class AiPrimaryConfiguration {
                 .baseUrl(baseUrl)
                 .defaultHeader("Authorization", "Bearer " + apiKey)
                 .defaultHeader("Content-Type", "application/json")
+                .build();
+    }
+
+    /**
+     * Provide a ChatClient bean so components that @Resource or @Autowired ChatClient can use
+     * the primary ChatModel. This mirrors examples in the Spring AI docs.
+     */
+    @Bean
+    public ChatClient chatClient(ChatModel chatModel, ToolCallbackProvider allToolsProvider) {
+        return ChatClient.builder(chatModel)
                 .build();
     }
 

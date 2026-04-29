@@ -1,9 +1,14 @@
 package com.XYai.myai.rag.etlpipeline.Nodes;
 
+import cn.hutool.core.collection.CollUtil;
+import com.XYai.myai.mapper.IntentNodeMapper;
+import com.XYai.myai.rag.channel.Processor.BM25PostProcessor;
 import com.XYai.myai.rag.etlpipeline.POJO.IngestionContext;
 import com.XYai.myai.rag.etlpipeline.POJO.NodeConfig;
 import com.XYai.myai.rag.etlpipeline.POJO.NodeResult;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.XYai.myai.rag.intent.POJO.IntentNode;
+import com.XYai.myai.redis.RedisKeyConfig;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -11,8 +16,14 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
+import org.wltea.analyzer.lucene.IKAnalyzer;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * 文档增强节点（ETL 流程中的 enricher 环节）
@@ -23,11 +34,29 @@ import org.springframework.util.StringUtils;
 @Component
 public class Enricher implements Ingestion {
 
+
+    // 缓存：意图 code → 归一化向量 (1024 维)
+    private static float[][] INTENT_VECTOR_ARRAY;  // [n][1024] 归一化向量
+    private static String[] INTENT_ID_ARRAY;       // [n] 意图 nodeId
+    private static volatile boolean VECTORS_LOADED = false;
+    private static final Object LOAD_LOCK = new Object();
+
+    // 相似度阈值（nodeId 是中文，可调高到 0.55）
+    private static final double VECTOR_THRESHOLD = 0.35;
+
     /**
      * 注入 Spring AI 对话模型（大模型客户端）
      */
     @Resource
     private ChatModel chatModel;
+    @Resource
+    private BM25PostProcessor bm25PostProcessor;
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+    @Resource
+    private IntentNodeMapper intentNodeMapper;
+    @Resource
+    private EmbeddingModel embeddingModel; // Spring AI
 
     /**
      * 返回当前节点类型：enricher（增强节点）
@@ -45,135 +74,215 @@ public class Enricher implements Ingestion {
      * @return 节点执行结果
      */
     public NodeResult execute(IngestionContext context, NodeConfig config) {
-        // 1. 获取文档，判空
-        Document document = context.getDocument();
-        if (document == null) {
+        long start = System.currentTimeMillis();
+
+        // 1. 懒加载向量
+        loadIntentVectors();
+
+        if (INTENT_VECTOR_ARRAY == null || INTENT_VECTOR_ARRAY.length == 0) {
+            return NodeResult.ok("无可用意图向量");
+        }
+
+        // 2. 获取文本块
+        List<Document> chunks = context.getChunks();
+        if (chunks == null || chunks.isEmpty()) {
             return NodeResult.ok("没有可增强的文本");
         }
 
-        // 2. 获取文档原文，判空
-        String originalText = document.getText();
-        if (!StringUtils.hasText(originalText)) {
-            return NodeResult.ok("没有可增强的文本");
+        // 3. 批量提取文本
+        List<String> texts = chunks.stream()
+                .map(Document::getText)
+                .filter(Objects::nonNull)
+                .toList();
+
+        if (texts.isEmpty()) {
+            return NodeResult.ok("无有效文本");
         }
 
-        // 3. 检查元数据中是否已经存在增强文本（避免重复处理）
-        Object enhancedValue = document.getMetadata().get(IngestionContext.META_ENHANCED_TEXT);
-        String enhancedText = enhancedValue == null ? null : String.valueOf(enhancedValue);
+        // 4. 批量向量化
+        float[][] queryVectors = batchEmbedAndNormalize(texts);
 
-        if (StringUtils.hasText(enhancedText)) {
-            return NodeResult.ok("增强文本已存在");
+        // 5. 并行匹配
+        List<String> results = matchAllParallel(queryVectors);
+
+        // 6. 注入
+        List<Document> newChunks = new ArrayList<>();
+        for (int i = 0; i < chunks.size(); i++) {
+            String intent = (i < results.size()) ? results.get(i) : "未知意图";
+            newChunks.add(chunks.get(i).mutate()
+                    .metadata(IngestionContext.META_INTENT_NODE, intent)
+                    .build());
         }
 
-        // 4. 调用 LLM 执行文本增强
-        String result = enhanceText(originalText, config);
+        context.setChunks(newChunks);
 
-        // 5. 增强失败 → 保存原文作为兜底
-        if (!StringUtils.hasText(result)) {
-            document.getMetadata().put(IngestionContext.META_ENHANCED_TEXT, originalText);
-            return NodeResult.ok("增强失败，已回退原文");
-        }
+        long elapsed = System.currentTimeMillis() - start;
+        log.info("增强完成: {} 文本块, {} 意图, 耗时 {}ms",
+                texts.size(), INTENT_ID_ARRAY.length, elapsed);
 
-        // 6. 增强成功 → 保存增强后的文本到元数据
-        document.getMetadata().put(IngestionContext.META_ENHANCED_TEXT, result);
-        return NodeResult.ok("增强文本=" + result.length());
+        return NodeResult.ok("增强完成");
     }
 
     /**
-     * 调用大模型执行文本增强
-     *
-     * @param text   原始文本
-     * @param config 节点配置
-     * @return 增强后的文本（失败则返回原文）
+     * 懒加载意图向量（使用你的 getIntentNodes）
      */
-    private String enhanceText(String text, NodeConfig config) {
-        try {
-            // 1. 读取节点配置：增强模式、输入最大长度、输出最大长度
-            JsonNode settings = config == null ? null : config.getSettings();
-            String mode = "rewrite"; // 默认：重写增强
+    private void loadIntentVectors() {
+        if (VECTORS_LOADED) return;
+        synchronized (LOAD_LOCK) {
+            if (VECTORS_LOADED) return;
+            long start = System.currentTimeMillis();
+            try {
+                // 使用你的方法获取意图节点列表（返回 List<String>）
+                List<String> nodeIdList = getIntentNodes();
+                if (nodeIdList.isEmpty()) {
+                    log.warn("无叶子意图节点");
+                    return;
+                }
+                log.debug("加载 {} 个意图节点", nodeIdList.size());
+                // 批量向量化 + 归一化
+                float[][] vectors = batchEmbedAndNormalize(nodeIdList);
+                // 转存到数组
+                INTENT_ID_ARRAY = nodeIdList.toArray(new String[0]);
+                INTENT_VECTOR_ARRAY = vectors;
+                VECTORS_LOADED = true;
+                log.info("向量加载完成: {} 个意图, 维度 {}, 耗时 {}ms",
+                        INTENT_ID_ARRAY.length,
+                        vectors.length > 0 ? vectors[0].length : 0,
+                        System.currentTimeMillis() - start);
+            } catch (Exception e) {
+                log.error("向量加载失败", e);
+                VECTORS_LOADED = false;
+            }
+        }
+    }
 
-            // 从配置中读取 mode
-            if (settings != null && settings.has("mode") && settings.get("mode").isTextual()) {
-                String value = settings.get("mode").asText();
-                if (StringUtils.hasText(value)) {
-                    mode = value;
+    /**
+     * 批量 Embedding + 归一化
+     */
+    private float[][] batchEmbedAndNormalize(List<String> texts) {
+        if (texts == null || texts.isEmpty()) {
+            return new float[0][];
+        }
+        int n = texts.size();
+        float[][] vectors = new float[n][];
+        try {
+            // 尝试批量 Embedding
+            var embeddings = embeddingModel.embedForResponse(texts);
+            for (int i = 0; i < n; i++) {
+                vectors[i] = embeddings.getResults().get(i).getOutput();
+                normalizeInPlace(vectors[i]);  // 原地归一化
+            }
+        } catch (Exception e) {
+            // 降级：串行处理
+            for (int i = 0; i < n; i++) {
+                try {
+                    vectors[i] = embeddingModel.embed(texts.get(i));
+                    normalizeInPlace(vectors[i]);
+                } catch (Exception ex) {
+                    log.error("Embedding 失败: text={}", texts.get(i), ex);
+                    vectors[i] = new float[1024];  // 零向量兜底
                 }
             }
+        }
+        return vectors;
+    }
 
-            // 读取最大输入字符数（默认 5000）
-            int maxInputChars = readInt(settings, "maxInputChars", 5000);
+    /**
+     * 原地 L2 归一化（零内存分配）
+     */
+    private void normalizeInPlace(float[] vec) {
+        if (vec == null || vec.length == 0) return;
+        double norm = 0.0;
+        for (float v : vec) {
+            norm += (double) v * v;
+        }
+        norm = Math.sqrt(norm);
+        if (norm < 1e-8) return;  // 防止除零
+        double invNorm = 1.0 / norm;
+        for (int i = 0; i < vec.length; i++) {
+            vec[i] = (float) (vec[i] * invNorm);
+        }
+    }
 
-            // 读取最大输出字符数（默认 2000）
-            int maxOutputChars = readInt(settings, "maxOutputChars", 2000);
+    /**
+     * 并行匹配所有查询向量
+     */
+    private List<String> matchAllParallel(float[][] queryVectors) {
+        return queryVectors.length == 1
+                ? Collections.singletonList(matchFast(queryVectors[0]))
+                : Arrays.stream(queryVectors)
+                  .parallel()  // 并行流
+                  .map(this::matchFast)
+                  .toList();
+    }
 
-            // 2. 截断超长文本，避免 token 超限
-            String finalText = text.length() > maxInputChars ? text.substring(0, maxInputChars) : text;
-
-            // 3. 构建提示词（根据 mode 生成不同系统提示）
-            Prompt enhancedPrompt = getPrompt(finalText, mode, maxOutputChars);
-
-            // 4. 调用大模型
-            String enhanced = chatModel.call(enhancedPrompt).getResult().getOutput().getText();
-
-            // 5. 模型返回空 → 回退原文
-            if (!StringUtils.hasText(enhanced)) {
-                return finalText;
+    /**
+     * 快速匹配（数组线性扫描 + 循环展开）
+     */
+    private String matchFast(float[] queryVec) {
+        if (queryVec == null || INTENT_VECTOR_ARRAY == null) {
+            return "未知意图";
+        }
+        int bestIdx = -1;
+        double maxScore = -1.0;
+        int n = INTENT_VECTOR_ARRAY.length;
+        // 线性扫描（CPU 缓存友好）
+        for (int i = 0; i < n; i++) {
+            float[] intentVec = INTENT_VECTOR_ARRAY[i];
+            if (intentVec == null) continue;
+            double score = cosineSimilarityFast(queryVec, intentVec);
+            if (score > maxScore) {
+                maxScore = score;
+                bestIdx = i;
             }
-
-            // 6. 返回增强结果（去空格）
-            return enhanced.trim();
-        } catch (Exception ex) {
-            // 异常捕获：调用失败 → 回退原文
-            log.warn("增强节点调用失败, 回退原文", ex);
-            return text;
         }
+        // 阈值过滤
+        if (maxScore >= VECTOR_THRESHOLD && bestIdx >= 0) {
+            return INTENT_ID_ARRAY[bestIdx];
+        }
+        return "未知意图";
     }
 
     /**
-     * 根据增强模式构建 LLM 提示词（Prompt）
-     *
-     * @param text           待处理文本
-     * @param mode           模式：summary / structure / rewrite
-     * @param maxOutputChars 最大输出字数
-     * @return Prompt 对象
+     * 快速余弦相似度（已归一化向量 = 点积）
+     * 循环展开优化（4 倍速）
      */
-    private Prompt getPrompt(String text, String mode, int maxOutputChars) {
-        // 根据模式选择系统提示词
-        String systemMessage = switch (mode == null ? "rewrite" : mode.toLowerCase()) {
-            // 摘要模式：生成简洁摘要
-            case "summary" ->
-                    "你是文档摘要助手。请基于给定文本生成准确、简洁的摘要，不要编造事实，输出不超过 " + maxOutputChars + " 字。";
-            // 结构化模式：整理成标题、要点、关键词
-            case "structure" ->
-                    "你是文档结构化助手。请把给定文本整理成标题、要点、关键词的结构化结果，不要编造事实，输出不超过 " + maxOutputChars + " 字。";
-            // 默认重写增强：优化表达、补结构、提炼关键词
-            default ->
-                    "你是文档增强助手。请在不改变原始事实的前提下，优化文本表达、补充标题和层次结构、提炼关键词，输出不超过 " + maxOutputChars + " 字。";
-        };
-
-        // 用户消息
-        String userMessage = "增强模式：" + mode + "\n" +
-                "请处理以下文本：\n" + text;
-
-        // 构建并返回 Prompt
-        return new Prompt(
-                new SystemMessage(systemMessage),
-                new UserMessage(userMessage)
-        );
+    private double cosineSimilarityFast(float[] a, float[] b) {
+        int len = Math.min(a.length, b.length);
+        double score = 0.0;
+        // 循环展开（4 倍）
+        int i = 0;
+        for (; i < len - 3; i += 4) {
+            score += (double) a[i] * b[i]
+                    + (double) a[i+1] * b[i+1]
+                    + (double) a[i+2] * b[i+2]
+                    + (double) a[i+3] * b[i+3];
+        }
+        // 处理剩余元素
+        for (; i < len; i++) {
+            score += (double) a[i] * b[i];
+        }
+        return score;  // 已归一化，无需除法
     }
 
-    /**
-     * 安全读取配置中的 int 类型参数
-     *
-     * @param settings     配置节点
-     * @param key          配置key
-     * @param defaultValue 默认值
-     * @return 读取到的 int 值
-     */
-    private int readInt(JsonNode settings, String key, int defaultValue) {
-        if (settings != null && settings.has(key) && settings.get(key).canConvertToInt()) {
-            return settings.get(key).asInt();
+
+
+
+    private List<String> getIntentNodes(){
+        // 加载子节点
+        Set<String> intentSet = stringRedisTemplate.opsForSet().members(RedisKeyConfig.intentNodeLeaveKey());
+        List<String> intents = new ArrayList<>();
+        if (CollUtil.isNotEmpty(intentSet)) {
+            intents = new ArrayList<>(intentSet);
         }
-        return defaultValue;
+        // Redis 为空，从数据库加载
+        if (intents.isEmpty()) {
+            intents = intentNodeMapper.selectList(
+                            new QueryWrapper<IntentNode>().eq("children_count", 0)
+                    ).stream()
+                    .map(IntentNode::getNodeId)
+                    .collect(Collectors.toList());
+        }
+        return intents;
     }
 }

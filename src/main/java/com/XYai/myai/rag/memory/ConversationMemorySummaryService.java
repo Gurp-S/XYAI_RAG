@@ -9,6 +9,7 @@ import com.XYai.myai.rag.memory.POJO.LoadSession;
 import com.XYai.myai.rag.memory.POJO.MemoryProperties;
 import com.XYai.myai.redis.RedisKeyConfig;
 import com.XYai.myai.user.LoginUserInfoManager;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -91,7 +92,7 @@ public class ConversationMemorySummaryService {
             return;
         }
         // 执行压缩
-        memoryCompactExecutor.execute(()->{
+        memoryCompactExecutor.execute(() -> {
             try {
                 doCompressIfNeeded(conversationId, message, userId);
             } catch (InterruptedException e) {
@@ -116,8 +117,8 @@ public class ConversationMemorySummaryService {
         // ========== 步骤1：前置条件检查 ==========
         int maxTurns = memoryProperties.getSummaryStartTurns(); // 达到该轮数才开始压缩
 
-        // ========== 步骤2：分布式锁（防止并发压缩，避免数据冲突） ==========
-        String lockKey = "summary:lock:" + userId + conversationId;
+        // ========== 步骤2：分布式锁（防止并发压缩，避免数据冲突） =========
+        String lockKey = RedisKeyConfig.userConversationLock(userId, conversationId);
         RLock lock = redissonClient.getLock(lockKey);
         if (!lock.tryLock(0, 30, TimeUnit.SECONDS))
             return;
@@ -127,7 +128,7 @@ public class ConversationMemorySummaryService {
             String chatMessageKey = RedisKeyConfig.userConversationRecord(userId, conversationId);
             // 先保存新消息（每轮都保存） -- Redis 统一存 JSON 字符串
             RScoredSortedSet<String> scoredSet = redissonClient.getScoredSortedSet(chatMessageKey);
-            scoredSet.add((double) System.currentTimeMillis(), objectMapper.writeValueAsString(message));
+            scoredSet.add((double) System.currentTimeMillis(), JSON.toJSONString(message));
             // 持久化到 DB 使用受管线程池执行，避免使用 CompletableFuture.runAsync 造成线程不可控
             recordSessionDB(conversationId, message);
             // 再判断是否需要压缩
@@ -142,22 +143,20 @@ public class ConversationMemorySummaryService {
             String latestSummary = summaryBucket.get();
 
             // ========== 步骤5：提取要压缩的消息,并删除 ==========
-            // 保留最近 4 轮，压缩更早的消息
-            Collection<String> firstBatch = scoredSet.valueRange(0, 0);
+            // 保留最近 4 轮，压缩更早的4轮消息
+            Collection<String> firstBatch = scoredSet.valueRange(0, maxTurns - memoryProperties.getHistoryKeepTurns() - 1);
             if (firstBatch == null || firstBatch.isEmpty()) {
                 return;
             }
-            String firstMsg = firstBatch.iterator().next();
-            try {
-                scoredSet.remove(firstMsg);
-            } catch (Exception ignore) {
-            }
+            // 删除历史对话
+            scoredSet.removeAll(firstBatch);
 
-            // ========== 步骤7：调用 LLM 生成摘要 ==========
+            // ========== 步骤6：调用 LLM 生成摘要 ==========
             String existingSummary = latestSummary == null ? "无" : latestSummary;
-            String summary = summarizeMessages(existingSummary, firstMsg);
+            String summary = summarizeMessages(existingSummary, firstBatch);
 
-            // ========== 步骤8：存储摘要 ==========
+
+            // ========== 步骤7：存储摘要 ==========
             summaryBucket.set(summary);
             // 使用受管线程池异步更新 DB
             upsetSummary(conversationId, summary);
@@ -178,18 +177,36 @@ public class ConversationMemorySummaryService {
      * @return 新的摘要文本
      * @throws JsonProcessingException 当序列化/反序列化失败时抛出
      */
-    private String summarizeMessages(String existingSummary, String toSummary) throws JsonProcessingException {
+    private String summarizeMessages(String existingSummary, Collection<String> toSummary) throws JsonProcessingException {
         // 如果有旧摘要，追加进去（增量合并，避免重复)
         SummaryMessage summaryMessage = new SummaryMessage();
         summaryMessage.setLastestSummary("历史摘要（仅用于合并去重，不得作为事实新增来源):" + existingSummary.trim());
         summaryMessage.setChatMessage("对话:" + toSummary);
-        String summaryMessageJson = objectMapper.writeValueAsString(summaryMessage);
-        String SystemMessage = ("合并以上对话与历史摘要，去重后输出更新摘要。\n" +
-                "要求：严格≤" + memoryProperties.getSummaryMaxChars() + "字符；仅一行。格式:原本的JSON格式");
+        String historyToSummary = toSummary.stream()
+                .map(json -> JSON.parseObject(json, ChatMessage.class))  // 转 ChatMessage
+                .map(chatMsg -> "用户：" + (chatMsg.getUserMessage() == null ? "" : chatMsg.getUserMessage())
+                        + " | AI：" + (chatMsg.getAssistantMessage() == null ? "" : chatMsg.getAssistantMessage()))
+                .reduce((msg1, msg2) -> msg1 + "；" + msg2)  // 拼接成一行
+                .orElse("无对话内容");
+        String systemMessage = """
+                你是一个专业的对话摘要助手。请合并以下历史摘要与新对话，输出一行简洁摘要。
+                要求：
+                1. 严格≤%d 字符；
+                2. 仅保留关键事实，去除寒暄/重复；
+                3. 输出纯文本，不要 JSON/Markdown。
+                """.formatted(memoryProperties.getSummaryMaxChars());
+        String userMessage = """
+                历史摘要（参考，不要复述）:
+                %s
+                新对话:
+                %s
+                请输出更新后的摘要:
+                """.formatted(existingSummary, historyToSummary);
         Prompt prompt = new Prompt(
-                new SystemMessage(SystemMessage),
-                new UserMessage(summaryMessageJson));
-        return chatModel.call(prompt).getResult().getOutput().getText();
+                new SystemMessage(systemMessage),
+                new UserMessage(userMessage));
+        String raw = chatModel.call(prompt).getResult().getOutput().getText();
+        return raw == null ? existingSummary : raw;
     }
 
     /**
@@ -258,8 +275,9 @@ public class ConversationMemorySummaryService {
      */
     public LoadSession load(String conversationId) {
         // 获取上下文对话和摘要
-        String conversationKey = "chatMessage:" + conversationId;
-        String summaryKey = "summary:" + conversationId;
+        long userId = LoginUserInfoManager.get().getId();
+        String conversationKey = RedisKeyConfig.userConversationRecord(userId, conversationId);
+        String summaryKey = RedisKeyConfig.userSummaryRecord(userId, conversationId);
         RScoredSortedSet<String> scoredSet = redissonClient.getScoredSortedSet(conversationKey);
         Collection<String> convoObjs = scoredSet.valueRange(0, -1);
         Set<ChatMessage> conversations;
@@ -268,10 +286,7 @@ public class ConversationMemorySummaryService {
         } else {
             Set<ChatMessage> tmp = new LinkedHashSet<>();
             for (String convoJson : convoObjs) {
-                try {
-                    tmp.add(objectMapper.readValue(convoJson, ChatMessage.class));
-                } catch (Exception ignored) {
-                }
+                tmp.add(JSON.parseObject(convoJson, ChatMessage.class));
             }
             conversations = tmp;
         }

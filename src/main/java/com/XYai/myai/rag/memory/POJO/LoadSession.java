@@ -29,4 +29,25 @@ public class LoadSession {
         Set<ChatMessage> set = conv == null ? new LinkedHashSet<>() : new LinkedHashSet<>(conv);
         return LoadSession.builder().summary(summary).conversation(set).build();
     }
+
+    public String getHistoryAsText() {
+        if (conversation == null || conversation.isEmpty()) {
+            return "无";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (ChatMessage cm : conversation) {
+            // 忽略空消息
+            if (cm == null) continue;
+            // 拼接 User 发言
+            if (cm.getUserMessage() != null && !cm.getUserMessage().isBlank()) {
+                sb.append("User: ").append(cm.getUserMessage().trim()).append("\n");
+            }
+            // 拼接 AI 回复
+            if (cm.getAssistantMessage() != null && !cm.getAssistantMessage().isBlank()) {
+                sb.append("AI: ").append(cm.getAssistantMessage().trim()).append("\n");
+            }
+        }
+        String result = sb.toString().trim();
+        return result.isBlank() ? "无" : result;
+    }
 }

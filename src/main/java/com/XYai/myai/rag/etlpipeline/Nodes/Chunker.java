@@ -46,7 +46,7 @@ public class Chunker implements Ingestion {
         }
 
         // 2. 提取要分块的文本（优先使用增强后的文本，没有则用原文）
-        String text = extractText(sourceDoc);
+        String text = sourceDoc.getText();
         if (!StringUtils.hasText(text)) {
             return NodeResult.fail("分块文本内容为空");
         }
@@ -273,20 +273,5 @@ public class Chunker implements Ingestion {
             return settings.get(key).asInt();
         }
         return defaultVal;
-    }
-
-    /**
-     * 提取分块用的文本：优先使用增强文本，没有则用原文
-     */
-    private String extractText(Document sourceDoc) {
-        // 从元数据获取增强后的文本
-        Object enhancedValue = sourceDoc.getMetadata().get(IngestionContext.META_ENHANCED_TEXT);
-        String enhancedText = enhancedValue == null ? null : String.valueOf(enhancedValue);
-
-        // 增强文本有值则用增强文本，否则用原始文本
-        if (StringUtils.hasText(enhancedText)) {
-            return enhancedText;
-        }
-        return sourceDoc.getText();
     }
 }

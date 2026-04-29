@@ -37,7 +37,7 @@ public class IngestionContext implements Serializable {
     public static final String META_SOURCE_TYPE = "sourceType";
     public static final String META_RAW_BYTES = "rawBytes";
     public static final String META_MIME_TYPE = "mimeType";
-    public static final String META_ENHANCED_TEXT = "enhancedText";
+    public static final String META_ENHANCED = "enhanced";
     public static final String META_COLLECTION_NAME = "collectionName";
     public static final String META_KB_ID = "kbId";
     public static final String META_FILE_NAME = "fileName";
@@ -46,9 +46,9 @@ public class IngestionContext implements Serializable {
     public static final String META_CHUNK_SIZE = "chunkSize";
     public static final String META_FILE_ID = "fileId";
     public static final String META_TIME_CREATE = "createTime";
-    public static final String META_OWNER_ID = "ownerId";         // 上传者用户ID
     public static final String META_VISIBILITY = "visibility";   // 可见范围 private/group/public
     public static final String META_COPY_CHUNK = "copy_chunk";   // 可见范围 private/group/public
+    public static final String META_INTENT_NODE = "intentNode";
     @Serial
     private static final long serialVersionUID = 1L;
     // 主文档：文本在 text，其他信息在 metadata

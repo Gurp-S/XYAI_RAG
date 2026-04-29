@@ -61,7 +61,7 @@ public class MilvusFileManager {
      * 解析结果
      */
     @NotNull
-    private static List<Map<String, Object>> getMetadataResultByMilvusClient(R<QueryResults> response) {
+    public List<Map<String, Object>> getMetadataResultByMilvusClient(R<QueryResults> response) {
         QueryResultsWrapper wrapper = new QueryResultsWrapper(response.getData());
         List<QueryResultsWrapper.RowRecord> rowRecords = wrapper.getRowRecords();
         List<Map<String, Object>> list = new ArrayList<>();
@@ -163,6 +163,15 @@ public class MilvusFileManager {
         Boolean existsCollectionAcl = milvusCollectionService.exists(collectionName);
         log.info("milvusCollectionService:添加文件,当前集合:{}", collectionName);
         if (existsCollectionAcl) {//添加到默认集合
+            // 数据规范化：把 Document.metadata 标准化为原子字段，避免把复杂 JSON 存入 metadata
+            Map<String, String> hints = Map.of(
+                    "fileId", "string",
+                    "chunkId", "long",
+                    "chunkSize", "long",
+                    "visibility", "lowercase",
+                    "createTime", "string"
+            );
+            MilvusMetadataFilter.sanitizeDocuments(documents, hints);
             // 首先记录 ACL（依赖 Document.metadata 中的 fileId/chunkId），
             milvusAclManager.addFileUserACl(documents, collectionName);
             // 再将文档交给 VectorStore 进行 embedding & 写入 Milvus

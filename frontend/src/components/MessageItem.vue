@@ -44,7 +44,7 @@
       </div>
 
       <div
-        v-if="text && role === 'assistant' && !isStreaming"
+        v-if="text && role === 'assistant'"
         class="message assistant-markdown"
         ref="markdownEl"
         v-html="assistantMarkdownHtml"
@@ -125,7 +125,7 @@ const mcpStatusText = computed(() => {
 });
 
 const assistantMarkdownHtml = computed(() => {
-  if (props.role !== "assistant" || props.isStreaming) return "";
+  if (props.role !== "assistant") return "";
   return renderAssistantMarkdown(props.text);
 });
 

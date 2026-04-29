@@ -95,22 +95,23 @@ public class UserServiceImpl implements UserService {
         if (records == null || records.isEmpty()) {
             return Result.success(List.of());
         }
-        // 可选：异步更新摘要（实现保留）
-        setSummary(conversationId);
+        // TODO异步更新摘要（实现保留）
+//        setSummary(conversationId);
         return Result.success(records);
     }
 
-    private void setSummary(String conversationId) {
-        CompletableFuture.runAsync(() -> {
-            // TODO: 将会话摘要逻辑实现进来（或调用 ConversationMemorySummaryService）
-            ChatSessionRecord chatSessionRecord = chatSessionRecordMapper.selectById(conversationId);
-            if (chatSessionRecord == null) {
-                return;
-            }
-            String summaryKey = "summary:" + conversationId;
-            stringRedisTemplate.opsForValue().set(summaryKey, chatSessionRecord.getSummaryText());
-        });
-    }
+//    private void setSummary(String conversationId) {
+//        CompletableFuture.runAsync(() -> {
+//            // TODO: 将会话摘要逻辑实现进来（或调用 ConversationMemorySummaryService）
+//            ChatSessionRecord chatSessionRecord = chatSessionRecordMapper.selectById(conversationId);
+//            if (chatSessionRecord == null) {
+//                return;
+//            }
+//            Long userId = LoginUserInfoManager.get().getId();
+//            String summaryKey = RedisKeyConfig.userSummaryRecord(userId,conversationId);
+//            stringRedisTemplate.opsForValue().set(summaryKey, chatSessionRecord.getSummaryText());
+//        });
+//    }
 
     /**
      * 用户登出

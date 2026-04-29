@@ -106,19 +106,8 @@ public class UploadIngestionContextFactory {
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
         // ====================== 【自动注入权限字段】 ======================
-        if (user != null) {
-            // 上传者ID（Long）
-            metadata.put(IngestionContext.META_OWNER_ID, user.getId());
-
             // 默认私有
             metadata.put(IngestionContext.META_VISIBILITY, "private");
-
-        } else {
-            // 无用户时的安全默认值
-            metadata.put(IngestionContext.META_OWNER_ID, 0L);
-            metadata.put(IngestionContext.META_VISIBILITY, "private");
-        }
-
         // 构建文档
         Document document = Document.builder()
                 .text("")

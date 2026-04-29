@@ -52,8 +52,7 @@ public class SecurityConfig {
                         .permitAll()
                         .anyRequest().authenticated());
 
-        // 把 JWT 认证过滤器放在 UsernamePasswordAuthenticationFilter 之前，这样每次请求都会先由 JWT 过滤器
-        // 尝试从 Authorization header 中解析并验证 token，再设置 SecurityContext
+        // 然后再注册 JWT 认证过滤器，负责正常业务认证
         log.info("jwt验证");
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

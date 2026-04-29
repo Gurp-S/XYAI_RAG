@@ -72,11 +72,12 @@ public class MilvusAclManager {
             int maxChunkSize = Math.min(chunkSize, (int) RedisKeyConfig.MAX_CHUNK_PER_FILE);
             if (maxChunkSize <= 0) continue;
 
-            RBitSet bitSet = redissonClient.getBitSet(RedisKeyConfig.userFileBitKey(userId, fileId));
-            if (!bitSet.isExists()) continue;
+            RBitSet collectionBitSet = redissonClient.getBitSet(RedisKeyConfig.collectionFileChunkBitKey(collectionName, fileId));
+            RBitSet userBitSet = redissonClient.getBitSet(RedisKeyConfig.userFileBitKey(userId, fileId));
+            if (!userBitSet.isExists() || !collectionBitSet.isExists()) continue;
 
             for (int i = 1; i <= maxChunkSize; i++) {
-                if (bitSet.get(i)) {
+                if (userBitSet.get(i) && collectionBitSet.get(i)) {
                     result.add(fileId + ":" + i);
                 }
             }
@@ -98,6 +99,7 @@ public class MilvusAclManager {
         if (user == null) return false;
         Long userId = user.getId();
         if (fileId == null || fileId.isBlank()) return false;
+
 
         RBitSet bitSet = redissonClient.getBitSet(RedisKeyConfig.userFileBitKey(userId, fileId));
         try {
@@ -122,10 +124,12 @@ public class MilvusAclManager {
                 .map(parts -> parts[0])
                 .collect(Collectors.toSet());
 
-        for (String fid : fileIdsInCollection) {
+        for (String fileId : fileIdsInCollection) {
             try {
-                RBitSet bitSet = redissonClient.getBitSet(RedisKeyConfig.userFileBitKey(userId, fid));
-                if (bitSet != null) bitSet.delete();
+                RBitSet userBitSet = redissonClient.getBitSet(RedisKeyConfig.userFileBitKey(userId, fileId));
+                if (userBitSet != null) {
+                    userBitSet.delete();
+                }
             } catch (Exception e) {
                 log.debug("删除用户文件位图失败", e);
             }
@@ -174,8 +178,48 @@ public class MilvusAclManager {
                     if (fileChunkUserCount < 0) {
                         cnt.set(0);
                     }
-                    // 当计数为0时执行删除动作
+                    // 当计数为0时执行删除动作（删除 Milvus 中的文档）
                     deleteNoAclFileChunk(fileId, chunkId);
+
+                    // 同步更新各 collection 中该文件的位图，清除该 chunk 位；若某 collection 不再包含任何分片则清理相应索引
+                    try {
+                        RSet<String> collections = redissonClient.getSet(RedisKeyConfig.fileHashKey(fileId));
+                        for (String coll : collections) {
+                            if (coll == null) continue;
+                            try {
+                                RBitSet collectionBitSet = redissonClient.getBitSet(RedisKeyConfig.collectionFileChunkBitKey(coll, fileId));
+                                collectionBitSet.set(chunkId, false);
+                                if (collectionBitSet.cardinality() == 0) {
+                                    // 删除 collectionFileIds 中的 fileId:chunkSize 项
+                                    RSet<String> fileIdSet = redissonClient.getSet(RedisKeyConfig.collectionFileIds(coll));
+                                    try {
+                                        Optional<String> entry = fileIdSet.stream().filter(s -> s != null && s.startsWith(fileId + ":")).findFirst();
+                                        entry.ifPresent(fileIdSet::remove);
+                                    } catch (Exception ignore) {
+                                    }
+                                    try {
+                                        collectionBitSet.delete();
+                                    } catch (Exception ignore) {
+                                    }
+                                    // 移除 file -> collection 映射
+                                    try {
+                                        RSet<String> fileHashSet = redissonClient.getSet(RedisKeyConfig.fileHashKey(fileId));
+                                        fileHashSet.remove(coll);
+                                        if (fileHashSet.isEmpty()) {
+                                            try {
+                                                redissonClient.getKeys().delete(RedisKeyConfig.fileHashKey(fileId));
+                                            } catch (Exception ignore) {
+                                            }
+                                        }
+                                    } catch (Exception ignore) {
+                                    }
+                                }
+                            } catch (Exception ignore) {
+                            }
+                        }
+                    } catch (Exception ignore) {
+                    }
+
                     // 删除计数器 key
                     try {
                         redissonClient.getKeys().delete(RedisKeyConfig.fileChunkUserCountKey(fileId, chunkId));
@@ -210,7 +254,21 @@ public class MilvusAclManager {
                 .collect(Collectors.toList());
 
         setUserFileChunks(userId, fileId, all, chunkSize);
+        // 标记集合中存在该文件的分片位
+        try {
+            RBitSet collectionBitSet = redissonClient.getBitSet(RedisKeyConfig.collectionFileChunkBitKey(collectionName, fileId));
+            for (int i = 1; i <= cap; i++) {
+                collectionBitSet.set(i, true);
+            }
+        } catch (Exception e) {
+            log.warn("设置 collectionBitSet 失败 collection={} fileId={}", collectionName, fileId, e);
+        }
         redissonClient.getSet(RedisKeyConfig.collectionFileIds(collectionName)).add(fileId + ":" + chunkSize);
+        // 记录 file -> collection 的映射，便于反向查找
+        try {
+            redissonClient.getSet(RedisKeyConfig.fileHashKey(fileId)).add(collectionName);
+        } catch (Exception ignore) {
+        }
     }
 
     public void addFileUserACl(List<Document> documents, String collectionName) {
@@ -228,7 +286,22 @@ public class MilvusAclManager {
                 .toList();
 
         setUserFileChunks(userId, fileId, chunkIds, chunkSize);
+        // 标记集合中存在该文件的分片位（只标记实际上传的 chunkIds）
+        try {
+            RBitSet collectionBitSet = redissonClient.getBitSet(RedisKeyConfig.collectionFileChunkBitKey(collectionName, fileId));
+            chunkIds.stream()
+                    .filter(Objects::nonNull)
+                    .filter(id -> id >= 1 && id <= Math.min(chunkSize, RedisKeyConfig.MAX_CHUNK_PER_FILE))
+                    .forEach(id -> collectionBitSet.set(id, true));
+        } catch (Exception e) {
+            log.warn("设置 collectionBitSet 失败 collection={} fileId={}", collectionName, fileId, e);
+        }
         redissonClient.getSet(RedisKeyConfig.collectionFileIds(collectionName)).add(fileId + ":" + chunkSize);
+        // 记录 file -> collection 的映射，便于反向查找
+        try {
+            redissonClient.getSet(RedisKeyConfig.fileHashKey(fileId)).add(collectionName);
+        } catch (Exception ignore) {
+        }
     }
 
     /**
@@ -336,7 +409,21 @@ public class MilvusAclManager {
             // 如果全局计数为 0 清理 collection 相关的全局数据
             if (newCount <= 0) {
                 try {
-                    // 删除集合下文件索引及计数器
+                    // 删除集合下文件索引及计数器，并清理集合内每个文件的 collectionBitSet
+                    RSet<String> fileIds = redissonClient.getSet(RedisKeyConfig.collectionFileIds(collectionName));
+                    for (String entry : fileIds) {
+                        try {
+                            if (entry != null && entry.contains(":")) {
+                                String fid = entry.split(":", 2)[0];
+                                RBitSet collectionBitSet = redissonClient.getBitSet(RedisKeyConfig.collectionFileChunkBitKey(collectionName, fid));
+                                try {
+                                    collectionBitSet.delete();
+                                } catch (Exception ignore) {
+                                }
+                            }
+                        } catch (Exception ignore) {
+                        }
+                    }
                     redissonClient.getKeys().delete(RedisKeyConfig.collectionFileIds(collectionName));
                     redissonClient.getKeys().delete(RedisKeyConfig.collectionUserCountKey(collectionName));
                 } catch (Exception ex) {

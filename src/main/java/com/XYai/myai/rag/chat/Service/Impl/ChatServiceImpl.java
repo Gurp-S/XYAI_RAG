@@ -12,16 +12,11 @@ import com.XYai.myai.rag.memory.POJO.LoadSession;
 import com.XYai.myai.rag.rewrite.POJO.RewriteResult;
 import com.XYai.myai.rag.rewrite.QueryRewriter;
 import com.XYai.myai.user.LoginUserInfoManager;
-import com.alibaba.fastjson2.JSON;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.ai.chat.messages.SystemMessage;
-import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,7 +24,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 
+import java.time.Duration;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 聊天服务实现，基于 Ollama 模型并使用内存保存会话上下文。
@@ -40,7 +38,7 @@ import java.util.List;
 public class ChatServiceImpl implements ChatService {
 
     @Resource
-    private final ChatModel chatModel;
+    private ChatModel chatModel;
     @Resource
     private QueryRewriter queryRewriter;
     @Resource
@@ -49,6 +47,10 @@ public class ChatServiceImpl implements ChatService {
     private IntentResult intentResult;
     @Resource
     private MultiChannelRetrievalEngine multiChannelRetrievalEngine;
+    @Resource
+    private ToolCallbackProvider allToolsProvider;
+    @Resource
+    private ChatClient chatClient;
 
 
     /**
@@ -77,9 +79,28 @@ public class ChatServiceImpl implements ChatService {
 
         // 多通道召回
         List<RetrievedChunk> retrieve = multiChannelRetrievalEngine.retrieve(questionIntents, rewrittenMessage, conversationId,message);
-        log.info("retrieve:{}",retrieve);
-        // prompt生成
-        Prompt prompt = getPrompt(message, retrieve, load);
+        log.info("retrieve:{}",retrieve.stream().map(RetrievedChunk::getMetadata).toList());
+        // prompt生成（构建为 system 和 user 文本以便通过 ChatClient 的 fluent API 使用）
+        String historyText = (load == null) ? "无" : load.getHistoryAsText();
+        String retrieveText = (retrieve.isEmpty()) ? "无" :
+                retrieve.stream()
+                        .map(RetrievedChunk::getContent)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.joining("\n---\n"));
+        String systemMessage = """
+                你是活泼温柔、表达自然且业务专业的AI助手XY。
+                1. 回答要求：答案精准唯一,逻辑通顺,拒绝无效废话与生硬格式化;
+                2. 交互风格：用户闲聊时轻松活泼,语气亲和,适度趣味互动;解答问题时严谨专业;
+                3. 工具能力：主动识别场景,优先调用MCP工具,支持多个工具组合混用,串联查询,借助工具数据完善回答,不凭空编造信息,工具不可用先进行常识回答但是要说明是常识回答;
+                4. 文档规则：参考文档仅作辅助参考,无关联则完全忽略;禁止大段复制,回显原始JSON文档,只精简引用必要内容;
+                5. 内容限制：语言通俗易懂,拒绝机械话术,贴合日常对话感。
+                """;
+        String userMessage = """
+                参考文档:<<%s>>
+                更早的历史对话摘要:<<%s>>
+                历史对话:<<%s>>
+                用户消息:<<%s>>
+                """.formatted(retrieveText,load == null ? "无" : load.getSummary(), historyText, message);
         // 对话
         StringBuilder fullAnswer = new StringBuilder();
         Long userId;
@@ -89,56 +110,33 @@ public class ChatServiceImpl implements ChatService {
         } else {
             userId = null;
         }
+        // 使用 ChatClient 的 fluent prompt builder 发起流式对话（stream().content() -> Flux<String>）
+        // 将上游流发布为一个共享（multicast）流，防止框架或监控等对返回的 Flux 进行多次订阅
+        // 导致重复调用模型/重复持久化的问题。
         SecurityContext context = SecurityContextHolder.getContext();
-        return chatModel.stream(prompt)
-                .map(this::extractChunkText)
-                .filter(chunk -> chunk != null && !chunk.isBlank())
+        Flux<String> stream = chatClient.prompt()
+                .system(s -> s.text(systemMessage))
+                .user(u -> u.text(userMessage))
+                .stream()
+                .content()
+                .filter(s -> s != null && !s.isBlank())
+                .timeout(Duration.ofSeconds(60))
                 .doOnNext(fullAnswer::append)
-                .doFinally(signal -> {
-                    SecurityContextHolder.setContext(context);
+                // 仅在流正常完成时持久化会话摘要，避免在超时/取消/错误场景下写入不完整内容
+                .doOnComplete(() -> {
                     ChatMessage chatMessage = ChatMessage.builder()
                             .userMessage(message)
                             .assistantMessage(fullAnswer.toString())
                             .userId(userId)
                             .build();
                     conversationMemorySummaryService.compressIfNeeded(conversationId, chatMessage);
-                });
-    }
+                })
+                // 无论完成、错误还是取消，都要恢复安全上下文
+                .doFinally(signal -> SecurityContextHolder.setContext(context));
 
-    @NotNull
-    private Prompt getPrompt(String message, List<RetrievedChunk> retrieve, LoadSession load) {
-
-        // 添加 MCP 工具调用的结果（如有）
-        // 添加知识库检索结果
-        String loadJSON = JSON.toJSONString(load);
-        String retrieveJSON = JSON.toJSONString(retrieve);
-        String systemMessage = """
-                你是活泼且专业的 AI 助手 XY。请根据提供的文档片段和历史对话（如果有）来回答用户问题。
-                重要：如果没有可用的参考文档或历史对话，不要在回答中陈述“参考文档为空”或“历史为空”等内容。
-                如果有文档或历史，请仅使用必要的片段，不要逐字回显整个文档 JSON。
-                参考文档:<<%s>>
-                历史对话:<<%s>>
-                """.formatted(retrieve == null ? "无" : retrieveJSON, load == null ? "无" : loadJSON);
-        String userMessage = """
-                用户消息:<<%s>>
-                """.formatted(message);
-        return new Prompt(
-                new SystemMessage(systemMessage),
-                new UserMessage(userMessage));
-    }
-
-    /**
-     * 从流式响应块中提取文本内容。
-     *
-     * @param response 聊天模型的响应块
-     * @return 提取出的文本内容，若为空则返回空字符串
-     */
-    private String extractChunkText(ChatResponse response) {
-        if (response == null || response.getResult() == null || response.getResult().getOutput() == null) {
-            return "";
-        }
-        String text = response.getResult().getOutput().getText();
-        return text == null ? "" : text;
+        // 使用 publish().refCount(1) 或 share() 将上游连接并复用单个订阅，避免重复执行上游副作用。
+        // publish().refCount(1) 会在第一个订阅时连接上游，并在最后一个取消后断开连接。
+        return stream.publish().refCount(1);
     }
 
     /**

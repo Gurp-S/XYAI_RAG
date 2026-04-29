@@ -1056,9 +1056,11 @@ body.sidebar-style-outline .sidebar.collapsed .logout-btn {
   background: color-mix(in srgb, var(--surface-solid) 88%, transparent);
   box-shadow: var(--shadow-md);
   display: flex;
-  align-items: flex-end;
-  gap: 10px;
-  padding: 0.85rem 0.9rem 0.85rem 1rem;
+  /* 垂直居中输入文本，避免靠底部显得不平衡 */
+  align-items: center;
+  gap: 12px;
+  /* 上下间距略小，文本更居中 */
+  padding: 0.7rem 0.9rem 0.7rem 1rem;
 }
 
 #message {
@@ -1067,10 +1069,13 @@ body.sidebar-style-outline .sidebar.collapsed .logout-btn {
   border: none;
   background: transparent;
   color: var(--text-main);
-  font-size: 0.95rem;
-  line-height: 1.6;
+  /* 稍微放大字体并调整行高，提升可读性和视觉平衡 */
+  font-size: 1rem;
+  line-height: 1.5;
   outline: none;
   max-height: 200px;
+  /* 确保多行时上下都有呼吸空间 */
+  padding: 2px 0;
 }
 
 #message::placeholder {

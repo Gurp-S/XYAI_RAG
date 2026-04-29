@@ -90,10 +90,12 @@ let greetingTimer = null;
 const greetingClockTick = ref(Date.now());
 const STREAM_FLUSH_MIN_INTERVAL = 24;
 const STREAM_FLUSH_FORCE_CHARS = 320;
-const STREAM_HEARTBEAT_TIMEOUT_MS = 18000;
+// 延长流式心跳超时，避免在后端较慢响应时过早中止并触发重试
+const STREAM_HEARTBEAT_TIMEOUT_MS = 95000;
 const STREAM_HEARTBEAT_CHECK_MS = 4000;
 const STREAM_AUTO_RETRY_DELAY_MS = 1200;
-const STREAM_MAX_AUTO_RETRIES = 1;
+// 禁用自动重试以避免网络抖动或超时导致重复调用模型消耗大量 tokens
+const STREAM_MAX_AUTO_RETRIES = 0;
 
 const isAiChat = computed(() => store.chatMode === "ai");
 const chatTargetName = computed(() =>
@@ -491,9 +493,17 @@ async function performAiChat(message, userMsgIndex, options = {}) {
       conversationId: requestConversationId,
     };
 
+    // 为每次请求生成唯一 request id，便于后端日志关联和去重排查
+    const requestId =
+      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+        ? crypto.randomUUID()
+        : `req_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+
+    console.debug(`[ai] requestId=${requestId} conversation=${requestConversationId}`);
+
     const response = await authFetch("/ai/chat", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "X-Request-Id": requestId },
       signal: currentAbortController.signal,
       body: JSON.stringify(requestBody),
     });
@@ -697,6 +707,7 @@ function processSSEEvent(eventBlock, assistantIndex) {
 
   if (!content) return;
 
+  // 将流片段追加到待刷新的缓冲区，统一由渲染器做语法规范化与修正。
   pendingChunkAssistantIndex = assistantIndex;
   pendingChunkText += content;
   scheduleChunkFlush();

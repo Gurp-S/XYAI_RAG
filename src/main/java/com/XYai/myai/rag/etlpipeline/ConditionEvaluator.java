@@ -47,7 +47,7 @@ public class ConditionEvaluator {
             case "source.uri" -> toStringOrNull(document.getMetadata().get(IngestionContext.META_SOURCE_URI));
             case "hasRawText" -> String.valueOf(StringUtils.hasText(document.getText()));
             case "hasEnhancedText" -> String.valueOf(StringUtils.hasText(
-                    toStringOrNull(document.getMetadata().get(IngestionContext.META_ENHANCED_TEXT))
+                    toStringOrNull(document.getMetadata().get(IngestionContext.META_ENHANCED))
             ));
             default -> null;
         };

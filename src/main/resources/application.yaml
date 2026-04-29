@@ -25,14 +25,16 @@ spring:
       base-url: https://dashscope.aliyuncs.com/compatible-mode
       chat:
         options:
-          model: qwen3-max
-          temperature: 0.1
-          maxTokens: 4096
+          model: qwen3.5-122b-a10b
+          temperature: 0.3
+          maxTokens: 1000
+          internal-tool-execution-enabled: true
+          parallel-tool-calls: false
     dashscope:
       api-key: ${ALIYUN_BAILIAN_API_KEY:}  # 可复用同一个 Key
       rerank:
         enabled: true
-        model: gte-rerank  # ✅ 正确的 rerank 模型名
+        model: gte-rerank
         # 可选：自定义超时/重试
         timeout: 10s
         max-retries: 3
@@ -54,6 +56,14 @@ spring:
         index-type: ivf_flat
         index-params:
           nlist: 1024
+    mcp:
+      client:
+        toolcallback:
+          enabled: true
+        name: mcp-client
+      a
+        type: async
+
 
 
 jwt:
@@ -67,18 +77,18 @@ jwt:
   rsa-private-key-path: D:/lea/xyai/config/keys/private_pkcs8.pem
   rsa-public-key-path: D:/lea/xyai/config/keys/public_x509.pem
 
-resilience4j:
-  circuitbreaker:
-    instances:
-      searchChannel:
-        slidingWindowSize: 10       # 最近10次调用统计
-        failureRateThreshold: 50    # 失败率≥50% 开启熔断
-        waitDurationInOpenState: 10s # 熔断10秒后半开重试
-        permittedNumberOfCallsInHalfOpenState: 3
-  timelimiter:
-    instances:
-      searchChannel:
-        timeoutDuration: 3s   # 接口超时时间
+#resilience4j:
+#  circuitbreaker:
+#    instances:
+#      searchChannel:
+#        slidingWindowSize: 10       # 最近10次调用统计
+#        failureRateThreshold: 50    # 失败率≥50% 开启熔断
+#        waitDurationInOpenState: 10s # 熔断10秒后半开重试
+#        permittedNumberOfCallsInHalfOpenState: 3
+#  timelimiter:
+#    instances:
+#      searchChannel:
+#        timeoutDuration: 3s   # 接口超时时间
 
 app:
   memory:
@@ -97,14 +107,14 @@ upload:
   upLoadEnabled: true
 memory:
     history-keep-turns: 4
-    summary-start-turns: 4
+    summary-start-turns: 8
     summary-max-chars: 300
     summary-enabled: true
 rewriter:
   rewriter-min-chars: 50
-  rewriter-enabled: true
+  rewriter-enabled: false
 intent:
-  intent-enabled: true
+  intent-enabled: false
   update-intent-enabled: true
   redis-enabled: true
   DBEnabled: true
@@ -124,8 +134,14 @@ splitter:
   overlap: 200
   chinese-tokenize: true
 pipeline:
-  enricher-enable: false
+  enricher-enable: true
 milvus:
   delete-count-collection-threshold: 1
   delete-count-file-threshold: 1
   delete-count-threshold: 3
+tool:
+  amap:
+    api-key: daceb403e4a6c3d58c283d8a4db885eb
+    enabled: true
+  bilibili:
+    enabled: true

@@ -2,7 +2,7 @@ package com.XYai.myai.rag.aop;
 
 import cn.hutool.core.util.IdUtil;
 import com.XYai.myai.monitorEndpoint.service.TraceRecordService;
-import com.XYai.myai.rag.RagTraceContext;
+import com.XYai.myai.rag.aop.Annotation.RagTraceContext;
 import com.XYai.myai.rag.aop.Annotation.RagTraceNode;
 import com.XYai.myai.rag.aop.Annotation.RagTraceRoot;
 import jakarta.annotation.Resource;

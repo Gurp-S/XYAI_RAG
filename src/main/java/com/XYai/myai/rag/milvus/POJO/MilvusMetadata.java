@@ -16,15 +16,12 @@ public class MilvusMetadata {
             "kbId",
             "chunkSize",
             "fileId",
-            "createTime",
+            "intentNode",
             // ========== 权限字段（核心） ==========
             //"ownerId", //userId 最高权力移除
             //"groupId",移除
-            "visibility", //private public groupPublic
+            "visibility" //private public groupPublic
             //"sharedWith", //移除
-            // ========== 文本版本控制 ==========
-            "version",
-            "updatedAt"
     );
 
     // 必须包含：所有用于过滤查询的字段

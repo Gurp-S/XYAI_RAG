@@ -4,7 +4,10 @@ import com.XYai.myai.rag.milvus.POJO.MilvusMetadata;
 import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Component
 public final class MilvusMetadataFilter {
@@ -122,5 +125,104 @@ public final class MilvusMetadataFilter {
             return s.substring(0, MAX_STRING_LENGTH);
         }
         return value;
+    }
+
+
+    public static Map<String, Object> sanitize(Map<String, Object> metadata, Map<String, String> typeHints) {
+        Map<String, Object> normalized = new HashMap<>();
+        if (metadata == null || metadata.isEmpty()) return normalized;
+
+        for (Map.Entry<String, Object> e : metadata.entrySet()) {
+            String key = e.getKey();
+            Object val = e.getValue();
+            String hint = typeHints == null ? null : typeHints.get(key);
+
+            try {
+                if (hint != null) {
+                    switch (hint) {
+                        case "long" -> {
+                            Long v = tryParseLong(val);
+                            if (v != null) normalized.put(key, v);
+                            else if (val != null) normalized.put(key, val.toString());
+                        }
+                        case "int" -> {
+                            Long v = tryParseLong(val);
+                            if (v != null) normalized.put(key, v.intValue());
+                            else if (val != null) normalized.put(key, val.toString());
+                        }
+                        case "boolean" -> {
+                            Boolean b = tryParseBoolean(val);
+                            if (b != null) normalized.put(key, b);
+                            else if (val != null) normalized.put(key, val.toString());
+                        }
+                        case "lowercase" -> normalized.put(key, val == null ? null : val.toString().trim().toLowerCase());
+                        case "string", "date" -> normalized.put(key, val == null ? null : val.toString());
+                        default -> normalized.put(key, val == null ? null : val.toString());
+                    }
+                } else {
+                    // no hint: try to keep numbers/booleans, otherwise toString()
+                    if (val instanceof Number || val instanceof Boolean) {
+                        normalized.put(key, val);
+                    } else if (val == null) {
+                        normalized.put(key, null);
+                    } else {
+                        String className = val.getClass().getName();
+                        // convert complex gson structures or maps/lists to string to avoid client-side types
+                        if (className.contains("google.gson") || val instanceof Map || val instanceof List) {
+                            normalized.put(key, val.toString());
+                        } else {
+                            normalized.put(key, val.toString());
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                if (val != null) normalized.put(key, val.toString());
+            }
+        }
+        return normalized;
+    }
+
+    public static void sanitizeDocuments(List<Document> documents, Map<String, String> typeHints) {
+        if (documents == null || documents.isEmpty()) return;
+        for (Document doc : documents) {
+            try {
+                Map<String, Object> meta = doc.getMetadata();
+                Map<String, Object> normalized = sanitize(meta, typeHints);
+                if (meta == null) continue;
+                try {
+                    meta.clear();
+                    meta.putAll(normalized);
+                } catch (UnsupportedOperationException uoe) {
+                }
+            } catch (Exception ex) {
+            }
+        }
+    }
+
+    private static Long tryParseLong(Object o) {
+        if (o == null) return null;
+        if (o instanceof Number) return ((Number) o).longValue();
+        String s = o.toString().trim();
+        if (s.isEmpty()) return null;
+        try {
+            if (s.contains(".")) {
+                // handle "1.0" -> 1
+                BigDecimal d = new BigDecimal(s);
+                return d.longValue();
+            }
+            return Long.parseLong(s);
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
+
+    private static Boolean tryParseBoolean(Object o) {
+        if (o == null) return null;
+        if (o instanceof Boolean) return (Boolean) o;
+        String s = o.toString().trim().toLowerCase();
+        if (s.isEmpty()) return null;
+        if (s.equals("true") || s.equals("1") || s.equals("yes")) return true;
+        if (s.equals("false") || s.equals("0") || s.equals("no")) return false;
+        return null;
     }
 }

@@ -10,13 +10,12 @@ import com.XYai.myai.user.LoginUserInfoManager;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hsmf.datatypes.Chunks;
+import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 过滤后处理器。
@@ -60,9 +59,25 @@ public class FilterPostProcessor implements SearchResultPostProcessor {
                 .filter(FilterPostProcessor::filterComplete)                   // 2. 数据完整性过滤
                 .filter(this::filterScore)                      // 3. 分数阈值过滤
                 .filter(chunk -> filterPermission(chunk, userId))        // 4. 权限校验过滤
+                //.filter(this::filterUnloadCollection)              // 5. 集合加载过滤
                 .filter(this::filterContentLength)             // 6. 内容长度合规过滤
                 .toList();
     }
+
+    private boolean filterUnloadCollection(RetrievedChunk chunk){
+        // 加载的集合
+        Long userId = LoginUserInfoManager.get().getId();
+        RSet<String> loadCollections = redissonClient.getSet(RedisKeyConfig.userLoadCollectionsKey(userId));
+        // 集合下fileIdChunk
+        Set<Object> fileChunkIds = loadCollections.stream()
+                .map(loadCollection->
+                        redissonClient.getSet(RedisKeyConfig.collectionFileIds(loadCollection)))
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
+        return fileChunkIds.contains(chunk.getMetadata().get("fileId"));
+    }
+
+
 
     private boolean filterContentLength(RetrievedChunk chunk) {
         String content = chunk.getContent();
@@ -75,7 +90,7 @@ public class FilterPostProcessor implements SearchResultPostProcessor {
         Double score = chunk.getScore();
         Double bm25Score = chunk.getBm25Score();
         if (score == null) return false;
-        return score > 0.5 && bm25Score > 0.5;
+        return score > 0.5 || bm25Score > 0.4;
     }
 
     private static Boolean filterComplete(RetrievedChunk chunk) {

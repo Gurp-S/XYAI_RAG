@@ -68,7 +68,6 @@ public class Rewriter implements QueryRewriterService {
 
             // 6. JSON解析
             RewriteResult result = objectMapper.readValue(rewrittenMessage, RewriteResult.class);
-            log.info("重写解析成功：{}", result);
             return result;
 
         } catch (Exception e) {
@@ -94,16 +93,18 @@ public class Rewriter implements QueryRewriterService {
                 严格遵守以下规则：
                 1. 将用户口语化查询标准化为正式查询句。
                 2. 如果包含多个问题，必须拆分为subQuery数组。
-                3. 只返回JSON，不要解释、不要多余文字、不要markdown。
-                4. 必须严格按照以下JSON结构返回：
+                3. 只返回标准 JSON 格式，不要任何解释、不要 Markdown、不要反引号
+                4. 如果无法改写，返回：{"rewrittenQuery": "原始查询", "subQuery": null}
                 %s
                 """.formatted(formatJson);
 
+//        String userText = """
+//                上下文：%s
+//                用户问题：%s
+//                """.formatted(context, userQuestion);
         String userText = """
-                上下文：%s
                 用户问题：%s
-                """.formatted(context, userQuestion);
-
+                """.formatted(userQuestion);
         return new Prompt(List.of(
                 new SystemMessage(systemText),
                 new UserMessage(userText)

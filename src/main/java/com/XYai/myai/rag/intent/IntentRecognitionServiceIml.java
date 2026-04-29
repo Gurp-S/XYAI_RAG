@@ -7,6 +7,7 @@ import com.XYai.myai.mapper.IntentNodeMapper;
 import com.XYai.myai.rag.intent.POJO.*;
 import com.XYai.myai.rag.memory.POJO.LoadSession;
 import com.XYai.myai.rag.rewrite.POJO.RewriteResult;
+import com.XYai.myai.redis.RedisKeyConfig;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Resource;
@@ -15,6 +16,8 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.jetbrains.annotations.NotNull;
+import org.redisson.api.RSet;
+import org.redisson.api.RedissonClient;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
@@ -42,7 +45,6 @@ import java.util.concurrent.CompletableFuture;
 public class IntentRecognitionServiceIml implements IntentRecognitionService {
     private static final Analyzer IK_ANALYZER = new IKAnalyzer(true);
     private static final String INTENT_NODE_NAME = "intent:tree:node:";
-    private static final String INTENT_NODE_CHILDREN_PREFIX = "intent:tree:children:";
     @Resource
     private StringRedisTemplate stringRedisTemplate;
     @Resource
@@ -53,6 +55,8 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
     private IntentProperties intentProperties;
     @Resource
     private VectorStore vectorStore;
+    @Resource
+    private RedissonClient redissonClient;
 
     /**
      * 识别一组查询（可能包含拆分后的子问题）并返回意图列表。
@@ -182,9 +186,14 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
             log.info("兜底进行: query={}", query);
 
             // 1. 查叶子节点
-            List<IntentNode> leafNodes = intentNodeMapper.selectList(
-                    new QueryWrapper<IntentNode>().eq("children_count", 0)
-            );
+            // 1.1先查redis失败查mysql
+            RSet<Object> set = redissonClient.getSet(RedisKeyConfig.intentNodeLeaveKey());
+            List<IntentNode> leafNodes = set.stream().map(o -> JSON.parseObject(o.toString(), IntentNode.class)).toList();
+            if (leafNodes == null || leafNodes.isEmpty()) {
+                leafNodes = intentNodeMapper.selectList(
+                        new QueryWrapper<IntentNode>().eq("children_count", 0)
+                );
+            }
             if (leafNodes == null || leafNodes.isEmpty()) {
                 log.warn("无叶子节点，返回降级结果");
                 return getDegradeIntentResult(query);
@@ -229,7 +238,7 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
 
                 // 查 Redis（加空值保护）
                 String json = stringRedisTemplate.opsForValue()
-                        .get(INTENT_NODE_NAME + score.getIntentNodeName());
+                        .get(RedisKeyConfig.intentNodeNameKey(score.getIntentNodeName()));
                 if (json != null && !json.isBlank()) {
                     IntentNode node = JSON.parseObject(json, IntentNode.class);
                     if (node != null) {
@@ -345,10 +354,10 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
         try {
             // 1) 节点完整 JSON
             String json = com.alibaba.fastjson2.JSON.toJSONString(token);
-            stringRedisTemplate.opsForValue().set(INTENT_NODE_NAME + token.getName(), json);
+            stringRedisTemplate.opsForValue().set(RedisKeyConfig.intentNodeNameKey(token.getName()), json);
             // 2) 父子关系
             if (StrUtil.isNotBlank(token.getParentName())) {
-                stringRedisTemplate.opsForSet().add(INTENT_NODE_CHILDREN_PREFIX + token.getParentName(), token.getName());
+                stringRedisTemplate.opsForSet().add(RedisKeyConfig.intentNodeChildrenKey(token.getParentName()), token.getName());
             }
         } catch (Exception e) {
             log.warn("缓存意图节点到 redis 失败", e);
@@ -372,7 +381,7 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
             }
             // 1) 先按 name -> nodeId 查
             // 安全获取 Redis 中的意图ID
-            String nodeName = stringRedisTemplate.opsForValue().get(INTENT_NODE_NAME + tokenize);
+            String nodeName = stringRedisTemplate.opsForValue().get(RedisKeyConfig.intentNodeNameKey(tokenize));
             if (StrUtil.isBlank(nodeName)) {
                 continue;
             }

@@ -3,7 +3,6 @@ package com.XYai.myai.rag.channel.Processor;
 import com.XYai.myai.rag.channel.POJO.RetrievedChunk;
 import com.XYai.myai.rag.channel.POJO.SearchContext;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.springframework.stereotype.Component;
@@ -12,27 +11,18 @@ import org.wltea.analyzer.lucene.IKAnalyzer;
 import java.io.IOException;
 import java.util.*;
 
-
 /**
- * 去重后处理器。
- *
- * <p>定位：召回后处理第一步，优先移除重复 chunk，降低后续过滤与重排成本。</p>
+ * BM25 相关性打分处理器（线程安全版）
+ * 修复并行调用导致的变量覆盖、分词异常问题
  */
 @Slf4j
 @Component
 public class BM25PostProcessor implements SearchResultPostProcessor {
 
-
-    private static final Analyzer IK_ANALYZER = new IKAnalyzer(true);
-
     private static final String NAME = "BM25-processor";
-
+    // BM25 固定参数
     private static final double K1 = 1.2;
     private static final double B = 0.75;
-    private double avgLength;
-    private int totalDocs;
-    private final Map<String, Integer> wordDocCount = new HashMap<>();
-
 
     @Override
     public String getName() {
@@ -41,59 +31,73 @@ public class BM25PostProcessor implements SearchResultPostProcessor {
 
     @Override
     public int getOrder() {
-        return 1;  // 第一个执行，先去重再进行后续处理
+        return 1;
     }
 
+    /**
+     * 核心处理方法
+     */
     @Override
     public List<RetrievedChunk> process(List<RetrievedChunk> chunks, SearchContext context) {
-        // 空输入
         if (chunks == null || chunks.isEmpty()) {
             return chunks;
         }
-        wordDocCount.clear();
-        avgLength = 0.0;
-        totalDocs = 0;
-        // 对输入进行分词
+
+        // 1. 创建独立的 IKAnalyzer
+        IKAnalyzer ikAnalyzer = new IKAnalyzer(true);
+        // 2. 本次请求独立的状态变量
         String question = context.getOriginalQuery();
-        List<String> questionTokenizes = BM25TokenizeWithIk(question);
-        // 对召回的分块进行分词
-        List<List<String>> contents = chunks.stream().map(RetrievedChunk::getContent).map(this::BM25TokenizeWithIk).toList();
-        this.totalDocs = chunks.size();
-        this.avgLength = contents.stream().mapToInt(List::size).average().orElse(0.0);
-        if (this.avgLength <= 0) {
-            this.avgLength = 1.0;
+        List<String> questionTokens = tokenize(ikAnalyzer, question);
+        List<List<String>> docTokensList = new ArrayList<>();
+        for (RetrievedChunk chunk : chunks) {
+            docTokensList.add(tokenize(ikAnalyzer, chunk.getContent()));
         }
-        buildWordDocCount(contents);
+        // 3. 本次请求独立计算 BM25 统计值
+        int totalDocs = chunks.size();
+        double avgLength = docTokensList.stream().mapToInt(List::size).average().orElse(1.0);
+        Map<String, Integer> wordDocCount = buildWordDocCount(docTokensList);
+        // 4. 逐文档计算 BM25 分数
         for (int i = 0; i < chunks.size(); i++) {
             RetrievedChunk chunk = chunks.get(i);
-            if (chunk.getBm25Score() != null) continue;
-            List<String> docTokens = contents.get(i);
-            double score = calculateScore(questionTokenizes, docTokens);
+            if (chunk.getBm25Score() != null) {
+                continue;
+            }
+            List<String> docTokens = docTokensList.get(i);
+            double score = calculateScore(questionTokens, docTokens, totalDocs, avgLength, wordDocCount);
             chunk.setBm25Score(score);
         }
+        // 关闭分词器
+        ikAnalyzer.close();
         return chunks;
     }
 
-    private void buildWordDocCount(List<List<String>> contents) {
-        wordDocCount.clear();
-        for (List<String> content : contents) {
-            Set<String> uniqueWords = new HashSet<>(content);
+    /**
+     * 构建词-文档频数字典
+     */
+    public Map<String, Integer> buildWordDocCount(List<List<String>> docTokensList) {
+        Map<String, Integer> wordDocCount = new HashMap<>();
+        for (List<String> docTokens : docTokensList) {
+            Set<String> uniqueWords = new HashSet<>(docTokens);
             for (String word : uniqueWords) {
                 wordDocCount.put(word, wordDocCount.getOrDefault(word, 0) + 1);
             }
         }
+        return wordDocCount;
     }
 
-    public double calculateScore(List<String> questionTokenizes, List<String> chunks) {
+    /**
+     * 计算单文档 BM25 分数
+     */
+    public double calculateScore(List<String> questionTokens, List<String> docTokens,
+                                 int totalDocs, double avgLength, Map<String, Integer> wordDocCount) {
         double score = 0.0;
-        int docLength = chunks.size();
-        for (String word : questionTokenizes) {
-            // 跳过不存在的词
+        int docLength = docTokens.size();
+        for (String word : questionTokens) {
             if (!wordDocCount.containsKey(word)) {
                 continue;
             }
-            double idf = calculateIDF(word);
-            int tf = calculateTF(word, chunks);
+            double idf = calculateIDF(word, totalDocs, wordDocCount);
+            int tf = calculateTF(word, docTokens);
             double numerator = tf * (K1 + 1);
             double denominator = tf + K1 * (1 - B + B * docLength / avgLength);
             score += idf * numerator / denominator;
@@ -101,19 +105,30 @@ public class BM25PostProcessor implements SearchResultPostProcessor {
         return score;
     }
 
-    private int calculateTF(String word, List<String> doc) {
-        return Collections.frequency(doc, word);
+    /**
+     * 词频 TF 计算
+     */
+    public int calculateTF(String word, List<String> docTokens) {
+        return Collections.frequency(docTokens, word);
     }
 
-    private double calculateIDF(String word) {
-        int docCount = wordDocCount.getOrDefault(word, 0);
+    /**
+     * 逆文档频率 IDF 计算
+     */
+    public double calculateIDF(String word, int totalDocs, Map<String, Integer> wordDocCount) {
+        int docCount = wordDocCount.get(word);
         return Math.log(1.0 + (totalDocs - docCount + 0.5) / (docCount + 0.5));
     }
 
-    private List<String> BM25TokenizeWithIk(String text) {
-        if (text == null || text.isBlank()) return List.of();
+    /**
+     * IK 分词
+     */
+    public List<String> tokenize(IKAnalyzer analyzer, String text) {
+        if (text == null || text.isBlank()) {
+            return List.of();
+        }
         List<String> tokens = new ArrayList<>();
-        try (TokenStream tokenStream = IK_ANALYZER.tokenStream("", text)) {
+        try (TokenStream tokenStream = analyzer.tokenStream("", text)) {
             CharTermAttribute termAttr = tokenStream.addAttribute(CharTermAttribute.class);
             tokenStream.reset();
             while (tokenStream.incrementToken()) {
@@ -124,12 +139,7 @@ public class BM25PostProcessor implements SearchResultPostProcessor {
             }
             tokenStream.end();
         } catch (IOException e) {
-            log.warn("IKAnalyzer 分词失败，回退返回原始文本分割", e);
-            // 回退：简单按空格拆分
-            String[] parts = text.trim().split("\\s+");
-            for (String p : parts) {
-                if (!p.isBlank()) tokens.add(p.trim());
-            }
+            log.warn("IK分词失败，文本：{}", text, e);
         }
         return tokens;
     }

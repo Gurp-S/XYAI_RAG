@@ -60,26 +60,26 @@ public class PipelineDefinitionFactory {
         NodeConfig parser = NodeConfig.builder()
                 .nodeId("parser")
                 .nodeType("parser")
-                .nextNodeId(pipelineProperties.getEnricherEnable() ? "enricher" : "chunker")
+                .nextNodeId("chunker")
                 .build();
         nodes.add(parser);
-
-        if (pipelineProperties.getEnricherEnable()) {
-            NodeConfig enricher = NodeConfig.builder()
-                    .nodeId("enricher")
-                    .nodeType("enricher")
-                    .nextNodeId("chunker")
-                    .build();
-            nodes.add(enricher);
-        }
 
         NodeConfig chunker = NodeConfig.builder()
                 .nodeId("chunker")
                 .nodeType("chunker")
                 .settings(chunkSettings)
-                .nextNodeId("indexer")
+                .nextNodeId(pipelineProperties.getEnricherEnable() ? "enricher" : "indexer")
                 .build();
         nodes.add(chunker);
+
+        if (pipelineProperties.getEnricherEnable()) {
+            NodeConfig enricher = NodeConfig.builder()
+                    .nodeId("enricher")
+                    .nodeType("enricher")
+                    .nextNodeId("indexer")
+                    .build();
+            nodes.add(enricher);
+        }
 
         NodeConfig indexer = NodeConfig.builder()
                 .nodeId("indexer")

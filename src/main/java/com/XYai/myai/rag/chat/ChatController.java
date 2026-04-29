@@ -77,6 +77,7 @@ public class ChatController {
      */
     @RagTraceRoot(name = "对话", conversationIdArg = "conversationId", taskIdArg = "taskId")
     private Flux<String> doChat(String message, String conversationId) {
+        log.info("对话开始");
         return chatService.DoChat(message, conversationId);
     }
 

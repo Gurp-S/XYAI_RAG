@@ -54,18 +54,17 @@ public class VectorGlobalSearchChannel implements SearchChannel {
     @Override
     public boolean isEnabled(SearchContext context) {
         // 无意图 → 直接启用
-//        if (context.getKbIntents().isEmpty()) {
-//            return true;
-//        }
-//        // 计算所有意图节点中的最高置信度
-//        double maxScore = context.getKbIntents().stream()
-//                .map(SubQuestionIntent::getNodeScore)
-//                .flatMap(nodesScore -> nodesScore.getNodeScoreList().stream())
-//                .mapToDouble(NodeScore::getScore)
-//                .max().orElse(0.0);
-//        // 最高置信度 < CONFIDENCE_THRESHOLD -> 启用全局检索
-//        return maxScore < CONFIDENCE_THRESHOLD;
-        return true;
+        if (context.getKbIntents().isEmpty()) {
+            return true;
+        }
+        // 计算所有意图节点中的最高置信度
+        double maxScore = context.getKbIntents().stream()
+                .map(SubQuestionIntent::getNodeScore)
+                .flatMap(nodesScore -> nodesScore.getNodeScoreList().stream())
+                .mapToDouble(NodeScore::getScore)
+                .max().orElse(0.0);
+        // 最高置信度 < CONFIDENCE_THRESHOLD -> 启用全局检索
+        return maxScore < CONFIDENCE_THRESHOLD;
     }
 
     /**
@@ -98,7 +97,7 @@ public class VectorGlobalSearchChannel implements SearchChannel {
                 .toList();
 
         // 合并结果 → 排序 → 截断
-        List<RetrievedChunk> allChunks = futures.stream()
+        List<RetrievedChunk> vectorSearchResult = futures.stream()
                 .map(CompletableFuture::join)
                 .flatMap(List::stream)
                 .sorted((a, b) -> Double.compare(b.getScore(), a.getScore()))
@@ -107,8 +106,8 @@ public class VectorGlobalSearchChannel implements SearchChannel {
 
         return SearchChannelResult.builder()
                 .channelName(getName())
-                .chunks(allChunks)
-                .metadata(allChunks.stream().map(RetrievedChunk::getMetadata).toList())
+                .chunks(vectorSearchResult)
+                .metadata(vectorSearchResult.stream().map(RetrievedChunk::getMetadata).toList())
                 .build();
     }
 
