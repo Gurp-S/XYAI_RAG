@@ -28,10 +28,10 @@ public class MCPToolConfig {
         log.info("===== 注册MCP工具 =====");
 
         // 高德
-//        if (toolProperties.getAmap() != null && toolProperties.getAmap().isEnabled()) {
-//            toolBeans.add(aMapTool);
-//            log.info("注册高德地图工具 AMapTool");
-//        }
+        if (toolProperties.getAmap() != null && toolProperties.getAmap().isEnabled()) {
+            toolBeans.add(aMapTool);
+            log.info("注册高德地图工具 AMapTool");
+        }
 
         if (toolProperties.getBilibili() != null && toolProperties.getBilibili().isEnabled()) {
             toolBeans.add(bilibiliTool);

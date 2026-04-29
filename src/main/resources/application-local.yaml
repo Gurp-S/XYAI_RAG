@@ -36,3 +36,9 @@ jwt:
   # 下面使用你刚才放置的绝对路径
   rsa-private-key-path: D:/lea/xyai/config/keys/private_pkcs8.pem
   rsa-public-key-path: D:/lea/xyai/config/keys/public_x509.pem
+tool:
+  amap:
+    api-key: daceb403e4a6c3d58c283d8a4db885eb
+    enabled: true
+  bilibili:
+    enabled: true

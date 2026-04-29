@@ -61,7 +61,7 @@ spring:
         toolcallback:
           enabled: true
         name: mcp-client
-      a
+
         type: async
 
 
@@ -141,7 +141,7 @@ milvus:
   delete-count-threshold: 3
 tool:
   amap:
-    api-key: daceb403e4a6c3d58c283d8a4db885eb
+    api-key: ${tool.amap.api-key:}
     enabled: true
   bilibili:
     enabled: true
