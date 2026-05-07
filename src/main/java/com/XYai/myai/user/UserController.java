@@ -145,6 +145,17 @@ public class UserController {
         return userService.history(requireLoginUser().getId());
     }
 
+
+    @GetMapping("/history/delete")
+    public Result<String> deleteHistory(String conversationId) {
+        return userService.deleteHistory(requireLoginUser().getId(), conversationId);
+    }
+
+    @GetMapping("/history/updata")
+    public Result<String> updateHistory(ChatSessionRecord chatSessionRecord) {
+        return userService.updateHistory(chatSessionRecord);
+    }
+
     /**
      * 获取某一个会话的完整聊天记录
      * 使用 AOP 埋点记录 RAG 调用链路
@@ -259,6 +270,7 @@ public class UserController {
         String refreshToken = maybeRefresh.get();
         return userService.refreshAccessToken(refreshToken, response);
     }
+
 
     // ================================ 工具方法 ================================
 

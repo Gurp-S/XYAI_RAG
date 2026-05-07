@@ -1056,11 +1056,9 @@ body.sidebar-style-outline .sidebar.collapsed .logout-btn {
   background: color-mix(in srgb, var(--surface-solid) 88%, transparent);
   box-shadow: var(--shadow-md);
   display: flex;
-  /* 垂直居中输入文本，避免靠底部显得不平衡 */
   align-items: center;
-  gap: 12px;
-  /* 上下间距略小，文本更居中 */
-  padding: 0.7rem 0.9rem 0.7rem 1rem;
+  gap: 6px;
+  padding: 0.6rem 0.9rem 0.6rem 0.6rem;
 }
 
 #message {

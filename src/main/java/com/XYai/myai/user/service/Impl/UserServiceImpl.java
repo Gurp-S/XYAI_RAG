@@ -36,6 +36,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 
 /**
  * 用户服务实现类。
@@ -163,7 +165,6 @@ public class UserServiceImpl implements UserService {
         try {
             passwordMatches = passwordEncoder.matches(providedPassword, user.getPassword());
         } catch (IllegalArgumentException ignored) {
-            passwordMatches = false;
         }
         if (!passwordMatches) {
             passwordMatches = Objects.equals(providedPassword, user.getPassword());
@@ -205,6 +206,10 @@ public class UserServiceImpl implements UserService {
     public Result<List<ChatSessionRecord>> history(Long userId) {
         if (userId == null || userId < 0)
             return Result.error(500, "id非法");
+        User currentUser = LoginUserInfoManager.get();
+        if (currentUser == null || !Objects.equals(currentUser.getId(), userId)) {
+            return Result.error(403, "无权限访问");
+        }
         List<ChatSessionRecord> conversations = getConversationId(userId);
         return Result.success(conversations);
     }
@@ -232,13 +237,14 @@ public class UserServiceImpl implements UserService {
         BeanUtils.copyProperties(userDTO, user);
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         userMapper.insert(user);
-
         // 注册后初始化用户“分区”缓存：先创建空的可访问集合列表
         Long userId = user.getId() != null ? user.getId() : userDTO.getId();
         if (userId != null) {
             try {
-                RSet<String> set = redissonClient.getSet(RedisKeyConfig.userLoadCollectionsKey(userId));
-                set.clear();
+                RSet<String> loadSet = redissonClient.getSet(RedisKeyConfig.userLoadCollectionsKey(userId));
+                RSet<String> unLoadSet = redissonClient.getSet(RedisKeyConfig.userUnloadCollectionsKey(userId));
+                loadSet.clear();
+                unLoadSet.clear();
             } catch (Exception e) {
                 log.warn("初始化用户分区缓存失败, userId={}", userId, e);
             }
@@ -382,5 +388,66 @@ public class UserServiceImpl implements UserService {
         Map<String, Object> body = Map.of("accessToken", newAccessToken, "expiresAt",
                 jwtProperties.getAccessTokenExpSec());
         return Result.success(body);
+    }
+
+
+    public Result<String> deleteHistory(Long userId, String conversationId){
+        if (conversationId == null || conversationId.isBlank()) {
+            return Result.error(400, "conversationId 不能为空");
+        }
+
+        // 验证当前用户是否为该会话的拥有者
+        ChatSessionRecord rec = chatSessionRecordMapper.selectById(conversationId);
+        if (rec == null) {
+            return Result.error(404, "会话不存在");
+        }
+        if (rec.getUserId() == null || !Objects.equals(rec.getUserId(), userId)) {
+            return Result.error(403, "无权限删除此会话");
+        }
+
+        // 删除会话元信息
+        chatSessionRecordMapper.deleteById(conversationId);
+        // 删除会话下的所有消息（chat_conversation 表以 chat_message_id 为主键，需按 conversation_id 删除）
+        LambdaQueryWrapper<com.XYai.myai.rag.memory.POJO.ChatConversation> q = new LambdaQueryWrapper<>();
+        q.eq(com.XYai.myai.rag.memory.POJO.ChatConversation::getConversationId, conversationId);
+        chatConversationMapper.delete(q);
+
+        return Result.success();
+    }
+
+    public Result<String> updateHistory(ChatSessionRecord chatSessionRecord){
+        if (chatSessionRecord == null || chatSessionRecord.getConversationId() == null || chatSessionRecord.getConversationId().isBlank()) {
+            return Result.error(400, "conversationId 不能为空");
+        }
+
+        // 验证权限：所属用户
+        ChatSessionRecord exist = chatSessionRecordMapper.selectById(chatSessionRecord.getConversationId());
+        if (exist == null) {
+            return Result.error(404, "会话不存在");
+        }
+        Long currentUserId = LoginUserInfoManager.get() != null ? LoginUserInfoManager.get().getId() : null;
+        if (exist.getUserId() == null || currentUserId == null || !Objects.equals(exist.getUserId(), currentUserId)) {
+            return Result.error(403, "无权限更新此会话");
+        }
+
+        // 只更新传入的可变字段（title / summaryText）避免覆盖其他列为 null
+        LambdaUpdateWrapper<ChatSessionRecord> update = new LambdaUpdateWrapper<>();
+        update.eq(ChatSessionRecord::getConversationId, chatSessionRecord.getConversationId());
+        boolean hasSet = false;
+        if (chatSessionRecord.getTitle() != null) {
+            update.set(ChatSessionRecord::getTitle, chatSessionRecord.getTitle());
+            hasSet = true;
+        }
+        if (chatSessionRecord.getSummaryText() != null) {
+            update.set(ChatSessionRecord::getSummaryText, chatSessionRecord.getSummaryText());
+            hasSet = true;
+        }
+
+        if (!hasSet) {
+            return Result.error(400, "没有需要更新的字段");
+        }
+
+        chatSessionRecordMapper.update(null, update);
+        return Result.success();
     }
 }

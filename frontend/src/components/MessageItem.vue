@@ -51,6 +51,32 @@
       ></div>
       <div v-else-if="text" class="message">{{ text }}</div>
 
+      <!-- 文件分享卡片 -->
+      <div v-if="file" class="file-card" :class="{ received: file.status === 'pending' }">
+        <div class="file-card-icon">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+          </svg>
+        </div>
+        <div class="file-card-info">
+          <div class="file-card-name">{{ file.name || '文件' }}</div>
+          <div class="file-card-meta">
+            {{ file.size ? formatFileSize(file.size) : '' }}
+            <span v-if="file.status === 'pending'" class="file-card-badge">待接收</span>
+            <span v-else-if="file.status === 'accepted'" class="file-card-badge accepted">已接收</span>
+          </div>
+        </div>
+        <button v-if="file.status === 'pending'" class="file-card-accept" type="button" @click="$emit('acceptFile', file)">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          接收
+        </button>
+      </div>
+
       <!-- 错误状态与重试按钮 -->
       <div v-if="error" class="error-container">
         <div class="error-message">
@@ -102,7 +128,19 @@ const props = defineProps({
   assistantLabel: { type: String, default: "AI" },
   fromName: { type: String, default: "" },
   isStreaming: { type: Boolean, default: false },
+  file: { type: Object, default: null },
 });
+
+const emit = defineEmits(["retry", "edit", "acceptFile"]);
+
+function formatFileSize(bytes) {
+  if (!bytes || bytes === 0) return ''
+  const units = ['B', 'KB', 'MB', 'GB']
+  let i = 0
+  let size = bytes
+  while (size >= 1024 && i < units.length - 1) { size /= 1024; i++ }
+  return size.toFixed(i > 0 ? 1 : 0) + ' ' + units[i]
+}
 
 const avatarText = computed(() =>
   props.role === "user"
@@ -405,5 +443,82 @@ watch(assistantMarkdownHtml, () => {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* ─── File Card ─── */
+.file-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--panel-border) 50%, transparent);
+  background: color-mix(in srgb, var(--surface-soft) 80%, transparent);
+}
+.file-card.received {
+  border-color: color-mix(in srgb, var(--primary) 20%, transparent);
+  background: color-mix(in srgb, var(--primary) 4%, transparent);
+}
+.file-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.file-card-info {
+  flex: 1;
+  min-width: 0;
+}
+.file-card-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.file-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.file-card-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: color-mix(in srgb, #f59e0b 14%, transparent);
+  color: #d97706;
+}
+.file-card-badge.accepted {
+  background: color-mix(in srgb, #22c55e 12%, transparent);
+  color: #16a34a;
+}
+.file-card-accept {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color 0.12s;
+}
+.file-card-accept:hover {
+  background: var(--primary-hover);
 }
 </style>

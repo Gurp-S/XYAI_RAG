@@ -18,6 +18,7 @@ const CONVERSATION_CACHE_KEY = "conversationCache";
 const CONVERSATION_CACHE_ORDER_KEY = "conversationCacheOrder";
 const USER_CHAT_SESSIONS_KEY = "userChatSessions";
 const LAST_AI_CONVERSATION_KEY = "lastAiConversationId";
+const PINNED_CONVERSATIONS_KEY = "pinnedConversationIds";
 const AUTH_TOKEN_CHANGE_EVENT = "xyai:auth-token-change";
 const MAX_CONVERSATION_CACHE_ITEMS = 18;
 const MAX_CONVERSATION_MESSAGE_COUNT = 60;
@@ -86,6 +87,55 @@ function readJsonStorage(key, fallback) {
   } catch {
     return fallback;
   }
+}
+
+function readPinnedConversationIds() {
+  const raw = readJsonStorage(PINNED_CONVERSATIONS_KEY, []);
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((id) => String(id || "").trim())
+    .filter(Boolean)
+    .slice(0, 64);
+}
+
+function persistPinnedConversationIds(ids) {
+  try {
+    localStorage.setItem(
+      PINNED_CONVERSATIONS_KEY,
+      JSON.stringify(Array.isArray(ids) ? ids : []),
+    );
+  } catch {
+    // ignore
+  }
+}
+
+function applyPinnedOrdering(history, pinnedIds) {
+  const list = Array.isArray(history) ? [...history] : [];
+  const pins = Array.isArray(pinnedIds)
+    ? pinnedIds.map((id) => String(id || "").trim()).filter(Boolean)
+    : [];
+  if (pins.length === 0) return list;
+
+  const pinSet = new Set(pins);
+  const pinnedItems = [];
+  const others = [];
+
+  list.forEach((item) => {
+    const id = String(item?.conversationId || "").trim();
+    if (id && pinSet.has(id)) {
+      pinnedItems.push(item);
+    } else {
+      others.push(item);
+    }
+  });
+
+  pinnedItems.sort((a, b) => {
+    const ia = pins.indexOf(String(a?.conversationId || ""));
+    const ib = pins.indexOf(String(b?.conversationId || ""));
+    return ia - ib;
+  });
+
+  return [...pinnedItems, ...others];
 }
 
 function trimText(value, maxLength = MAX_CONVERSATION_TEXT_LENGTH) {
@@ -217,6 +267,8 @@ function readConversationCacheOrder(cache) {
   return normalizedOrder;
 }
 
+let conversationCacheDebounceTimer = null;
+
 function persistConversationCache(cache, order) {
   try {
     localStorage.setItem(CONVERSATION_CACHE_KEY, JSON.stringify(cache || {}));
@@ -227,6 +279,19 @@ function persistConversationCache(cache, order) {
   } catch (error) {
     console.warn("Failed to persist conversation cache:", error);
   }
+}
+
+function schedulePersistConversationCache(store) {
+  if (conversationCacheDebounceTimer) {
+    clearTimeout(conversationCacheDebounceTimer);
+  }
+  conversationCacheDebounceTimer = setTimeout(() => {
+    conversationCacheDebounceTimer = null;
+    persistConversationCache(
+      store.conversationCache,
+      store.conversationCacheOrder,
+    );
+  }, 400);
 }
 
 function resolveViewFromPath(path) {
@@ -491,7 +556,10 @@ export const useUiStore = defineStore("ui", {
     currentView: "chat", // 'chat' or 'db'
     chatMode: "ai", // 'ai' | 'user' | 'group'
     chatTarget: null,
-    chatHistory: JSON.parse(localStorage.getItem("chatHistory")) || [],
+    chatHistory: applyPinnedOrdering(
+      JSON.parse(localStorage.getItem("chatHistory")) || [],
+      readPinnedConversationIds(),
+    ),
     loadingHistory: false,
     activeConversationId: createConversationId(),
     lastAiConversationId:
@@ -506,6 +574,7 @@ export const useUiStore = defineStore("ui", {
     conversationCache: readConversationCache(),
     conversationCacheOrder: readConversationCacheOrder(readConversationCache()),
     userChatSessions: readJsonStorage(USER_CHAT_SESSIONS_KEY, {}),
+    pinnedConversationIds: readPinnedConversationIds(),
   }),
   getters: {
     userDisplayName: (state) =>
@@ -815,9 +884,17 @@ export const useUiStore = defineStore("ui", {
         JSON.stringify(this.userChatSessions),
       );
     },
-    updateCurrentMessages(messages) {
+    updateCurrentMessages(messages, options = {}) {
+      const incoming = Array.isArray(messages) ? messages : [];
+      const preserveRef = Boolean(options && options.preserveRef);
       const safeMessages = Array.isArray(messages) ? [...messages] : [];
-      this.currentMessages = safeMessages;
+
+      if (!preserveRef) {
+        this.currentMessages = safeMessages;
+      } else if (this.currentMessages !== incoming) {
+        // 允许调用方在原数组上 push/splice，再在此处仅做持久化更新
+        this.currentMessages = incoming;
+      }
 
       if (this.chatMode === "ai") {
         if (!this.activeConversationId) return;
@@ -926,18 +1003,21 @@ export const useUiStore = defineStore("ui", {
       }
     },
     persistConversationCache() {
-      persistConversationCache(
-        this.conversationCache,
-        this.conversationCacheOrder,
-      );
+      schedulePersistConversationCache(this);
     },
     resetAuthState() {
+      // Cancel pending cache persistence
+      if (conversationCacheDebounceTimer) {
+        clearTimeout(conversationCacheDebounceTimer);
+        conversationCacheDebounceTimer = null;
+      }
       this.setUser(null);
       this.chatHistory = [];
       this.currentMessages = [];
       this.conversationCache = {};
       this.conversationCacheOrder = [];
       this.userChatSessions = {};
+      this.pinnedConversationIds = [];
       this.chatMode = "ai";
       this.chatTarget = null;
       this.lastAiConversationId = null;
@@ -950,6 +1030,7 @@ export const useUiStore = defineStore("ui", {
       localStorage.removeItem(CONVERSATION_CACHE_ORDER_KEY);
       localStorage.removeItem(USER_CHAT_SESSIONS_KEY);
       localStorage.removeItem(LAST_AI_CONVERSATION_KEY);
+      localStorage.removeItem(PINNED_CONVERSATIONS_KEY);
       if (router.currentRoute.value.path !== "/") {
         router.push("/").catch(() => {});
       }
@@ -1138,12 +1219,108 @@ export const useUiStore = defineStore("ui", {
           return entry;
         });
 
-        this.chatHistory = [...optimisticLocal, ...normalizedHistory];
+        this.chatHistory = applyPinnedOrdering(
+          [...optimisticLocal, ...normalizedHistory],
+          this.pinnedConversationIds,
+        );
         localStorage.setItem("chatHistory", JSON.stringify(this.chatHistory));
       } catch (err) {
         console.error("Failed to fetch history:", err);
       } finally {
         this.loadingHistory = false;
+      }
+    },
+    togglePinConversation(conversationId) {
+      const convId = String(conversationId || "").trim();
+      if (!convId) return;
+
+      const current = Array.isArray(this.pinnedConversationIds)
+        ? [...this.pinnedConversationIds]
+        : [];
+      const exists = current.includes(convId);
+      const next = exists
+        ? current.filter((id) => id !== convId)
+        : [convId, ...current];
+
+      this.pinnedConversationIds = next;
+      persistPinnedConversationIds(next);
+
+      this.chatHistory = applyPinnedOrdering(this.chatHistory, next);
+      localStorage.setItem("chatHistory", JSON.stringify(this.chatHistory));
+    },
+    async renameHistory(conversationId, title) {
+      const convId = String(conversationId || "").trim();
+      const nextTitle = String(title || "").trim();
+      if (!convId || !nextTitle) return false;
+
+      const index = this.chatHistory.findIndex(
+        (item) => item?.conversationId === convId,
+      );
+      if (index >= 0) {
+        this.chatHistory[index] = {
+          ...this.chatHistory[index],
+          title: nextTitle,
+        };
+        localStorage.setItem("chatHistory", JSON.stringify(this.chatHistory));
+      }
+
+      try {
+        const url = `/user/history/updata?conversationId=${encodeURIComponent(
+          convId,
+        )}&title=${encodeURIComponent(nextTitle)}`;
+        const response = await authFetch(url, { method: "GET" });
+        const result = await safeReadJson(response);
+        return Boolean(response.ok && result?.code === 200);
+      } catch (error) {
+        console.error("Failed to rename history:", error);
+        return false;
+      } finally {
+        this.fetchHistory(true);
+      }
+    },
+    async deleteHistory(conversationId) {
+      const convId = String(conversationId || "").trim();
+      if (!convId) return false;
+
+      // optimistic remove (UI first)
+      this.chatHistory = this.chatHistory.filter(
+        (item) => item?.conversationId !== convId,
+      );
+      localStorage.setItem("chatHistory", JSON.stringify(this.chatHistory));
+
+      if (Array.isArray(this.pinnedConversationIds)) {
+        this.pinnedConversationIds = this.pinnedConversationIds.filter(
+          (id) => id !== convId,
+        );
+        persistPinnedConversationIds(this.pinnedConversationIds);
+      }
+
+      if (this.conversationCache && this.conversationCache[convId]) {
+        delete this.conversationCache[convId];
+      }
+      if (Array.isArray(this.conversationCacheOrder)) {
+        this.conversationCacheOrder = this.conversationCacheOrder.filter(
+          (id) => id !== convId,
+        );
+      }
+      this.persistConversationCache();
+
+      if (this.activeConversationId === convId) {
+        this.newConversation();
+      }
+
+      try {
+        const url = `/user/history/delete?conversationId=${encodeURIComponent(
+          convId,
+        )}`;
+        const response = await authFetch(url, { method: "GET" });
+        const result = await safeReadJson(response);
+        return Boolean(response.ok && result?.code === 200);
+      } catch (error) {
+        console.error("Failed to delete history:", error);
+        return false;
+      } finally {
+        this.fetchHistory(true);
       }
     },
     toggleHighPerf() {

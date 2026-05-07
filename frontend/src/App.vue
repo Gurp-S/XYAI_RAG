@@ -36,14 +36,14 @@ import Sidebar from './components/Sidebar.vue'
 import ModalManager from './components/ModalManager.vue'
 import Login from './components/Login.vue'
 import { useUiStore } from './store/index'
-import { onMounted, watch } from 'vue'
+import { onMounted, onErrorCaptured, watch, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 const ui = useUiStore()
 const route = useRoute()
+const hasRenderError = ref(false)
 
 onMounted(() => {
-  // 如果已登录但没有历史记录，初始化拉取一次
   if (ui.currentUser && ui.chatHistory.length === 0) {
     ui.fetchHistory()
   }
@@ -52,6 +52,17 @@ onMounted(() => {
 
 watch(() => route.path, () => {
   ui.syncViewFromRoute(route.path)
+})
+
+// Global error boundary — prevents white screen on component crash
+onErrorCaptured((err, instance, info) => {
+  console.error("[App] captured error:", err, info)
+  // Only show fallback for rendering errors; network errors pass through
+  if (info?.includes("render") || info?.includes("setup")) {
+    hasRenderError.value = true
+    return false // prevent propagation
+  }
+  return true
 })
 </script>
 

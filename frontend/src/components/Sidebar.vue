@@ -31,6 +31,10 @@
             :history="store.chatHistory"
             :active-conversation-id="store.activeConversationId"
             @select="handleSelectConversation"
+            @rename="handleRenameConversation"
+            @pin="handlePinConversation"
+            @share="handleShareConversation"
+            @delete="handleDeleteConversation"
         />
     </div>
 
@@ -99,6 +103,27 @@ function switchToDb() {
 function handleSelectConversation(session) {
     store.setView('chat')
     store.selectConversation(session)
+}
+
+async function handleRenameConversation(payload) {
+    const session = payload?.session
+    const title = payload?.title
+    if (!session?.conversationId || !title) return
+    await store.renameHistory(session.conversationId, title)
+}
+
+function handlePinConversation(session) {
+    if (!session?.conversationId) return
+    store.togglePinConversation(session.conversationId)
+}
+
+function handleShareConversation() {
+    // 分享（复制 conversationId）已在 HistoryList 内完成
+}
+
+async function handleDeleteConversation(session) {
+    if (!session?.conversationId) return
+    await store.deleteHistory(session.conversationId)
 }
 
 function handleLogout() {

@@ -18,8 +18,11 @@ import java.time.LocalDateTime;
 @TableName("chat_conversation")
 public class ChatConversation {
 
-    @TableId(value = "chat_message_id", type = IdType.INPUT) // 或 IdType.ASSIGN_UUID / ASSIGN_ID / AUTO
+    @TableId(value = "chat_message_id", type = IdType.ASSIGN_ID)
     private String chatMessageId;
+
+    @TableField("user_id")
+    private Long userId;
 
     @TableField("conversation_id")
     private String conversationId;

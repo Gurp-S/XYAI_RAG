@@ -1,10 +1,17 @@
 package com.XYai.myai.rag.milvus;
 
 import com.XYai.myai.config.Result;
+import com.XYai.myai.mapper.UserMapper;
+import com.XYai.myai.user.LoginUserInfoManager;
+import com.XYai.myai.user.POJO.User;
+import com.XYai.myai.user.userChat.POJO.FileMessage;
+import com.XYai.myai.user.userChat.POJO.UserChatRequest;
+import com.XYai.myai.user.userChat.UserChatService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +30,10 @@ public class MilvusController {
     private MilvusFileManager milvusFileManager;
     @Resource
     private MilvusCollectionService milvusCollectionService;
+    @Resource
+    private UserChatService userChatService;
+    @Resource
+    private UserMapper userMapper;
 
     /**
      * 查看数据库的数据(实际为redis下user的所有数据)
@@ -154,5 +165,91 @@ public class MilvusController {
             return Result.error(1, "无权限访问");
         }
         return milvusCollectionService.rebuild(collectionName);
+    }
+
+    /**
+     * 分享文件的消息
+     * @param collectionName
+     * @param fileId
+     * @param userId
+     * @param chunkId
+     * @return
+     */
+    @PostMapping("/share/message")
+    public Result<FileMessage> shareFilesMessage(
+            @RequestParam String collectionName,
+            @RequestParam String fileId,
+            @RequestParam Long userId,
+            @RequestParam(required = false) Integer chunkId) {
+        User sender = LoginUserInfoManager.get();
+        if (sender == null || sender.getId() == null) {
+            return Result.error(401, "未登录");
+        }
+        if (userId == null || userId <= 0) {
+            return Result.error(400, "userId 不能为空");
+        }
+        if (sender.getId().equals(userId)) {
+            return Result.error(400, "不能分享给自己");
+        }
+        if (userMapper.selectById(userId) == null) {
+            return Result.error(404, "用户不存在");
+        }
+        if (!milvusAclManager.getCollectionAcl(collectionName) || !milvusAclManager.getFileAcl(fileId)) {
+            log.info("shareFilesMessageNoAcl: {}", collectionName);
+            return Result.error(1, "无权限访问");
+        }
+
+        Integer normalizedChunkId = (chunkId != null && chunkId > 0) ? chunkId : null;
+        String payload = "{\"type\":\"file_share\",\"collectionName\":\"" + collectionName
+                + "\",\"fileId\":\"" + fileId + "\",\"chunkId\":"
+                + (normalizedChunkId == null ? "null" : normalizedChunkId) + "}";
+
+        UserChatRequest request = new UserChatRequest(
+                payload,
+                null,
+                sender.getId(),
+                "user",
+                String.valueOf(userId),
+                null,
+                sender.getName()
+        );
+        UserChatService.UserChatSendResult sendResult = userChatService.send(request);
+
+        FileMessage message = FileMessage.builder()
+                .id(sendResult.messageId())
+                .conversationId(sendResult.conversationId())
+                .targetType("user")
+                .targetId(String.valueOf(userId))
+                .senderId(String.valueOf(sender.getId()))
+                .senderName(sender.getName())
+                .content(payload)
+                .timestamp(sendResult.timestamp())
+                .acceptOrReject(null)
+                .collectionName(collectionName)
+                .fileId(fileId)
+                .chunkId(normalizedChunkId)
+                .fromUserId(sender.getId())
+                .toUserId(userId)
+                .status("PENDING")
+                .createdAt(sendResult.timestamp())
+                .build();
+        return Result.success(message);
+    }
+
+    /**
+     * 确认接受后进行权限的设定
+     * @param collectionName
+     * @param fileId
+     * @param userId
+     * @param chunkId
+     * @return
+     */
+    @PostMapping("/share")
+    public Result<String> shareFiles(String collectionName ,String fileId , Long userId , int chunkId){
+        if (!milvusAclManager.getCollectionAcl(collectionName) || !milvusAclManager.getFileAcl(fileId)) {
+            log.info("shareFilesNoAcl:{}", collectionName);
+            return Result.error(1, "无权限访问");
+        }
+        return milvusFileManager.shareFiles(collectionName, fileId , userId , chunkId);
     }
 }

@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.XYai.myai.mapper.IntentNodeMapper;
 import com.XYai.myai.rag.intent.POJO.*;
 import com.XYai.myai.rag.memory.POJO.LoadSession;
+import com.XYai.myai.rag.milvus.MilvusVectorStoreConfig;
 import com.XYai.myai.rag.rewrite.POJO.RewriteResult;
 import com.XYai.myai.redis.RedisKeyConfig;
 import com.alibaba.fastjson2.JSON;
@@ -22,17 +23,19 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.document.Document;
+import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 意图识别服务实现。实现流程：
@@ -57,6 +60,13 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
     private VectorStore vectorStore;
     @Resource
     private RedissonClient redissonClient;
+    @Resource
+    private MilvusVectorStoreConfig milvusVectorStoreConfig;
+
+    private List<Document> docs;
+
+    @Resource(name = "intentExecutor")
+    private ThreadPoolTaskExecutor intentExecutor;
 
     /**
      * 识别一组查询（可能包含拆分后的子问题）并返回意图列表。
@@ -67,27 +77,42 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
      * @return 最多三个 SubQuestionIntent 结果
      */
     public List<SubQuestionIntent> recognize(RewriteResult rewriteResult, LoadSession load) {
-        // 加载子问题（优先使用已分解的子查询）
-        List<String> list;
+        // 1. 解析子问题列表（与原逻辑一致）
+        List<String> queries;
         if (rewriteResult == null) {
-            list = List.of();
+            queries = List.of();
         } else if (CollUtil.isNotEmpty(rewriteResult.getSubQuery())) {
-            list = rewriteResult.getSubQuery();
+            queries = rewriteResult.getSubQuery();
         } else if (!StrUtil.isBlank(rewriteResult.getRewrittenQuery())) {
-            list = List.of(rewriteResult.getRewrittenQuery());
+            queries = List.of(rewriteResult.getRewrittenQuery());
         } else {
-            list = List.of();
+            queries = List.of();
         }
-        // 并行识别每个子问题
-        List<CompletableFuture<SubQuestionIntent>> tasks = list.stream().map(
-                query -> CompletableFuture.supplyAsync(
-                        () -> classifyIntent(query, load)
-                )).toList();
-        List<SubQuestionIntent> subIntent = tasks.stream().map(
-                CompletableFuture::join
-        ).toList();
-        List<SubQuestionIntent> nonNull = subIntent.stream().filter(Objects::nonNull).toList();
-        return nonNull.subList(0, Math.min(3, nonNull.size()));
+
+        if (queries.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<CompletableFuture<SubQuestionIntent>> futures = queries.stream()
+                .map(query -> CompletableFuture
+                        .supplyAsync(() -> classifyIntent(query, load), intentExecutor)
+                        .orTimeout(4000, TimeUnit.MILLISECONDS)
+                        .exceptionally(ex -> {
+                            log.warn("意图识别子任务失败或超时: query={}", query, ex);
+                            return getDegradeIntentResult(query);
+                        })
+                )
+                .toList();
+
+        // 4. 等待全部完成（不强制要求结果）
+        CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).join();
+
+        // 5. 收集结果，取前 3 个非空值
+        return futures.stream()
+                .map(CompletableFuture::join)          // 此时已全部完成
+                .filter(Objects::nonNull)
+                .limit(3)
+                .toList();
     }
 
     /**
@@ -106,7 +131,7 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
         //TODO 同义词映射
         //分词判断
         List<String> tokenizes = tokenizeWithIk(query);
-        //读取redis意图树.有->返回,没有->数据库查询
+        // 读取redis意图树.有->返回,没有->数据库查询
         if (intentProperties.getRedisEnabled()) {
             SubQuestionIntent byRedis = matchIntentFromRedis(tokenizes);
             if (byRedis != null) {
@@ -122,10 +147,15 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
                 return bySql;
             }
         }
-        //TODO RAG向量检索,没有->兜底策略加载所有意图子节点
+        // RAG向量检索,没有->兜底策略加载所有意图子节点
+        SubQuestionIntent byRag = null;
         if (intentProperties.getVectorEnabled()) {
-            SubQuestionIntent byRag = matchIntentFromRag(tokenizes);
-            if (byRag != null) {
+            byRag = matchIntentFromRag(query);
+            Optional<Double> maxScoreOptional = byRag.getNodeScore().getNodeScoreList().stream()
+                    .map(NodeScore::getScore).max(Comparator.naturalOrder());
+            Double maxScore = maxScoreOptional.orElse(0.0);
+            if (maxScore > 0.75) {
+                // 分数低不返回
                 log.info("向量判断成功");
                 return byRag;
             }
@@ -135,8 +165,8 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
             log.info("兜底更新未开启,降级返回原文");
             return getDegradeIntentResult(query);
         }
-        //返回降级策略
-        return fallback(query, load);
+        //返回降级策略(复用向量的节点)
+        return fallback(query, load, byRag);
     }
 
     @NotNull
@@ -158,19 +188,48 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
     /**
      * 使用 RAG/向量检索方式匹配意图（目前为占位实现）。
      *
-     * @param tokenizes 分词后的 token 列表
      * @return 匹配到的 IntentNode 列表（可能为空）
      */
-    private SubQuestionIntent matchIntentFromRag(List<String> tokenizes) {
-        List<IntentNode> matches = new ArrayList<>();
-        List<NodeScore> list = new ArrayList<>();
-        for (String tokenize : tokenizes) {
-            // TODO: 向量检索实现
-            vectorStore.getName();
+    private SubQuestionIntent matchIntentFromRag(String query) {
+        // 构造搜索请求：取前3个，相似度阈值 0.7
+        List<Document> docs = milvusVectorStoreConfig.getIntentVectorStore().similaritySearch(SearchRequest.builder()
+                .query(query)
+                .topK(3)
+                .similarityThreshold(0.3)
+                .build());
+
+        if (docs == null || docs.isEmpty()) {
+            return null;
         }
-        return matches.isEmpty() && list.isEmpty() ? null
-                : SubQuestionIntent.builder().subIntent(matches).nodeScore(NodesScore.builder()
-                                                                           .nodeScoreList(list).build()).build();
+        List<IntentNode> matches = new ArrayList<>();
+        List<NodeScore> nodeScores = new ArrayList<>();
+        for (Document doc : docs) {
+            // 从 metadata 还原 IntentNode
+            IntentNode node = new IntentNode();
+            node.setNodeId((String) doc.getMetadata().get("nodeId"));
+            node.setName((String) doc.getMetadata().get("name"));
+            node.setParentName((String) doc.getMetadata().get("parentName"));
+            node.setCollectionName((String) doc.getMetadata().get("collectionName"));
+            Object topKObj = doc.getMetadata().get("topK");
+            node.setTopK(topKObj instanceof Number ? ((Number) topKObj).intValue() : 5);
+            matches.add(node);
+            double score = 0.0;
+            if (doc.getMetadata().containsKey("score")) {
+                score = ((Number) doc.getMetadata().get("score")).doubleValue();
+            } else if (doc.getMetadata().containsKey("distance")) {
+                // 距离需转换为相似度，假设余弦距离 range [0,2]
+                double dist = ((Number) doc.getMetadata().get("distance")).doubleValue();
+                score = 1 - dist / 2;   // 近似转换
+            }
+            nodeScores.add(NodeScore.builder()
+                    .intentNodeName(node.getName())
+                    .score(score)
+                    .build());
+        }
+        return SubQuestionIntent.builder()
+                .subIntent(matches)
+                .nodeScore(NodesScore.builder().nodeScoreList(nodeScores).build())
+                .build();
     }
 
     /**
@@ -179,17 +238,22 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
      *
      * @param query 原始查询
      * @param load  上下文
+     * @param byRag
      * @return 识别到的意图对象
      */
-    private SubQuestionIntent fallback(String query, LoadSession load) {
+    private SubQuestionIntent fallback(String query, LoadSession load, SubQuestionIntent byRag) {
         try {
             log.info("兜底进行: query={}", query);
-
+            // 优先使用ByRAG没有再查
+            List<IntentNode> subIntent = byRag.getSubIntent();
+            List<IntentNode> leafNodes = subIntent == null ? List.of() : subIntent;
             // 1. 查叶子节点
             // 1.1先查redis失败查mysql
             RSet<Object> set = redissonClient.getSet(RedisKeyConfig.intentNodeLeaveKey());
-            List<IntentNode> leafNodes = set.stream().map(o -> JSON.parseObject(o.toString(), IntentNode.class)).toList();
-            if (leafNodes == null || leafNodes.isEmpty()) {
+            if (leafNodes.isEmpty()) {
+                leafNodes = set.stream().map(o -> JSON.parseObject(o.toString(), IntentNode.class)).toList();
+            }
+            if (leafNodes.isEmpty()) {
                 leafNodes = intentNodeMapper.selectList(
                         new QueryWrapper<IntentNode>().eq("children_count", 0)
                 );
@@ -327,18 +391,30 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
      * @return 匹配到的 IntentNode 列表
      */
     private SubQuestionIntent matchIntentFromSql(List<String> tokenizes) {
-        List<NodeScore> list = new ArrayList<>();
-        List<IntentNode> matches = new ArrayList<>();
-        for (String tokenize : tokenizes) {
-            IntentNode getLeafNodes = intentNodeMapper.selectById(tokenize);
-            if (getLeafNodes != null) {
-                matches.add(getLeafNodes);
-                list.add(NodeScore.builder().intentNodeName(tokenize).score(0.95).build());
-            }
-        }
-        return matches.isEmpty() && list.isEmpty() ? null
-                : SubQuestionIntent.builder().subIntent(matches).nodeScore(NodesScore.builder()
-                                                                           .nodeScoreList(list).build()).build();
+        if (tokenizes.isEmpty()) return null;
+
+        // 去重、去空
+        List<String> cleanTokens = tokenizes.stream()
+                .filter(StrUtil::isNotBlank)
+                .distinct()
+                .toList();
+
+        // 批量按 id 查询
+        List<IntentNode> allMatched = intentNodeMapper.selectList(
+                new QueryWrapper<IntentNode>().in("node_id", cleanTokens));
+        if (allMatched.isEmpty()) return null;
+
+        List<NodeScore> nodeScores = allMatched.stream()
+                .map(node -> NodeScore.builder()
+                        .intentNodeName(node.getName())
+                        .score(0.95)
+                        .build())
+                .toList();
+
+        return SubQuestionIntent.builder()
+                .subIntent(allMatched)
+                .nodeScore(NodesScore.builder().nodeScoreList(nodeScores).build())
+                .build();
     }
 
     /**
@@ -371,30 +447,48 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
      * @return 匹配到的 IntentNode 列表
      */
     private SubQuestionIntent matchIntentFromRedis(List<String> tokenizes) {
-        //redis用hash存,hashkey为名字,value为id
-        //id使用如 "group-hr"、"group-hr-leave-annual"格式可以直接返回树
+        if (tokenizes.isEmpty()) return null;
+
+        // 1. 构建 Redis key 列表（去重、去空）
+        List<String> cleanTokens = tokenizes.stream()
+                .filter(StrUtil::isNotBlank)
+                .distinct()
+                .toList();
+
+        List<String> redisKeys = cleanTokens.stream()
+                .map(RedisKeyConfig::intentNodeNameKey)
+                .toList();
+
+        // 2. 批量获取 JSON 字符串
+        List<String> jsons = stringRedisTemplate.opsForValue().multiGet(redisKeys);
+        if (jsons == null || jsons.isEmpty()) return null;
+
+        // 3. 解析并收集有效的 IntentNode
         List<IntentNode> matches = new ArrayList<>();
-        List<NodeScore> list = new ArrayList<>();
-        for (String tokenize : tokenizes) {
-            if (StrUtil.isBlank(tokenize)) {
-                continue;
-            }
-            // 1) 先按 name -> nodeId 查
-            // 安全获取 Redis 中的意图ID
-            String nodeName = stringRedisTemplate.opsForValue().get(RedisKeyConfig.intentNodeNameKey(tokenize));
-            if (StrUtil.isBlank(nodeName)) {
-                continue;
-            }
-            IntentNode node =
-                    com.alibaba.fastjson2.JSON.parseObject(nodeName, IntentNode.class);
-            if (node != null) {
-                matches.add(node);
-                list.add(NodeScore.builder().intentNodeName(tokenize).score(0.95).build());
+        List<NodeScore> nodeScores = new ArrayList<>();
+
+        for (int i = 0; i < cleanTokens.size(); i++) {
+            String json = jsons.get(i);
+            if (StrUtil.isBlank(json)) continue;
+            try {
+                IntentNode node = JSON.parseObject(json, IntentNode.class);
+                if (node != null) {
+                    matches.add(node);
+                    nodeScores.add(NodeScore.builder()
+                            .intentNodeName(cleanTokens.get(i))
+                            .score(0.95)
+                            .build());
+                }
+            } catch (Exception e) {
+                log.debug("解析 Redis 中的意图节点失败: key={}", redisKeys.get(i));
             }
         }
-        return matches.isEmpty() && list.isEmpty() ? null
-                : SubQuestionIntent.builder().subIntent(matches).nodeScore(NodesScore.builder()
-                                                                           .nodeScoreList(list).build()).build();
+
+        if (matches.isEmpty()) return null;
+        return SubQuestionIntent.builder()
+                .subIntent(matches)
+                .nodeScore(NodesScore.builder().nodeScoreList(nodeScores).build())
+                .build();
     }
 
     /**

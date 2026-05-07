@@ -358,7 +358,13 @@
 # ('证书', '教育-教务', '证书相关', '教务', 8, 0),
 # ('学费', '教育-教务', '学费相关', '教务', 8, 0),
 # ('课表', '教育-教务', '课表相关', '教务', 8, 0);
-
+-- 只加 user_id 字段（如果你之前没加）
+# ALTER TABLE chat_conversation
+#     ADD COLUMN `user_id` bigint NOT NULL COMMENT '用户ID' AFTER `chat_message_id`;
+#
+# -- 加上索引
+# ALTER TABLE chat_conversation
+#     ADD INDEX idx_user_conversation (`user_id`,`conversation_id`);
 
 
 

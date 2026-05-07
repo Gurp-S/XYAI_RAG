@@ -1,4 +1,4 @@
-package com.XYai.myai.user.userChat;
+package com.XYai.myai.user.userChat.POJO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,16 +1,16 @@
-package com.XYai.myai.user.userChat;
+package com.XYai.myai.user.userChat.POJO;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 /**
  * 内部使用的聊天消息实体类（用于内存队列存储）。
  * 字段与持久化对象保持简单一致，适合轻量消息存储与回放。
  */
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatMessage {

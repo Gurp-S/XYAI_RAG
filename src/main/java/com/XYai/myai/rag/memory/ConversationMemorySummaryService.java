@@ -188,13 +188,7 @@ public class ConversationMemorySummaryService {
                         + " | AI：" + (chatMsg.getAssistantMessage() == null ? "" : chatMsg.getAssistantMessage()))
                 .reduce((msg1, msg2) -> msg1 + "；" + msg2)  // 拼接成一行
                 .orElse("无对话内容");
-        String systemMessage = """
-                你是一个专业的对话摘要助手。请合并以下历史摘要与新对话，输出一行简洁摘要。
-                要求：
-                1. 严格≤%d 字符；
-                2. 仅保留关键事实，去除寒暄/重复；
-                3. 输出纯文本，不要 JSON/Markdown。
-                """.formatted(memoryProperties.getSummaryMaxChars());
+        String systemMessage = "合并摘要。要求：≤%d字，去寒暄，纯文本。".formatted(memoryProperties.getSummaryMaxChars());
         String userMessage = """
                 历史摘要（参考，不要复述）:
                 %s
@@ -238,6 +232,7 @@ public class ConversationMemorySummaryService {
                 }
             }
             ChatConversation conversation = new ChatConversation();
+            conversation.setUserId(message.getUserId());
             conversation.setConversationId(ConversationId);
             conversation.setUserMessage(message.getUserMessage());
             conversation.setAssistantMessage(message.getAssistantMessage());

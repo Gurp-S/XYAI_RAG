@@ -23,6 +23,8 @@ import java.util.Map;
 @Component
 public class Parser implements Ingestion {
 
+    private static final AutoDetectParser TIKA_PARSER = new AutoDetectParser();
+
     private static final int DEFAULT_MAX_PARSE_CHARS = 5_000_000;
 
     @Override
@@ -48,6 +50,10 @@ public class Parser implements Ingestion {
         }
         // 检测MIME类型(如果没有)
         String text;
+        // 文件小没有必要用tika
+        if (rawBytes.length < 1000) {
+            text = new String(rawBytes, StandardCharsets.UTF_8);
+        }
         Metadata metadata = new Metadata();
         Object mimeTypeValue = document.getMetadata().get(IngestionContext.META_MIME_TYPE);
         String mimeType = mimeTypeValue == null ? null : String.valueOf(mimeTypeValue);
@@ -57,11 +63,15 @@ public class Parser implements Ingestion {
         // Tika解析
         try (ByteArrayInputStream input = new ByteArrayInputStream(rawBytes)) {
             BodyContentHandler handler = new BodyContentHandler(DEFAULT_MAX_PARSE_CHARS);
-            new AutoDetectParser().parse(input, handler, metadata, new ParseContext());
+            TIKA_PARSER.parse(input, handler, metadata, new ParseContext());
             text = handler.toString();
         } catch (Exception ex) {
-            // TODO解析失败时按UTF-8直接转文本
-            text = new String(rawBytes, StandardCharsets.UTF_8);
+            // 解析失败时按UTF-8直接转文本
+            if (rawBytes.length < 5_000_000) {
+                text = new String(rawBytes, StandardCharsets.UTF_8);
+            } else {
+                return NodeResult.fail("file too large and Tika failed");
+            }
         }
 
         if (!StringUtils.hasText(text)) {

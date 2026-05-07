@@ -56,7 +56,7 @@
       </template>
     </div>
 
-    <FooterInput v-model="input" @send="send" />
+    <FooterInput v-model="input" @send="send" @share="handleShare" />
   </main>
 </template>
 
@@ -265,6 +265,11 @@ function scheduleChunkFlush() {
       flushPendingChunk();
     });
   }, STREAM_FLUSH_MIN_INTERVAL - elapsed);
+}
+
+function handleShare({ target, userId }) {
+  if (!userId) return
+  // TODO: 对接 /share 和 /share/message 接口发送文件
 }
 
 async function send() {

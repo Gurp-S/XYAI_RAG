@@ -2,6 +2,7 @@ package com.XYai.myai.rag.rewrite;
 
 import com.XYai.myai.rag.memory.POJO.LoadSession;
 import com.XYai.myai.rag.rewrite.POJO.RewriteResult;
+import com.alibaba.fastjson2.JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
@@ -44,13 +45,8 @@ public class Rewriter implements QueryRewriterService {
 
         String userQuestion = userMessage.getRewrittenQuery();
         String formatJson;
-        try {
-            // 2. 修复：正确生成 JSON 格式示例给大模型
-            formatJson = objectMapper.writeValueAsString(RewriteResult.builder().build());
-        } catch (JsonProcessingException e) {
-            log.error("生成JSON格式失败", e);
-            return userMessage;
-        }
+        // 2. 修复：正确生成 JSON 格式示例给大模型
+        formatJson = JSON.toJSONString(RewriteResult.builder().build());
 
         // 3. 构建提示词
         Prompt prompt = getPrompt(userQuestion, formatJson, load);
@@ -67,8 +63,7 @@ public class Rewriter implements QueryRewriterService {
             }
 
             // 6. JSON解析
-            RewriteResult result = objectMapper.readValue(rewrittenMessage, RewriteResult.class);
-            return result;
+            return JSON.parseObject(rewrittenMessage, RewriteResult.class);
 
         } catch (Exception e) {
             log.error("LLM调用/解析失败，用户输入：{}", userQuestion, e);
@@ -80,21 +75,15 @@ public class Rewriter implements QueryRewriterService {
      * 构建提示词（修复：提示词更清晰、模型更容易返回正确JSON）
      */
     private Prompt getPrompt(String userQuestion, String formatJson, LoadSession load) {
-        String context;
-        try {
-            context = load == null ? "无上下文" : objectMapper.writeValueAsString(load);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("上下文序列化失败", e);
-        }
+        String context = load == null ? "无" : JSON.toJSONString(load);
 
         // 核心优化：提示词更明确，强制返回JSON
         String systemText = """
-                你是专业的查询重写与子问题拆分助手。
-                严格遵守以下规则：
-                1. 将用户口语化查询标准化为正式查询句。
-                2. 如果包含多个问题，必须拆分为subQuery数组。
-                3. 只返回标准 JSON 格式，不要任何解释、不要 Markdown、不要反引号
-                4. 如果无法改写，返回：{"rewrittenQuery": "原始查询", "subQuery": null}
+                你是查询重写与子问题拆分器
+                严格遵守规则：
+                将用户口语化查询标准化为正式查询句
+                如果包含多个问题，必须拆分为subQuery数组
+                只返回标准 JSON 格式
                 %s
                 """.formatted(formatJson);
 

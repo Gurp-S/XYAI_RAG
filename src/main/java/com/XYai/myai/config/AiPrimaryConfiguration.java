@@ -1,6 +1,7 @@
 package com.XYai.myai.config;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.ollama.OllamaEmbeddingModel;
@@ -51,7 +52,8 @@ public class AiPrimaryConfiguration {
      * the primary ChatModel. This mirrors examples in the Spring AI docs.
      */
     @Bean
-    public ChatClient chatClient(ChatModel chatModel, ToolCallbackProvider allToolsProvider) {
+    public ChatClient chatClient(ChatModel chatModel,
+                                 ToolCallbackProvider allToolsProvider) {
         return ChatClient.builder(chatModel)
                 .build();
     }

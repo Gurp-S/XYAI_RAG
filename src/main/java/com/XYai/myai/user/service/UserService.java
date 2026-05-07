@@ -60,4 +60,8 @@ public interface UserService {
     Result<String> addFriend(Long userId, Long friendId);
 
     Result<Map<String, Object>> refreshAccessToken(String refreshToken, HttpServletResponse response);
+
+    Result<String> deleteHistory(Long id, String conversationId);
+
+    Result<String> updateHistory(ChatSessionRecord chatSessionRecord);
 }

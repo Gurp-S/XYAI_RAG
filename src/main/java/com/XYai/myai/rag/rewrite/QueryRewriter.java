@@ -35,7 +35,7 @@ public class QueryRewriter {
 //        queryRewriterService.easyReweite(userMessage, load);
         // 判断是否开启llm
         RewriteResult userMessage = RewriteResult.builder().rewrittenQuery(userQuestion).build();
-        if (!rewriterProperties.getRewriterEnabled()) return userMessage;
+        if (!rewriterProperties.getRewriterEnabled() || userQuestion.length() < 15) return userMessage;
         // 使用 LLM 进行智能重写
         return queryRewriterService.callLLMRewriteAndSplit(userMessage, load);
     }

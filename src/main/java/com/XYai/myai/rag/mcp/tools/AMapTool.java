@@ -10,6 +10,7 @@ import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Objects;
 
@@ -28,8 +29,8 @@ public class AMapTool {
         return "{\"status\":0,\"info\":\"" + msg.replace("\"", "'") + "\",\"count\":0}";
     }
 
-    private String filterSuccess(JSONObject data) {
-        log.info("mcp工具完成{}", data);
+    private String filterSuccess(String toolName,JSONObject data) {
+        log.info("{} 工具完成{}",toolName, data);
         return "{\"status\":1,\"info\":\"OK\",\"count\":" + data.getOrDefault("count", 1) + ",\"data\":" + data + "}";
     }
 
@@ -43,11 +44,9 @@ public class AMapTool {
             @ToolParam(description = "指定查询的城市") String city
     ) {
         try {
-            log.info("geoCode进行中");
             // 纯字符串拼接 + 中文编码
             String url = "https://restapi.amap.com/v3/geocode/geo?address=" + address + "&key=" + AMAP_KEY + "&output=json";
 
-            log.info("geoCodeUrl:{}", url);
             String jsonStr = restTemplate.getForObject(url, String.class);
             JSONObject json = JSON.parseObject(jsonStr);
 
@@ -77,7 +76,7 @@ public class AMapTool {
             dto.setDistrict(item.getString("district"));
             dto.setLocation(item.getString("location"));
 
-            return filterSuccess(item);
+            return filterSuccess("geoCode",item);
         } catch (Exception e) {
             return fail("调用失败: " + e.getMessage());
         }
@@ -92,7 +91,6 @@ public class AMapTool {
         if (location == null || !location.matches("^\\d+\\.\\d+,\\d+\\.\\d+$")) {
             return fail("参数格式错误：请输入'经度,纬度'，如 '116.397,39.908'");
         }
-        log.info("reverseGeoCode进行中");
         try {
             // 纯字符串拼接
             String url = "https://restapi.amap.com/v3/geocode/regeo?location=" + location + "&key=" + AMAP_KEY + "&output=json";
@@ -111,7 +109,7 @@ public class AMapTool {
             res.put("township", addrComp.getString("township"));
             res.put("location", location);
 
-            return filterSuccess(res);
+            return filterSuccess("reverseGeoCode",res);
         } catch (Exception e) {
             return fail("调用失败: " + e.getMessage());
         }
@@ -128,7 +126,6 @@ public class AMapTool {
             @ToolParam(description = "搜索区划") String region,
             @ToolParam(description = "指定城市数据召回限制") String city_limit
     ) {
-        log.info("keywordSearch进行中");
         try {
             // 纯字符串拼接
             String url = "https://restapi.amap.com/v3/place/text?keywords=" +
@@ -154,7 +151,7 @@ public class AMapTool {
 
             JSONObject res = new JSONObject();
             res.put("pois", arr);
-            return filterSuccess(res);
+            return filterSuccess("keywordSearch",res);
         } catch (Exception e) {
             return fail("搜索失败: " + e.getMessage());
         }
@@ -170,27 +167,35 @@ public class AMapTool {
             @ToolParam(description = "地点关键字指定地点类型") String keywords,
             @ToolParam(description = "指定地点类型") String types,
             @ToolParam(description = "搜索区划") String region,
-            @ToolParam(description = "指定城市数据召回限制") String city_limit,
+            @ToolParam(description = "指定城市数据召回限制") String cityLimit,
             @ToolParam(description = "搜索半径") String radius,
             @ToolParam(description = "排序规则") String sortRule
     ) {
-        log.info("aroundSearch进行中");
         try {
-            // 纯字符串拼接
+            // 1. 参数校验：location 必填
+            if (location == null || location.trim().isEmpty()) {
+                return fail("location 不能为空，格式：经度,纬度");
+            }
+
+            // 2. 使用 UriComponentsBuilder 构建 URL，自动编码
             String url = "https://restapi.amap.com/v3/place/around?location=" + (location == null ? "" : location) + "&types=" +
                     (types == null ? "" : types) + "&region=" + (region == null ? "" : region) +
                     "&radius=" + (radius == null ? "" : radius) + "&sortRule=" + (sortRule == null ? "" : sortRule) +
-                    "&city_limit=" + (city_limit == null ? "" : city_limit) +
+                    "&city_limit=" + (cityLimit == null ? "" : cityLimit) +
                     "&keywords=" + (keywords == null ? "" : keywords) +
                     "&key=" + AMAP_KEY + "&output=json";
 
             String jsonStr = restTemplate.getForObject(url, String.class);
             JSONObject json = JSON.parseObject(jsonStr);
+            String status = json.getString("status");
+            if (!"1".equals(status)) {
+                String info = json.getString("info");
+                return fail("高德 API 返回错误: " + info);
+            }
             JSONArray pois = json.getJSONArray("pois");
-
             JSONArray arr = new JSONArray();
             if (pois != null && !pois.isEmpty()) {
-                pois.stream().limit(3).forEach(o -> {
+                pois.stream().limit(10).forEach(o -> {
                     JSONObject p = (JSONObject) o;
                     JSONObject item = new JSONObject();
                     item.put("name", p.getString("name"));
@@ -199,12 +204,15 @@ public class AMapTool {
                     item.put("distance", p.getString("distance"));
                     arr.add(item);
                 });
+            } else {
+                log.warn("周边未搜索到任何 POI，请检查参数: location={}, radius={}, keywords={}, types={}", location, radius, keywords, types);
             }
-
             JSONObject res = new JSONObject();
             res.put("pois", arr);
-            return filterSuccess(res);
+            res.put("count", arr.size());
+            return filterSuccess("aroundSearch", res);
         } catch (Exception e) {
+            log.error("aroundSearch 调用失败", e);
             return fail("搜索失败: " + e.getMessage());
         }
     }
@@ -249,7 +257,7 @@ public class AMapTool {
 
             JSONObject res = new JSONObject();
             res.put("tips", arr);
-            return filterSuccess(res);
+            return filterSuccess("enterPrompt",res);
         } catch (Exception e) {
             return fail("搜索失败: " + e.getMessage());
         }
@@ -321,7 +329,7 @@ public class AMapTool {
                 res.put("restriction", path.getString("restriction"));
             }
 
-            return filterSuccess(res);
+            return filterSuccess("direction",res);
         } catch (Exception e) {
             return fail("路线规划失败: " + e.getMessage());
         }
@@ -356,7 +364,7 @@ public class AMapTool {
             res.put("distance", distance);
             res.put("origin", startingPoint);
             res.put("destination", endingPoint);
-            return filterSuccess(res);
+            return filterSuccess("calculateDistance",res);
         } catch (Exception e) {
             return fail("距离计算失败: " + e.getMessage());
         }
@@ -381,7 +389,6 @@ public class AMapTool {
                     + city + "&extensions=" + extensions
                     + "&key=" + AMAP_KEY + "&output=json";
             String jsonStr = restTemplate.getForObject(url, String.class);
-            log.info("高德返回：{}", jsonStr);
             JSONObject json = JSON.parseObject(jsonStr);
 
             // 2. 状态判断
@@ -411,7 +418,7 @@ public class AMapTool {
                 res.put("reportTime", forecast.getString("reporttime"));
                 res.put("forecasts", forecast.getJSONArray("casts"));
             }
-            return filterSuccess(res);
+            return filterSuccess("weather",res);
         } catch (Exception e) {
             log.error("天气异常", e);
             return fail("天气服务异常：" + e.getMessage());
@@ -441,7 +448,7 @@ public class AMapTool {
             res.put("province", json.getString("province"));
             res.put("city", json.getString("city"));
             res.put("location", json.getString("location"));
-            return filterSuccess(res);
+            return filterSuccess("ipLocation",res);
         } catch (Exception e) {
             return fail("IP定位失败: " + e.getMessage());
         }
