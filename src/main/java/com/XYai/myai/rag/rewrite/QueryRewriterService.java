@@ -1,7 +1,7 @@
 package com.XYai.myai.rag.rewrite;
 
-import com.XYai.myai.rag.memory.POJO.LoadSession;
-import com.XYai.myai.rag.rewrite.POJO.RewriteResult;
+import com.XYai.myai.rag.memory.pojo.LoadSession;
+import com.XYai.myai.rag.rewrite.pojo.RewriteResult;
 
 /**
  * 查询重写服务接口（重写与拆分）。

@@ -1,9 +1,8 @@
 package com.XYai.myai.rag.rewrite;
 
-import com.XYai.myai.rag.memory.POJO.LoadSession;
-import com.XYai.myai.rag.rewrite.POJO.RewriteResult;
+import com.XYai.myai.rag.memory.pojo.LoadSession;
+import com.XYai.myai.rag.rewrite.pojo.RewriteResult;
 import com.alibaba.fastjson2.JSON;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

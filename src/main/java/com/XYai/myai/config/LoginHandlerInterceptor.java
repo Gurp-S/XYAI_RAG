@@ -2,7 +2,7 @@ package com.XYai.myai.config;
 
 import com.XYai.myai.mapper.UserMapper;
 import com.XYai.myai.user.LoginUserInfoManager;
-import com.XYai.myai.user.POJO.User;
+import com.XYai.myai.user.pojo.User;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -52,7 +52,7 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
             if (userInfo == null) {
                 throw new NullPointerException();
             }
-            LoginUserInfoManager.set(userInfo);
+            LoginUserInfoManager.setUserId(userInfo.getId());
         } catch (NullPointerException e) {
             LoginUserInfoManager.remove();
             throw new SecurityException("解析用户信息失败");

@@ -365,6 +365,84 @@
 # -- 加上索引
 # ALTER TABLE chat_conversation
 #     ADD INDEX idx_user_conversation (`user_id`,`conversation_id`);
+-- 用户评估表
+# CREATE TABLE `xy_user_evaluate` (
+#                                  `id` BIGINT NOT NULL AUTO_INCREMENT,
+#                                  `conversation_id` VARCHAR(64) NOT NULL,
+#                                  `message_id` VARCHAR(64) NOT NULL,
+#                                  `user_id` BIGINT NOT NULL,
+#                                  `feedback` TINYINT NOT NULL COMMENT '1-赞,0-踩',
+#                                  `reason` VARCHAR(100) DEFAULT NULL COMMENT '点踩原因分类',
+#                                  `comment` VARCHAR(500) DEFAULT NULL,
+#                                  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
+#                                  `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+#                                  PRIMARY KEY (`id`),
+#                                  KEY `idx_message` (`message_id`),
+#                                  KEY `idx_user` (`user_id`)
+# ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+#
+# -- 系统评估表
+# CREATE TABLE `xy_system_evaluate` (
+#                                    `id` BIGINT NOT NULL AUTO_INCREMENT,
+#                                    `conversation_id` VARCHAR(64) NOT NULL,
+#                                    `message_id` VARCHAR(64) NOT NULL,
+#                                    `user_id` BIGINT DEFAULT NULL,
+#                                    `overall_score` DECIMAL(5,4) DEFAULT NULL,
+#                                    `retrieval_score` DECIMAL(5,4) DEFAULT NULL,
+#                                    `faithfulness_score` DECIMAL(5,4) DEFAULT NULL,
+#                                    `answer_relevance_score` DECIMAL(5,4) DEFAULT NULL,
+#                                    `completeness_score` DECIMAL(5,4) DEFAULT NULL,
+#                                    `retrieved_doc_count` INT DEFAULT NULL,
+#                                    `latency_ms` BIGINT DEFAULT NULL,
+#                                    `model_name` VARCHAR(50) DEFAULT NULL,
+#                                    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
+#                                    PRIMARY KEY (`id`),
+#                                    KEY `idx_message` (`message_id`)
+# ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+# CREATE TABLE `xy_user_evaluate` (
+#                                     `message_id`      VARCHAR(64) NOT NULL COMMENT '消息ID，主键',
+#                                     `conversation_id` VARCHAR(64) NOT NULL COMMENT '对话ID',
+#                                     `user_id`         BIGINT      NOT NULL COMMENT '用户ID',
+#                                     `feedback`        TINYINT     NOT NULL COMMENT '1-赞,0-踩',
+#                                     `create_time`     DATETIME    DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+#                                     `update_time`     DATETIME    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+#                                     PRIMARY KEY (`message_id`)
+# ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户点赞点踩评价表';
+#
+# -- 可选：为用户ID创建索引（便于查询某个用户的所有评价）
+# CREATE INDEX `idx_user` ON `xy_user_evaluate` (`user_id`);
+#
+# -- 可选：为会话ID创建索引（便于查询某个会话的评价）
+# CREATE INDEX `idx_conversation` ON `xy_user_evaluate` (`conversation_id`);
+# ALTER TABLE trace_record MODIFY start_time DATETIME COMMENT '执行开始时间';
+
+-- ==================== RAG 全链路追踪表 ====================
+# CREATE TABLE IF NOT EXISTS `trace_record` (
+#     `trace_id` VARCHAR(64) NOT NULL COMMENT '全链路唯一 traceId',
+#     `name` VARCHAR(255) DEFAULT NULL COMMENT '根节点名称或任务名',
+#     `start_time` DATETIME DEFAULT NULL COMMENT '链路开始时间',
+#     `status` VARCHAR(32) DEFAULT NULL COMMENT '链路状态(RUNNING/SUCCESS/ERROR)',
+#     `error_message` TEXT DEFAULT NULL COMMENT '错误消息',
+#     PRIMARY KEY (`trace_id`)
+# ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='RAG 全链路追踪记录表';
+#
+# CREATE TABLE IF NOT EXISTS `node_record` (
+#     `node_id` VARCHAR(64) NOT NULL COMMENT '节点唯一 ID',
+#     `trace_id` VARCHAR(64) NOT NULL COMMENT '所属 traceId',
+#     `node_name` VARCHAR(255) DEFAULT NULL COMMENT '节点名称',
+#     `node_type` VARCHAR(64) DEFAULT NULL COMMENT '节点类型',
+#     `cost_time` BIGINT DEFAULT NULL COMMENT '节点耗时(毫秒)',
+#     `status` VARCHAR(32) DEFAULT NULL COMMENT '节点状态(SUCCESS/ERROR)',
+#     `error_message` TEXT DEFAULT NULL COMMENT '节点异常信息',
+#     PRIMARY KEY (`node_id`),
+#     KEY `idx_trace_id` (`trace_id`)
+# ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='RAG 链路节点记录表';
+
+# ALTER TABLE `chat_conversation`
+#     ADD COLUMN `feedback` INT NOT NULL DEFAULT -1 COMMENT '反馈：1-点赞，0-点踩，-1-未评价';
+# ALTER TABLE `chat_conversation` ADD INDEX idx_feedback (`feedback`);
+
 
 
 

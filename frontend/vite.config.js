@@ -76,6 +76,7 @@ export default defineConfig({
       "/user": { target: "http://localhost:8080", changeOrigin: true },
       "/milvus": { target: "http://localhost:8080", changeOrigin: true },
       "/oss": { target: "http://localhost:8080", changeOrigin: true },
+      "/evaluate": { target: "http://localhost:8080", changeOrigin: true },
     },
   },
   build: {

@@ -6,6 +6,7 @@
     :class="{
       'is-blurred': !ui.currentUser || ui.showLogin,
       'sidebar-collapsed': ui.isSidebarCollapsed,
+      'sidebar-fullscreen': ui.isFullscreen,
     }"
   >
     <Sidebar v-if="ui.currentUser" />

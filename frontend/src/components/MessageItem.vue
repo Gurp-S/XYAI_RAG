@@ -77,6 +77,32 @@
         </button>
       </div>
 
+      <!-- 用户消息操作区 -->
+      <div v-if="text && role === 'user'" class="msg-action-bar user-actions">
+         <button class="msg-action-btn" title="复制" @click="$emit('copy', text)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+         </button>
+         <button class="msg-action-btn" title="修改" @click="$emit('edit', text)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+         </button>
+      </div>
+
+      <!-- AI 消息操作区 -->
+      <div v-if="text && role === 'assistant'" class="msg-action-bar assistant-actions">
+         <button class="msg-action-btn" title="复制" @click="$emit('copy', text)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+         </button>
+         <button class="msg-action-btn" title="重新生成" @click="$emit('retry')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+         </button>
+         <button class="msg-action-btn" :class="{ active: props.feedback === 1 }" title="点赞" @click="$emit('like')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+         </button>
+         <button class="msg-action-btn" :class="{ active: props.feedback === 0 }" title="踩" @click="$emit('dislike')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"></path></svg>
+         </button>
+      </div>
+
       <!-- 错误状态与重试按钮 -->
       <div v-if="error" class="error-container">
         <div class="error-message">
@@ -114,9 +140,10 @@
 <script setup>
 import { computed, ref, onMounted, watch, nextTick } from "vue";
 import { useUiStore } from '../store'
-import { renderAssistantMarkdown, attachImageZoom } from "../services/markdown";
+import { renderAssistantMarkdown, attachImageZoom, initCodeCopyButtons } from "../services/markdown";
 
 const props = defineProps({
+
   role: { type: String, default: "assistant" },
   text: { type: String, default: "" },
   rag: { type: Boolean, default: false },
@@ -124,14 +151,15 @@ const props = defineProps({
   error: { type: Boolean, default: false },
   errorMessage: { type: String, default: "" },
   canRetry: { type: Boolean, default: false },
-  mcpStatus: { type: String, default: "" }, // '', 'running', 'success', 'error'
+  mcpStatus: { type: String, default: "" },
   assistantLabel: { type: String, default: "AI" },
   fromName: { type: String, default: "" },
   isStreaming: { type: Boolean, default: false },
   file: { type: Object, default: null },
+  feedback: { type: Number, default: -1 }, // -1=none, 1=like, 0=dislike
 });
 
-const emit = defineEmits(["retry", "edit", "acceptFile"]);
+const emit = defineEmits(["retry", "edit", "copy", "like", "dislike", "acceptFile"]);
 
 function formatFileSize(bytes) {
   if (!bytes || bytes === 0) return ''
@@ -153,6 +181,7 @@ const avatarText = computed(() =>
 const store = useUiStore()
 const avatarUrl = computed(() => {
   if (props.role === 'user') return store.currentUser?.avatar || ''
+  if (props.role === 'assistant') return store.aiAvatar || ''
   return ''
 })
 
@@ -172,15 +201,61 @@ const markdownEl = ref(null);
 onMounted(() => {
   nextTick(() => {
     attachImageZoom(markdownEl.value);
+    initCodeCopyButtons(markdownEl.value);
   });
 });
 
 watch(assistantMarkdownHtml, () => {
-  nextTick(() => attachImageZoom(markdownEl.value));
+  nextTick(() => {
+    attachImageZoom(markdownEl.value);
+    initCodeCopyButtons(markdownEl.value);
+  });
 });
 </script>
 
 <style scoped>
+.msg-action-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.message-wrapper:hover .msg-action-bar {
+  opacity: 1;
+}
+.msg-action-bar.user-actions {
+  align-self: flex-start; /* 相对于用户气泡靠左 */
+}
+.msg-action-bar.assistant-actions {
+  align-self: flex-start;
+}
+.msg-action-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+.msg-action-btn:hover {
+  background: var(--hover-bg);
+  color: var(--text-main);
+}
+.msg-action-btn.active {
+  color: var(--primary);
+}
+.msg-action-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
 .message {
   white-space: pre-wrap;
   word-break: break-word;
@@ -244,9 +319,55 @@ watch(assistantMarkdownHtml, () => {
 }
 
 .assistant-markdown :deep(pre.code-block) {
-  position: relative;
+  margin: 0;
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 0 0 16px 16px;
+  background:
+    linear-gradient(180deg, rgba(10, 15, 28, 0.98), rgba(5, 10, 20, 0.98)),
+    color-mix(in srgb, var(--bg-hover) 74%, transparent);
+  box-shadow:
+    0 18px 34px rgba(2, 6, 23, 0.20),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  overflow: auto;
+  white-space: pre !important;
+  font-family: "JetBrains Mono", "Consolas", monospace;
+  font-size: 0.92rem;
+  line-height: 1.72;
+  tab-size: 4;
+  -moz-tab-size: 4;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--primary) 50%, transparent) transparent;
+}
+body:not(.dark) .assistant-markdown :deep(pre.code-block) {
+  background:
+    linear-gradient(180deg, rgba(245, 248, 252, 0.98), rgba(235, 240, 248, 0.98)),
+    color-mix(in srgb, var(--bg-hover) 60%, transparent);
+  box-shadow:
+    0 8px 20px rgba(2, 6, 23, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+.assistant-markdown :deep(pre.code-block code) {
+  background: transparent !important;
+  white-space: pre !important;
+  display: block;
+  padding: 0;
+  margin: 0;
+  font-size: inherit;
+  line-height: inherit;
+  font-family: inherit;
+}
+.assistant-markdown :deep(pre.code-block code .hljs),
+.assistant-markdown :deep(pre.code-block code.hljs) {
+  background: transparent !important;
+  white-space: pre !important;
+}
+.assistant-markdown :deep(pre.code-block code) span {
+  white-space: pre !important;
+}
+
+.assistant-markdown :deep(.code-block-wrapper) {
   margin: 0.72rem 0 0.9rem;
-  padding: 2.65rem 0 0;
   border-radius: 16px;
   border: 1px solid color-mix(in srgb, var(--panel-border) 74%, transparent);
   background:
@@ -255,49 +376,79 @@ watch(assistantMarkdownHtml, () => {
   box-shadow:
     0 18px 34px rgba(2, 6, 23, 0.20),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  overflow: auto;
-  scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--primary) 50%, transparent) transparent;
 }
 
-.assistant-markdown :deep(pre.code-block)::before {
-  content: attr(data-language);
-  position: absolute;
-  top: 0.8rem;
-  left: 0.92rem;
-  padding: 0.22rem 0.64rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.76);
+body:not(.dark) .assistant-markdown :deep(.code-block-wrapper) {
+  background:
+    linear-gradient(180deg, rgba(245, 248, 252, 0.98), rgba(235, 240, 248, 0.98)),
+    color-mix(in srgb, var(--bg-hover) 60%, transparent);
+  box-shadow:
+    0 8px 20px rgba(2, 6, 23, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  border-color: color-mix(in srgb, var(--panel-border) 64%, transparent);
+}
+body:not(.dark) .assistant-markdown :deep(pre.code-block code) {
+  color: #1e293b;
+}
+
+.assistant-markdown :deep(.code-block-header) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.56rem 0.92rem;
+}
+
+.assistant-markdown :deep(.code-lang-label) {
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  z-index: 1;
+  color: rgba(255, 255, 255, 0.76);
 }
 
-.assistant-markdown :deep(pre.code-block)::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(90deg, rgba(96, 165, 250, 0.12), transparent 26%, transparent 74%, rgba(167, 139, 250, 0.12));
-  opacity: 0.34;
+body:not(.dark) .assistant-markdown :deep(.code-lang-label) {
+  color: var(--text-muted);
 }
 
-.assistant-markdown :deep(pre.code-block code) {
-  display: block;
-  margin: 0;
-  padding: 1rem 1rem 1.05rem;
-  border-radius: 0;
+.assistant-markdown :deep(.code-copy-btn) {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   background: transparent;
-  color: inherit;
-  font-family: "JetBrains Mono", "Consolas", monospace;
-  font-size: 0.92rem;
-  line-height: 1.72;
-  white-space: pre;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background-color 0.15s, color 0.15s;
+}
+.assistant-markdown :deep(.code-copy-btn:hover) {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+}
+body:not(.dark) .assistant-markdown :deep(.code-copy-btn) {
+  color: var(--text-muted);
+}
+body:not(.dark) .assistant-markdown :deep(.code-copy-btn:hover) {
+  background: var(--hover-bg);
+  color: var(--text-main);
+}
+.assistant-markdown :deep(.code-copy-btn .copy-icon) {
+  width: 14px;
+  height: 14px;
+}
+.assistant-markdown :deep(.code-copy-btn .copy-label) {
+  font-size: 0.72rem;
+}
+
+.assistant-markdown :deep(.code-block-divider) {
+  height: 1px;
+  margin: 0 0.92rem;
+  background: rgba(255, 255, 255, 0.08);
+}
+body:not(.dark) .assistant-markdown :deep(.code-block-divider) {
+  background: color-mix(in srgb, var(--panel-border) 50%, transparent);
 }
 
 .assistant-markdown :deep(blockquote) {

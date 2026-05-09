@@ -1,9 +1,8 @@
 package com.XYai.myai.rag.intent;
 
 import com.XYai.myai.mapper.IntentNodeMapper;
-import com.XYai.myai.rag.intent.POJO.IntentNode;
+import com.XYai.myai.rag.intent.pojo.IntentNode;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;

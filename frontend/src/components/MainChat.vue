@@ -9,7 +9,12 @@
       <strong class="context-name">{{ chatTargetName }}</strong>
     </div>
 
-    <div id="chatBox" ref="chatBox" class="chat-box">
+    <div id="chatBox" ref="chatBox" class="chat-box" @scroll="handleScroll">
+      <!-- 加载更早消息的提示 -->
+      <div v-if="store.loadingOlder" class="older-loading-indicator">
+        <span class="loading-spinner-sm"></span>
+        <span>加载更早的消息...</span>
+      </div>
       <MessageItem
         v-if="isAiChat"
         role="assistant"
@@ -29,7 +34,10 @@
           "
           class="message-wrapper assistant loading"
         >
-          <div class="avatar">{{ assistantLabel }}</div>
+          <div class="avatar">
+            <img v-if="store.aiAvatar" :src="store.aiAvatar" alt="AI" class="avatar-img" />
+            <template v-else>{{ assistantLabel }}</template>
+          </div>
           <div class="message-content">
             <div class="message typing-loader">
               <span></span>
@@ -51,12 +59,17 @@
           :assistant-label="assistantLabel"
           :from-name="m.fromName"
           :is-streaming="isAiChat && isStreaming && idx === messages.length - 1 && m.role === 'assistant'"
+          :feedback="m.feedback ?? -1"
           @retry="handleRetry(idx)"
+          @copy="handleCopy(m.text)"
+          @edit="handleEdit(idx, m.text)"
+          @like="handleLike(idx)"
+          @dislike="handleDislike(idx)"
         />
       </template>
     </div>
 
-    <FooterInput v-model="input" @send="send" @share="handleShare" />
+    <FooterInput v-model="input" @send="send" />
   </main>
 </template>
 
@@ -128,7 +141,7 @@ const aiGreetingText = computed(() => {
     phaseGreeting = "夜深了";
   }
 
-  return `${phaseGreeting}，我是 XY-AI（策略搭子模式）。你负责提目标，我负责拆步骤、找依据、给可执行答案。`;
+  return `${phaseGreeting}，我是 XY`;
 });
 
 function buildMessageKey(message, index) {
@@ -143,7 +156,10 @@ watch(
   () => store.currentMessages,
   (newMsgs) => {
     messages.value = newMsgs || [];
-    scrollToBottom();
+    // 加载更早消息时不滚动到底部（保持用户当前滚动位置）
+    if (!store.loadingOlder) {
+      scrollToBottom();
+    }
   },
   { immediate: true },
 );
@@ -170,6 +186,15 @@ function scrollToBottom() {
       }
     });
   });
+}
+
+function handleScroll() {
+  const el = chatBox.value;
+  if (!el) return;
+  // 滚动到顶部（或接近顶部 50px 以内）时触发加载更早消息
+  if (el.scrollTop <= 50 && !store.loadingOlder && store.hasMoreMessages) {
+    store.loadOlderMessages();
+  }
 }
 
 function clearStreamHeartbeatMonitor() {
@@ -265,11 +290,6 @@ function scheduleChunkFlush() {
       flushPendingChunk();
     });
   }, STREAM_FLUSH_MIN_INTERVAL - elapsed);
-}
-
-function handleShare({ target, userId }) {
-  if (!userId) return
-  // TODO: 对接 /share 和 /share/message 接口发送文件
 }
 
 async function send() {
@@ -658,6 +678,70 @@ function handleRetry(index) {
   retry(index);
 }
 
+function handleCopy(text) {
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    // 可选：加一个复制成功的提示
+  }).catch((err) => {
+    console.error("复制失败:", err);
+  });
+}
+
+function handleEdit(index, text) {
+  if (typeof index !== "number" || index < 0 || !text) return;
+  // 把用户消息放回输入框，并滚动到输入区
+  input.value = text;
+  // 保持消息可见，不删除气泡
+}
+
+function handleLike(index) {
+  if (typeof index !== "number" || index < 0) return;
+  const msg = messages.value[index];
+  if (!msg || msg.role !== "assistant") return;
+  // 切换点赞状态：已赞->取消(-1), 否则->赞(1)
+  const newFeedback = msg.feedback === 1 ? -1 : 1;
+  msg.feedback = newFeedback;
+  sendFeedback(msg, newFeedback);
+}
+
+function handleDislike(index) {
+  if (typeof index !== "number" || index < 0) return;
+  const msg = messages.value[index];
+  if (!msg || msg.role !== "assistant") return;
+  // 切换点踩状态：已踩->取消(-1), 否则->踩(0)
+  const newFeedback = msg.feedback === 0 ? -1 : 0;
+  msg.feedback = newFeedback;
+  sendFeedback(msg, newFeedback);
+}
+
+async function sendFeedback(msg, feedbackValue) {
+  const conversationId = store.activeConversationId;
+  const chatMessageId = msg.id || "";
+  if (!conversationId || !chatMessageId) {
+    console.warn("反馈发送失败: 缺少 conversationId 或 chatMessageId");
+    return;
+  }
+  try {
+    // 使用 query params 方式发送，兼容 @RequestParam
+    const query = new URLSearchParams({
+      conversationId,
+      chatMessageId,
+      feedback: String(feedbackValue),
+    }).toString();
+    const response = await authFetch(`/evaluate/user?${query}`, {
+      method: "POST",
+    });
+    const result = await safeReadJson(response);
+    if (response.ok && result?.code === 200) {
+      console.log("[反馈] 发送成功:", feedbackValue);
+    } else {
+      console.warn("[反馈] 后端返回异常:", response.status, result);
+    }
+  } catch (err) {
+    console.error("[反馈] 发送异常:", err);
+  }
+}
+
 function handleVisibilityChange() {
   if (
     typeof document !== "undefined" &&
@@ -837,6 +921,30 @@ onUnmounted(() => {
   40% {
     transform: scale(1);
     opacity: 1;
+  }
+}
+
+.older-loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.loading-spinner-sm {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--panel-border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+@media (max-width: 768px) {
+  .older-loading-indicator {
+    padding: 8px 0;
+    font-size: 12px;
   }
 }
 </style>

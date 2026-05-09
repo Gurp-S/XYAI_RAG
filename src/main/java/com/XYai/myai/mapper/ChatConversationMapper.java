@@ -1,6 +1,6 @@
 package com.XYai.myai.mapper;
 
-import com.XYai.myai.rag.memory.POJO.ChatConversation;
+import com.XYai.myai.rag.memory.pojo.ChatConversation;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 

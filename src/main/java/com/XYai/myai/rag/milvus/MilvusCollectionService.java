@@ -64,7 +64,7 @@ public class MilvusCollectionService {
      */
     public void createCollectionIfAbsent(String collectionName) {
         // 添加集合权限给当前用户(创建同时加载给用户)
-        Long userId = LoginUserInfoManager.get().getId();
+        Long userId = LoginUserInfoManager.getUserId();
         redissonClient.getSet(RedisKeyConfig.userLoadCollectionsKey(userId)).add(collectionName);
         redissonClient.getAtomicLong(RedisKeyConfig.collectionUserCountKey(collectionName)).incrementAndGet();
     }

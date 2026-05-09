@@ -1,10 +1,16 @@
 package com.XYai.myai.config;
 
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
+import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -14,24 +20,23 @@ import java.util.concurrent.ThreadPoolExecutor;
 /**
  * 应用通用配置，包含 Ollama 模型与结构化输出格式定义。
  */
+@Slf4j
 @Configuration
 @EnableAsync
-public class CommonConfiguration {
+public class CommonConfiguration implements AsyncConfigurer {
 
-    /**
-     * 定义专门用于记忆压缩和大模型异步调用的线程池，防止阻塞主业务。
-     */
-    @Bean("memoryCompactExecutor")
-    public Executor memoryCompactExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(2);
-        executor.setMaxPoolSize(4);
-        executor.setQueueCapacity(500);
-        executor.setThreadNamePrefix("MemCompact-");
-        // 如果队列塞满则由调用者当前线程执行（防止任务丢失）
-        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        executor.initialize();
-        return executor;
+    @Resource
+    @Qualifier("taskUserExecutor")
+    private ThreadPoolTaskExecutor taskUserExecutor;
+
+    @Override
+    public Executor getAsyncExecutor() {
+        return taskUserExecutor;
+    }
+
+    @Override
+    public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
+        return (ex, method, params) -> log.error("异步方法异常: {}", method, ex);
     }
 
     /**

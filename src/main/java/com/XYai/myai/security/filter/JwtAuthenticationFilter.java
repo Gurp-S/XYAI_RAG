@@ -1,10 +1,10 @@
 package com.XYai.myai.security.filter;
 
 import com.XYai.myai.mapper.UserMapper;
-import com.XYai.myai.security.POJO.JwtProperties;
+import com.XYai.myai.security.pojo.JwtProperties;
 import com.XYai.myai.security.service.JwtService;
 import com.XYai.myai.user.LoginUserInfoManager;
-import com.XYai.myai.user.POJO.User;
+import com.XYai.myai.user.pojo.User;
 import com.XYai.myai.user.service.CustomUserDetailsService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.FilterChain;
@@ -79,7 +79,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             Long uid = Long.parseLong(ud.getUsername());
                             User domain = userMapper.selectById(uid);
                             if (domain != null) {
-                                LoginUserInfoManager.set(domain);
+                                LoginUserInfoManager.setUserId(domain.getId());
                                 log.debug("LoginUserInfoManager set by id: {}", uid);
                             }
                         } catch (NumberFormatException ignore) {
@@ -89,7 +89,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                 q.eq(User::getName, username).or().eq(User::getPhone, username).or().eq(User::getEmail, username);
                                 User domain = userMapper.selectOne(q);
                                 if (domain != null) {
-                                    LoginUserInfoManager.set(domain);
+                                    LoginUserInfoManager.setUserId(domain.getId());
                                     log.debug("LoginUserInfoManager set by username/email/phone: {}", username);
                                 } else {
                                     log.debug("No domain user found for token subject: {}", username);

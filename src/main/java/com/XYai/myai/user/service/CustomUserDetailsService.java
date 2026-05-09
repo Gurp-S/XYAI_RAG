@@ -1,7 +1,7 @@
 package com.XYai.myai.user.service;
 
 import com.XYai.myai.mapper.UserMapper;
-import com.XYai.myai.user.POJO.User;
+import com.XYai.myai.user.pojo.User;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.annotation.Resource;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

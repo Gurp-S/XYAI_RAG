@@ -1,8 +1,8 @@
 package com.XYai.myai.rag.rewrite;
 
-import com.XYai.myai.rag.memory.POJO.LoadSession;
-import com.XYai.myai.rag.rewrite.POJO.RewriteResult;
-import com.XYai.myai.rag.rewrite.POJO.RewriterProperties;
+import com.XYai.myai.rag.memory.pojo.LoadSession;
+import com.XYai.myai.rag.rewrite.pojo.RewriteResult;
+import com.XYai.myai.rag.rewrite.pojo.RewriterProperties;
 import jakarta.annotation.Resource;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.web.bind.annotation.RestController;

@@ -1,8 +1,7 @@
 package com.XYai.myai.rag.mcp.tools;
 
 import com.XYai.myai.mapper.ChatConversationMapper;
-import com.XYai.myai.mapper.ChatSessionRecordMapper;
-import com.XYai.myai.rag.memory.POJO.ChatConversation;
+import com.XYai.myai.rag.memory.pojo.ChatConversation;
 import com.XYai.myai.user.LoginUserInfoManager;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.annotation.Resource;
@@ -20,9 +19,9 @@ public class CommonTools {
     @Resource
     private ChatConversationMapper chatConversationMapper;
 
-    @Tool(name = "memery_search" ,description = "模糊查找用户会话记忆和工具记忆如果刚才没有收到相关会话记录")
+    @Tool(name = "memery_search" ,description = "模糊查找会话/工具记忆(如果刚才没有收到)")
     public String memeryTools(@ToolParam(description = "查找的内容") String expr){
-        Long userId = LoginUserInfoManager.get().getId();
+        Long userId = LoginUserInfoManager.getUserId();
         // 根据用户id查找对话 从userMessage 和 assistantMessage 中模糊查
 
         LambdaQueryWrapper<ChatConversation> wrapper = new LambdaQueryWrapper<>();
@@ -52,6 +51,7 @@ public class CommonTools {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return LocalDateTime.now().format(formatter);
     }
+
 
 
 }

@@ -3,15 +3,14 @@ package com.XYai.myai.rag.milvus;
 import com.XYai.myai.config.Result;
 import com.XYai.myai.mapper.UserMapper;
 import com.XYai.myai.user.LoginUserInfoManager;
-import com.XYai.myai.user.POJO.User;
-import com.XYai.myai.user.userChat.POJO.FileMessage;
-import com.XYai.myai.user.userChat.POJO.UserChatRequest;
+import com.XYai.myai.user.pojo.User;
+import com.XYai.myai.user.userChat.pojo.FileMessage;
+import com.XYai.myai.user.userChat.pojo.UserChatRequest;
 import com.XYai.myai.user.userChat.UserChatService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +40,7 @@ public class MilvusController {
      * @return 返回数据库集合列表
      */
     @GetMapping("/list")
-    public Result<List<String>> listCollections() {// TODO懒加载
+    public Result<List<String>> listCollections() {
         return Result.success(milvusCollectionService.getAllCollectionNames());
     }
 
@@ -52,7 +51,7 @@ public class MilvusController {
      * @return 元数据列表
      */
     @PostMapping("/metadata")
-    public Result<List<Map<String, Object>>> getCollectionsFiles(String collectionName) {// TODO懒加载
+    public Result<List<Map<String, Object>>> getCollectionsFiles(String collectionName) {
         //是否有权限（若没有权限则返回错误）
         if (!milvusAclManager.getCollectionAcl(collectionName)) {
             log.info("getCollectionsMetadataNoACl:{}", collectionName);
@@ -181,7 +180,7 @@ public class MilvusController {
             @RequestParam String fileId,
             @RequestParam Long userId,
             @RequestParam(required = false) Integer chunkId) {
-        User sender = LoginUserInfoManager.get();
+        User sender = LoginUserInfoManager.getUser();
         if (sender == null || sender.getId() == null) {
             return Result.error(401, "未登录");
         }

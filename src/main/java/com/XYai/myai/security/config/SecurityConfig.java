@@ -1,6 +1,7 @@
 package com.XYai.myai.security.config;
 
 import com.XYai.myai.security.filter.JwtAuthenticationFilter;
+import com.XYai.myai.security.handler.CustomAccessDeniedHandler;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -57,7 +58,7 @@ public class SecurityConfig {
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         // 使用自定义的 AccessDeniedHandler，避免在 response 已经被提交时尝试 forward/redirect 导致二次提交错误
-        http.exceptionHandling(ex -> ex.accessDeniedHandler(new com.XYai.myai.security.handler.CustomAccessDeniedHandler()));
+        http.exceptionHandling(ex -> ex.accessDeniedHandler(new CustomAccessDeniedHandler()));
 
         return http.build();
     }

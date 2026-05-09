@@ -1,7 +1,7 @@
 package com.XYai.myai.rag.etlpipeline;
 
-import com.XYai.myai.rag.etlpipeline.Nodes.Ingestion;
-import com.XYai.myai.rag.etlpipeline.POJO.*;
+import com.XYai.myai.rag.etlpipeline.nodes.Ingestion;
+import com.XYai.myai.rag.etlpipeline.pojo.*;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,6 +1,6 @@
 package com.XYai.myai.rag.etlpipeline;
 
-import com.XYai.myai.rag.etlpipeline.POJO.IngestionContext;
+import com.XYai.myai.rag.etlpipeline.pojo.IngestionContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Component;

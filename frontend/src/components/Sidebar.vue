@@ -1,5 +1,5 @@
 ﻿<template>
-  <aside id="sidebar" class="sidebar" :class="{ collapsed: store.isSidebarCollapsed }">
+  <aside id="sidebar" class="sidebar" :class="{ collapsed: store.isSidebarCollapsed, fullscreen: store.isFullscreen }">
     <div class="sidebar-header">
         <svg viewBox="0 0 24 24">
             <path

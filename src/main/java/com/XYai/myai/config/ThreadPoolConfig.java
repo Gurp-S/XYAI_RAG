@@ -1,8 +1,7 @@
 package com.XYai.myai.config;
 
+import com.XYai.myai.rag.aop.annotation.RagTraceContext;
 import com.XYai.myai.user.LoginUserInfoManager;
-import com.XYai.myai.user.POJO.User;
-import com.alibaba.ttl.TtlRunnable;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +10,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.concurrent.Executor;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
+
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -35,23 +36,43 @@ public class ThreadPoolConfig {
     @Bean
     public TaskDecorator userContextDecorator() {
         return runnable -> {
-            User appUser = LoginUserInfoManager.get();
+            // ★ 在父线程（提交任务时）捕获当前上下文
+            String traceId = RagTraceContext.getTraceId();
+            Long userId = LoginUserInfoManager.getUserId();
             SecurityContext securityContext = SecurityContextHolder.getContext();
-            Runnable ttlRunnable = TtlRunnable.get(runnable);
 
             return () -> {
-                SecurityContext originalContext = SecurityContextHolder.getContext();
+                // 保存子线程原有上下文（用于恢复）
+                String originalTraceId = RagTraceContext.getTraceId();
+                Long originalUserId = LoginUserInfoManager.getUserId();
+                SecurityContext originalSecurity = SecurityContextHolder.getContext();
+
                 try {
+                    // 注入父线程上下文
+                    if (traceId != null && !traceId.isBlank()) {
+                        RagTraceContext.setTraceId(traceId);
+                    }
+                    if (userId != null) {
+                        LoginUserInfoManager.setUserId(userId);
+                    }
                     if (securityContext != null && securityContext.getAuthentication() != null) {
                         SecurityContextHolder.setContext(securityContext);
                     }
-                    if (appUser != null) {
-                        LoginUserInfoManager.set(appUser);
-                    }
-                    ttlRunnable.run();
+                    // 执行实际任务
+                    runnable.run();
                 } finally {
-                    LoginUserInfoManager.remove();
-                    SecurityContextHolder.setContext(originalContext);
+                    // 恢复子线程原上下文（避免内存泄漏 & 干扰后续任务）
+                    if (originalTraceId != null) {
+                        RagTraceContext.setTraceId(originalTraceId);
+                    } else {
+                        RagTraceContext.clear();
+                    }
+                    if (originalUserId != null) {
+                        LoginUserInfoManager.setUserId(originalUserId);
+                    } else {
+                        LoginUserInfoManager.remove();
+                    }
+                    SecurityContextHolder.setContext(originalSecurity);
                 }
             };
         };
@@ -123,6 +144,32 @@ public class ThreadPoolConfig {
     @Bean("chatExecutor")
     public ThreadPoolTaskExecutor chatExecutor(@Qualifier("ioBoundExecutor") ThreadPoolTaskExecutor ioBoundExecutor) {
         return ioBoundExecutor;
+    }
+
+    /**
+     * 链路追踪记录专用线程池（轻量级，只做 DB 插入）。
+     */
+    @Bean("traceExecutor")
+    public ThreadPoolTaskExecutor traceExecutor(TaskDecorator userContextDecorator) {
+        return buildExecutor("trace-", 2, 4, 200,
+                new ThreadPoolExecutor.CallerRunsPolicy(), userContextDecorator);
+    }
+
+    // ======================== Reactor Scheduler（TTL 感知） ========================
+
+    /**
+     * 替代 Schedulers.boundedElastic() 的 TTL 感知调度器。
+     * 基于 Spring 管理的 ThreadPoolTaskExecutor（已配置 userContextDecorator），
+     * 保证 LoginUserInfoManager 的 ThreadLocal 在响应式链中正确传递。
+     */
+    @Bean("reactorBoundedElasticScheduler")
+    public Scheduler reactorBoundedElasticScheduler(TaskDecorator userContextDecorator) {
+        ThreadPoolTaskExecutor executor = buildExecutor(
+                "reactor-ttl-", CPU_COUNT * 2, CPU_COUNT * 4, Integer.MAX_VALUE / 2,
+                new ThreadPoolExecutor.CallerRunsPolicy(), userContextDecorator);
+        executor.setKeepAliveSeconds(60);
+        executor.initialize();
+        return Schedulers.fromExecutor(executor);
     }
 
     // ======================== 工具方法 ========================

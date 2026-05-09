@@ -2,28 +2,31 @@ package com.XYai.myai.rag.aop;
 
 import cn.hutool.core.util.IdUtil;
 import com.XYai.myai.monitorEndpoint.service.TraceRecordService;
-import com.XYai.myai.rag.aop.Annotation.RagTraceContext;
-import com.XYai.myai.rag.aop.Annotation.RagTraceNode;
-import com.XYai.myai.rag.aop.Annotation.RagTraceRoot;
+import com.XYai.myai.rag.aop.annotation.RagTraceContext;
+import com.XYai.myai.rag.aop.annotation.RagTraceNode;
+import com.XYai.myai.rag.aop.annotation.RagTraceRoot;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-
-// REMARK: 注意不要把注解类型和 DTO 同名（例如 RagTraceRoot 既可能是 DTO 也可能被期望为注解）。
-// 如果这里的意图是拦截带注解的方法（读取注解属性），需要创建一个注解接口（@interface）并使用该注解类型，
-// 而不是使用 DTO。若同时存在同名 DTO，请重命名其中之一以避免混淆。
 
 /**
  * RAG 全链路追踪切面类。
  * 负责拦截由 {@link RagTraceRoot} 和 {@link RagTraceNode} 标记的方法，
  * 在方法执行前后维护链路上下文并记录执行轨迹和耗时情况。
+ *
+ * <p>
+ * 对于响应式（Flux/Mono）返回值，上下文清理和节点记录延迟到流终止时执行，
+ * 避免在方法返回后、流订阅前过早清除 ThreadLocal。
+ * </p>
  */
 @Slf4j
 @Aspect
@@ -40,28 +43,85 @@ public class RagTraceAspect {
      * @param traceRoot 注解实例，包含任务名等信息
      * @return 目标方法执行结果
      */
-    @Around("@annotation(traceRoot)")
-    public Object aroundRoot(ProceedingJoinPoint joinPoint, RagTraceRoot traceRoot) throws Throwable {
-        // 1. 优先复用外部已经放入上下文的 traceId/taskId
-        String traceId = resolveTaskId(joinPoint, traceRoot.taskIdArg(), RagTraceContext.getTraceId());
-        if (traceId == null || traceId.isBlank()) {
-            traceId = IdUtil.getSnowflakeNextIdStr();
+    @Around("@annotation(com.XYai.myai.rag.aop.annotation.RagTraceRoot)")
+    public Object aroundRoot(ProceedingJoinPoint joinPoint) throws Throwable {
+        // 从 joinPoint 获取注解实例
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        Method method = signature.getMethod();
+        RagTraceRoot traceRoot = method.getAnnotation(RagTraceRoot.class);
+        if (traceRoot == null) {
+            return joinPoint.proceed();
         }
+        // 1. 优先复用外部已经放入上下文的 traceId/taskId
+        String traceId = IdUtil.getSnowflakeNextIdStr();
+        String methodName = joinPoint.getSignature().toShortString();
+        log.info("[TRACE_ROOT] ====== 入口: {} ======", methodName);
+        log.info("[TRACE_ROOT] 生成traceId={}, taskName='{}', thread={}", traceId, traceRoot.name(),
+                Thread.currentThread().getName());
         // 2. 记录链路开始信息（存入数据库）
         traceRecordService.startRun(traceId, traceRoot.name());
         // 3. 将traceId存入上下文（ThreadLocal，保证线程安全）
         RagTraceContext.setTraceId(traceId);
-        try {
-            // 4. 执行目标方法（业务逻辑）
-            return joinPoint.proceed();
-        } catch (Exception e) {
-            // 5. 记录异常状态
-            traceRecordService.recordError(traceId, e.getMessage());
-            throw e;
-        } finally {
-            // 6. 清理上下文，避免内存泄漏
-            RagTraceContext.clear();
+        log.info("[TRACE_ROOT] traceId已设置到ThreadLocal, getTraceId()={}", RagTraceContext.getTraceId());
+        // 4. 执行目标方法（业务逻辑）
+        Object result = joinPoint.proceed();
+        log.info("[TRACE_ROOT] 目标方法返回, result类型={}", result != null ? result.getClass().getSimpleName() : "null");
+        // 5. 处理响应式返回值（Flux/Mono）：延迟清理 traceId 到流终止时
+        if (result instanceof Publisher<?> publisher) {
+            log.info("[TRACE_ROOT] 检测到响应式返回值, 延迟traceId清理到流终止");
+            return wrapReactiveResult(publisher, traceId, traceRoot.name());
         }
+        // 6. 同步返回值：正常清理
+        log.info("[TRACE_ROOT] 同步返回值, 立即清理traceId");
+        RagTraceContext.clear();
+        return result;
+    }
+
+    /**
+     * 包装响应式结果（Flux/Mono）：在流终止/出错时记录状态并清理 traceId。
+     * 避免同步 finally 提前清除 ThreadLocal 导致后续节点获取不到 traceId。
+     */
+    private Object wrapReactiveResult(Publisher<?> publisher, String traceId, String taskName) {
+        if (publisher instanceof Flux<?> flux) {
+            log.info("[TRACE_ROOT] 包装Flux, traceId={} 将在流终止时清理", traceId);
+            return flux
+                    .doOnNext(v -> {
+                        // 首次订阅时确保 traceId 仍然可用
+                        if (RagTraceContext.getTraceId() == null) {
+                            log.warn("[TRACE_ROOT] ⚠ Flux订阅后发现traceId已丢失! 重新设置 traceId={}", traceId);
+                            RagTraceContext.setTraceId(traceId);
+                        }
+                    })
+                    .doOnError(e -> {
+                        log.error("[TRACE_ROOT] Flux异常, traceId={}, error={}", traceId, e.getMessage());
+                        traceRecordService.recordError(traceId, e.getMessage());
+                    })
+                    .doFinally(signal -> {
+                        log.info("[TRACE_ROOT] Flux结束, traceId={}, signal={}, 清理ThreadLocal", traceId, signal);
+                        RagTraceContext.clear();
+                    });
+        }
+        if (publisher instanceof Mono<?> mono) {
+            log.info("[TRACE_ROOT] 包装Mono, traceId={} 将在流终止时清理", traceId);
+            return mono
+                    .doOnSuccess(v -> {
+                        if (RagTraceContext.getTraceId() == null) {
+                            log.warn("[TRACE_ROOT] ⚠ Mono订阅后发现traceId已丢失! 重新设置 traceId={}", traceId);
+                            RagTraceContext.setTraceId(traceId);
+                        }
+                    })
+                    .doOnError(e -> {
+                        log.error("[TRACE_ROOT] Mono异常, traceId={}, error={}", traceId, e.getMessage());
+                        traceRecordService.recordError(traceId, e.getMessage());
+                    })
+                    .doFinally(signal -> {
+                        log.info("[TRACE_ROOT] Mono结束, traceId={}, signal={}, 清理ThreadLocal", traceId, signal);
+                        RagTraceContext.clear();
+                    });
+        }
+        // 其他 Publisher 类型，保守处理
+        log.warn("[TRACE_ROOT] 未知的Publisher类型: {}, 不做包装处理", publisher.getClass().getName());
+        return publisher;
     }
 
     /**
@@ -74,10 +134,17 @@ public class RagTraceAspect {
     @Around("@annotation(traceNode)")
     public Object aroundNode(ProceedingJoinPoint joinPoint, RagTraceNode traceNode) throws Throwable {
         // 1. 从上下文获取当前traceId（若没有则不追踪，避免空指针）
-        String traceId = resolveTaskId(joinPoint, traceNode.taskIdArg(), RagTraceContext.getTraceId());
+        String traceId = RagTraceContext.getTraceId();
+        String methodName = joinPoint.getSignature().toShortString();
         if (traceId == null || traceId.trim().isEmpty()) {
+            log.warn("[TRACE_NODE] ⚠ traceId为空, 跳过追踪! method={}, nodeName='{}', thread={}",
+                    methodName, traceNode.name(), Thread.currentThread().getName());
+            log.warn("[TRACE_NODE]   可能原因: 1) aroundRoot的finally提前清除了traceId; " +
+                    "2) 异步线程未传递ThreadLocal; 3) 该方法不在RagTraceRoot链路中");
             return joinPoint.proceed();
         }
+        log.info("[TRACE_NODE] 节点: name='{}', type='{}', method={}, traceId={}, thread={}",
+                traceNode.name(), traceNode.type(), methodName, traceId, Thread.currentThread().getName());
         // 2. 生成节点唯一nodeId
         String nodeId = IdUtil.getSnowflakeNextIdStr();
         // 3. 节点入栈（维护节点层级关系，支持嵌套调用）
@@ -98,80 +165,6 @@ public class RagTraceAspect {
         } finally {
             // 8. 节点出栈，恢复上下文
             RagTraceContext.popNode();
-        }
-    }
-
-    private String resolveTaskId(ProceedingJoinPoint joinPoint, String taskIdArg, String fallback) {
-        String resolved = resolveValue(joinPoint, taskIdArg);
-        return (resolved == null || resolved.isBlank()) ? fallback : resolved;
-    }
-
-    private String resolveValue(ProceedingJoinPoint joinPoint, String expression) {
-        if (expression == null || expression.isBlank()) {
-            return null;
-        }
-        Object[] args = joinPoint.getArgs();
-        String[] parts = expression.split("\\.");
-
-        // 先尝试按参数名匹配（如果编译保留了参数名）
-        String[] parameterNames = null;
-        if (joinPoint.getSignature() instanceof MethodSignature methodSignature) {
-            parameterNames = methodSignature.getParameterNames();
-        }
-
-        for (int i = 0; i < args.length; i++) {
-            Object arg = args[i];
-            if (arg == null) {
-                continue;
-            }
-            if (parameterNames != null && i < parameterNames.length && expression.equals(parameterNames[i])) {
-                return String.valueOf(arg);
-            }
-            if (parts.length > 0) {
-                Object current = arg;
-                boolean matched = true;
-                for (String part : parts) {
-                    current = readProperty(current, part);
-                    if (current == null) {
-                        matched = false;
-                        break;
-                    }
-                }
-                if (matched) {
-                    return String.valueOf(current);
-                }
-            }
-        }
-
-        if (parts.length > 1) {
-            String leaf = parts[parts.length - 1];
-            for (Object arg : args) {
-                Object leafValue = readProperty(arg, leaf);
-                if (leafValue != null) {
-                    return String.valueOf(leafValue);
-                }
-            }
-        }
-
-        return null;
-    }
-
-    private Object readProperty(Object target, String name) {
-        if (target == null || name == null || name.isBlank()) {
-            return null;
-        }
-        try {
-            String getterName = "get" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
-            Method getter = target.getClass().getMethod(getterName);
-            return getter.invoke(target);
-        } catch (Exception ignored) {
-            try {
-                Field field = target.getClass().getDeclaredField(name);
-                field.setAccessible(true);
-                return field.get(target);
-            } catch (Exception ignoredToo) {
-                return null;
-            }
         }
     }
 }

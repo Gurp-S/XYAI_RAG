@@ -3,7 +3,6 @@ package com.XYai.myai.rag.milvus;
 import cn.hutool.core.util.StrUtil;
 import com.XYai.myai.redis.RedisKeyConfig;
 import com.XYai.myai.user.LoginUserInfoManager;
-import com.XYai.myai.user.POJO.User;
 import io.milvus.client.MilvusClient;
 import io.milvus.param.dml.DeleteParam;
 import jakarta.annotation.Resource;
@@ -38,14 +37,14 @@ public class MilvusAclManager {
     @Value("${spring.ai.vectorstore.milvus.collectionName:my_ai}")
     private String physicalCollectionName;
 
-    @Value("${spring.ai.vectorstore.milvus.databaseName:default}")
+    @Value("${spring.ai.vectorstore.milvus.databaseName:my_xy}")
     private String databaseName;
 
     /**
      * 获取当前用户可见的集合列表（跨实例共享，Redis 优先）。
      */
     public List<String> getUserCollectionsAcl() {
-        Long userId = LoginUserInfoManager.get().getId();
+        Long userId = LoginUserInfoManager.getUserId();
         String loadRedisKey = RedisKeyConfig.userLoadCollectionsKey(userId);
         String unloadRedisKey = RedisKeyConfig.userUnloadCollectionsKey(userId);
         RSet<String> permissionLoadSet = redissonClient.getSet(loadRedisKey);
@@ -60,7 +59,7 @@ public class MilvusAclManager {
      * 获取当前权限集合元数据(文档id)
      */
     public List<String> getCollectionFiles(String collectionName) {
-        Long userId = LoginUserInfoManager.get().getId();
+        Long userId = LoginUserInfoManager.getUserId();
         List<String> result = new ArrayList<>();
         RSet<String> fileIdSet = redissonClient.getSet(RedisKeyConfig.collectionFileIds(collectionName));
 
@@ -95,9 +94,7 @@ public class MilvusAclManager {
     }
 
     public Boolean getFileAcl(String fileId) {
-        User user = LoginUserInfoManager.get();
-        if (user == null) return false;
-        Long userId = user.getId();
+        Long userId = LoginUserInfoManager.getUserId();
         if (fileId == null || fileId.isBlank()) return false;
 
 
@@ -114,7 +111,7 @@ public class MilvusAclManager {
      * 删除该集合下所有文件当前用户的权限
      */
     public void deleteCollectionDocumentAcl(String collectionName) {
-        Long userId = LoginUserInfoManager.get().getId();
+        Long userId = LoginUserInfoManager.getUserId();
         RSet<String> collectionFileIds = redissonClient.getSet(RedisKeyConfig.collectionFileIds(collectionName));
 
         Set<String> fileIdsInCollection = collectionFileIds.stream()
@@ -140,9 +137,7 @@ public class MilvusAclManager {
      * 删除 Redis 里的集合下文件权限缓存
      */
     public void deleteDocumentAcl(Long chunkId, String fileId) {
-        User user = LoginUserInfoManager.get();
-        if (user == null || fileId == null || fileId.isBlank() || chunkId == null) return;
-        Long userId = user.getId();
+        Long userId = LoginUserInfoManager.getUserId();
 
         RBitSet bitSet = redissonClient.getBitSet(RedisKeyConfig.userFileBitKey(userId, fileId));
         boolean hadAcl = false;
@@ -246,7 +241,7 @@ public class MilvusAclManager {
     }
 
     public void addFileUserACl(String fileId, String collectionName, Long chunkSize) {
-        Long userId = LoginUserInfoManager.get().getId();
+        Long userId = LoginUserInfoManager.getUserId();
         int cap = (int) Math.min(chunkSize, RedisKeyConfig.MAX_CHUNK_PER_FILE);
 
         List<Long> all = LongStream.rangeClosed(1, cap)
@@ -273,7 +268,7 @@ public class MilvusAclManager {
 
     public void addFileUserACl(List<Document> documents, String collectionName) {
         if (documents == null || documents.isEmpty()) return;
-        Long userId = LoginUserInfoManager.get().getId();
+        Long userId = LoginUserInfoManager.getUserId();
         Document firstDoc = documents.getFirst();
         String fileId = firstDoc.getMetadata().get("fileId").toString();
         long chunkSize = Long.parseLong(firstDoc.getMetadata().get("chunkSize").toString());
@@ -326,9 +321,7 @@ public class MilvusAclManager {
     }
 
     public boolean userCollectionLoadAcl(String collectionName) {
-        User user = LoginUserInfoManager.get();
-        if (user == null || collectionName == null || collectionName.isBlank()) return false;
-        Long userId = user.getId();
+        Long userId = LoginUserInfoManager.getUserId();
         RSet<String> loadSet = redissonClient.getSet(RedisKeyConfig.userLoadCollectionsKey(userId));
         try {
             return loadSet.contains(collectionName);
@@ -342,9 +335,7 @@ public class MilvusAclManager {
      * 原子地将 collection 从 unloaded 移到 loaded
      */
     public boolean moveCollectionToLoaded(String collectionName) {
-        User user = LoginUserInfoManager.get();
-        if (user == null || collectionName == null || collectionName.isBlank()) return false;
-        Long userId = user.getId();
+        Long userId = LoginUserInfoManager.getUserId();
         String loadKey = RedisKeyConfig.userLoadCollectionsKey(userId);
         String unloadKey = RedisKeyConfig.userUnloadCollectionsKey(userId);
 
@@ -367,9 +358,7 @@ public class MilvusAclManager {
      * 原子地将 collection 从 loaded 移到 unloaded
      */
     public boolean moveCollectionToUnloaded(String collectionName) {
-        User user = LoginUserInfoManager.get();
-        if (user == null || collectionName == null || collectionName.isBlank()) return false;
-        Long userId = user.getId();
+        Long userId = LoginUserInfoManager.getUserId();
         String loadKey = RedisKeyConfig.userLoadCollectionsKey(userId);
         String unloadKey = RedisKeyConfig.userUnloadCollectionsKey(userId);
 
@@ -389,9 +378,7 @@ public class MilvusAclManager {
     }
 
     public void deleteCollectionAcl(String collectionName) {
-        User user = LoginUserInfoManager.get();
-        if (user == null) return;
-        Long userId = user.getId();
+        Long userId = LoginUserInfoManager.getUserId();
         try {
             // 全局用户计数器 - 减 1
             RAtomicLong collectionUserCount = redissonClient.getAtomicLong(RedisKeyConfig.collectionUserCountKey(collectionName));

@@ -1,6 +1,6 @@
 package com.XYai.myai.rag.mcp.tools;
 
-import com.XYai.myai.rag.mcp.POJO.GeoCodeDTO;
+import com.XYai.myai.rag.mcp.pojo.GeoCodeDTO;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
@@ -10,7 +10,6 @@ import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Objects;
 
@@ -29,15 +28,15 @@ public class AMapTool {
         return "{\"status\":0,\"info\":\"" + msg.replace("\"", "'") + "\",\"count\":0}";
     }
 
-    private String filterSuccess(String toolName,JSONObject data) {
-        log.info("{} 工具完成{}",toolName, data);
+    private String filterSuccess(String toolName, JSONObject data) {
+        log.info("{} 工具完成{}", toolName, data);
         return "{\"status\":1,\"info\":\"OK\",\"count\":" + data.getOrDefault("count", 1) + ",\"data\":" + data + "}";
     }
 
     // ============================== 地理编码 ==============================
     @Tool(
             name = "geo_code",
-            description = "地址转坐标。参数：address(结构化地址), city(城市名/编码)"
+            description = "地址转坐标,参数: address(必填,地址字符串), city(可选,城市名)"
     )
     public String geoCode(
             @ToolParam(description = "结构化地址信息") String address,
@@ -76,7 +75,7 @@ public class AMapTool {
             dto.setDistrict(item.getString("district"));
             dto.setLocation(item.getString("location"));
 
-            return filterSuccess("geoCode",item);
+            return filterSuccess("geoCode", item);
         } catch (Exception e) {
             return fail("调用失败: " + e.getMessage());
         }
@@ -85,7 +84,7 @@ public class AMapTool {
     // ============================== 逆地理编码 ==============================
     @Tool(
             name = "reverse_geo_code",
-            description = "坐标转地址。参数：location('经度,纬度'格式)"
+            description = "坐标转地址。参数：location(必填,格式:经度,纬度)"
     )
     public String reverseGeoCode(@ToolParam(description = "经纬度坐标") String location) {
         if (location == null || !location.matches("^\\d+\\.\\d+,\\d+\\.\\d+$")) {
@@ -109,7 +108,7 @@ public class AMapTool {
             res.put("township", addrComp.getString("township"));
             res.put("location", location);
 
-            return filterSuccess("reverseGeoCode",res);
+            return filterSuccess("reverseGeoCode", res);
         } catch (Exception e) {
             return fail("调用失败: " + e.getMessage());
         }
@@ -118,7 +117,7 @@ public class AMapTool {
     // ============================== 关键字搜索 ==============================
     @Tool(
             name = "keyword_search",
-            description = "按关键词搜索POI。参数：keywords(地点名), types(POI类型), region(区划), city_limit(城市编码)"
+            description = "按关键词搜索POI,参数: keywords(必填,关键词), types(可选,类型代码), region(可选,区域), city_limit(可选,城市限制)"
     )
     public String keywordSearch(
             @ToolParam(description = "地点关键字指定地点类型") String keywords,
@@ -151,7 +150,7 @@ public class AMapTool {
 
             JSONObject res = new JSONObject();
             res.put("pois", arr);
-            return filterSuccess("keywordSearch",res);
+            return filterSuccess("keywordSearch", res);
         } catch (Exception e) {
             return fail("搜索失败: " + e.getMessage());
         }
@@ -160,7 +159,8 @@ public class AMapTool {
     // ============================== 周边搜索 ==============================
     @Tool(
             name = "around_search",
-            description = "按坐标+半径搜索周边POI。参数：location(中心点'经度,纬度'), keywords(关键字), types(类型), radius(米), sortRule(排序)"
+            description = "按坐标+半径搜索周边POI,参数: location(必填,中心点坐标), keywords(可选,关键词), types(可选,类型), " +
+                    "radius(可选,半径米), sortRule(可选,排序), cityLimit(可选,城市限制)"
     )
     public String aroundSearch(
             @ToolParam(description = "圆形区域检索中心点（必填）") String location,
@@ -220,7 +220,8 @@ public class AMapTool {
     // ============================== 输入提示 ==============================
     @Tool(
             name = "enterPrompt",
-            description = "关键词搜索建议。参数：keywords(查询词), types(分类), location(坐标), city(城市), datatype(数据类型)"
+            description = "关键词输入提示,参数: keywords(必填,查询词), types(可选,类型), location(可选,坐标), " +
+                    "city(可选,城市), cityLimit(可选), datatype(可选)"
     )
     public String enterPrompt(
             @ToolParam(description = "查询关键词") String keywords,
@@ -257,7 +258,7 @@ public class AMapTool {
 
             JSONObject res = new JSONObject();
             res.put("tips", arr);
-            return filterSuccess("enterPrompt",res);
+            return filterSuccess("enterPrompt", res);
         } catch (Exception e) {
             return fail("搜索失败: " + e.getMessage());
         }
@@ -266,7 +267,8 @@ public class AMapTool {
     // ============================== 路径规划 ==============================
     @Tool(
             name = "direction",
-            description = "路线规划(步行/公交/驾车/骑行)。参数：directionType(类型), origin/destination(坐标), city1/city2(城市编码)"
+            description = "路线规划,参数: directionType(必填,步行/公共/驾车/骑行), origin(必填,起点坐标), " +
+                    "destination(必填,终点坐标), city1(公共必填), city2(公共必填)"
     )
     public String direction(
             @ToolParam(description = "路径规划类型") String directionType,
@@ -329,7 +331,7 @@ public class AMapTool {
                 res.put("restriction", path.getString("restriction"));
             }
 
-            return filterSuccess("direction",res);
+            return filterSuccess("direction", res);
         } catch (Exception e) {
             return fail("路线规划失败: " + e.getMessage());
         }
@@ -341,8 +343,8 @@ public class AMapTool {
             description = "计算两点直线距离(米)。参数：startingPoint/endingPoint('经度,纬度'格式)"
     )
     public String calculateDistance(
-            @ToolParam(description = "起点经纬度，格式'经度,纬度'", required = true) String startingPoint,
-            @ToolParam(description = "终点经纬度，格式'经度,纬度'", required = true) String endingPoint
+            @ToolParam(description = "起点经纬度，格式'经度,纬度'") String startingPoint,
+            @ToolParam(description = "终点经纬度，格式'经度,纬度'") String endingPoint
     ) {
         if (startingPoint == null || endingPoint == null) {
             return fail("缺少参数：需提供起点和终点坐标");
@@ -364,7 +366,7 @@ public class AMapTool {
             res.put("distance", distance);
             res.put("origin", startingPoint);
             res.put("destination", endingPoint);
-            return filterSuccess("calculateDistance",res);
+            return filterSuccess("calculateDistance", res);
         } catch (Exception e) {
             return fail("距离计算失败: " + e.getMessage());
         }
@@ -407,8 +409,7 @@ public class AMapTool {
                 res.put("temperature", w.getString("temperature"));
                 res.put("wind", w.getString("winddirection") + w.getString("windpower") + "级");
                 res.put("humidity", w.getString("humidity") + "%");
-            }
-            else if ("all".equals(extensions)) {
+            } else if ("all".equals(extensions)) {
                 JSONArray forecasts = json.getJSONArray("forecasts");
                 if (forecasts == null || forecasts.isEmpty()) {
                     return fail("未获取到天气预报");
@@ -418,7 +419,7 @@ public class AMapTool {
                 res.put("reportTime", forecast.getString("reporttime"));
                 res.put("forecasts", forecast.getJSONArray("casts"));
             }
-            return filterSuccess("weather",res);
+            return filterSuccess("weather", res);
         } catch (Exception e) {
             log.error("天气异常", e);
             return fail("天气服务异常：" + e.getMessage());
@@ -448,7 +449,7 @@ public class AMapTool {
             res.put("province", json.getString("province"));
             res.put("city", json.getString("city"));
             res.put("location", json.getString("location"));
-            return filterSuccess("ipLocation",res);
+            return filterSuccess("ipLocation", res);
         } catch (Exception e) {
             return fail("IP定位失败: " + e.getMessage());
         }

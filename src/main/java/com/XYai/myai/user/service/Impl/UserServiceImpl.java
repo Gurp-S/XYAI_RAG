@@ -5,22 +5,22 @@ import com.XYai.myai.mapper.ChatConversationMapper;
 import com.XYai.myai.mapper.ChatSessionRecordMapper;
 import com.XYai.myai.mapper.GroupMapper;
 import com.XYai.myai.mapper.UserMapper;
-import com.XYai.myai.rag.aop.Annotation.RagTraceNode;
-import com.XYai.myai.rag.memory.POJO.ChatConversation;
-import com.XYai.myai.rag.memory.POJO.ChatSessionRecord;
+import com.XYai.myai.rag.memory.pojo.ChatConversation;
+import com.XYai.myai.rag.memory.pojo.ChatSessionRecord;
 import com.XYai.myai.redis.RedisKeyConfig;
 import com.XYai.myai.security.JwtUtil;
-import com.XYai.myai.security.POJO.JwtProperties;
+import com.XYai.myai.security.pojo.JwtProperties;
 import com.XYai.myai.security.service.JwtService;
 import com.XYai.myai.user.LoginUserInfoManager;
-import com.XYai.myai.user.POJO.Group;
-import com.XYai.myai.user.POJO.RefreshToken;
-import com.XYai.myai.user.POJO.User;
-import com.XYai.myai.user.POJO.UserDTO;
+import com.XYai.myai.user.pojo.Group;
+import com.XYai.myai.user.pojo.RefreshToken;
+import com.XYai.myai.user.pojo.User;
+import com.XYai.myai.user.pojo.UserDTO;
 import com.XYai.myai.user.service.CustomUserDetailsService;
 import com.XYai.myai.user.service.RefreshTokenService;
 import com.XYai.myai.user.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,9 +35,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 
 /**
  * 用户服务实现类。
@@ -74,31 +71,62 @@ public class UserServiceImpl implements UserService {
      * 查询对话内容（会话内的消息）
      * /** 获取好友
      */
-    @RagTraceNode(name = "历史对话查询", type = "conversation")
-    public Result<List<ChatConversation>> conversationHistory(String conversationId, LocalDateTime cursor) {
-        log.info("查询对话数据");
+
+    /**
+     * 查询会话内的消息记录 - 基于游标（时间戳）的懒加载
+     *
+     * @param conversationId 会话ID
+     * @param cursor         上一页最后一条消息的创建时间（null表示第一页）
+     * @param limit
+     * @return 消息列表（按时间升序）
+     */
+    public Result<List<ChatConversation>> conversationHistory(String conversationId, LocalDateTime cursor, int limit) {
+        log.info("查询对话数据，conversationId: {}, cursor: {}, limit: {}", conversationId, cursor, limit);
         if (conversationId == null || conversationId.isBlank()) {
             return Result.error(404, "会话无记录");
         }
+        int pageSize = limit < 1 ? 20 : Math.min(limit, 100);
+
+        // 首次加载：没有游标，返回最新的 pageSize 条消息
+        if (cursor == null) {
+            LambdaQueryWrapper<ChatConversation> descWrapper = new LambdaQueryWrapper<ChatConversation>()
+                    .select(ChatConversation::getChatMessageId,
+                            ChatConversation::getConversationId,
+                            ChatConversation::getUserMessage,
+                            ChatConversation::getAssistantMessage,
+                            ChatConversation::getCreatedAt,
+                            ChatConversation::getFeedback)
+                    .eq(ChatConversation::getConversationId, conversationId)
+                    .orderByDesc(ChatConversation::getCreatedAt)
+                    .last("limit " + pageSize);
+            List<ChatConversation> descRecords = chatConversationMapper.selectList(descWrapper);
+            if (descRecords == null) {
+                descRecords = Collections.emptyList();
+            } else {
+                Collections.reverse(descRecords); // 反转成升序，方便前端按时间顺序渲染
+            }
+            return Result.success(descRecords);
+        }
+
+        // 有游标：加载比 cursor 更早的消息（向上滚动历史）
         LambdaQueryWrapper<ChatConversation> queryWrapper = new LambdaQueryWrapper<ChatConversation>()
-                .select(ChatConversation::getConversationId,
+                .select(ChatConversation::getChatMessageId,
+                        ChatConversation::getConversationId,
                         ChatConversation::getUserMessage,
                         ChatConversation::getAssistantMessage,
-                        ChatConversation::getCreatedAt)
-                .eq(ChatConversation::getConversationId, conversationId);
-        if (cursor != null) {
-            queryWrapper.lt(ChatConversation::getCreatedAt, cursor);
-        }
-        queryWrapper.orderByAsc(ChatConversation::getCreatedAt);
+                        ChatConversation::getCreatedAt,
+                        ChatConversation::getFeedback)
+                .eq(ChatConversation::getConversationId, conversationId)
+                .lt(ChatConversation::getCreatedAt, cursor)
+                .orderByAsc(ChatConversation::getCreatedAt)
+                .last("limit " + pageSize);
 
-        // 使用 ChatConversationMapper
         List<ChatConversation> records = chatConversationMapper.selectList(queryWrapper);
-
-        if (records == null || records.isEmpty()) {
-            return Result.success(List.of());
+        if (records == null) {
+            records = Collections.emptyList();
         }
-        // TODO异步更新摘要（实现保留）
-//        setSummary(conversationId);
+        // 异步更新摘要（保留原有注释逻辑）
+        // setSummary(conversationId);
         return Result.success(records);
     }
 
@@ -121,7 +149,7 @@ public class UserServiceImpl implements UserService {
      * @return 成功返回
      */
     public Result<String> logout(HttpServletRequest request, HttpServletResponse response) {
-        User user = LoginUserInfoManager.get();
+        User user = LoginUserInfoManager.getUser();
         JwtUtil.clearRefreshTokenCookie(response, jwtProperties);
         if (user == null || user.getId() == null) {
             return Result.success("登出成功");
@@ -206,7 +234,7 @@ public class UserServiceImpl implements UserService {
     public Result<List<ChatSessionRecord>> history(Long userId) {
         if (userId == null || userId < 0)
             return Result.error(500, "id非法");
-        User currentUser = LoginUserInfoManager.get();
+        User currentUser = LoginUserInfoManager.getUser();
         if (currentUser == null || !Objects.equals(currentUser.getId(), userId)) {
             return Result.error(403, "无权限访问");
         }
@@ -222,8 +250,8 @@ public class UserServiceImpl implements UserService {
      */
     private List<ChatSessionRecord> getConversationId(Long userId) {
         LambdaQueryWrapper<ChatSessionRecord> query = new LambdaQueryWrapper<>();
-        // ChatSessionRecord.userId 类型是 String
-        query.eq(ChatSessionRecord::getUserId, String.valueOf(userId));
+        query.eq(ChatSessionRecord::getUserId, userId);
+        query.orderByDesc(ChatSessionRecord::getCreatedAt);
         return chatSessionRecordMapper.selectList(query);
     }
 
@@ -391,7 +419,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    public Result<String> deleteHistory(Long userId, String conversationId){
+    public Result<String> deleteHistory(Long userId, String conversationId) {
         if (conversationId == null || conversationId.isBlank()) {
             return Result.error(400, "conversationId 不能为空");
         }
@@ -408,14 +436,14 @@ public class UserServiceImpl implements UserService {
         // 删除会话元信息
         chatSessionRecordMapper.deleteById(conversationId);
         // 删除会话下的所有消息（chat_conversation 表以 chat_message_id 为主键，需按 conversation_id 删除）
-        LambdaQueryWrapper<com.XYai.myai.rag.memory.POJO.ChatConversation> q = new LambdaQueryWrapper<>();
-        q.eq(com.XYai.myai.rag.memory.POJO.ChatConversation::getConversationId, conversationId);
+        LambdaQueryWrapper<com.XYai.myai.rag.memory.pojo.ChatConversation> q = new LambdaQueryWrapper<>();
+        q.eq(com.XYai.myai.rag.memory.pojo.ChatConversation::getConversationId, conversationId);
         chatConversationMapper.delete(q);
 
         return Result.success();
     }
 
-    public Result<String> updateHistory(ChatSessionRecord chatSessionRecord){
+    public Result<String> updateHistory(ChatSessionRecord chatSessionRecord) {
         if (chatSessionRecord == null || chatSessionRecord.getConversationId() == null || chatSessionRecord.getConversationId().isBlank()) {
             return Result.error(400, "conversationId 不能为空");
         }
@@ -425,7 +453,7 @@ public class UserServiceImpl implements UserService {
         if (exist == null) {
             return Result.error(404, "会话不存在");
         }
-        Long currentUserId = LoginUserInfoManager.get() != null ? LoginUserInfoManager.get().getId() : null;
+        Long currentUserId = LoginUserInfoManager.getUserId();
         if (exist.getUserId() == null || currentUserId == null || !Objects.equals(exist.getUserId(), currentUserId)) {
             return Result.error(403, "无权限更新此会话");
         }
@@ -450,4 +478,6 @@ public class UserServiceImpl implements UserService {
         chatSessionRecordMapper.update(null, update);
         return Result.success();
     }
+
+
 }

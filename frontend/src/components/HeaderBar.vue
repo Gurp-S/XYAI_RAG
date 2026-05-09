@@ -71,18 +71,32 @@ width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         </button>
                     </div>
 
-                    <div class="section-title">侧栏风格</div>
+                    <div class="section-title">侧栏按钮模式</div>
                     <div class="style-row">
                         <button
-                            v-for="item in sidebarStyleOptions"
-                            :key="item.name"
                             class="style-chip"
-                            :class="{ active: item.name === store.sidebarStyle }"
-                            @click="changeSidebarStyle(item.name)"
+                            :class="{ active: store.sidebarMode === 'fullscreen' }"
+                            @click="store.setSidebarMode('fullscreen')"
                         >
-                            <span class="chip-dot" :style="{ background: item.preview }"></span>
-                            <span>{{ item.label }}</span>
+                            <span class="chip-dot" style="background: linear-gradient(135deg,#94a3b8,#475569)"></span>
+                            <span>全屏</span>
                         </button>
+                        <button
+                            class="style-chip"
+                            :class="{ active: store.sidebarMode === 'collapse' }"
+                            @click="store.setSidebarMode('collapse')"
+                        >
+                            <span class="chip-dot" style="background: linear-gradient(135deg,#cbd5e1,#64748b)"></span>
+                            <span>收起</span>
+                        </button>
+                    </div>
+
+                    <div class="section-title">消息气泡</div>
+                    <div class="style-row" style="justify-content: space-between; align-items: center; cursor: pointer; padding: 4px 6px;" @click="toggleBotBubble">
+                        <span style="font-size: 13px; color: var(--text-main);">AI 返回消息底色</span>
+                        <div class="toggle-switch" :class="{ 'is-active': store.botBubbleEnabled }">
+                            <div class="toggle-knob"></div>
+                        </div>
                     </div>
 
                     <div class="section-title blur-title">
@@ -111,6 +125,22 @@ width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         accept="image/png,image/jpeg,image/webp,image/gif"
                         class="background-input"
                         @change="handleBackgroundUpload"
+                    >
+
+                    <div class="section-title">AI 头像</div>
+                    <div class="panel-actions">
+                        <button class="panel-btn" type="button" @click="triggerAiAvatarUpload">上传头像</button>
+                        <button v-if="store.aiAvatar" class="panel-btn danger" type="button" @click="clearAiAvatar">清除头像</button>
+                    </div>
+                    <div v-if="store.aiAvatar" class="ai-avatar-preview">
+                        <img :src="store.aiAvatar" alt="AI头像预览" class="ai-avatar-preview-img" />
+                    </div>
+                    <input
+                        ref="aiAvatarUploader"
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,image/gif"
+                        class="background-input"
+                        @change="handleAiAvatarUpload"
                     >
                 </div>
             </transition>
@@ -153,11 +183,6 @@ const themeOptions = [
     { name: 'cyber-violet', label: '暮紫', preview: 'linear-gradient(135deg,#6d28d9,#2563eb)' },
 ]
 
-const sidebarStyleOptions = [
-    { name: 'orbit', label: '柔面', preview: 'linear-gradient(135deg,#e2e8f0,#94a3b8)' },
-    { name: 'outline', label: '线框', preview: 'linear-gradient(135deg,#cbd5e1,#475569)' },
-]
-
 function handleNewChat() {
     showAppearancePanel.value = false
     store.newConversation();
@@ -176,16 +201,16 @@ function toggleThemeLocally() {
     store.toggleDarkMode()
 }
 
+function toggleBotBubble() {
+    store.setBotBubbleEnabled(!store.botBubbleEnabled)
+}
+
 function toggleAppearancePanel() {
     showAppearancePanel.value = !showAppearancePanel.value
 }
 
 function changeTheme(themeName) {
     store.setTheme(themeName)
-}
-
-function changeSidebarStyle(styleName) {
-    store.setSidebarStyle(styleName)
 }
 
 function triggerBackgroundUpload() {
@@ -273,6 +298,38 @@ async function handleBackgroundUpload(event) {
 
 function clearBackground() {
     store.clearBackgroundImage()
+}
+
+const aiAvatarUploader = ref(null)
+const MAX_AVATAR_SIZE = 2 * 1024 * 1024
+
+function triggerAiAvatarUpload() {
+    if (!aiAvatarUploader.value) return
+    aiAvatarUploader.value.value = ''
+    aiAvatarUploader.value.click()
+}
+
+async function handleAiAvatarUpload(event) {
+    const file = event.target?.files?.[0]
+    if (!file) return
+    if (file.size > MAX_AVATAR_SIZE) {
+        alert('头像图片不能超过 2MB')
+        event.target.value = ''
+        return
+    }
+    try {
+        const dataUrl = await fileToDataUrl(file)
+        store.setAiAvatar(dataUrl)
+    } catch (err) {
+        console.error('AI头像处理失败', err)
+        alert('头像处理失败，请重试')
+    } finally {
+        event.target.value = ''
+    }
+}
+
+function clearAiAvatar() {
+    store.setAiAvatar('')
 }
 
 function handleBackgroundBlurChange(event) {
@@ -480,6 +537,29 @@ onUnmounted(() => {
     background: color-mix(in srgb, var(--primary) 16%, transparent);
 }
 
+.toggle-switch {
+    width: 32px; height: 18px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--panel-border) 60%, transparent);
+    position: relative;
+    transition: background-color 0.2s;
+}
+.toggle-switch.is-active {
+    background: var(--primary);
+}
+.toggle-knob {
+    position: absolute;
+    left: 2px; top: 2px;
+    width: 14px; height: 14px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.toggle-switch.is-active .toggle-knob {
+    transform: translateX(14px);
+}
+
 .chip-dot {
     width: 12px;
     height: 12px;
@@ -533,6 +613,20 @@ onUnmounted(() => {
 
 .background-input {
     display: none;
+}
+
+.ai-avatar-preview {
+    margin-top: 8px;
+    display: flex;
+    justify-content: center;
+}
+.ai-avatar-preview-img {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--panel-border);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .panel-fade-enter-active,

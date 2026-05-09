@@ -2,15 +2,16 @@ package com.XYai.myai.rag.etlpipeline;
 
 import cn.hutool.core.util.IdUtil;
 import com.XYai.myai.config.Result;
-import com.XYai.myai.rag.aop.Annotation.rateLimit;
-import com.XYai.myai.rag.etlpipeline.Factory.PipelineDefinitionFactory;
-import com.XYai.myai.rag.etlpipeline.Factory.UploadIngestionContextFactory;
-import com.XYai.myai.rag.etlpipeline.Oss.OssService;
-import com.XYai.myai.rag.etlpipeline.POJO.*;
+import com.XYai.myai.rag.aop.annotation.RagTraceRoot;
+import com.XYai.myai.rag.aop.annotation.RateLimit;
+import com.XYai.myai.rag.etlpipeline.factory.PipelineDefinitionFactory;
+import com.XYai.myai.rag.etlpipeline.factory.UploadIngestionContextFactory;
+import com.XYai.myai.rag.etlpipeline.oss.OssService;
+import com.XYai.myai.rag.etlpipeline.pojo.*;
 import com.XYai.myai.rag.milvus.MilvusFileManager;
 import com.XYai.myai.redis.RedisKeyConfig;
 import com.XYai.myai.user.LoginUserInfoManager;
-import com.XYai.myai.user.POJO.User;
+import com.XYai.myai.user.pojo.User;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
@@ -65,7 +66,8 @@ public class UploadController {
 
 
     @PostMapping("up")
-    @rateLimit(limit = 10, rateName = "upload_up")
+    @RagTraceRoot(name = "上传" , conversationIdArg = "" , taskIdArg = "上传")
+    @RateLimit(limit = 10, rateName = "upload_up")
     public Result<String> upLoad(
             @RequestParam("file") List<MultipartFile> files,
             @RequestParam("collectionName") String collectionName) {
@@ -81,7 +83,7 @@ public class UploadController {
         String taskId = IdUtil.getSnowflakeNextIdStr();
         accumulator.setTaskId(taskId);
         uploadTaskStore.start(taskId);
-        User user = LoginUserInfoManager.get();
+        User user = LoginUserInfoManager.getUser();
 
         List<MultipartFile> safeFiles = new ArrayList<>(files.size());
         List<File> tempFilesToCleanup = new ArrayList<>();
@@ -198,7 +200,7 @@ public class UploadController {
 
         UpLoadAccumulator accumulator = new UpLoadAccumulator();
         try {
-            User user = LoginUserInfoManager.get();
+            User user = LoginUserInfoManager.getUser();
             IngestionContext inputContext = uploadIngestionContextFactory.createFromSource(
                     sourceUri, sourceType, collectionName, kbId, user);
             var pipeline = pipelineDefinitionFactory.createSourcePipeline(sourceUri, sourceType);
@@ -227,7 +229,7 @@ public class UploadController {
 
         UpLoadAccumulator accumulator = new UpLoadAccumulator();
         try {
-            User user = LoginUserInfoManager.get();
+            User user = LoginUserInfoManager.getUser();
             IngestionContext inputContext = uploadIngestionContextFactory.createInline(
                     content, collectionName, kbId, user);
             var pipeline = pipelineDefinitionFactory.createInlinePipeline("inline");

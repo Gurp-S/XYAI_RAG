@@ -5,7 +5,6 @@ spring:
     active: local
   datasource:
     url: ${SPRING_MYSQL_URL:jdbc:mysql://localhost:3306/my_ai?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai}
-    # Move sensitive defaults into application-local.yaml or environment variables
     username: ${SPRING_MYSQL_USERNAME:}
     password: ${SPRING_MYSQL_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -20,49 +19,196 @@ spring:
       database: ${SPRING_REDIS_DB:0}
       timeout: 3s
   ai:
+    # OpenAI兼容模式（统一使用阿里云百炼）
     openai:
       api-key: ${ALIYUN_BAILIAN_API_KEY:}
       base-url: https://dashscope.aliyuncs.com/compatible-mode
       chat:
         options:
-          model: qwen3.5-122b-a10b
+          model: qwen3.5-flash  # 默认使用最强模型
           temperature: 0.3
-          maxTokens: 1000
-    dashscope:
-      api-key: ${ALIYUN_BAILIAN_API_KEY:}  # 可复用同一个 Key
-      rerank:
-        enabled: true
-        model: gte-rerank
-        # 可选：自定义超时/重试
-        timeout: 10s
-        max-retries: 3
+          max-tokens: 1000
+    # Anthropic兼容模式（同样通过百炼）
+    anthropic:
+      api-key: ${ALIYUN_BAILIAN_API_KEY:}
+      chat:
+        options:
+          model: claude-3-sonnet-20240229
+
+
+    # 本地Ollama
     ollama:
       base-url: http://localhost:11434
       embedding:
         options:
           model: qwen3-embedding
+    # Milvus向量存储
     vectorstore:
       milvus:
         client:
           host: localhost
           port: 19530
-        databaseName: my_xy
-        collectionName: my_ai
-        embeddingDimension: 4096
-        metricType: COSINE
+        database-name: my_xy
+        collection-name: my_ai
+        embedding-dimension: 4096
+        metric-type: COSINE
         initialize-schema: true
         index-type: ivf_flat
         index-params:
           nlist: 1024
+    # MCP客户端配置
     mcp:
       client:
         toolcallback:
           enabled: true
         name: mcp-client
-
         type: async
 
+# 模型路由配置（顶级配置）
+router:
+  strategy: failover  # failover: 降级切换, latency_based: 延迟优先, round_robin: 轮询
+  first-packet-timeout: 5000  # 首包探测超时(ms)
+  cascade-timeout: 30000      # 级联调用总超时(ms)
+  enable-first-packet-detect: true  # 是否启用首包探测
+  candidates:
+    - name: qwen3.5-flash
+      display-name: 通义千问-3.5-flash
+      api-model: qwen3.5-flash
+      priority: 1
+      enabled: true
+      circuit-breaker:
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10000
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
 
+    - name: qwen3.6-flash
+      display-name: 通义千问-3.6-flash
+      api-model: qwen3.6-flash
+      priority: 2
+      enabled: true
+      circuit-breaker:
+        failure-rate-threshold: 40
+        wait-duration-in-open-state: 8000
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+
+    - name: qwen-flash
+      display-name: 通义千问-Flash
+      api-model: qwen3.5-flash
+      priority: 3
+      enabled: true
+      circuit-breaker:
+        failure-rate-threshold: 30
+        wait-duration-in-open-state: 5000
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+
+    - name: qwen3.5-122b-a10b
+      display-name: 通义千问3.5-122b-a10b
+      api-model: qwen3.5-122b-a10b
+      priority: 4
+      enabled: true
+      circuit-breaker:
+        failure-rate-threshold: 45
+        wait-duration-in-open-state: 15000
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+
+    - name: qwen3.5-397b-a17b
+      display-name: qwen3.5-397b-a17b
+      api-model: qwen3.5-397b-a17b
+      priority: 5
+      enabled: true
+      circuit-breaker:
+        failure-rate-threshold: 40
+        wait-duration-in-open-state: 20000
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+
+# Resilience4j全局配置（与router配合使用）
+resilience4j:
+  circuit-breaker:
+    configs:
+      default:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10000
+        permitted-number-of-calls-in-half-open-state: 3
+        minimum-number-of-calls: 5
+        automatic-transition-from-open-to-half-open-enabled: true
+    instances:
+      qwen-max-breaker:
+        base-config: default
+      qwen-plus-breaker:
+        base-config: default
+        failure-rate-threshold: 40
+      deepseek-breaker:
+        base-config: default
+        failure-rate-threshold: 45
+  time-limiter:
+    instances:
+      ai-call:
+        timeout-duration: 30s
+
+# 其他业务配置
+logging:
+  level:
+    com.XYai.myai: info
+    io.github.resilience4j: info  # 查看熔断器状态变化
+
+ragent:
+  trace:
+    enabled: true
+
+upload:
+  ragEnabled: true
+  ossEnabled: false
+  upLoadEnabled: true
+
+memory:
+  history-keep-turns: 4
+  summary-start-turns: 8
+  summary-max-chars: 300
+  summary-enabled: true
+
+rewriter:
+  rewriter-min-chars: 50
+  rewriter-enabled: false
+
+intent:
+  intent-enabled: true
+  update-intent-enabled: true
+  redis-enabled: true
+  DBEnabled: false
+  vector-enabled: true
+
+aliyun:
+  oss:
+    endpoint: ${ALIOSS_ENDPOINT:oss-cn-shanghai.aliyuncs.com}
+    access-key-id: ${ALIOSS_ACCESS_KEY_ID:}
+    access-key-secret: ${ALIOSS_ACCESS_KEY_SECRET:}
+    bucket: ${ALIOSS_BUCKET_NAME:}
+    basePath: optional/base/path/
+    publicRead: true
+
+
+pipeline:
+  enricher-enable: true
+
+milvus:
+  delete-count-collection-threshold: 1
+  delete-count-file-threshold: 1
+  delete-count-threshold: 3
+
+tool:
+  amap:
+    api-key: ${tool.amap.api-key:}
+    enabled: true
+  bilibili:
+    enabled: true
+  common-tools:
+    enabled: true
 
 jwt:
   issuer: XYai
@@ -74,74 +220,3 @@ jwt:
   http-secure: false
   rsa-private-key-path: D:/lea/xyai/config/keys/private_pkcs8.pem
   rsa-public-key-path: D:/lea/xyai/config/keys/public_x509.pem
-
-#resilience4j:
-#  circuitbreaker:
-#    instances:
-#      searchChannel:
-#        slidingWindowSize: 10       # 最近10次调用统计
-#        failureRateThreshold: 50    # 失败率≥50% 开启熔断
-#        waitDurationInOpenState: 10s # 熔断10秒后半开重试
-#        permittedNumberOfCallsInHalfOpenState: 3
-#  timelimiter:
-#    instances:
-#      searchChannel:
-#        timeoutDuration: 3s   # 接口超时时间
-
-app:
-  memory:
-    store: mysql
-
-logging:
-  level:
-    org.XYai.myai: debug
-ragent:
-  trace:
-    enabled: true  # 生产环境启用，用于问题排查和性能监控
-    # enabled: false  # 开发环境可关闭，提升性能
-upload:
-  ragEnabled: true
-  ossEnabled: false
-  upLoadEnabled: true
-memory:
-    history-keep-turns: 4
-    summary-start-turns: 8
-    summary-max-chars: 300
-    summary-enabled: true
-rewriter:
-  rewriter-min-chars: 50
-  rewriter-enabled: false
-intent:
-  intent-enabled: false
-  update-intent-enabled: true
-  redis-enabled: false
-  DBEnabled: false
-  vector-enabled: true
-aliyun:
-  oss:
-    # Moved secrets to application-local.yaml which is git-ignored.
-    # Provide values via environment variables in CI or local application-local.yaml for development.
-    endpoint: ${ALIOSS_ENDPOINT:oss-cn-shanghai.aliyuncs.com}
-    access-key-id: ${ALIOSS_ACCESS_KEY_ID:}
-    access-key-secret: ${ALIOSS_ACCESS_KEY_SECRET:}
-    bucket: ${ALIOSS_BUCKET_NAME:}
-    basePath: optional/base/path/
-    publicRead: true
-splitter:
-  chunk-size: 1200
-  overlap: 200
-  chinese-tokenize: true
-pipeline:
-  enricher-enable: true
-milvus:
-  delete-count-collection-threshold: 1
-  delete-count-file-threshold: 1
-  delete-count-threshold: 3
-tool:
-  amap:
-    api-key: ${tool.amap.api-key:}
-    enabled: true
-  bilibili:
-    enabled: true
-  common-tools:
-    enabled: true

@@ -1,6 +1,6 @@
 package com.XYai.myai.mapper;
 
-import com.XYai.myai.rag.milvus.POJO.CollectionRecord;
+import com.XYai.myai.rag.milvus.pojo.CollectionRecord;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 

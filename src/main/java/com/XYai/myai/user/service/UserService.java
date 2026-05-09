@@ -1,13 +1,14 @@
 package com.XYai.myai.user.service;
 
 import com.XYai.myai.config.Result;
-import com.XYai.myai.rag.memory.POJO.ChatConversation;
-import com.XYai.myai.rag.memory.POJO.ChatSessionRecord;
-import com.XYai.myai.user.POJO.Group;
-import com.XYai.myai.user.POJO.UserDTO;
+import com.XYai.myai.rag.memory.pojo.ChatConversation;
+import com.XYai.myai.rag.memory.pojo.ChatSessionRecord;
+import com.XYai.myai.user.pojo.Group;
+import com.XYai.myai.user.pojo.UserDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -47,9 +48,10 @@ public interface UserService {
      *
      * @param conversationId 会话 ID
      * @param cursor         查询游标（时间点），用于分页
+     * @param limit
      * @return 会话内消息列表
      */
-    Result<List<ChatConversation>> conversationHistory(String conversationId, java.time.LocalDateTime cursor);
+    Result<List<ChatConversation>> conversationHistory(String conversationId, LocalDateTime cursor, int limit);
 
     void register(UserDTO userDTO);
 

@@ -1,10 +1,13 @@
 package com.XYai.myai.rag.milvus;
 
 import com.XYai.myai.config.Result;
-import com.XYai.myai.rag.etlpipeline.POJO.SkipFileInfo;
+import com.XYai.myai.rag.etlpipeline.pojo.SkipFileInfo;
 import com.XYai.myai.rag.etlpipeline.UploadTaskStore;
 import com.XYai.myai.redis.RedisKeyConfig;
 import com.XYai.myai.user.LoginUserInfoManager;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import io.milvus.client.MilvusServiceClient;
 import io.milvus.grpc.QueryResults;
 import io.milvus.param.R;
@@ -86,7 +89,7 @@ public class MilvusFileManager {
             SkipFileInfo result = new SkipFileInfo();
             reportFetchTask(taskId);
 
-            long userId = LoginUserInfoManager.get().getId();
+            long userId = LoginUserInfoManager.getUserId();
             String redisKey = RedisKeyConfig.fileHashKey(fileHash);
 
             // 1. 检查文件哈希是否已存在
@@ -261,7 +264,60 @@ public class MilvusFileManager {
         }
 
         List<Map<String, Object>> raw = getMetadataResultByMilvusClient(response);
+        raw = sortByCreateTimeAndFileChunk(raw);
         return milvusMetadataFilter.showFilter(raw);
+    }
+
+    /**
+     * 对查询原始结果排序：先按 createTime 倒序，再按 doc_id 升序
+     */
+    private List<Map<String, Object>> sortByCreateTimeAndFileChunk(List<Map<String, Object>> rawList) {
+        if (rawList == null || rawList.isEmpty()) return rawList;
+        return rawList.stream()
+                .sorted(Comparator
+                        .comparing(this::extractCreateTime, Comparator.nullsLast(Comparator.reverseOrder()))
+                        .thenComparing(this::extractFileIdFromDocId, Comparator.nullsLast(String::compareTo))
+                        .thenComparingLong(this::extractChunkIdFromDocId))
+                .collect(Collectors.toList());
+    }
+
+    // 从 doc_id 中提取 fileId（例如 "abc-000001" → "abc"）
+    private String extractFileIdFromDocId(Map<String, Object> m) {
+        String docId = (String) m.get("doc_id");
+        if (docId == null || !docId.contains("-")) return null;
+        return docId.substring(0, docId.lastIndexOf("-"));
+    }
+
+    // 从 doc_id 中提取 chunkId 数值（例如 "abc-000001" → 1）
+    private long extractChunkIdFromDocId(Map<String, Object> m) {
+        String docId = (String) m.get("doc_id");
+        if (docId == null || !docId.contains("-")) return 0;
+        try {
+            return Long.parseLong(docId.substring(docId.lastIndexOf("-") + 1));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    /**
+     * 从 metadata JSON 字符串中提取 createTime
+     */
+    private String extractCreateTime(Map<String, Object> record) {
+        Object metaObj = record.get("metadata");
+        if (!(metaObj instanceof String metaStr)) {
+            return null;
+        }
+        try {
+            JsonObject json = JsonParser.parseString(metaStr).getAsJsonObject();
+            JsonElement elem = json.get("createTime");   // 注意 key 名与存入时一致
+            if (elem != null && !elem.isJsonNull()) {
+                return elem.getAsString();
+            }
+        } catch (Exception e) {
+            // 解析失败忽略
+            log.debug("提取 createTime 失败", e);
+        }
+        return null;
     }
 
     /**
@@ -378,5 +434,13 @@ public class MilvusFileManager {
             collectionBitSet.set(id, true);
         }
         log.info("分享文件权限: userId={} fileId={} chunks={}", userId, fileId, chunkIds.size());
+    }
+
+    public Result<String> updateFileChunk(String fileId,int chunkId,Map<String, Object> fileInfo){
+        Long userId = LoginUserInfoManager.getUserId();
+
+
+
+        return Result.success();
     }
 }

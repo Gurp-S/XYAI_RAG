@@ -1,13 +1,11 @@
 package com.XYai.myai.rag.milvus;
 
-import com.XYai.myai.rag.milvus.POJO.MilvusMetadata;
+import com.XYai.myai.rag.milvus.pojo.MilvusMetadata;
 import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Component
 public final class MilvusMetadataFilter {
@@ -37,7 +35,7 @@ public final class MilvusMetadataFilter {
     }
 
     /**
-     * 最终数据过滤：只保留允许显示的字段 + 字符串超长截断 + 清洗数据
+     * 最终数据过滤：只保留允许显示的字段 + 字符串超长截断 + 清洗数据 + 排序
      */
     public List<Map<String, Object>> showFilter(List<Map<String, Object>> rawList) {
         if (rawList == null || rawList.isEmpty()) return List.of();
@@ -73,8 +71,9 @@ public final class MilvusMetadataFilter {
 
         Map<String, Object> cleanedMetadata = filter(document.getMetadata());
 
-        // Spring AI Document
-        return new Document(document.getText(), cleanedMetadata);
+        return document.mutate()
+                .metadata(cleanedMetadata)
+                .build();
     }
 
     /**

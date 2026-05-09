@@ -1,12 +1,22 @@
 package com.XYai.myai.xyAdmin;
 
+import com.XYai.myai.config.Result;
+
 public class Announcement {
 
-    public void sentMessage(){}
+    public Result<String> sentMessage() {
+        return Result.success();
+    }
 
-    public void getHistoryMessage(){}
+    public Result<String> getHistoryMessage() {
+        return Result.success();
+    }
 
-    public void deleteMessage(){}
+    public Result<String> deleteMessage() {
+        return Result.success();
+    }
 
-    public void updateMessage(){}
+    public Result<String> updateMessage() {
+        return Result.success();
+    }
 }

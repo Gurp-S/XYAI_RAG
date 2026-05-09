@@ -1,16 +1,16 @@
 package com.XYai.myai.rag.channel;
 
-import com.XYai.myai.rag.channel.POJO.RetrievedChunk;
-import com.XYai.myai.rag.channel.POJO.SearchChannel;
-import com.XYai.myai.rag.channel.POJO.SearchChannelResult;
-import com.XYai.myai.rag.channel.POJO.SearchContext;
-import com.XYai.myai.rag.channel.Processor.*;
-import com.XYai.myai.rag.intent.POJO.SubQuestionIntent;
-import com.XYai.myai.rag.rewrite.POJO.RewriteResult;
+import com.XYai.myai.rag.channel.pojo.RetrievedChunk;
+import com.XYai.myai.rag.channel.pojo.SearchChannel;
+import com.XYai.myai.rag.channel.pojo.SearchChannelResult;
+import com.XYai.myai.rag.channel.pojo.SearchContext;
+import com.XYai.myai.rag.channel.processor.*;
+import com.XYai.myai.rag.intent.pojo.SubQuestionIntent;
+import com.XYai.myai.rag.rewrite.pojo.RewriteResult;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
@@ -26,7 +26,7 @@ import java.util.stream.Stream;
  * 并在召回合并后执行固定顺序的后处理：去重 -> 过滤 -> 重排。
  */
 @Slf4j
-@Component
+@Service
 public class MultiChannelRetrievalEngine {
 
     @Resource
@@ -85,8 +85,6 @@ public class MultiChannelRetrievalEngine {
                         })
                 )
                 .toList();
-        // 没有检索到文章
-        log.info("futures:{}",futures);
         if (futures.isEmpty())
             return null;
         // 查找结果合并

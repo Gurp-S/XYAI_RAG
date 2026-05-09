@@ -1,6 +1,6 @@
 package com.XYai.myai.security;
 
-import com.XYai.myai.security.POJO.JwtProperties;
+import com.XYai.myai.security.pojo.JwtProperties;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -2,15 +2,14 @@ package com.XYai.myai.user;
 
 import com.XYai.myai.config.Result;
 import com.XYai.myai.mapper.UserMapper;
-import com.XYai.myai.rag.aop.Annotation.RagTraceRoot;
-import com.XYai.myai.rag.memory.POJO.ChatConversation;
-import com.XYai.myai.rag.memory.POJO.ChatSessionRecord;
+import com.XYai.myai.rag.memory.pojo.ChatConversation;
+import com.XYai.myai.rag.memory.pojo.ChatSessionRecord;
 import com.XYai.myai.security.JwtUtil;
-import com.XYai.myai.security.POJO.JwtProperties;
-import com.XYai.myai.user.POJO.Group;
-import com.XYai.myai.user.POJO.User;
-import com.XYai.myai.user.POJO.UserDTO;
-import com.XYai.myai.user.POJO.UserVO;
+import com.XYai.myai.security.pojo.JwtProperties;
+import com.XYai.myai.user.pojo.Group;
+import com.XYai.myai.user.pojo.User;
+import com.XYai.myai.user.pojo.UserDTO;
+import com.XYai.myai.user.pojo.UserVO;
 import com.XYai.myai.user.service.UserService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -156,18 +155,13 @@ public class UserController {
         return userService.updateHistory(chatSessionRecord);
     }
 
-    /**
-     * 获取某一个会话的完整聊天记录
-     * 使用 AOP 埋点记录 RAG 调用链路
-     *
-     * @param conversationId 会话ID
-     * @return 消息列表
-     */
-    @RagTraceRoot(name = "历史对话查询", conversationIdArg = "conversationId", taskIdArg = "taskId")
+
     @GetMapping("/history/conversation")
-    public Result<List<ChatConversation>> conversationHistory(String conversationId) {
-        LocalDateTime cursor = LocalDateTime.now();
-        return userService.conversationHistory(conversationId, cursor);
+    public Result<List<ChatConversation>> conversationHistory(
+            String conversationId,
+            @RequestParam(required = false) LocalDateTime cursor,
+            @RequestParam(defaultValue = "20") int limit) {
+        return userService.conversationHistory(conversationId, cursor, limit);
     }
 
     // ================================ 好友管理 ================================
@@ -281,7 +275,7 @@ public class UserController {
      * @return 当前登录用户实体
      */
     private User requireLoginUser() {
-        User loginUser = LoginUserInfoManager.get();
+        User loginUser = LoginUserInfoManager.getUser();
         if (loginUser == null || loginUser.getId() == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "未登录");
         }

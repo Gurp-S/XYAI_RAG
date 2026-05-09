@@ -13,7 +13,9 @@ const THEME_KEY = "themeName";
 const DARK_KEY = "theme";
 const BG_KEY = "userBackgroundImage";
 const BG_BLUR_KEY = "userBackgroundBlur";
-const SIDEBAR_STYLE_KEY = "sidebarStyle";
+const AI_AVATAR_KEY = "aiAvatar";
+const BOT_BUBBLE_KEY = "botBubbleEnabled";
+const SIDEBAR_MODE_KEY = "sidebarMode";
 const CONVERSATION_CACHE_KEY = "conversationCache";
 const CONVERSATION_CACHE_ORDER_KEY = "conversationCacheOrder";
 const USER_CHAT_SESSIONS_KEY = "userChatSessions";
@@ -25,7 +27,6 @@ const MAX_CONVERSATION_MESSAGE_COUNT = 60;
 const MAX_CONVERSATION_TEXT_LENGTH = 4000;
 const MAX_CONVERSATION_ERROR_LENGTH = 2000;
 const MAX_CONVERSATION_RAG_ITEMS = 12;
-const SIDEBAR_STYLES = new Set(["orbit", "outline"]);
 const THEME_NAMES = new Set([
   "deep-space",
   "ink-gold",
@@ -359,9 +360,18 @@ function readBackgroundBlur() {
   return clampBackgroundBlur(localStorage.getItem(BG_BLUR_KEY) || 4);
 }
 
-function readSidebarStyle() {
-  const style = localStorage.getItem(SIDEBAR_STYLE_KEY) || "orbit";
-  return SIDEBAR_STYLES.has(style) ? style : "orbit";
+function readAiAvatar() {
+  return localStorage.getItem(AI_AVATAR_KEY) || "";
+}
+
+function readSidebarMode() {
+  const val = localStorage.getItem(SIDEBAR_MODE_KEY);
+  return val === "fullscreen" ? "fullscreen" : "collapse";
+}
+
+function readBotBubbleEnabled() {
+  const val = localStorage.getItem(BOT_BUBBLE_KEY);
+  return val === null ? true : val === "true";
 }
 
 function buildContactConversationId(type, currentUserId, targetId) {
@@ -418,7 +428,7 @@ function applyBodyAppearance(
   themeName,
   backgroundImage,
   backgroundBlur,
-  sidebarStyle,
+  botBubbleEnabled,
 ) {
   const body = document.body;
   if (!body) return;
@@ -434,15 +444,11 @@ function applyBodyAppearance(
 
   body.classList.add(`theme-${nextThemeName}`);
 
-  const sidebarStyleClassList = Array.from(body.classList).filter((cls) =>
-    cls.startsWith("sidebar-style-"),
-  );
-  sidebarStyleClassList.forEach((cls) => body.classList.remove(cls));
-
-  const nextSidebarStyle = SIDEBAR_STYLES.has(sidebarStyle)
-    ? sidebarStyle
-    : "orbit";
-  body.classList.add(`sidebar-style-${nextSidebarStyle}`);
+  if (botBubbleEnabled === false) {
+    body.classList.add("no-bot-bubble");
+  } else {
+    body.classList.remove("no-bot-bubble");
+  }
 
   if (backgroundImage) {
     body.classList.add("has-user-bg");
@@ -548,6 +554,8 @@ export const useUiStore = defineStore("ui", {
     currentUser: normalizeUser(readJsonStorage("currentUser", null)),
     highPerf: false,
     isSidebarCollapsed: false,
+    sidebarMode: readSidebarMode(),
+    isFullscreen: false,
     activeModal: null,
     uploadTargetCollection: null,
     isUploading: false,
@@ -561,6 +569,8 @@ export const useUiStore = defineStore("ui", {
       readPinnedConversationIds(),
     ),
     loadingHistory: false,
+    loadingOlder: false,
+    hasMoreMessages: true,
     activeConversationId: createConversationId(),
     lastAiConversationId:
       localStorage.getItem(LAST_AI_CONVERSATION_KEY) || null,
@@ -568,12 +578,14 @@ export const useUiStore = defineStore("ui", {
     showLogoutConfirm: false,
     darkMode: readDarkMode(),
     themeName: readThemeName(),
-    sidebarStyle: readSidebarStyle(),
+
+    botBubbleEnabled: readBotBubbleEnabled(),
     backgroundImage: readBackgroundImage(),
     backgroundBlur: readBackgroundBlur(),
     conversationCache: readConversationCache(),
     conversationCacheOrder: readConversationCacheOrder(readConversationCache()),
     userChatSessions: readJsonStorage(USER_CHAT_SESSIONS_KEY, {}),
+    aiAvatar: readAiAvatar(),
     pinnedConversationIds: readPinnedConversationIds(),
   }),
   getters: {
@@ -666,7 +678,7 @@ export const useUiStore = defineStore("ui", {
         this.themeName,
         this.backgroundImage,
         this.backgroundBlur,
-        this.sidebarStyle,
+        this.botBubbleEnabled,
       );
     },
     setDarkMode(darkMode) {
@@ -706,9 +718,13 @@ export const useUiStore = defineStore("ui", {
         : "rgba(255, 250, 244, 0.1)";
       runAppearanceTransition(update, overlayColor);
     },
-    setSidebarStyle(styleName) {
-      this.sidebarStyle = SIDEBAR_STYLES.has(styleName) ? styleName : "orbit";
-      localStorage.setItem(SIDEBAR_STYLE_KEY, this.sidebarStyle);
+    setSidebarMode(mode) {
+      this.sidebarMode = mode === "fullscreen" ? "fullscreen" : "collapse";
+      localStorage.setItem(SIDEBAR_MODE_KEY, this.sidebarMode);
+    },
+    setBotBubbleEnabled(val) {
+      this.botBubbleEnabled = !!val;
+      localStorage.setItem(BOT_BUBBLE_KEY, String(this.botBubbleEnabled));
       this.applyAppearance();
     },
     setBackgroundImage(dataUrl) {
@@ -763,6 +779,16 @@ export const useUiStore = defineStore("ui", {
     clearBackgroundImage() {
       this.setBackgroundImage("");
     },
+    setAiAvatar(url) {
+      this.aiAvatar = url || "";
+      try {
+        if (this.aiAvatar) {
+          localStorage.setItem(AI_AVATAR_KEY, this.aiAvatar);
+        } else {
+          localStorage.removeItem(AI_AVATAR_KEY);
+        }
+      } catch (_) {}
+    },
     setBackgroundBlur(blurPx) {
       this.backgroundBlur = clampBackgroundBlur(blurPx);
       localStorage.setItem(BG_BLUR_KEY, String(this.backgroundBlur));
@@ -797,12 +823,56 @@ export const useUiStore = defineStore("ui", {
       this.lastAiConversationId = nextConversationId;
       localStorage.setItem(LAST_AI_CONVERSATION_KEY, this.lastAiConversationId);
       this.setView("chat");
+      // 先用缓存快速显示，再异步请求后端获取最新数据（含 feedback 字段）
       if (this.conversationCache[nextConversationId]) {
         this.currentMessages = [...this.conversationCache[nextConversationId]];
-        this.touchConversationCache(nextConversationId);
-        this.persistConversationCache();
       } else {
         this.currentMessages = [];
+      }
+      // 异步刷新消息（含 feedback）
+      this.refreshCurrentConversation();
+    },
+    /** 从后端刷新当前对话的消息数据（含 feedback），不影响本地缓存 */
+    async refreshCurrentConversation() {
+      const convId = this.activeConversationId;
+      if (!convId) return;
+      try {
+        const response = await authFetch(
+          `/user/history/conversation?conversationId=${encodeURIComponent(convId)}`,
+          { method: "GET" },
+        );
+        const result = await safeReadJson(response);
+        if (response.ok && result?.code === 200) {
+          const rawData = Array.isArray(result.data) ? result.data : [];
+          const messages = rawData
+            .map((msg) => {
+              const msgs = [];
+              if (msg.userMessage) {
+                msgs.push({
+                  id: msg.chatMessageId,
+                  role: "user",
+                  text: msg.userMessage,
+                  createdAt: msg.createdAt,
+                  feedback: msg.feedback ?? -1,
+                });
+              }
+              if (msg.assistantMessage) {
+                msgs.push({
+                  id: msg.chatMessageId,
+                  role: "assistant",
+                  text: msg.assistantMessage,
+                  createdAt: msg.createdAt,
+                  feedback: msg.feedback ?? -1,
+                });
+              }
+              return msgs;
+            })
+            .flat();
+          this.currentMessages = messages;
+          this.setConversationCacheEntry(convId, messages);
+        }
+      } catch (err) {
+        // 静默失败，不影响已有显示
       }
     },
     openContactChat(type, target) {
@@ -1070,16 +1140,13 @@ export const useUiStore = defineStore("ui", {
 
       this.activeConversationId = convId;
       this.setView("chat");
+      this.hasMoreMessages = true;
+      this.loadingOlder = false;
 
-      // 2. 检查 Pinia 内存缓存
-      if (
-        this.conversationCache[convId] &&
-        this.conversationCache[convId].length > 0
-      ) {
-        this.currentMessages = [...this.conversationCache[convId]];
-        this.touchConversationCache(convId);
-        this.persistConversationCache();
-        return;
+      // 2. 先用缓存快速显示（如果有），再发请求获取最新数据（含 feedback）
+      const cached = this.conversationCache[convId];
+      if (cached && cached.length > 0) {
+        this.currentMessages = [...cached];
       }
 
       try {
@@ -1095,16 +1162,20 @@ export const useUiStore = defineStore("ui", {
               const msgs = [];
               if (msg.userMessage) {
                 msgs.push({
+                  id: msg.chatMessageId,
                   role: "user",
                   text: msg.userMessage,
                   createdAt: msg.createdAt,
+                  feedback: msg.feedback ?? -1,
                 });
               }
               if (msg.assistantMessage) {
                 msgs.push({
+                  id: msg.chatMessageId,
                   role: "assistant",
                   text: msg.assistantMessage,
                   createdAt: msg.createdAt,
+                  feedback: msg.feedback ?? -1,
                 });
               }
               return msgs;
@@ -1119,6 +1190,81 @@ export const useUiStore = defineStore("ui", {
         console.error("Failed to fetch conversation detail:", err);
       }
     },
+    async loadOlderMessages() {
+      if (
+        this.loadingOlder ||
+        !this.hasMoreMessages ||
+        !this.activeConversationId
+      ) {
+        return;
+      }
+      const messages = this.currentMessages;
+      if (!messages || messages.length === 0) {
+        return;
+      }
+
+      // 取当前最早消息的 createdAt 作为游标
+      const oldestMsg = messages[0];
+      const cursor = oldestMsg?.createdAt;
+      if (!cursor) {
+        return;
+      }
+
+      this.loadingOlder = true;
+      try {
+        const response = await authFetch(
+          `/user/history/conversation?conversationId=${encodeURIComponent(this.activeConversationId)}&cursor=${encodeURIComponent(cursor)}&limit=20`,
+          { method: "GET" },
+        );
+        const result = await safeReadJson(response);
+        if (response.ok && result?.code === 200) {
+          const rawData = Array.isArray(result.data) ? result.data : [];
+          if (rawData.length === 0) {
+            this.hasMoreMessages = false;
+            return;
+          }
+
+          const olderMessages = rawData
+            .map((msg) => {
+              const msgs = [];
+              if (msg.userMessage) {
+                msgs.push({
+                  id: `old_${msg.chatMessageId || Date.now()}`,
+                  role: "user",
+                  text: msg.userMessage,
+                  createdAt: msg.createdAt,
+                  feedback: msg.feedback ?? -1,
+                });
+              }
+              if (msg.assistantMessage) {
+                msgs.push({
+                  id: `old_${msg.chatMessageId || Date.now()}`,
+                  role: "assistant",
+                  text: msg.assistantMessage,
+                  createdAt: msg.createdAt,
+                  feedback: msg.feedback ?? -1,
+                });
+              }
+              return msgs;
+            })
+            .flat();
+
+          // 去重（避免与已有消息重复），然后前置到现有消息之前
+          const existingIds = new Set(messages.map((m) => m.id));
+          const deduped = olderMessages.filter((m) => !existingIds.has(m.id));
+          this.currentMessages = [...deduped, ...messages];
+
+          if (rawData.length < 20) {
+            this.hasMoreMessages = false;
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load older messages:", err);
+      } finally {
+        this.loadingOlder = false;
+      }
+    },
+
     async fetchHistory(force = false) {
       if (!this.currentUser || !this.currentUser.id) {
         return;
@@ -1219,8 +1365,20 @@ export const useUiStore = defineStore("ui", {
           return entry;
         });
 
+        // 保留既有的非乐观条目以防后端返回空列表（例如查询参数类型错误导致无记录）
+        const existingRemote = this.chatHistory.filter((item) => {
+          if (item?.optimistic) return false;
+          if (
+            normalizedHistory.some(
+              (r) => r?.conversationId === item?.conversationId,
+            )
+          )
+            return false;
+          return true;
+        });
+
         this.chatHistory = applyPinnedOrdering(
-          [...optimisticLocal, ...normalizedHistory],
+          [...existingRemote, ...optimisticLocal, ...normalizedHistory],
           this.pinnedConversationIds,
         );
         localStorage.setItem("chatHistory", JSON.stringify(this.chatHistory));
@@ -1327,6 +1485,12 @@ export const useUiStore = defineStore("ui", {
       this.highPerf = !this.highPerf;
     },
     toggleSidebar() {
+      if (this.sidebarMode === "fullscreen") {
+        // 全屏模式：切换 isFullscreen 状态
+        this.isFullscreen = !this.isFullscreen;
+        return;
+      }
+      // 收起模式：现有折叠动画
       if (sidebarAnimating) return;
 
       const next = !this.isSidebarCollapsed;

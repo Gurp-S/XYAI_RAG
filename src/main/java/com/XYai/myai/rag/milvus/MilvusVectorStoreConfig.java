@@ -28,7 +28,7 @@ public class MilvusVectorStoreConfig {
                 .databaseName("my_xy")                     // 关键：指定数据库
                 .collectionName("intent")                  // 关键：指定集合
                 .metricType(MetricType.COSINE)             // 可选，默认 COSINE
-                .indexType(IndexType.IVF_FLAT)             // 可选，默认 IVF_FLAT
+                .indexType(IndexType.IVF_FLAT)// 可选，默认 IVF_FLAT
                 .batchingStrategy(new TokenCountBatchingStrategy()) // 可选
                 .build();
     }

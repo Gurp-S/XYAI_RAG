@@ -4,10 +4,10 @@ package com.XYai.myai.rag.intent;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.XYai.myai.mapper.IntentNodeMapper;
-import com.XYai.myai.rag.intent.POJO.*;
-import com.XYai.myai.rag.memory.POJO.LoadSession;
+import com.XYai.myai.rag.intent.pojo.*;
+import com.XYai.myai.rag.memory.pojo.LoadSession;
 import com.XYai.myai.rag.milvus.MilvusVectorStoreConfig;
-import com.XYai.myai.rag.rewrite.POJO.RewriteResult;
+import com.XYai.myai.rag.rewrite.pojo.RewriteResult;
 import com.XYai.myai.redis.RedisKeyConfig;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -24,6 +24,7 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.document.Document;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -50,7 +51,11 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
     private static final String INTENT_NODE_NAME = "intent:tree:node:";
     @Resource
     private StringRedisTemplate stringRedisTemplate;
-    @Resource
+    /**
+     * 使用结构化输出专用模型（qwen3.5-122b-a10b, temp=0.1, maxTokens=2000），
+     * 确保意图识别能稳定输出合法 JSON 结构。
+     */
+    @Resource(name = "structuredOutputModel")
     private ChatModel chatModel;
     @Resource
     private IntentNodeMapper intentNodeMapper;
@@ -131,6 +136,7 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
         //TODO 同义词映射
         //分词判断
         List<String> tokenizes = tokenizeWithIk(query);
+        log.info("意图识别的问题:{}",query);
         // 读取redis意图树.有->返回,没有->数据库查询
         if (intentProperties.getRedisEnabled()) {
             SubQuestionIntent byRedis = matchIntentFromRedis(tokenizes);

@@ -1,7 +1,7 @@
 package com.XYai.myai;
 
 import com.XYai.myai.mapper.IntentNodeMapper;
-import com.XYai.myai.rag.intent.POJO.IntentNode;
+import com.XYai.myai.rag.intent.pojo.IntentNode;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;

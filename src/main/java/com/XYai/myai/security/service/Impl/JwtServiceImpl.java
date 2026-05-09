@@ -1,6 +1,6 @@
 package com.XYai.myai.security.service.Impl;
 
-import com.XYai.myai.security.POJO.JwtProperties;
+import com.XYai.myai.security.pojo.JwtProperties;
 import com.XYai.myai.security.service.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;

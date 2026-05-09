@@ -14,7 +14,7 @@
   --bg-hover: rgba(15, 98, 254, 0.13);
   --bot-msg: rgba(248, 252, 255, 0.95);
   --bot-border: rgba(161, 183, 222, 0.72);
-  --user-msg: linear-gradient(135deg, #0f62fe, #ff6b2c);
+  --user-msg: #ffffff;
   --input-surface: rgba(255, 255, 255, 0.94);
   --bg-base: #f3f7ff;
   --bg-gradient-a: rgba(15, 98, 254, 0.22);
@@ -38,46 +38,47 @@
 }
 
 body.theme-deep-space {
-  --primary: #0f62fe;
-  --primary-hover: #0043ce;
-  --secondary: #06b6d4;
-  --bg-base: #eff5ff;
-  --bg-gradient-a: rgba(15, 98, 254, 0.2);
-  --bg-gradient-b: rgba(6, 182, 212, 0.15);
-  --bg-gradient-c: rgba(56, 189, 248, 0.12);
+  --primary: #1a2639;
+  --primary-hover: #283a54;
+  --secondary: #8a9bb4;
+  --panel-border: rgba(26, 38, 57, 0.24);
+  --bg-base: #eff2f6;
+  --bg-gradient-a: rgba(26, 38, 57, 0.16);
+  --bg-gradient-b: rgba(138, 155, 180, 0.12);
+  --bg-gradient-c: rgba(40, 58, 84, 0.08);
 }
 
 body.theme-ink-gold {
-  --primary: #d97706;
-  --primary-hover: #d97706;
-  --secondary: #f43f5e;
-  --panel-border: rgba(213, 153, 95, 0.54);
-  --bg-base: #fff7ef;
-  --bg-gradient-a: rgba(217, 119, 6, 0.2);
-  --bg-gradient-b: rgba(244, 63, 94, 0.14);
-  --bg-gradient-c: rgba(251, 191, 36, 0.11);
+  --primary: #4a3e35;
+  --primary-hover: #5e5045;
+  --secondary: #b89868;
+  --panel-border: rgba(184, 152, 104, 0.36);
+  --bg-base: #f6f4f1;
+  --bg-gradient-a: rgba(74, 62, 53, 0.12);
+  --bg-gradient-b: rgba(184, 152, 104, 0.12);
+  --bg-gradient-c: rgba(94, 80, 69, 0.08);
 }
 
 body.theme-pine-night {
-  --primary: #0f766e;
-  --primary-hover: #0f766e;
-  --secondary: #10b981;
-  --panel-border: rgba(87, 163, 145, 0.56);
-  --bg-base: #edf9f5;
-  --bg-gradient-a: rgba(15, 118, 110, 0.2);
-  --bg-gradient-b: rgba(16, 185, 129, 0.16);
-  --bg-gradient-c: rgba(125, 211, 252, 0.1);
+  --primary: #213c34;
+  --primary-hover: #32574c;
+  --secondary: #7e998a;
+  --panel-border: rgba(33, 60, 52, 0.24);
+  --bg-base: #f1f4f3;
+  --bg-gradient-a: rgba(33, 60, 52, 0.14);
+  --bg-gradient-b: rgba(126, 153, 138, 0.12);
+  --bg-gradient-c: rgba(50, 87, 76, 0.08);
 }
 
 body.theme-cyber-violet {
-  --primary: #be185d;
-  --primary-hover: #9d174d;
-  --secondary: #2563eb;
-  --panel-border: rgba(191, 120, 163, 0.58);
-  --bg-base: #fff3fb;
-  --bg-gradient-a: rgba(190, 24, 93, 0.2);
-  --bg-gradient-b: rgba(37, 99, 235, 0.14);
-  --bg-gradient-c: rgba(244, 114, 182, 0.12);
+  --primary: #362947;
+  --primary-hover: #4c3b63;
+  --secondary: #a48ebd;
+  --panel-border: rgba(54, 41, 71, 0.24);
+  --bg-base: #f4f2f6;
+  --bg-gradient-a: rgba(54, 41, 71, 0.14);
+  --bg-gradient-b: rgba(164, 142, 189, 0.12);
+  --bg-gradient-c: rgba(76, 59, 99, 0.08);
 }
 
 body.dark {
@@ -198,16 +199,9 @@ body {
 }
 
 /* Performance helpers: hint the browser to promote these layers to their own compositing layer */
-.sidebar,
-.main-content,
 .theme-transition-overlay {
   will-change: transform, opacity;
   backface-visibility: hidden;
-}
-
-.sidebar,
-.main-content {
-  transform: translateZ(0);
 }
 
 /* During sidebar animation reduce heavy painting (shadows/filters) for smoother transitions */
@@ -318,6 +312,9 @@ body.dark.has-user-bg .floating-bg::after {
 .app-container.sidebar-collapsed {
   --sidebar-width: 82px;
 }
+.app-container.sidebar-fullscreen {
+  --sidebar-width: 0px;
+}
 
 .sidebar {
   flex-shrink: 0;
@@ -335,7 +332,6 @@ body.dark.has-user-bg .floating-bg::after {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transform: translateZ(0);
   transition:
     width 140ms cubic-bezier(0.22, 1, 0.36, 1),
     border-color 180ms ease,
@@ -347,16 +343,16 @@ body.dark.has-user-bg .floating-bg::after {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(
-    164deg,
-    color-mix(in srgb, var(--primary) 9%, transparent),
-    transparent 44%
-  );
-  opacity: 0.86;
+  opacity: 0.24;
 }
 
 .sidebar.collapsed {
   width: 82px;
+}
+
+/* 全屏模式：侧栏完全隐藏 */
+.sidebar.fullscreen {
+  display: none;
 }
 
 .app-container.sidebar-collapsed .sidebar {
@@ -366,8 +362,10 @@ body.dark.has-user-bg .floating-bg::after {
 /* Markdown image / zoomable helper */
 .assistant-markdown img.zoomable {
   max-width: 100%;
+  max-height: 420px;
   height: auto;
   display: inline-block;
+  object-fit: contain;
   border-radius: 8px;
   transition:
     transform 160ms ease,
@@ -376,6 +374,20 @@ body.dark.has-user-bg .floating-bg::after {
 }
 .assistant-markdown img.zoomable:active {
   transform: scale(0.995);
+}
+
+/* 多图横向排列容器：将连续图片包裹在可滚动的横排容器中 */
+.assistant-markdown .image-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  align-items: flex-start;
+  margin: 0.5rem 0;
+}
+.assistant-markdown .image-row img.zoomable {
+  flex-shrink: 0;
+  max-height: 320px;
+  max-width: min(420px, 72vw);
 }
 
 /* KaTeX error fallback */
@@ -438,8 +450,7 @@ body.dark.has-user-bg .floating-bg::after {
 .menu-item:hover {
   background: var(--hover-bg);
   color: var(--text-main);
-  transform: translateY(-1px);
-  box-shadow: 0 10px 20px rgba(35, 62, 114, 0.14);
+  box-shadow: 0 6px 14px rgba(35, 62, 114, 0.1);
 }
 
 .menu-item.active {
@@ -491,7 +502,6 @@ body.dark.has-user-bg .floating-bg::after {
 .history-item:hover {
   background: var(--hover-bg);
   color: var(--text-main);
-  transform: translateY(-1px);
 }
 
 .history-empty {
@@ -518,8 +528,7 @@ body.dark.has-user-bg .floating-bg::after {
 
 .user-profile:hover {
   background: var(--hover-bg);
-  transform: translateY(-1px);
-  box-shadow: 0 10px 22px rgba(37, 64, 117, 0.16);
+  box-shadow: 0 6px 16px rgba(37, 64, 117, 0.12);
 }
 
 .user-profile::before {
@@ -588,7 +597,6 @@ body.dark.has-user-bg .floating-bg::after {
   color: #ef4444;
   border-color: rgba(239, 68, 68, 0.45);
   background: rgba(239, 68, 68, 0.14);
-  transform: translateY(-1px);
 }
 
 .logout-btn svg {
@@ -857,8 +865,7 @@ body.sidebar-style-outline .sidebar.collapsed .logout-btn {
 .btn-ghost:hover {
   background: var(--hover-bg);
   border-color: color-mix(in srgb, var(--primary) 28%, var(--panel-border));
-  transform: translateY(-1px);
-  box-shadow: 0 10px 20px rgba(35, 62, 114, 0.12);
+  box-shadow: 0 6px 14px rgba(35, 62, 114, 0.1);
 }
 
 .menu-item,
@@ -888,14 +895,35 @@ body.sidebar-style-outline .sidebar.collapsed .logout-btn {
   flex-direction: column;
   gap: 1.25rem;
   overscroll-behavior: contain;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.chat-box:hover {
+  scrollbar-color: color-mix(in srgb, var(--text-muted) 15%, transparent)
+    transparent;
 }
 
 .chat-box::-webkit-scrollbar {
-  width: 0;
-  height: 0;
-  display: none;
+  width: 5px;
+  height: 5px;
+}
+
+.chat-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-box::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 999px;
+}
+
+.chat-box:hover::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--text-muted) 15%, transparent);
+}
+
+.chat-box::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--text-muted) 25%, transparent);
 }
 
 .message-wrapper {
@@ -908,6 +936,7 @@ body.sidebar-style-outline .sidebar.collapsed .logout-btn {
   align-self: flex-end;
   flex-direction: row-reverse;
   max-width: 88%;
+  animation: messageRise 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .message-wrapper.assistant {
@@ -970,9 +999,32 @@ body.sidebar-style-outline .sidebar.collapsed .logout-btn {
 }
 
 .user .message {
-  color: #fff;
+  color: var(--text-main);
   background: var(--user-msg);
+  border: 1px solid var(--panel-border);
   border-top-right-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 用户气泡斜线装饰 — 右下角简约斜纹 */
+.user .message::after {
+  content: "";
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  width: 40px;
+  height: 40px;
+  background: repeating-linear-gradient(
+    135deg,
+    transparent,
+    transparent 4px,
+    var(--panel-border) 4px,
+    var(--panel-border) 5px
+  );
+  opacity: 0.18;
+  border-radius: 4px;
+  pointer-events: none;
 }
 
 .assistant .message {
@@ -1555,7 +1607,7 @@ body.sidebar-style-outline .sidebar.collapsed .logout-btn {
   --bg-gradient-c: rgba(72, 124, 173, 0.12);
   --bot-msg: rgba(255, 251, 245, 0.96);
   --bot-border: rgba(78, 100, 128, 0.32);
-  --user-msg: linear-gradient(145deg, #1f3f69, #31598c);
+  --user-msg: #ffffff;
   --shadow-md: 0 16px 34px rgba(43, 60, 90, 0.12);
   --shadow-lg: 0 24px 48px rgba(35, 49, 74, 0.16);
   --panel-radius: 20px;
@@ -1588,33 +1640,6 @@ body {
     "IBM Plex Sans", "Source Han Sans SC", "PingFang SC", "Microsoft YaHei",
     sans-serif;
   letter-spacing: 0.01em;
-}
-
-body.theme-deep-space {
-  --primary: #1f3f69;
-  --primary-hover: #295083;
-  --secondary: #d17b2f;
-}
-
-body.theme-ink-gold {
-  --primary: #6f3a08;
-  --primary-hover: #7b430e;
-  --secondary: #c55a2a;
-  --bg-base: #f5ece1;
-}
-
-body.theme-pine-night {
-  --primary: #235e59;
-  --primary-hover: #2f706a;
-  --secondary: #c88239;
-  --bg-base: #e8efe8;
-}
-
-body.theme-cyber-violet {
-  --primary: #43376d;
-  --primary-hover: #534382;
-  --secondary: #b46a46;
-  --bg-base: #efe9f2;
 }
 
 body.dark.theme-deep-space {
@@ -1658,17 +1683,81 @@ body.dark.theme-cyber-violet {
     );
 }
 
-body.dark .floating-bg {
-  background-image:
-    radial-gradient(circle at 7% 12%, var(--bg-gradient-a), transparent 38%),
-    radial-gradient(circle at 82% 11%, var(--bg-gradient-b), transparent 34%),
-    radial-gradient(circle at 46% 90%, var(--bg-gradient-c), transparent 40%),
-    linear-gradient(
-      155deg,
-      color-mix(in srgb, var(--bg-base) 92%, #040914) 0%,
-      color-mix(in srgb, var(--bg-base) 90%, #0e1c31) 50%,
-      color-mix(in srgb, var(--bg-base) 88%, #193152) 100%
-    );
+/* ===== 流式思考中（加载动画）布局修复 ===== */
+.message-wrapper.assistant.loading {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  margin: 8px 0;
+  /* 去掉 width:100%，让它随内容宽度自适应 */
+  /* width: 100%; */
+  box-sizing: border-box;
+  background: transparent !important;
+}
+
+.message-wrapper.assistant.loading .avatar {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+}
+
+.message-wrapper.assistant.loading .avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.message-wrapper.assistant.loading .message-content {
+  /* 去掉 flex:1，让内容不再撑满剩余宽度 */
+  /* flex: 1; */
+  min-width: 0;
+}
+
+.message-wrapper.assistant.loading .typing-loader {
+  padding: 12px 16px;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  min-height: 40px;
+  border-radius: 14px;
+  background: var(--bot-msg, #f2f2f2);
+  border: 1px solid var(--bot-border, #e0e0e0);
+  box-shadow: 0 10px 18px rgba(53, 67, 93, 0.1);
+  /* 加上 max-width，防止加载条拉得太长 */
+  max-width: 80%;
+}
+
+/* 深色主题下保持一致性 */
+body.dark .message-wrapper.assistant.loading .typing-loader {
+  background: var(--bot-msg, rgba(13, 24, 41, 0.94));
+  border-color: var(--bot-border, rgba(92, 118, 156, 0.48));
+  box-shadow: 0 12px 20px rgba(4, 10, 22, 0.42);
+}
+
+/* 移动端适配 */
+@media (max-width: 980px) {
+  .message-wrapper.assistant.loading {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+  
+  .message-wrapper.assistant.loading .avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+  }
+  
+  /* 移动端也限制一下最大宽度 */
+  .message-wrapper.assistant.loading .typing-loader {
+    max-width: 75%;
+  }
 }
 
 .floating-bg::after {
@@ -1740,9 +1829,8 @@ body.dark.has-user-bg .floating-bg::after {
 }
 
 .menu-item:hover {
-  transform: translateY(-1px);
   border-color: color-mix(in srgb, var(--primary) 30%, var(--panel-border));
-  box-shadow: 0 10px 18px rgba(44, 62, 96, 0.14);
+  box-shadow: 0 6px 14px rgba(44, 62, 96, 0.1);
 }
 
 .menu-item.active {
@@ -1880,8 +1968,11 @@ body.dark.has-user-bg .floating-bg::after {
 
 .user .message {
   background: var(--user-msg);
-  color: #f7fbff;
+  color: var(--text-main);
+  border: 1px solid var(--panel-border);
   box-shadow: 0 12px 20px rgba(28, 52, 87, 0.22);
+  position: relative;
+  overflow: hidden;
 }
 
 .input-wrapper {
@@ -1972,7 +2063,28 @@ body.dark .assistant .message {
   box-shadow: 0 12px 20px rgba(4, 10, 22, 0.42);
 }
 
+body.no-bot-bubble .assistant .message {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+body.no-bot-bubble .assistant .assistant-markdown {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+body.no-bot-bubble .message-wrapper.assistant .typing-loader {
+  background: transparent !important;
+  border: none !important;
+  padding: 12px 0 !important;
+  box-shadow: none !important;
+}
+
 body.dark .user .message {
+  background: var(--surface-solid);
+  border-color: var(--panel-border);
   box-shadow: 0 14px 22px rgba(4, 10, 22, 0.5);
 }
 
@@ -2100,6 +2212,12 @@ body {
   min-height: 0;
 }
 
+/* 全屏模式：主内容区撑满 */
+.app-container.sidebar-fullscreen .main-content-wrapper {
+  margin-left: 0;
+  width: 100%;
+}
+
 .sidebar.collapsed .menu-item,
 .sidebar.collapsed .history-list-wrapper .history-item {
   width: 42px;
@@ -2195,7 +2313,7 @@ body .user-profile {
 .btn-ghost:hover,
 .logout-btn:hover,
 .confirm-btn:hover {
-  will-change: transform;
+  will-change: auto;
 }
 
 .sidebar {

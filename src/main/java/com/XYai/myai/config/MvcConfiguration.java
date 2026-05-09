@@ -1,7 +1,10 @@
 package com.XYai.myai.config;
 
+import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskDecorator;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -12,6 +15,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Configuration
 public class MvcConfiguration implements WebMvcConfigurer {
+
+    @Resource
+    private TaskDecorator userContextDecorator;
 
     /**
      * 配置专门用于处理 Spring MVC 异步请求（如 Flux / SSE 流式输出）的线程池，
@@ -24,6 +30,7 @@ public class MvcConfiguration implements WebMvcConfigurer {
         executor.setMaxPoolSize(100);
         executor.setQueueCapacity(500);
         executor.setThreadNamePrefix("MvcAsync-");
+        executor.setTaskDecorator(userContextDecorator);  // ★ 添加装饰器
         executor.initialize();
         return executor;
     }
