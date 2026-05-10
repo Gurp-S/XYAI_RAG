@@ -68,7 +68,7 @@ public class IntentDirectedSearchChannel implements SearchChannel {
     @Override
     public boolean isEnabled(SearchContext context) {
         // 启用条件：有明确的意图
-        return CollUtil.isNotEmpty(context.getKbIntents());
+        return false;
     }
 
     @Override
@@ -142,7 +142,7 @@ public class IntentDirectedSearchChannel implements SearchChannel {
             RetrievedChunk chunk = RetrievedChunk.builder()
                     .content(content)
                     .metadata(metadata)
-                    .score(1.)
+                    .score(1.0)
                     .build();
             result.add(chunk);
         }

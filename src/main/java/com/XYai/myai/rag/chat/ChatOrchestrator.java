@@ -151,9 +151,6 @@ public class ChatOrchestrator {
                 log.info("[RAG_SYNC] <<< 步骤6完成: retrieved数量={}, 耗时={}ms",
                         retrieved != null ? retrieved.size() : 0,
                         System.currentTimeMillis() - t3);
-
-                log.info("[RAG_SYNC] ==== 同步RAG流程完成, 总耗时={}ms ====",
-                        System.currentTimeMillis() - t1);
                 return new RAGIntermediate(rewritten, retrieved);
             } finally {
                 LoginUserInfoManager.remove();
@@ -171,7 +168,6 @@ public class ChatOrchestrator {
             String originalMessage,
             UserContext userCtx) {
         return Mono.fromCallable(() -> {
-            log.info("[BUILD_PROMPT] ==== 构建最终Prompt(步骤7-8) ==== thread={}", Thread.currentThread().getName());
             LoginUserInfoManager.setUserId(userCtx != null ? userCtx.getUserId() : null);
             if (userCtx != null && userCtx.getSecurityContext() != null) {
                 SecurityContextHolder.setContext(userCtx.getSecurityContext());
@@ -214,8 +210,6 @@ public class ChatOrchestrator {
     @RagTraceNode(name = "模型调用及记忆保存", type = "模型调用")
     public Flux<String> executeModelCall(String finalPrompt, String conversationId,
             String originalMessage, UserContext userCtx) {
-        log.info("[MODEL_CALL] ==== 开始模型调用(步骤9-11) ==== thread={}", Thread.currentThread().getName());
-        log.info("[MODEL_CALL] finalPrompt长度={}, conversationId={}", finalPrompt.length(), conversationId);
         StringBuilder fullAnswer = new StringBuilder();
 
         return modelInvocation.callModelStream(finalPrompt, conversationId)

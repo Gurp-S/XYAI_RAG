@@ -4,31 +4,46 @@ import com.XYai.myai.rag.channel.pojo.RetrievedChunk;
 import com.XYai.myai.rag.channel.pojo.SearchChannel;
 import com.XYai.myai.rag.channel.pojo.SearchChannelResult;
 import com.XYai.myai.rag.channel.pojo.SearchContext;
-import com.XYai.myai.rag.intent.pojo.NodeScore;
-import com.XYai.myai.rag.intent.pojo.SubQuestionIntent;
 import com.XYai.myai.rag.rewrite.pojo.RewriteResult;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.protobuf.ByteString;
+import io.milvus.client.MilvusClient;
+import io.milvus.grpc.FieldData;
+import io.milvus.grpc.SearchResults;
+import io.milvus.param.MetricType;
+import io.milvus.param.dml.SearchParam;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.document.Document;
-import org.springframework.ai.vectorstore.SearchRequest;
-import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Component
 public class VectorGlobalSearchChannel implements SearchChannel {
 
-    private static final double SIMILARITY_THRESHOLD = 0.4;
+    private static final double SIMILARITY_THRESHOLD = 0.5;   // COSINE 相似度阈值
     private static final int DEFAULT_TOP_K = 5;
-    private static final double CONFIDENCE_THRESHOLD = 0.6;
 
     @Resource
-    private VectorStore vectorStore;
+    private EmbeddingModel embeddingModel;
+
+    @Resource
+    private MilvusClient milvusClient;
+
+    @Value("${spring.ai.vectorstore.milvus.collectionName:my_ai}")
+    private String defaultCollectionName;
+
+    @Value("${spring.ai.vectorstore.milvus.databaseName:my_xy}")
+    private String databaseName;
 
     @Resource(name = "searchChannelExecutor")
     private ThreadPoolTaskExecutor searchChannelExecutor;
@@ -48,127 +63,142 @@ public class VectorGlobalSearchChannel implements SearchChannel {
         return "vector-global-search";
     }
 
-    /**
-     * 启用判断：无意图 或 平均置信度过低
-     */
     @Override
     public boolean isEnabled(SearchContext context) {
-        // 无意图 → 直接启用
-//        if (context.getKbIntents().isEmpty()) {
-//            return true;
-//        }
-        // 计算所有意图节点中的最高置信度
-//        double maxScore = context.getKbIntents().stream()
-//                .map(SubQuestionIntent::getNodeScore)
-//                .flatMap(nodesScore -> nodesScore.getNodeScoreList().stream())
-//                .mapToDouble(NodeScore::getScore)
-//                .max().orElse(0.0);
-//        // 最高置信度 < CONFIDENCE_THRESHOLD -> 启用全局检索
-//        return maxScore < CONFIDENCE_THRESHOLD;
-        return true;
+        return true;   // 全局检索始终启用（原意图逻辑已移除）
     }
 
-    /**
-     * 核心检索：只搜单个集合 + 正确并行 + 空安全
-     */
     @Override
     public SearchChannelResult search(SearchContext context) {
-        // 空安全：优先使用 rewriteQuestion，如果为空回退到 question（兼容不同构造方式）
+        // 获取查询列表
         RewriteResult rewriteResult = Optional.ofNullable(context.getRewriteQuestion())
-                .orElse(RewriteResult.builder().rewrittenQuery(context.getOriginalQuery()).subQuery(null).build());
+                .orElse(RewriteResult.builder()
+                        .rewrittenQuery(context.getOriginalQuery())
+                        .subQuery(null)
+                        .build());
         if (rewriteResult == null) {
-            return SearchChannelResult.builder()
-                    .channelName(getName())
-                    .chunks(Collections.emptyList())
-                    .metadata(Collections.emptyList())
-                    .build();
+            return emptyResult();
         }
 
-        // 获取查询列表
         List<String> queryList = Optional.ofNullable(rewriteResult.getSubQuery())
                 .filter(list -> !list.isEmpty())
                 .orElse(List.of(rewriteResult.getRewrittenQuery()));
 
-        // 并行检索
+        // 并行多查询检索
         List<CompletableFuture<List<RetrievedChunk>>> futures = queryList.stream()
                 .map(query -> CompletableFuture.supplyAsync(
-                        () -> getChunks(query),
+                        () -> searchWithNativeMilvus(query),
                         searchChannelExecutor
                 ))
                 .toList();
 
-        // 合并结果 → 排序 → 截断
-        List<RetrievedChunk> vectorSearchResult = futures.stream()
+        List<RetrievedChunk> allChunks = futures.stream()
                 .map(CompletableFuture::join)
                 .flatMap(List::stream)
-                .sorted((a, b) -> Double.compare(b.getScore(), a.getScore()))
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparingDouble(RetrievedChunk::getScore).reversed())
                 .limit(DEFAULT_TOP_K)
                 .collect(Collectors.toList());
 
         return SearchChannelResult.builder()
                 .channelName(getName())
-                .chunks(vectorSearchResult)
-                .metadata(vectorSearchResult.stream().map(RetrievedChunk::getMetadata).toList())
+                .chunks(allChunks)
+                .metadata(allChunks.stream().map(RetrievedChunk::getMetadata).toList())
                 .build();
     }
 
     /**
-     * 集合向量检索
+     * 原生 Milvus 检索，精准匹配 Indexer 写入的字段：
+     * - embedding 用于 ANN 搜索
+     * - content 作为返回的文本
+     * - metadata 作为元数据（JSON 字符串）
      */
-    private List<RetrievedChunk> getChunks(String query) {
+    private List<RetrievedChunk> searchWithNativeMilvus(String query) {
         try {
-            List<Document> documents = vectorStore.similaritySearch(SearchRequest.builder()
-                    .query(query)
-                    .topK(DEFAULT_TOP_K)
-                    .similarityThreshold(SIMILARITY_THRESHOLD)
-                    .build());
+            float[] vectorArray = embeddingModel.embed(query);
+            List<Float> vectorList = IntStream.range(0, vectorArray.length)
+                    .mapToObj(i -> vectorArray[i])
+                    .toList();
 
-            if (documents == null || documents.isEmpty()) {
-                return List.of();
+            // 2. 原生搜索
+            SearchParam searchParam = SearchParam.newBuilder()
+                    .withDatabaseName(databaseName)
+                    .withCollectionName(defaultCollectionName)
+                    .withVectorFieldName("embedding")
+                    .withFloatVectors(Collections.singletonList(vectorList))
+                    .withTopK(DEFAULT_TOP_K)
+                    .withMetricType(MetricType.COSINE)
+                    .withOutFields(Arrays.asList("content", "metadata"))   // 只取需要的字段
+                    .build();
+
+            SearchResults results = milvusClient.search(searchParam).getData();
+            // 3. 解析结果
+            List<Float> scores = results.getResults().getScoresList();
+            List<FieldData> fieldsDataList = results.getResults().getFieldsDataList();
+
+            List<String> contentList = null;
+            List<String> metadataJsonList = null;
+
+            for (FieldData fieldData : fieldsDataList) {
+                if ("content".equals(fieldData.getFieldName())) {
+                    contentList = fieldData.getScalars().getStringData().getDataList();
+                } else if ("metadata".equals(fieldData.getFieldName())) {
+                    List<ByteString> byteStrings = fieldData.getScalars().getJsonData().getDataList();
+                    metadataJsonList = byteStrings.stream()
+                            .map(ByteString::toStringUtf8)
+                            .collect(Collectors.toList());
+                }
+            }
+            log.info("召回的内容:{},元数据:{}",contentList,metadataJsonList);
+            // 防御性处理
+            if (contentList == null) {
+                contentList = Collections.emptyList();
+            }
+            if (metadataJsonList == null || metadataJsonList.isEmpty()) {
+                metadataJsonList = Collections.nCopies(contentList.size(), "{}");
+            }
+            if (scores.isEmpty()) {
+                scores = Collections.nCopies(contentList.size(), 0.0f);
             }
 
             List<RetrievedChunk> chunks = new ArrayList<>();
-            for (Document doc : documents) {
-                if (doc == null) continue;
-
-                Map<String, Object> metadata = new HashMap<>(doc.getMetadata());
-                Double score = extractScore(metadata);
-                // 兜底分数 ≥ 阈值（逻辑不自相矛盾）
-                if (score == null) {
-                    score = SIMILARITY_THRESHOLD;
-                    metadata.put("score", score);
-                }
-
+            for (int i = 0; i < contentList.size(); i++) {
+                double score = (i < scores.size()) ? scores.get(i) : 0.0;
+                String metadataJson = i < metadataJsonList.size() ? metadataJsonList.get(i) : "{}";
+                Map<String, Object> metadata = parseMetadata(metadataJson);
                 chunks.add(RetrievedChunk.builder()
-                        .content(doc.getText())
-                        .metadata(metadata)
+                        .content(contentList.get(i))
                         .score(score)
+                        .metadata(metadata)
                         .build());
             }
+            log.info("向量召回文档分数:{}",chunks.stream().map(RetrievedChunk::getScore).toList());
             return chunks;
-
         } catch (Exception e) {
-            log.error("向量检索失败", e);
+            log.error("原生 Milvus 检索失败", e);
             return List.of();
         }
     }
 
     /**
-     * 提取 score / distance
+     * 将 metadata JSON 字符串解析为 Map
      */
-    private Double extractScore(Map<String, Object> metadata) {
-        if (metadata == null) return null;
-
-        Object scoreObj = metadata.get("score");
-        if (scoreObj instanceof Number n) {
-            return n.doubleValue();
+    private Map<String, Object> parseMetadata(String raw) {
+        if (raw == null || raw.isBlank()) return Collections.emptyMap();
+        try {
+            JSONObject obj = JSON.parseObject(raw);
+            return new HashMap<>(obj);
+        } catch (Exception e) {
+            log.warn("解析 metadata JSON 失败: {}", raw, e);
+            return Collections.emptyMap();
         }
+    }
 
-        Object distObj = metadata.get("distance");
-        if (distObj instanceof Number n) {
-            return 1.0 - n.doubleValue();
-        }
-
-        return null;
+    private SearchChannelResult emptyResult() {
+        return SearchChannelResult.builder()
+                .channelName(getName())
+                .chunks(Collections.emptyList())
+                .metadata(Collections.emptyList())
+                .build();
     }
 }

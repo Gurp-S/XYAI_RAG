@@ -80,14 +80,9 @@ public class ToolDecisionManager {
 
     @RagTraceNode(name = "MCP工具调用", type = "MCP工具")
     public List<ToolProcessorResult> toolProcessor(String query, LoadSession memorySession) {
-        log.info("[MCP_PROCESSOR] ====== toolProcessor 入口 ====== thread={}", Thread.currentThread().getName());
-        log.info("[MCP_PROCESSOR] query(前50字)='{}'",
-                query.length() > 50 ? query.substring(0, 50) + "..." : query);
-
         // 先用规则，失败则 LLM
         List<McpToolDecision> toolDecisionList = decideByRules(query);
         if (toolDecisionList.isEmpty()) {
-            log.info("[MCP_PROCESSOR] 规则未匹配到工具，使用 LLM 兜底");
             toolDecisionList = toolDecision(query,memorySession);  // 原有 LLM 决策方法保持不变
         } else {
             log.info("[MCP_PROCESSOR] 规则命中 {} 个工具，跳过 LLM", toolDecisionList.size());
@@ -99,12 +94,6 @@ public class ToolDecisionManager {
 
         // 获取 bean
         long t1 = System.currentTimeMillis();
-        log.info("[MCP_PROCESSOR] toolDecision 返回 {} 个决策, 耗时={}ms",
-                toolDecisionList.size(), System.currentTimeMillis() - t1);
-        for (McpToolDecision d : toolDecisionList) {
-            log.info("[MCP_PROCESSOR]   决策: id={}, toolName='{}', arguments={}",
-                    d.getId(), d.getToolName(), d.getArguments());
-        }
 
         if (toolDecisionList.isEmpty()) {
             log.info("[MCP_PROCESSOR] 无工具决策，直接返回空列表");
@@ -119,19 +108,9 @@ public class ToolDecisionManager {
                         mcpExecutor))
                 .toList();
         // 等待执行并返回
-        List<ToolProcessorResult> results = futures.stream()
+        return futures.stream()
                 .map(CompletableFuture::join)
                 .toList();
-
-        log.info("[MCP_PROCESSOR] ====== toolProcessor 完成, 共 {} 个结果 ======", results.size());
-        for (ToolProcessorResult r : results) {
-            log.info("[MCP_PROCESSOR]   结果: tool='{}', success={}, resultPreview='{}'",
-                    r.getToolName(), r.isSuccess(),
-                    r.getResult() != null && r.getResult().length() > 80
-                            ? r.getResult().substring(0, 80) + "..."
-                            : r.getResult());
-        }
-        return results;
     }
 
     /**

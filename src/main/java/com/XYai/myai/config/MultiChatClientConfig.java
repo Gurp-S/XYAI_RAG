@@ -51,12 +51,12 @@ public class MultiChatClientConfig {
     // ==================== 按照YAML配置的6个模型分别创建 ====================
 
     /**
-     * 1. qwen3.5-flash 模型（优先级1）
+     * 1. qwen-turbo 模型（优先级1）
      */
     @Bean("qwen35FlashModel")
     @Primary
     public ChatModel qwen35FlashModel(OpenAiApi openAiApi) {
-        return createChatModel(openAiApi, "qwen3.5-flash", 0.3, 1000);
+        return createChatModel(openAiApi, "qwen-turbo", 0.3, 1000);
     }
 
     @Bean("qwen35FlashClient")
@@ -82,7 +82,7 @@ public class MultiChatClientConfig {
      */
     @Bean("qwenFlashModel")
     public ChatModel qwenFlashModel(OpenAiApi openAiApi) {
-        return createChatModel(openAiApi, "qwen3.5-flash", 0.5, 1500);
+        return createChatModel(openAiApi, "qwen-turbo", 0.5, 1500);
     }
 
     @Bean("qwenFlashClient")
@@ -144,7 +144,7 @@ public class MultiChatClientConfig {
     // ==================== 默认客户端 ====================
 
     /**
-     * 默认聊天客户端（使用qwen3.5-flash）
+     * 默认聊天客户端（使用qwen-turbo）
      * 与spring.ai.openai.chat.options.model保持一致
      */
     @Bean
@@ -171,7 +171,7 @@ public class MultiChatClientConfig {
         Map<String, ChatClient> map = new HashMap<>();
 
         // 按YAML配置的candidates添加（key必须与YAML中的name完全一致）
-        map.put("qwen3.5-flash", qwen35FlashClient);
+        map.put("qwen-turbo", qwen35FlashClient);
         map.put("qwen3.6-flash", qwen36FlashClient);
         map.put("qwen-flash", qwenFlashClient);
         map.put("qwen3.5-122b-a10b", qwen122bClient);

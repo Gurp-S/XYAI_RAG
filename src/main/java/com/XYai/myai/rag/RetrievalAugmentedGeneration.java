@@ -156,18 +156,9 @@ public class RetrievalAugmentedGeneration {
         log.info("[RAG] 步骤7: 等待异步结果并构建RAGResult, thread={}", Thread.currentThread().getName());
 
         long t1 = System.currentTimeMillis();
-        log.info("[RAG] 步骤7.mcp: 等待MCP结果... mcpFuture.isDone={}, isCompletedExceptionally={}",
-                mcpFuture.isDone(), mcpFuture.isCompletedExceptionally());
         List<ToolProcessorResult> toolResults = mcpFuture.getNow(List.of());
         log.info("[RAG] 步骤7.mcp: MCP结果获取成功, 共{}个, 耗时={}ms",
                 toolResults.size(), System.currentTimeMillis() - t1);
-        for (ToolProcessorResult r : toolResults) {
-            log.info("[RAG] 步骤7.mcp:   工具'{}' success={} result预览={}",
-                    r.getToolName(), r.isSuccess(),
-                    r.getResult() != null && r.getResult().length() > 100
-                            ? r.getResult().substring(0, 100) + "..."
-                            : r.getResult());
-        }
 
         long t2 = System.currentTimeMillis();
         log.info("[RAG] 步骤7.mem: 记忆结果获取成功, 耗时={}ms", System.currentTimeMillis() - t2);

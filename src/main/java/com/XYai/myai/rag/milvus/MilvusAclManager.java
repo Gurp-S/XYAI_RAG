@@ -107,6 +107,20 @@ public class MilvusAclManager {
         }
     }
 
+    public Boolean getFileChunkAcl(String fileId,int chunkId) {
+        Long userId = LoginUserInfoManager.getUserId();
+        if (fileId == null || fileId.isBlank()) return false;
+
+
+        RBitSet bitSet = redissonClient.getBitSet(RedisKeyConfig.userFileBitKey(userId, fileId));
+        try {
+            return bitSet.get(chunkId);
+        } catch (Exception e) {
+            log.warn("getFileAcl bitset error", e);
+            return false;
+        }
+    }
+
     /**
      * 删除该集合下所有文件当前用户的权限
      */

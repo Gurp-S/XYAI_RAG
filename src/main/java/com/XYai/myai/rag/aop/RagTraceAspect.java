@@ -40,7 +40,6 @@ public class RagTraceAspect {
      * 环绕通知：在带 {@link RagTraceRoot} 注解的方法执行前后进行全链路 traceId 管理与记录。
      *
      * @param joinPoint 切入点
-     * @param traceRoot 注解实例，包含任务名等信息
      * @return 目标方法执行结果
      */
     @Around("@annotation(com.XYai.myai.rag.aop.annotation.RagTraceRoot)")
@@ -55,24 +54,18 @@ public class RagTraceAspect {
         // 1. 优先复用外部已经放入上下文的 traceId/taskId
         String traceId = IdUtil.getSnowflakeNextIdStr();
         String methodName = joinPoint.getSignature().toShortString();
-        log.info("[TRACE_ROOT] ====== 入口: {} ======", methodName);
-        log.info("[TRACE_ROOT] 生成traceId={}, taskName='{}', thread={}", traceId, traceRoot.name(),
-                Thread.currentThread().getName());
+        log.info("{}链路开始",methodName);
         // 2. 记录链路开始信息（存入数据库）
         traceRecordService.startRun(traceId, traceRoot.name());
         // 3. 将traceId存入上下文（ThreadLocal，保证线程安全）
         RagTraceContext.setTraceId(traceId);
-        log.info("[TRACE_ROOT] traceId已设置到ThreadLocal, getTraceId()={}", RagTraceContext.getTraceId());
         // 4. 执行目标方法（业务逻辑）
         Object result = joinPoint.proceed();
-        log.info("[TRACE_ROOT] 目标方法返回, result类型={}", result != null ? result.getClass().getSimpleName() : "null");
         // 5. 处理响应式返回值（Flux/Mono）：延迟清理 traceId 到流终止时
         if (result instanceof Publisher<?> publisher) {
-            log.info("[TRACE_ROOT] 检测到响应式返回值, 延迟traceId清理到流终止");
             return wrapReactiveResult(publisher, traceId, traceRoot.name());
         }
         // 6. 同步返回值：正常清理
-        log.info("[TRACE_ROOT] 同步返回值, 立即清理traceId");
         RagTraceContext.clear();
         return result;
     }
@@ -83,7 +76,6 @@ public class RagTraceAspect {
      */
     private Object wrapReactiveResult(Publisher<?> publisher, String traceId, String taskName) {
         if (publisher instanceof Flux<?> flux) {
-            log.info("[TRACE_ROOT] 包装Flux, traceId={} 将在流终止时清理", traceId);
             return flux
                     .doOnNext(v -> {
                         // 首次订阅时确保 traceId 仍然可用
@@ -97,12 +89,10 @@ public class RagTraceAspect {
                         traceRecordService.recordError(traceId, e.getMessage());
                     })
                     .doFinally(signal -> {
-                        log.info("[TRACE_ROOT] Flux结束, traceId={}, signal={}, 清理ThreadLocal", traceId, signal);
                         RagTraceContext.clear();
                     });
         }
         if (publisher instanceof Mono<?> mono) {
-            log.info("[TRACE_ROOT] 包装Mono, traceId={} 将在流终止时清理", traceId);
             return mono
                     .doOnSuccess(v -> {
                         if (RagTraceContext.getTraceId() == null) {
@@ -115,7 +105,6 @@ public class RagTraceAspect {
                         traceRecordService.recordError(traceId, e.getMessage());
                     })
                     .doFinally(signal -> {
-                        log.info("[TRACE_ROOT] Mono结束, traceId={}, signal={}, 清理ThreadLocal", traceId, signal);
                         RagTraceContext.clear();
                     });
         }
@@ -136,6 +125,7 @@ public class RagTraceAspect {
         // 1. 从上下文获取当前traceId（若没有则不追踪，避免空指针）
         String traceId = RagTraceContext.getTraceId();
         String methodName = joinPoint.getSignature().toShortString();
+        log.info("{}节点开始",methodName);
         if (traceId == null || traceId.trim().isEmpty()) {
             log.warn("[TRACE_NODE] ⚠ traceId为空, 跳过追踪! method={}, nodeName='{}', thread={}",
                     methodName, traceNode.name(), Thread.currentThread().getName());
@@ -143,8 +133,6 @@ public class RagTraceAspect {
                     "2) 异步线程未传递ThreadLocal; 3) 该方法不在RagTraceRoot链路中");
             return joinPoint.proceed();
         }
-        log.info("[TRACE_NODE] 节点: name='{}', type='{}', method={}, traceId={}, thread={}",
-                traceNode.name(), traceNode.type(), methodName, traceId, Thread.currentThread().getName());
         // 2. 生成节点唯一nodeId
         String nodeId = IdUtil.getSnowflakeNextIdStr();
         // 3. 节点入栈（维护节点层级关系，支持嵌套调用）

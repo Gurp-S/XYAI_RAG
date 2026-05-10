@@ -5,12 +5,15 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import com.XYai.myai.rag.channel.pojo.RetrievedChunk;
 import com.XYai.myai.rag.channel.pojo.SearchContext;
+import com.XYai.myai.rag.milvus.MilvusAclManager;
+import com.XYai.myai.rag.milvus.MilvusFileManager;
 import com.XYai.myai.redis.RedisKeyConfig;
 import com.XYai.myai.user.LoginUserInfoManager;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -29,16 +32,8 @@ public class FilterPostProcessor implements SearchResultPostProcessor {
     private static final String NAME = "filter-processor";
     @Resource
     private RedissonClient redissonClient;
-
-    private static Boolean filterComplete(RetrievedChunk chunk) {
-        if (chunk == null) return false;
-        if (chunk.getContent() == null) return false;
-        Map<String, Object> meta = chunk.getMetadata();
-        if (meta == null) return false;
-        Object fileId = meta.get("fileId");
-        Object chunkId = meta.get("chunkId");
-        return fileId != null && chunkId != null;
-    }
+    @Autowired
+    private MilvusAclManager milvusAclManager;
 
     @Override
     public String getName() {
@@ -52,7 +47,6 @@ public class FilterPostProcessor implements SearchResultPostProcessor {
 
     @Override
     public List<RetrievedChunk> process(List<RetrievedChunk> chunks, SearchContext context) {
-        // 空输入短路
         if (chunks == null || chunks.isEmpty()) {
             return List.of();
         }
@@ -64,12 +58,44 @@ public class FilterPostProcessor implements SearchResultPostProcessor {
         }
 
         return chunks.stream()
-                .filter(Objects::nonNull)                                  // 1. 空对象过滤
-                .filter(FilterPostProcessor::filterComplete)                   // 2. 数据完整性过滤
-                .filter(this::filterScore)                      // 3. 分数阈值过滤
-                .filter(chunk -> filterPermission(chunk, userId))        // 4. 权限校验过滤
-                //.filter(this::filterUnloadCollection)              // 5. 集合加载过滤
-                .filter(this::filterContentLength)             // 6. 内容长度合规过滤
+                .filter(Objects::nonNull)
+                .filter(chunk -> {
+                    if (!FilterPostProcessor.filterComplete(chunk)) {
+                        log.warn("[filterComplete] 丢弃 chunk: fileId={}, chunkId={}",
+                                chunk.getMetadata() != null ? chunk.getMetadata().get("fileId") : null,
+                                chunk.getMetadata() != null ? chunk.getMetadata().get("chunkId") : null);
+                        return false;
+                    }
+                    return true;
+                })
+                .filter(chunk -> {
+                    if (!filterScore(chunk)) {
+                        log.warn("[filterScore] 丢弃 chunk: score={}, bm25={}, chunkId={}",
+                                chunk.getScore(), chunk.getBm25Score(),
+                                chunk.getMetadata().get("chunkId"));
+                        return false;
+                    }
+                    return true;
+                })
+                .filter(chunk -> {
+                    if (!filterPermission(chunk, userId)) {
+                        log.warn("[filterPermission] 丢弃 chunk: fileId={}, chunkId={}, visibility={}",
+                                chunk.getMetadata().get("fileId"),
+                                chunk.getMetadata().get("chunkId"),
+                                chunk.getMetadata().get("visibility"));
+                        return false;
+                    }
+                    return true;
+                })
+                .filter(chunk -> {
+                    if (!filterContentLength(chunk)) {
+                        log.warn("[filterContentLength] 丢弃 chunk: length={}, chunkId={}",
+                                chunk.getContent() != null ? chunk.getContent().length() : 0,
+                                chunk.getMetadata().get("chunkId"));
+                        return false;
+                    }
+                    return true;
+                })
                 .toList();
     }
 
@@ -97,10 +123,20 @@ public class FilterPostProcessor implements SearchResultPostProcessor {
         Double score = chunk.getScore();
         Double bm25Score = chunk.getBm25Score();
         if (score == null) return false;
-        boolean commonScore = score > 0.65 && bm25Score > 0.5;
-        boolean highScore = score > 0.85 || bm25Score > 0.85;
-        boolean lowScore= score < 0.25 || bm25Score < 0.25;
-        return (commonScore || highScore) && !lowScore ;
+        boolean commonScore = score > 0.5 && bm25Score > 0.5;
+        boolean highAndLowScore = (score > 0.82 && bm25Score >0.2) ||
+               (bm25Score > 0.82 && score > 0.2);
+        return commonScore || highAndLowScore ;
+    }
+
+    private static Boolean filterComplete(RetrievedChunk chunk) {
+        if (chunk == null) return false;
+        if (chunk.getContent() == null) return false;
+        Map<String, Object> meta = chunk.getMetadata();
+        if (meta == null) return false;
+        Object fileId = meta.get("fileId");
+        Object chunkId = meta.get("chunkId");
+        return fileId != null && chunkId != null;
     }
 
     /**
@@ -124,16 +160,10 @@ public class FilterPostProcessor implements SearchResultPostProcessor {
             }
 
             // 3. 安全解析 chunkId
-            Long chunkId = Convert.toLong(metadata.get("chunkId"));
-            if (chunkId == null) {
-                log.warn("无法解析 chunkId: {}", metadata.get("chunkId"));
-                return false;
-            }
+            int chunkId = (int) metadata.get("chunkId");
 
+            boolean hasPermission = milvusAclManager.getFileChunkAcl(fileId,chunkId);
             // 4. 权限判断：用户有权限 OR 文档公开
-            boolean hasPermission = Optional.ofNullable(redissonClient.getBitSet(RedisKeyConfig.userFileBitKey(userId, fileId)))
-                    .map(bitSet -> bitSet.isExists() && bitSet.get(chunkId))
-                    .orElse(false);
 
             boolean isPublic = "public".equalsIgnoreCase(Convert.toStr(metadata.get("visibility")));
             return hasPermission || isPublic;

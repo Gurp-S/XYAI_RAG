@@ -107,7 +107,7 @@ public class ModelSelector {
                 .filter(ModelRouterProperties.ModelCandidate::isEnabled)
                 .findFirst()
                 .map(ModelRouterProperties.ModelCandidate::getName)
-                .orElse("qwen3.5-flash");
+                .orElse("qwen-turbo");
     }
 
     /**

@@ -99,7 +99,6 @@ public class MemorySearchChannel implements SearchChannel {
                     + (chatSessionRecord.getChatMessageId() == null ? "" : chatSessionRecord.getChatMessageId());
             RetrievedChunk chunk = RetrievedChunk.builder()
                     .id(id)
-                    .collectionName("Chat")
                     .content(content)
                     .metadata(metadata)
                     .build();

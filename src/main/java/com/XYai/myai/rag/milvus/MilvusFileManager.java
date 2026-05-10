@@ -154,36 +154,26 @@ public class MilvusFileManager {
                 .map(s -> Long.parseLong(s.split(":")[1]))
                 .orElse(0L);
     }
+//
+//    /**
+//     * 向 Milvus 集合添加文档（自动向量化），保证幂等性。
+//     */
+//    public Result<String> add(String collectionName, List<Document> documents) {
+//        if (documents == null || documents.isEmpty()) {
+//            return Result.error(400, "文档为空");
+//        }
+//
+//        if (!milvusCollectionService.exists(collectionName)) {
+//            return Result.error(404, "集合不存在或无权限: " + collectionName);
+//        }
+//
+//        // 记录 ACL 权限
+//        milvusAclManager.addFileUserACl(documents, collectionName);
+//
+//        log.info("成功添加 {} 个文档到集合 {} ", documents.size(), collectionName);
+//        return Result.success("添加成功");
+//    }
 
-    /**
-     * 向 Milvus 集合添加文档（自动向量化），保证幂等性。
-     */
-    public Result<String> add(String collectionName, List<Document> documents) {
-        if (documents == null || documents.isEmpty()) {
-            return Result.error(400, "文档为空");
-        }
-
-        if (!milvusCollectionService.exists(collectionName)) {
-            return Result.error(404, "集合不存在或无权限: " + collectionName);
-        }
-
-        // 规范化 metadata
-        MilvusMetadataFilter.sanitizeDocuments(documents, Map.of(
-                "fileId", "string",
-                "chunkId", "long",
-                "chunkSize", "long",
-                "visibility", "lowercase",
-                "createTime", "string"
-        ));
-
-        // 记录 ACL 权限
-        milvusAclManager.addFileUserACl(documents, collectionName);
-
-        // 使用 VectorStore 添加（若已存在相同 ID 会自动覆盖，取决于 VectorStore 实现）
-        vectorStore.add(documents);
-        log.info("成功添加 {} 个文档到集合 {} ", documents.size(), collectionName);
-        return Result.success("添加成功");
-    }
 
     /**
      * 删除文件分块权限（实际向量数据保留，由 Milvus 生命周期管理）。

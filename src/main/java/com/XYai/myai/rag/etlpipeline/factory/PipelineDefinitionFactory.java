@@ -57,29 +57,32 @@ public class PipelineDefinitionFactory {
             nodes.add(fetcher);
         }
 
+        // 原顺序：parser → enricher → chunker → indexer
+// 新顺序：parser → chunker → enricher → indexer
+
         NodeConfig parser = NodeConfig.builder()
                 .nodeId("parser")
                 .nodeType("parser")
-                .nextNodeId(pipelineProperties.getEnricherEnable() ? "enricher" : "chunker")
+                .nextNodeId("chunker")   // 直接指向 chunker
                 .build();
         nodes.add(parser);
-
-        if (pipelineProperties.getEnricherEnable()) {
-            NodeConfig enricher = NodeConfig.builder()
-                    .nodeId("enricher")
-                    .nodeType("enricher")
-                    .nextNodeId("chunker")
-                    .build();
-            nodes.add(enricher);
-        }
 
         NodeConfig chunker = NodeConfig.builder()
                 .nodeId("chunker")
                 .nodeType("chunker")
                 .settings(chunkSettings)
-                .nextNodeId("indexer")
+                .nextNodeId(pipelineProperties.getEnricherEnable() ? "enricher" : "indexer")
                 .build();
         nodes.add(chunker);
+
+        if (pipelineProperties.getEnricherEnable()) {
+            NodeConfig enricher = NodeConfig.builder()
+                    .nodeId("enricher")
+                    .nodeType("enricher")
+                    .nextNodeId("indexer")
+                    .build();
+            nodes.add(enricher);
+        }
 
         NodeConfig indexer = NodeConfig.builder()
                 .nodeId("indexer")
@@ -90,7 +93,7 @@ public class PipelineDefinitionFactory {
         return PipelineDefinition.builder()
                 .id(UUID.randomUUID().toString())
                 .name(pipelineName + "-etl-pipeline")
-                .description("upload ->parser -> enricher -> chunker -> indexer")
+                .description("upload ->parser -> chunker  -> enricher -> indexer")
                 .nodes(nodes)
                 .build();
     }

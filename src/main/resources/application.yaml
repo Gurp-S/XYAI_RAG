@@ -25,7 +25,7 @@ spring:
       base-url: https://dashscope.aliyuncs.com/compatible-mode
       chat:
         options:
-          model: qwen3.5-flash  # 默认使用最强模型
+          model: qwen-turbo  # 默认使用最强模型
           temperature: 0.3
           max-tokens: 1000
     # Anthropic兼容模式（同样通过百炼）
@@ -71,9 +71,9 @@ router:
   cascade-timeout: 30000      # 级联调用总超时(ms)
   enable-first-packet-detect: true  # 是否启用首包探测
   candidates:
-    - name: qwen3.5-flash
+    - name: qwen-turbo
       display-name: 通义千问-3.5-flash
-      api-model: qwen3.5-flash
+      api-model: qwen-turbo
       priority: 1
       enabled: true
       circuit-breaker:
@@ -177,7 +177,7 @@ rewriter:
   rewriter-enabled: false
 
 intent:
-  intent-enabled: true
+  intent-enabled: false
   update-intent-enabled: true
   redis-enabled: true
   DBEnabled: false

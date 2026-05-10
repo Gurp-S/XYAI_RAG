@@ -28,8 +28,6 @@ public class TraceRecordServiceIml implements TraceRecordService {
     @Override
     public void startRun(String traceId, String name) {
         try {
-            log.info("[TRACE_DB] >>> startRun: traceId={}, name='{}'", traceId, name);
-
             TraceRecord record = TraceRecord.builder()
                     .traceId(traceId)
                     .name(name)
@@ -39,9 +37,6 @@ public class TraceRecordServiceIml implements TraceRecordService {
 
             long t1 = System.currentTimeMillis();
             int result = traceRecordMapper.insert(record);
-            log.info("[TRACE_DB] <<< startRun 插入成功, result={}, traceId={}, 耗时={}ms",
-                    result, traceId, System.currentTimeMillis() - t1);
-
         } catch (Exception e) {
             log.error("[TRACE_DB] ⚠ startRun 插入失败! traceId={}, name='{}', error={}",
                     traceId, name, e.getMessage(), e);
@@ -51,8 +46,6 @@ public class TraceRecordServiceIml implements TraceRecordService {
     @Override
     public void recordNode(String traceId, String nodeId, Object name, Object type, long costTime) {
         try {
-            log.info("[TRACE_DB] >>> recordNode: traceId={}, nodeId={}, name='{}', type='{}', costTime={}",
-                    traceId, nodeId, name, type, costTime);
 
             NodeRecord record = NodeRecord.builder()
                     .nodeId(nodeId)
@@ -65,8 +58,6 @@ public class TraceRecordServiceIml implements TraceRecordService {
 
             long t1 = System.currentTimeMillis();
             int result = nodeRecordMapper.updateById(record);
-            log.info("[TRACE_DB] <<< recordNode 插入成功, result={}, traceId={}, 耗时={}ms",
-                    result, traceId, System.currentTimeMillis() - t1);
 
         } catch (Exception e) {
             log.error("[TRACE_DB] ⚠ recordNode 插入失败! traceId={}, nodeId={}, error={}",

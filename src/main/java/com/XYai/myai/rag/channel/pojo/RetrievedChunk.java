@@ -23,11 +23,6 @@ public class RetrievedChunk {
     private String id;
 
     /**
-     * 来源集合/collection 名称（用于来源追踪、通道分析、问题排障）。
-     */
-    private String collectionName;
-
-    /**
      * 片段文本内容（Rerank 与最终回答拼装的核心输入）。
      */
     private String content;
