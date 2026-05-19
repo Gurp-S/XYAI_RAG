@@ -1,6 +1,7 @@
 package com.XYai.myai.rag.etlpipeline;
 
 import cn.hutool.core.util.IdUtil;
+import com.XYai.myai.commonUtils.redis.RedisKeyConfig;
 import com.XYai.myai.config.Result;
 import com.XYai.myai.rag.aop.annotation.RagTraceRoot;
 import com.XYai.myai.rag.aop.annotation.RateLimit;
@@ -9,7 +10,6 @@ import com.XYai.myai.rag.etlpipeline.factory.UploadIngestionContextFactory;
 import com.XYai.myai.rag.etlpipeline.oss.OssService;
 import com.XYai.myai.rag.etlpipeline.pojo.*;
 import com.XYai.myai.rag.milvus.MilvusFileManager;
-import com.XYai.myai.redis.RedisKeyConfig;
 import com.XYai.myai.user.LoginUserInfoManager;
 import com.XYai.myai.user.pojo.User;
 import jakarta.annotation.Resource;
@@ -35,15 +35,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 
-/**
- * 上传控制器：只负责接收文件、构造 ETL 输入、调用 IngestionEngine、汇总结果。
- */
 @Slf4j
 @RestController
 @RequestMapping("/upload")
 public class UploadController {
-
-    private static final long MAX_IN_MEMORY_FILE_BYTES = 10L * 1024L * 1024L;
 
     @Resource
     private ObjectProvider<OssService> ossServiceProvider;
@@ -64,199 +59,230 @@ public class UploadController {
     @Resource(name = "uploadExecutor")
     private ThreadPoolTaskExecutor uploadExecutor;
 
-
     @PostMapping("up")
-    @RagTraceRoot(name = "上传" , conversationIdArg = "" , taskIdArg = "上传")
+    @RagTraceRoot(name = "上传", conversationIdArg = "", taskIdArg = "上传")
     @RateLimit(limit = 10, rateName = "upload_up")
     public Result<String> upLoad(
             @RequestParam("file") List<MultipartFile> files,
             @RequestParam("collectionName") String collectionName) {
+
+        // 步骤1：校验请求合法性
+        Result<String> validationError = validateRequest(files, collectionName);
+        if (validationError != null) {
+            return validationError;
+        }
+
+        // 步骤2：初始化任务
+        String taskId = initTask();
+
+        // 步骤3：将原始文件转换为可重复读取的安全文件，同时记录跳过的空文件
+        List<MultipartFile> safeFiles;
+        List<File> tempFiles = new ArrayList<>();
+        List<String> skippedEmptyFiles = new ArrayList<>();  // 记录空文件名
+        try {
+            safeFiles = prepareSafeFiles(files, tempFiles, skippedEmptyFiles);
+        } catch (IOException e) {
+            cleanupTempFiles(tempFiles);
+            uploadTaskStore.error(taskId, "准备文件失败: " + truncateMessage(e.getMessage()));
+            log.error("准备上传文件失败", e);
+            return Result.error(500, "准备上传文件失败");
+        }
+
+        // 步骤4：检查是否有有效文件
+        Result<String> emptyResult = checkSafeFilesNotEmpty(safeFiles, taskId, skippedEmptyFiles);
+        if (emptyResult != null) {
+            cleanupTempFiles(tempFiles);
+            return emptyResult;
+        }
+
+        // 步骤5：提交异步处理任务
+        Result<String> submitResult = submitAsyncTask(taskId, safeFiles, tempFiles, collectionName, skippedEmptyFiles);
+        if (submitResult != null) {
+            cleanupTempFiles(tempFiles);
+            return submitResult;
+        }
+
+        return Result.success(taskId);
+    }
+
+    // ==================== 步骤方法 ====================
+
+    private Result<String> validateRequest(List<MultipartFile> files, String collectionName) {
         if (!uploadProperties.getUpLoadEnabled()) {
             return Result.success("上传未开启");
         }
         if (files == null || files.isEmpty()) {
             return Result.error(400, "文件不能为空");
         }
-        log.info("上传开始");
+        if (!StringUtils.hasText(collectionName)) {
+            return Result.error(400, "collectionName 不能为空");
+        }
+        return null;
+    }
 
-        UpLoadAccumulator accumulator = new UpLoadAccumulator();
+    private String initTask() {
         String taskId = IdUtil.getSnowflakeNextIdStr();
-        accumulator.setTaskId(taskId);
         uploadTaskStore.start(taskId);
-        User user = LoginUserInfoManager.getUser();
+        log.info("上传任务已启动: {}", taskId);
+        return taskId;
+    }
 
-        List<MultipartFile> safeFiles = new ArrayList<>(files.size());
-        List<File> tempFilesToCleanup = new ArrayList<>();
-
-        for (MultipartFile f : files) {
+    /**
+     * 将原始文件转换为可安全重复读取的副本，同时记录被跳过的空文件名
+     * @param originals 原始上传文件列表
+     * @param tempFiles 生成的临时文件列表（输出参数，用于清理）
+     * @param skippedEmptyFiles 被跳过的空文件名列表（输出参数）
+     * @return 安全的 MultipartFile 列表
+     */
+    private List<MultipartFile> prepareSafeFiles(List<MultipartFile> originals,
+                                                 List<File> tempFiles,
+                                                 List<String> skippedEmptyFiles) throws IOException {
+        List<MultipartFile> safeFiles = new ArrayList<>();
+        for (MultipartFile f : originals) {
             if (f == null || f.isEmpty()) {
-                log.warn("上传列表中存在空文件，跳过");
+                String name = safeFileName(f);
+                log.warn("上传列表中存在空文件，跳过: {}", name);
+                skippedEmptyFiles.add(name);
                 continue;
             }
             long size = f.getSize();
             if (size <= 0) {
-                return Result.error(400, "上传文件大小非法: " + safeFileName(f));
+                throw new IOException("上传文件大小非法: " + safeFileName(f));
             }
-
-            try {
-                if (size <= MAX_IN_MEMORY_FILE_BYTES) {
-                    byte[] bytes;
-                    try (InputStream is = f.getInputStream()) {
-                        bytes = StreamUtils.copyToByteArray(is);
-                    }
-                    InMemoryMultipartFile mem = new InMemoryMultipartFile(f.getName(), f.getOriginalFilename(), f.getContentType(), bytes);
-                    safeFiles.add(mem);
-                } else {
-                    String safeName = safeFileName(f).replaceAll("[^a-zA-Z0-9_.-]", "_");
-                    Path tmpPath = Files.createTempFile("upload_", "_" + safeName);
-                    try (InputStream is = f.getInputStream()) {
-                        Files.copy(is, tmpPath, StandardCopyOption.REPLACE_EXISTING);
-                    }
-                    File tmp = tmpPath.toFile();
-                    tempFilesToCleanup.add(tmp);
-                    FileBackedMultipartFile fb = new FileBackedMultipartFile(f.getName(), f.getOriginalFilename(), f.getContentType(), tmp);
-                    safeFiles.add(fb);
+            if (size <= uploadProperties.getMaxInMemoryFileBytes()) {
+                byte[] bytes;
+                try (InputStream is = f.getInputStream()) {
+                    bytes = StreamUtils.copyToByteArray(is);
                 }
-            } catch (IOException e) {
-                for (File t : tempFilesToCleanup) {
-                    try {
-                        Files.deleteIfExists(t.toPath());
-                    } catch (Exception ignored) {
-                    }
+                InMemoryMultipartFile mem = new InMemoryMultipartFile(
+                        f.getName(), f.getOriginalFilename(), f.getContentType(), bytes);
+                safeFiles.add(mem);
+            } else {
+                String safeName = safeFileName(f).replaceAll("[^a-zA-Z0-9_.-]", "_");
+                Path tmpPath = Files.createTempFile("upload_", "_" + safeName);
+                try (InputStream is = f.getInputStream()) {
+                    Files.copy(is, tmpPath, StandardCopyOption.REPLACE_EXISTING);
                 }
-                log.error("准备上传文件失败: {}", safeFileName(f), e);
-                return Result.error(500, "准备上传文件失败: " + safeFileName(f));
+                File tmp = tmpPath.toFile();
+                tempFiles.add(tmp);
+                FileBackedMultipartFile fb = new FileBackedMultipartFile(
+                        f.getName(), f.getOriginalFilename(), f.getContentType(), tmp);
+                safeFiles.add(fb);
             }
         }
+        return safeFiles;
+    }
 
-        try {
-            uploadExecutor.execute(() -> {
-                try {
-                    for (MultipartFile file : safeFiles) {
-                        String fileHash = milvusFileManager.calculateFileHash(file);
-                        SkipFileInfo skipFileInfo = milvusFileManager.generateFile(fileHash, collectionName, taskId);
-                        if (skipFileInfo.getSkipStatus().equals(SkipFileInfo.UP_FILE)) {
-                            log.info("进行文件上传");
-                            boolean upStatus = processSingleFile(file, accumulator, collectionName, user, fileHash, List.of());
-                            if (upStatus) {
-                                redissonClient.getSet(RedisKeyConfig.fileHashKey(fileHash)).add(collectionName);
-                            }
-                        } else if (skipFileInfo.getSkipStatus().equals(SkipFileInfo.COPY_CHUNK)) { // 在分块后删除对应的分块
-                            log.info("进行分块上传");
-                            processSingleFile(file, accumulator, collectionName, user, fileHash, skipFileInfo.getCopyChunks());
-                        }
-                    }
-                    uploadTaskStore.success(taskId, "上传完成");
-                } catch (Exception ex) {
-                    log.error("处理上传任务失败: {}", taskId, ex);
-                    uploadTaskStore.error(taskId, ex.getMessage());
-                } finally {
-                    for (File t : tempFilesToCleanup) {
-                        try {
-                            Files.deleteIfExists(t.toPath());
-                        } catch (Exception ignored) {
-                        }
-                    }
-                }
-            });
-        } catch (RejectedExecutionException rex) {
-            log.warn("uploadExecutor saturated, rejecting upload task {}", taskId);
-            for (File t : tempFilesToCleanup) {
-                try {
-                    Files.deleteIfExists(t.toPath());
-                } catch (Exception ignored) {
-                }
+    private Result<String> checkSafeFilesNotEmpty(List<MultipartFile> safeFiles, String taskId,
+                                                  List<String> skippedEmptyFiles) {
+        if (safeFiles.isEmpty()) {
+            String msg = "没有有效的文件可上传";
+            if (!skippedEmptyFiles.isEmpty()) {
+                msg += "，已跳过空文件: " + skippedEmptyFiles.size() + " 个";
             }
+            uploadTaskStore.error(taskId, msg);
+            return Result.error(400, msg);
+        }
+        return null;
+    }
+
+    private Result<String> submitAsyncTask(String taskId, List<MultipartFile> safeFiles,
+                                           List<File> tempFiles, String collectionName,
+                                           List<String> skippedEmptyFiles) {
+        User user = LoginUserInfoManager.getUser();
+        try {
+            uploadExecutor.execute(() -> processFilesInAsync(taskId, safeFiles, tempFiles,
+                    collectionName, user, skippedEmptyFiles));
+        } catch (RejectedExecutionException rex) {
+            uploadTaskStore.error(taskId, "服务器繁忙");
+            log.warn("uploadExecutor 饱和，拒绝上传任务: {}", taskId);
             return Result.error(503, "服务器繁忙，请稍后重试");
         }
-
-        return Result.success(taskId);
+        return null;
     }
 
-    @PostMapping("/Task")
-    public Result<UploadTaskStore.TaskState> getJob(@RequestParam("taskId") String taskId) {
-        if (!StringUtils.hasText(taskId)) {
-            return Result.error(400, "taskId不能为空");
-        }
-        UploadTaskStore.TaskState current = uploadTaskStore.get(taskId);
-        if (current == null) {
-            return Result.error(404, "任务不存在或已过期");
-        }
-        return Result.success(current);
-    }
+    // ==================== 异步核心处理 ====================
 
-    @PostMapping("source")
-    public Result<String> upLoadSource(
-            @RequestParam("sourceUri") String sourceUri,
-            @RequestParam(value = "sourceType", required = false, defaultValue = "file") String sourceType,
-            @RequestParam("collectionName") String collectionName,
-            @RequestParam(value = "kbId", required = false) String kbId) {
-        if (!uploadProperties.getUpLoadEnabled()) {
-            return Result.success("上传未开启");
-        }
-        if (!StringUtils.hasText(sourceUri)) {
-            return Result.error(400, "sourceUri不能为空");
-        }
-
+    private void processFilesInAsync(String taskId, List<MultipartFile> safeFiles,
+                                     List<File> tempFiles, String collectionName,
+                                     User user, List<String> skippedEmptyFiles) {
         UpLoadAccumulator accumulator = new UpLoadAccumulator();
+        accumulator.setTaskId(taskId);
+        int successCount = 0;
+        List<String> failedFiles = new ArrayList<>();
+
         try {
-            User user = LoginUserInfoManager.getUser();
-            IngestionContext inputContext = uploadIngestionContextFactory.createFromSource(
-                    sourceUri, sourceType, collectionName, kbId, user);
-            var pipeline = pipelineDefinitionFactory.createSourcePipeline(sourceUri, sourceType);
-            IngestionContext outputContext = ingestionEngine.execute(pipeline, inputContext);
-            if (outputContext.getChunks() != null && !outputContext.getChunks().isEmpty()) {
-                accumulator.getAllChunks().addAll(outputContext.getChunks());
+            for (MultipartFile file : safeFiles) {
+                String fileHash;
+                try {
+                    fileHash = milvusFileManager.calculateFileHash(file);
+                } catch (Exception e) {
+                    log.warn("计算文件哈希失败，跳过: {}", safeFileName(file), e);
+                    failedFiles.add(safeFileName(file) + "(哈希失败)");
+                    continue;
+                }
+
+                SkipFileInfo skipFileInfo = milvusFileManager.generateFile(fileHash, collectionName, taskId);
+                boolean fileSuccess = false;
+                try {
+                    if (SkipFileInfo.UP_FILE.equals(skipFileInfo.getSkipStatus())) {
+                        log.info("进行文件上传: {}", safeFileName(file));
+                        fileSuccess = processSingleFile(file, accumulator, collectionName, user, fileHash, List.of());
+                    } else if (SkipFileInfo.COPY_CHUNK.equals(skipFileInfo.getSkipStatus())) {
+                        log.info("进行分块复用: {}", safeFileName(file));
+                        fileSuccess = processSingleFile(file, accumulator, collectionName, user, fileHash,
+                                skipFileInfo.getCopyChunks());
+                    }
+                    if (fileSuccess) {
+                        redissonClient.getSet(RedisKeyConfig.fileHashKey(fileHash)).add(collectionName);
+                        successCount++;
+                    } else {
+                        failedFiles.add(safeFileName(file));
+                    }
+                } catch (Exception e) {
+                    log.warn("处理文件失败: {}", safeFileName(file), e);
+                    failedFiles.add(safeFileName(file));
+                }
             }
+
+            String detailMsg = buildDetailMessage(successCount, failedFiles, accumulator, skippedEmptyFiles);
+            uploadTaskStore.success(taskId, detailMsg);
+
         } catch (Exception ex) {
-            log.warn("处理外部来源失败，已跳过: {}", sourceUri, ex);
-            accumulator.getFailedFiles().add(sourceUri);
+            // 即使中途异常退出，也保留已处理的统计信息
+            log.error("处理上传任务中断: {}", taskId, ex);
+            String partialMsg = buildDetailMessage(successCount, failedFiles, accumulator, skippedEmptyFiles)
+                    + "（任务中断: " + truncateMessage(ex.getMessage()) + "）";
+            uploadTaskStore.error(taskId, partialMsg);
+        } finally {
+            cleanupTempFiles(tempFiles);
         }
-        return buildUploadResult(accumulator);
     }
 
-    @PostMapping("inline")
-    public Result<String> upLoadInline(
-            @RequestParam("content") String content,
-            @RequestParam("collectionName") String collectionName,
-            @RequestParam(value = "kbId", required = false) String kbId) {
-        if (!uploadProperties.getUpLoadEnabled()) {
-            return Result.success("上传未开启");
-        }
-        if (!StringUtils.hasText(content)) {
-            return Result.error(400, "content不能为空");
-        }
-
-        UpLoadAccumulator accumulator = new UpLoadAccumulator();
-        try {
-            User user = LoginUserInfoManager.getUser();
-            IngestionContext inputContext = uploadIngestionContextFactory.createInline(
-                    content, collectionName, kbId, user);
-            var pipeline = pipelineDefinitionFactory.createInlinePipeline("inline");
-            IngestionContext outputContext = ingestionEngine.execute(pipeline, inputContext);
-            if (outputContext.getChunks() != null && !outputContext.getChunks().isEmpty()) {
-                accumulator.getAllChunks().addAll(outputContext.getChunks());
-            }
-        } catch (Exception ex) {
-            log.warn("处理inline文本失败，已跳过", ex);
-            accumulator.getFailedFiles().add("inline");
-        }
-        return buildUploadResult(accumulator);
-    }
-
-    private boolean processSingleFile(MultipartFile file, UpLoadAccumulator accumulator, String collectionName, User user, String fileHashId, List<Long> copyChunks) {
+    /**
+     * 处理单个文件，OSS 失败不阻断主流程。返回值表示是否成功生成分块。
+     */
+    private boolean processSingleFile(MultipartFile file, UpLoadAccumulator accumulator,
+                                      String collectionName, User user, String fileHashId,
+                                      List<Long> copyChunks) {
         if (file == null || file.isEmpty()) {
-            accumulator.getFailedFiles().add("unknown(empty)");
             return false;
         }
         String fileName = safeFileName(file);
 
         try {
+            // OSS 上传（失败仅记录，不中断后续处理）
             if (uploadProperties.getOssEnabled()) {
-                uploadToOss(file, accumulator, fileName);
+                try {
+                    uploadToOss(file, accumulator, fileName);
+                } catch (Exception ossEx) {
+                    log.warn("OSS 上传失败 (不影响知识库处理): {}", fileName, ossEx);
+                    accumulator.getOssFailedFiles().add(fileName);
+                }
             }
 
-            IngestionContext inputContext = uploadIngestionContextFactory.create(file, collectionName, user, fileHashId, copyChunks);
+            IngestionContext inputContext = uploadIngestionContextFactory.create(
+                    file, collectionName, user, fileHashId, copyChunks);
             inputContext.setTaskId(accumulator.getTaskId());
             var pipeline = pipelineDefinitionFactory.createUploadPipeline(fileName, file);
             IngestionContext outputContext = ingestionEngine.execute(pipeline, inputContext);
@@ -268,36 +294,32 @@ public class UploadController {
             return false;
         } catch (Exception ex) {
             log.warn("处理文件失败，已跳过: {}", fileName, ex);
-            accumulator.getFailedFiles().add(fileName);
             return false;
         }
     }
 
+    // ==================== 辅助方法 ====================
+
     private void uploadToOss(MultipartFile file, UpLoadAccumulator accumulator, String fileName) throws IOException {
         OssService ossService = ossServiceProvider.getIfAvailable();
         if (ossService == null) {
-            log.warn("upload.oss.enabled=true 但未找到 OssService，跳过 OSS 上传");
+            log.warn("OSS 服务不可用，跳过上传");
             return;
         }
-
         final int maxAttempts = 3;
         long baseDelayMs = 200L;
-        boolean success = false;
-        String ossUrl = null;
-
         for (int attempt = 1; attempt <= maxAttempts; attempt++) {
             try {
-                ossUrl = ossService.upload(file);
-                success = true;
-                break;
+                String ossUrl = ossService.upload(file);
+                accumulator.getUploadedUrls().add(fileName + " -> " + ossUrl);
+                return;
             } catch (Exception ex) {
                 if (attempt == maxAttempts) {
-                    log.warn("OSS 上传失败（最终尝试）: {} attempts, file={}", attempt, fileName, ex);
                     throw new IOException("OSS 上传失败: " + ex.getMessage(), ex);
                 }
                 long jitter = (long) (Math.random() * 100);
                 long backoff = baseDelayMs * (1L << (attempt - 1)) + jitter;
-                log.warn("OSS 上传失败，准备重试 (attempt={}): {}, backoff={}ms", attempt, fileName, backoff);
+                log.warn("OSS 上传失败，重试 {}/{}: {}", attempt, maxAttempts, fileName);
                 try {
                     Thread.sleep(backoff);
                 } catch (InterruptedException ie) {
@@ -306,24 +328,26 @@ public class UploadController {
                 }
             }
         }
-
-        if (success && ossUrl != null) {
-            accumulator.getUploadedUrls().add(fileName + " -> " + ossUrl);
-        }
     }
 
-    private Result<String> buildUploadResult(UpLoadAccumulator accumulator) {
-        if (accumulator.getAllChunks().isEmpty() && accumulator.getUploadedUrls().isEmpty()) {
-            return Result.error(400, "没有可处理成功的文件，失败文件: " + String.join(",", accumulator.getFailedFiles()));
+    private String buildDetailMessage(int successCount, List<String> failedFiles,
+                                      UpLoadAccumulator accumulator, List<String> skippedEmptyFiles) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("成功文件: ").append(successCount);
+        if (!failedFiles.isEmpty()) {
+            sb.append(", 失败文件: ").append(failedFiles.size())
+                    .append(" (").append(String.join(", ", failedFiles)).append(")");
         }
-        String msg = "处理完成: 成功文件=" + Math.max(1 - accumulator.getFailedFiles().size(), 0)
-                + ", 失败文件=" + accumulator.getFailedFiles().size()
-                + ", 文档分块=" + accumulator.getAllChunks().size()
-                + ", OSS上传=" + accumulator.getUploadedUrls().size();
-        if (!accumulator.getFailedFiles().isEmpty()) {
-            msg += ", 失败列表=" + String.join(",", accumulator.getFailedFiles());
+        if (!accumulator.getOssFailedFiles().isEmpty()) {
+            sb.append(", OSS上传失败: ").append(accumulator.getOssFailedFiles().size())
+                    .append(" (").append(String.join(", ", accumulator.getOssFailedFiles())).append(")");
         }
-        return Result.success(msg);
+        sb.append(", 文档分块: ").append(accumulator.getAllChunks().size());
+        sb.append(", OSS上传成功: ").append(accumulator.getUploadedUrls().size());
+        if (!skippedEmptyFiles.isEmpty()) {
+            sb.append(", 跳过空文件: ").append(skippedEmptyFiles.size());
+        }
+        return sb.toString();
     }
 
     private String safeFileName(MultipartFile file) {
@@ -331,4 +355,18 @@ public class UploadController {
         return (original == null || original.isBlank()) ? "unknown" : original;
     }
 
+    private void cleanupTempFiles(List<File> tempFiles) {
+        for (File f : tempFiles) {
+            try {
+                Files.deleteIfExists(f.toPath());
+            } catch (Exception ignored) {
+            }
+        }
+    }
+
+    private String truncateMessage(String msg) {
+        if (msg == null) return "未知错误";
+        int maxLen = uploadProperties.getMaxErrorMessageLength();
+        return msg.length() > maxLen ? msg.substring(0, maxLen) + "..." : msg;
+    }
 }

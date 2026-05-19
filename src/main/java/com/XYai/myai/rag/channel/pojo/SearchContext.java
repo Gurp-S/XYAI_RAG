@@ -1,14 +1,12 @@
 package com.XYai.myai.rag.channel.pojo;
 
 import com.XYai.myai.rag.intent.pojo.NodesScore;
-import com.XYai.myai.rag.intent.pojo.SubQuestionIntent;
-import com.XYai.myai.rag.rewrite.pojo.RewriteResult;import lombok.AllArgsConstructor;
+import com.XYai.myai.rag.rewrite.pojo.RewriteResult;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 
@@ -36,18 +34,10 @@ public class SearchContext {
      */
     private String conversationId;
 
-    /**
-     * 意图候选列表。
-     * 通道启停（isEnabled）常基于该字段判断是否做定向检索或全局兜底检索。
-     */
-    @Builder.Default
-    private List<SubQuestionIntent> kbIntents = new ArrayList<>();
 
-    /**
-     * 节点置信度信息。
-     * 可用于动态调节召回策略（例如低置信度时扩大召回范围）。
-     */
-    @Builder.Default
+    private Map<String, Integer> userMessageEntityFileChunkIds;
+
+
     private NodesScore intents = new NodesScore();
 
     /**

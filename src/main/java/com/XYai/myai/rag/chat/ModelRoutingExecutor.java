@@ -1,6 +1,9 @@
 package com.XYai.myai.rag.chat;
 
+import com.XYai.myai.config.MultiChatClientConfig;
+import com.XYai.myai.rag.chat.pojo.ModelCandidateEntity;
 import com.XYai.myai.rag.chat.pojo.ModelRouterProperties;
+import com.XYai.myai.rag.chat.pojo.StreamResult;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import jakarta.annotation.Resource;
 import lombok.Data;
@@ -37,16 +40,13 @@ public class ModelRoutingExecutor {
     @Resource
     private ModelRouterProperties routerProperties;
 
+    // ==================== 同步调用（保持不变） ====================
+
     /**
      * 执行路由调用（自动降级）
-     * @param prompt 用户输入
-     * @param sessionId 会话ID
-     * @return 模型响应
      */
     public String execute(String prompt, String sessionId) {
         long startTime = System.currentTimeMillis();
-
-        // 获取降级链路
         List<String> fallbackChain = modelSelector.getFallbackChain();
         log.info("降级链路: {}", fallbackChain);
 
@@ -55,7 +55,6 @@ public class ModelRoutingExecutor {
         }
 
         Exception lastException = null;
-
         for (String modelName : fallbackChain) {
             try {
                 String result = callModel(modelName, prompt, sessionId);
@@ -75,124 +74,12 @@ public class ModelRoutingExecutor {
         return "服务繁忙，请稍后重试";
     }
 
-    /**
-     * 指定模型流式执行（失败自动降级）
-     */
-    public Flux<String> executeWithPreferredStream(String prompt, String preferredModel, String sessionId) {
-        if (!healthStore.isHealthy(preferredModel)) {
-            log.warn("首选模型 [{}] 不健康，切换到降级链路", preferredModel);
-            return executeStream(prompt, sessionId);
-        }
-
-        log.info("使用首选模型 [{}] 进行流式调用", preferredModel);
-        return callModelStream(preferredModel, prompt, sessionId)
-                .onErrorResume(e -> {
-                    log.warn("首选模型 [{}] 流式调用失败: {}", preferredModel, e.getMessage());
-                    healthStore.recordFailure(preferredModel, (Exception) e);
-                    return executeStream(prompt, sessionId);
-                });
-    }
-
-    /**
-     * 并发流式调用（取最快响应）
-     */
-    public Flux<String> executeConcurrentStream(String prompt, String sessionId, long timeoutMs) {
-        List<String> candidates = modelSelector.getAvailableModels().stream()
-                .limit(3)
-                .map(ModelRouterProperties.ModelCandidate::getName)
-                .toList();
-
-        if (candidates.isEmpty()) {
-            return executeStream(prompt, sessionId);
-        }
-
-        log.info("并发流式调用 - 候选模型: {}", candidates);
-
-        // 选择第一个健康的模型进行流式调用
-        // 注意：真正的并发流式需要更复杂的实现，这里简化为选择最优模型
-        for (String modelName : candidates) {
-            if (healthStore.isHealthy(modelName)) {
-                log.info("并发流式调用使用模型: {}", modelName);
-                return callModelStream(modelName, prompt, sessionId)
-                        .onErrorResume(e -> {
-                            log.warn("模型 [{}] 流式调用失败，切换到降级链路", modelName);
-                            return executeStream(prompt, sessionId);
-                        });
-            }
-        }
-
-        return executeStream(prompt, sessionId);
-    }
-
-    // 在 ModelRoutingExecutor 中添加流式调用方法
-    public Flux<String> executeStream(String prompt, String sessionId) {
-        List<String> fallbackChain = modelSelector.getFallbackChain();
-        log.info("流式调用降级链路: {}", fallbackChain);
-
-        if (fallbackChain.isEmpty()) {
-            return Flux.just("暂无可用模型，请稍后重试");
-        }
-
-        return Flux.defer(() -> {
-            for (String modelName : fallbackChain) {
-                try {
-                    if (healthStore.isHealthy(modelName)) {
-                        return callModelStream(modelName, prompt, sessionId)
-                                .doOnComplete(() -> log.info("模型 [{}] 流式调用完成", modelName));
-                    }
-                } catch (Exception e) {
-                    log.warn("模型 [{}] 流式调用失败: {}", modelName, e.getMessage());
-                    healthStore.recordFailure(modelName, e);
-                }
-            }
-            return Flux.just("所有模型均不可用，请稍后重试");
-        });
-    }
-
-    private Flux<String> callModelStream(String modelName, String prompt, String sessionId) {
-        CircuitBreaker breaker = healthStore.getBreaker(modelName);
-
-        if (breaker.getState() == CircuitBreaker.State.OPEN) {
-            return Flux.error(new RuntimeException("模型 [" + modelName + "] 处于熔断状态"));
-        }
-
-        org.springframework.ai.chat.client.ChatClient client = modelClientMap.get(modelName);
-        if (client == null) {
-            return Flux.error(new RuntimeException("未找到模型对应的ChatClient: " + modelName));
-        }
-
-        long startTime = System.currentTimeMillis();
-        StringBuilder fullResponse = new StringBuilder();
-
-        return client.prompt(prompt).stream().content()
-                .doOnNext(fullResponse::append)
-                .doOnComplete(() -> {
-                    long duration = System.currentTimeMillis() - startTime;
-                    healthStore.recordSuccess(modelName, duration);
-                    log.debug("模型 [{}] 流式响应完成，耗时: {}ms", modelName, duration);
-                })
-                .doOnError(e -> {
-                    healthStore.recordFailure(modelName, (Exception) e);
-                    log.error("模型 [{}] 流式响应失败: {}", modelName, e.getMessage());
-                });
-    }
-
-    /**
-     * 指定模型执行（失败自动降级）
-     * @param prompt 用户输入
-     * @param preferredModel 首选模型
-     * @param sessionId 会话ID
-     * @return 模型响应
-     */
     public String executeWithPreferred(String prompt, String preferredModel, String sessionId) {
         long startTime = System.currentTimeMillis();
-
-        // 检查首选模型是否可用
         if (!healthStore.isHealthy(preferredModel)) {
             log.warn("首选模型 [{}] 不健康，切换到降级链路", preferredModel);
             return execute(prompt, sessionId);
         }
-
         try {
             String result = callModel(preferredModel, prompt, sessionId);
             long duration = System.currentTimeMillis() - startTime;
@@ -201,18 +88,14 @@ public class ModelRoutingExecutor {
         } catch (Exception e) {
             log.warn("首选模型 [{}] 调用失败: {}", preferredModel, e.getMessage());
             healthStore.recordFailure(preferredModel, e);
-            // 降级到默认路由
             return execute(prompt, sessionId);
         }
     }
 
-    /**
-     * 并发调用（取最快响应）
-     */
     public String executeConcurrent(String prompt, String sessionId, long timeoutMs) {
         List<String> candidates = modelSelector.getAvailableModels().stream()
                 .limit(3)
-                .map(ModelRouterProperties.ModelCandidate::getName)
+                .map(ModelCandidateEntity::getName)
                 .toList();
 
         if (candidates.isEmpty()) {
@@ -235,9 +118,9 @@ public class ModelRoutingExecutor {
                 .toList();
 
         try {
-            CompletableFuture<Map.Entry<String, String>> anyResult =
-                    CompletableFuture.anyOf(futures.toArray(new CompletableFuture[0]))
-                            .thenApply(obj -> (Map.Entry<String, String>) obj);
+            CompletableFuture<Map.Entry<String, String>> anyResult = CompletableFuture
+                    .anyOf(futures.toArray(new CompletableFuture[0]))
+                    .thenApply(obj -> (Map.Entry<String, String>) obj);
 
             Map.Entry<String, String> result = anyResult.get(timeoutMs, TimeUnit.MILLISECONDS);
             if (result.getValue() != null) {
@@ -249,26 +132,169 @@ public class ModelRoutingExecutor {
             log.warn("并发调用异常: {}", e.getMessage());
         }
 
-        // 降级到顺序执行
         return execute(prompt, sessionId);
     }
 
+    // ==================== 流式调用（返回 StreamResult） ====================
+
     /**
-     * 调用模型（带熔断保护）
+     * 自动路由流式调用（优先默认模型，否则降级）
+     */
+    public StreamResult executeStream(String prompt, String sessionId) {
+        // 优先使用配置的默认对话模型
+        String defaultModel = routerProperties.getFeatureModel("chat_default");
+        if (defaultModel != null && healthStore.isHealthy(defaultModel)
+                && (modelClientMap.containsKey(defaultModel)
+                || MultiChatClientConfig.getMutableModelMap().containsKey(defaultModel))) {
+            ModelCandidateEntity candidate = routerProperties.findByName(defaultModel);
+            if (candidate != null && candidate.isEnabled()) {
+                log.info("流式调用使用默认模型: {}", defaultModel);
+                // 直接返回包装对象，若失败降级到备用链路
+                return new StreamResult(
+                        callModelStream(defaultModel, prompt, sessionId)
+                                .onErrorResume(e -> {
+                                    log.warn("默认模型 [{}] 流式调用失败: {}", defaultModel, e.getMessage());
+                                    // 降级时需重新选择模型，返回降级链的第一个健康模型
+                                    return doFallbackStream(prompt, sessionId).content();
+                                }),
+                        defaultModel
+                );
+            }
+        }
+        // 默认模型不可用，直接走降级
+        return doFallbackStream(prompt, sessionId);
+    }
+
+    /**
+     * 指定模型流式调用（失败自动降级）
+     */
+    public StreamResult executeWithPreferredStream(String prompt, String preferredModel, String sessionId) {
+        if (!healthStore.isHealthy(preferredModel)) {
+            log.warn("首选模型 [{}] 不健康，切换到降级链路", preferredModel);
+            return executeStream(prompt, sessionId);
+        }
+
+        log.info("使用首选模型 [{}] 进行流式调用", preferredModel);
+        return new StreamResult(
+                callModelStream(preferredModel, prompt, sessionId)
+                        .onErrorResume(e -> {
+                            log.warn("首选模型 [{}] 流式调用失败: {}", preferredModel, e.getMessage());
+                            healthStore.recordFailure(preferredModel, (Exception) e);
+                            return executeStream(prompt, sessionId).content();
+                        }),
+                preferredModel
+        );
+    }
+
+    /**
+     * 并发流式调用（取最快响应）
+     */
+    public StreamResult executeConcurrentStream(String prompt, String sessionId, long timeoutMs) {
+        List<String> candidates = modelSelector.getAvailableModels().stream()
+                .limit(3)
+                .map(ModelCandidateEntity::getName)
+                .toList();
+
+        if (candidates.isEmpty()) {
+            return executeStream(prompt, sessionId);
+        }
+
+        log.info("并发流式调用 - 候选模型: {}", candidates);
+        for (String modelName : candidates) {
+            if (healthStore.isHealthy(modelName)) {
+                log.info("并发流式调用使用模型: {}", modelName);
+                return new StreamResult(
+                        callModelStream(modelName, prompt, sessionId)
+                                .onErrorResume(e -> {
+                                    log.warn("模型 [{}] 流式调用失败，切换到降级链路", modelName);
+                                    return executeStream(prompt, sessionId).content();
+                                }),
+                        modelName
+                );
+            }
+        }
+        return executeStream(prompt, sessionId);
+    }
+
+    // ==================== 降级逻辑（内部使用） ====================
+
+    /**
+     * 同步遍历降级链，返回第一个健康模型的 StreamResult
+     */
+    private StreamResult doFallbackStream(String prompt, String sessionId) {
+        List<String> fallbackChain = modelSelector.getFallbackChain();
+        log.info("降级链路: {}", fallbackChain);
+
+        if (fallbackChain.isEmpty()) {
+            return new StreamResult(Flux.just("暂无可用模型，请稍后重试"), "none");
+        }
+
+        for (String modelName : fallbackChain) {
+            try {
+                if (healthStore.isHealthy(modelName)) {
+                    log.info("降级链路使用模型: {}", modelName);
+                    return new StreamResult(callModelStream(modelName, prompt, sessionId), modelName);
+                }
+            } catch (Exception e) {
+                log.warn("模型 [{}] 健康检查异常: {}", modelName, e.getMessage());
+            }
+        }
+
+        log.error("所有模型均不可用");
+        return new StreamResult(Flux.just("所有模型均不可用，请稍后重试"), "none");
+    }
+
+    // ==================== 底层调用（私有） ====================
+
+    /**
+     * 流式调用模型（内部方法，返回 Flux<String>）
+     */
+    private Flux<String> callModelStream(String modelName, String prompt, String sessionId) {
+        CircuitBreaker breaker = healthStore.getBreaker(modelName);
+        if (breaker.getState() == CircuitBreaker.State.OPEN) {
+            return Flux.error(new RuntimeException("模型 [" + modelName + "] 处于熔断状态"));
+        }
+
+        ChatClient client = modelClientMap.get(modelName);
+        if (client == null) {
+            client = MultiChatClientConfig.getMutableModelMap().get(modelName);
+        }
+        if (client == null) {
+            return Flux.error(new RuntimeException("未找到模型对应的ChatClient: " + modelName));
+        }
+
+        long startTime = System.currentTimeMillis();
+        StringBuilder fullResponse = new StringBuilder();
+
+        return client.prompt(prompt).stream().content()
+                .doOnNext(fullResponse::append)
+                .doOnComplete(() -> {
+                    long duration = System.currentTimeMillis() - startTime;
+                    healthStore.recordSuccess(modelName, duration);
+                    log.debug("模型 [{}] 流式响应完成，耗时: {}ms", modelName, duration);
+                })
+                .doOnError(e -> {
+                    healthStore.recordFailure(modelName, (Exception) e);
+                    log.error("模型 [{}] 流式响应失败: {}", modelName, e.getMessage());
+                });
+    }
+
+    /**
+     * 同步调用模型（带熔断保护）
      */
     private String callModel(String modelName, String prompt, String sessionId) throws Exception {
         CircuitBreaker breaker = healthStore.getBreaker(modelName);
-
-        // 熔断检查
         if (breaker.getState() == CircuitBreaker.State.OPEN) {
             throw new RuntimeException("模型 [" + modelName + "] 处于熔断状态");
         }
 
         long startTime = System.currentTimeMillis();
-
         try {
             String result = breaker.executeSupplier(() -> {
-                org.springframework.ai.chat.client.ChatClient client = modelClientMap.get(modelName);
+                ChatClient client = modelClientMap.get(modelName);
+                if (client == null) {
+                    client = MultiChatClientConfig.getMutableModelMap().get(modelName);
+                }
                 if (client == null) {
                     throw new RuntimeException("未找到模型对应的ChatClient: " + modelName);
                 }
@@ -278,16 +304,12 @@ public class ModelRoutingExecutor {
             long duration = System.currentTimeMillis() - startTime;
             healthStore.recordSuccess(modelName, duration);
             return result;
-
         } catch (Exception e) {
             healthStore.recordFailure(modelName, e);
             throw e;
         }
     }
 
-    /**
-     * 获取所有模型的健康状态
-     */
     public Map<String, Object> getHealthStatus() {
         return healthStore.getAllHealthStatus();
     }

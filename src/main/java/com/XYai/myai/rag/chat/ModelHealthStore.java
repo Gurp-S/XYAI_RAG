@@ -1,5 +1,6 @@
 package com.XYai.myai.rag.chat;
 
+import com.XYai.myai.rag.chat.pojo.ModelCandidateEntity;
 import com.XYai.myai.rag.chat.pojo.ModelRouterProperties;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
@@ -10,7 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -43,15 +47,15 @@ public class ModelHealthStore {
     public void init() {
         this.breakerRegistry = CircuitBreakerRegistry.ofDefaults();
 
-        for (ModelRouterProperties.ModelCandidate candidate : routerProperties.getCandidates()) {
-            if (!candidate.isEnabled()) continue;
+        for (ModelCandidateEntity candidate : routerProperties.getCandidates()) {
+            if (!candidate.isEnabled())
+                continue;
 
             CircuitBreakerConfig config = CircuitBreakerConfig.custom()
-                    .failureRateThreshold(candidate.getCircuitBreaker().getFailureRateThreshold())
-                    .waitDurationInOpenState(Duration.ofMillis(
-                            candidate.getCircuitBreaker().getWaitDurationInOpenState()))
-                    .slidingWindowSize(candidate.getCircuitBreaker().getSlidingWindowSize())
-                    .minimumNumberOfCalls(candidate.getCircuitBreaker().getMinimumNumberOfCalls())
+                    .failureRateThreshold(candidate.getFailureThreshold())
+                    .waitDurationInOpenState(Duration.ofMillis(candidate.getWaitDurationOpen()))
+                    .slidingWindowSize(candidate.getSlidingWindowSize())
+                    .minimumNumberOfCalls(candidate.getMinimumCalls())
                     .build();
 
             CircuitBreaker breaker = CircuitBreaker.of(candidate.getName(), config);
@@ -69,7 +73,7 @@ public class ModelHealthStore {
 
             log.info("初始化熔断器: {} (阈值={}%)",
                     candidate.getName(),
-                    candidate.getCircuitBreaker().getFailureRateThreshold());
+                    candidate.getFailureThreshold());
         }
     }
 
@@ -80,7 +84,8 @@ public class ModelHealthStore {
 
     public boolean isHealthy(String modelName) {
         CircuitBreaker breaker = getBreaker(modelName);
-        if (breaker == null) return false;
+        if (breaker == null)
+            return false;
 
         // 熔断器开启 = 不健康
         if (breaker.getState() == CircuitBreaker.State.OPEN) {
@@ -127,13 +132,15 @@ public class ModelHealthStore {
         long failure = failureCount.getOrDefault(modelName, new AtomicLong(0)).get();
         long total = success + failure;
 
-        if (total == 0) return 1.0;
+        if (total == 0)
+            return 1.0;
         return (double) success / total;
     }
 
     public double getAvgLatency(String modelName) {
         Deque<Long> window = latencyWindow.get(modelName);
-        if (window == null || window.isEmpty()) return 0;
+        if (window == null || window.isEmpty())
+            return 0;
 
         synchronized (window) {
             return window.stream().mapToLong(Long::longValue).average().orElse(0);
@@ -154,14 +161,14 @@ public class ModelHealthStore {
     public Map<String, Object> getAllHealthStatus() {
         Map<String, Object> status = new LinkedHashMap<>();
 
-        for (ModelRouterProperties.ModelCandidate candidate : routerProperties.getCandidates()) {
+        for (ModelCandidateEntity candidate : routerProperties.getCandidates()) {
             String name = candidate.getName();
             Map<String, Object> modelStatus = new LinkedHashMap<>();
             modelStatus.put("enabled", candidate.isEnabled());
             modelStatus.put("breakerState", getBreakerState(name));
             modelStatus.put("healthy", isHealthy(name));
-            modelStatus.put("successRate", String.format("%.2f%%", getSuccessRate(name) * 100));
-            modelStatus.put("avgLatency", String.format("%.0fms", getAvgLatency(name)));
+            modelStatus.put("successRate", Math.round(getSuccessRate(name) * 10000) / 100.0);
+            modelStatus.put("avgLatency", Math.round(getAvgLatency(name)));
             modelStatus.put("totalCalls", getTotalCalls(name));
 
             if (lastError.containsKey(name)) {
@@ -194,5 +201,50 @@ public class ModelHealthStore {
         lastError.remove(modelName);
 
         log.info("已重置模型 [{}] 的健康状态", modelName);
+    }
+
+    /**
+     * 运行时注册新模型的熔断器和计数器（用于动态添加模型后调用）
+     */
+    public void registerModel(String modelName) {
+        if (breakers.containsKey(modelName)) {
+            log.warn("模型 [{}] 已注册熔断器，跳过", modelName);
+            return;
+        }
+
+        // 查找候选配置
+        ModelCandidateEntity candidate = null;
+        if (routerProperties.getCandidates() != null) {
+            candidate = routerProperties.getCandidates().stream()
+                    .filter(c -> c.getName().equals(modelName))
+                    .findFirst().orElse(null);
+        }
+
+        CircuitBreakerConfig config;
+        if (candidate != null) {
+            config = CircuitBreakerConfig.custom()
+                    .failureRateThreshold(candidate.getFailureThreshold())
+                    .waitDurationInOpenState(Duration.ofMillis(candidate.getWaitDurationOpen()))
+                    .slidingWindowSize(candidate.getSlidingWindowSize())
+                    .minimumNumberOfCalls(candidate.getMinimumCalls())
+                    .build();
+        } else {
+            config = CircuitBreakerConfig.ofDefaults();
+        }
+
+        CircuitBreaker breaker = CircuitBreaker.of(modelName, config);
+        breakers.put(modelName, breaker);
+        successCount.put(modelName, new AtomicLong(0));
+        failureCount.put(modelName, new AtomicLong(0));
+        latencyWindow.put(modelName, new ArrayDeque<>());
+
+        breaker.getEventPublisher()
+                .onStateTransition(event -> log.warn("熔断器 [{}] 状态变化: {} -> {}",
+                        event.getCircuitBreakerName(),
+                        event.getStateTransition().getFromState(),
+                        event.getStateTransition().getToState()));
+
+        log.info("运行时注册熔断器: {} (阈值={}%)", modelName,
+                candidate != null ? candidate.getFailureThreshold() : "默认");
     }
 }

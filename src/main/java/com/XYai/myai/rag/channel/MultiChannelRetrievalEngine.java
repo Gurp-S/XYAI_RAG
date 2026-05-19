@@ -1,19 +1,27 @@
 package com.XYai.myai.rag.channel;
 
+import com.XYai.myai.mapper.FileRecordMapper;
+import com.XYai.myai.rag.aop.annotation.RagTraceRoot;
 import com.XYai.myai.rag.channel.pojo.RetrievedChunk;
 import com.XYai.myai.rag.channel.pojo.SearchChannel;
 import com.XYai.myai.rag.channel.pojo.SearchChannelResult;
 import com.XYai.myai.rag.channel.pojo.SearchContext;
-import com.XYai.myai.rag.channel.processor.*;
-import com.XYai.myai.rag.intent.pojo.SubQuestionIntent;
+import com.XYai.myai.rag.channel.processor.BM25PostProcessor;
+import com.XYai.myai.rag.channel.processor.FilterPostProcessor;
+import com.XYai.myai.rag.channel.processor.RerankPostProcessor;
+import com.XYai.myai.rag.milvus.pojo.FileRecord;
 import com.XYai.myai.rag.rewrite.pojo.RewriteResult;
+import com.XYai.myai.xyAdmin.DashboardManager;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -37,6 +45,10 @@ public class MultiChannelRetrievalEngine {
     private FilterPostProcessor filterPostProcessor;
     @Resource
     private RerankPostProcessor rerankPostProcessor;
+    @Resource
+    private FileRecordMapper fileRecordMapper;
+    @Resource
+    private DashboardManager dashboardManager;
 
     @Resource(name = "searchChannelExecutor")
     private ThreadPoolTaskExecutor searchChannelExecutor;
@@ -50,11 +62,12 @@ public class MultiChannelRetrievalEngine {
      * <p>3) 合并所有通道的 chunks 后，进入 SearchResultPostProcessor 链路做质量提升。</p>
      * <p>4) 当前后处理采用固定顺序调用（非动态排序）：Deduplication -> Filter -> Rerank。</p>
      */
-    public List<RetrievedChunk> retrieve(List<SubQuestionIntent> questionIntents, RewriteResult query, String conversationId,String originalQuery) {
+    @RagTraceRoot(name = "多通道召回", conversationIdArg = "", taskIdArg = "多通道召回")
+    public List<RetrievedChunk> retrieve(Map<String, Integer> userMessageEntityFileChunkIds, RewriteResult query, String conversationId, String originalQuery) {
         // 构建查找对象
         SearchContext context = new SearchContext();
         context.setOriginalQuery(originalQuery);
-        context.setKbIntents(questionIntents);
+        context.setUserMessageEntityFileChunkIds(userMessageEntityFileChunkIds);
         context.setRewriteQuestion(query);
         context.setConversationId(conversationId);
         // 进行可执行的通道查找
@@ -126,12 +139,54 @@ public class MultiChannelRetrievalEngine {
     private List<RetrievedChunk> applyPostProcessors(List<RetrievedChunk> merged, SearchContext context) {
         // 1 bm25打分
         List<RetrievedChunk> bm25Process = bm25PostProcessor.process(merged, context);//不同的collection重复文档,相似文档
-        log.info("bm25:{}",bm25Process.stream().map(RetrievedChunk::getBm25Score).toList());
+        log.info("bm25:{}", bm25Process.stream().map(RetrievedChunk::getBm25Score).toList());
         // 2 过滤：在重排前先做硬约束清洗（权限、版本、低质量等）。
         List<RetrievedChunk> filterProcess = filterPostProcessor.process(bm25Process, context);//分数低,版本低,权限不足
-        log.info("filter:{}",filterProcess.stream().map(RetrievedChunk::getScore).toList());
+        log.info("filter:{}", filterProcess.stream().map(RetrievedChunk::getScore).toList());
         // 3 重排：基于语义模型或融合策略调整最终排序。
-        //return rerankPostProcessor.process(filterProcess, context);//rerank模型
-        return filterProcess;
+        List<RetrievedChunk> rerankProcess = rerankPostProcessor.process(filterProcess, context);//rerank模型
+        log.info("rerank:{}", rerankProcess.stream().map(RetrievedChunk::getScore).toList());
+        // 4.异步保存文档使用次数
+        rerankProcess.forEach(chunk ->
+                CompletableFuture.runAsync(
+                        () -> incrementFileChunkCount(chunk.getId()),
+                        searchChannelExecutor
+                ).exceptionally(ex -> {
+                    log.error("异步更新文件使用次数失败: chunkId={}", chunk.getId(), ex);
+                    return null;
+                })
+        );
+        return rerankProcess;
+    }
+
+    /**
+     * 对指定 chunk 的使用次数原子 +1。
+     * 若记录不存在则先插入（use_count = 1），存在则递增。
+     */
+    private void incrementFileChunkCount(String fileChunkId) {
+        log.info("准备异步更新文件使用次数");
+        dashboardManager.addFileUseCount();
+        boolean updated = fileRecordMapper.update(
+                null,
+                new LambdaUpdateWrapper<FileRecord>()
+                        .eq(FileRecord::getFileChunkId, fileChunkId)
+                        .setSql("use_count = use_count + 1")
+        ) > 0;
+        if (!updated) {
+            FileRecord record = FileRecord.builder()
+                    .fileChunkId(fileChunkId)
+                    .fileUsingCount(1L)
+                    .build();
+            try {
+                fileRecordMapper.insert(record);
+            } catch (DuplicateKeyException e) {
+                fileRecordMapper.update(
+                        null,
+                        new LambdaUpdateWrapper<FileRecord>()
+                                .eq(FileRecord::getFileChunkId, fileChunkId)
+                                .setSql("use_count = use_count + 1")
+                );
+            }
+        }
     }
 }

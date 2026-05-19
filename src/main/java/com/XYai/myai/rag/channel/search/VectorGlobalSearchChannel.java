@@ -1,5 +1,6 @@
 package com.XYai.myai.rag.channel.search;
 
+import com.XYai.myai.rag.aop.annotation.RagTraceNode;
 import com.XYai.myai.rag.channel.pojo.RetrievedChunk;
 import com.XYai.myai.rag.channel.pojo.SearchChannel;
 import com.XYai.myai.rag.channel.pojo.SearchChannelResult;
@@ -7,12 +8,12 @@ import com.XYai.myai.rag.channel.pojo.SearchContext;
 import com.XYai.myai.rag.rewrite.pojo.RewriteResult;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.ByteString;
 import io.milvus.client.MilvusClient;
 import io.milvus.grpc.FieldData;
 import io.milvus.grpc.SearchResults;
 import io.milvus.param.MetricType;
+import io.milvus.param.R;
 import io.milvus.param.dml.SearchParam;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -48,6 +50,10 @@ public class VectorGlobalSearchChannel implements SearchChannel {
     @Resource(name = "searchChannelExecutor")
     private ThreadPoolTaskExecutor searchChannelExecutor;
 
+    // 向量字段名
+    private static final String VECTOR_FIELD_CONTEXT = "embedding_context";
+    private static final String VECTOR_FIELD_QUESTION = "embedding_question";
+
     @Override
     public String getName() {
         return "vector-global-search";
@@ -65,12 +71,12 @@ public class VectorGlobalSearchChannel implements SearchChannel {
 
     @Override
     public boolean isEnabled(SearchContext context) {
-        return true;   // 全局检索始终启用（原意图逻辑已移除）
+        return true;
     }
 
     @Override
+    @RagTraceNode(name = "向量召回", type = "search")
     public SearchChannelResult search(SearchContext context) {
-        // 获取查询列表
         RewriteResult rewriteResult = Optional.ofNullable(context.getRewriteQuestion())
                 .orElse(RewriteResult.builder()
                         .rewrittenQuery(context.getOriginalQuery())
@@ -82,12 +88,19 @@ public class VectorGlobalSearchChannel implements SearchChannel {
 
         List<String> queryList = Optional.ofNullable(rewriteResult.getSubQuery())
                 .filter(list -> !list.isEmpty())
-                .orElse(List.of(rewriteResult.getRewrittenQuery()));
+                .orElseGet(() -> {
+                    String q = rewriteResult.getRewrittenQuery();
+                    return (q != null && !q.isBlank()) ? List.of(q) : List.of(context.getOriginalQuery());
+                });
 
         // 并行多查询检索
-        List<CompletableFuture<List<RetrievedChunk>>> futures = queryList.stream()
+        long t0 = System.currentTimeMillis();
+        List<float[]> queryVectorList = embeddingModel.embed(queryList);
+        long t1 = System.currentTimeMillis();
+        log.info("向量问题时间: {}ms", t1 - t0);
+        List<CompletableFuture<List<RetrievedChunk>>> futures = queryVectorList.stream()
                 .map(query -> CompletableFuture.supplyAsync(
-                        () -> searchWithNativeMilvus(query),
+                        () -> searchWithDualVectors(query),
                         searchChannelExecutor
                 ))
                 .toList();
@@ -108,81 +121,147 @@ public class VectorGlobalSearchChannel implements SearchChannel {
     }
 
     /**
-     * 原生 Milvus 检索，精准匹配 Indexer 写入的字段：
-     * - embedding 用于 ANN 搜索
-     * - content 作为返回的文本
-     * - metadata 作为元数据（JSON 字符串）
+     * 双向量搜索 + 合并（取每个 chunk 在两个字段中的最大余弦分数）
      */
-    private List<RetrievedChunk> searchWithNativeMilvus(String query) {
+    private List<RetrievedChunk> searchWithDualVectors(float[] queryVector) {
         try {
-            float[] vectorArray = embeddingModel.embed(query);
-            List<Float> vectorList = IntStream.range(0, vectorArray.length)
-                    .mapToObj(i -> vectorArray[i])
+            List<Float> vectorList = IntStream.range(0, queryVector.length)
+                    .mapToObj(i -> queryVector[i])
                     .toList();
 
-            // 2. 原生搜索
-            SearchParam searchParam = SearchParam.newBuilder()
-                    .withDatabaseName(databaseName)
-                    .withCollectionName(defaultCollectionName)
-                    .withVectorFieldName("embedding")
-                    .withFloatVectors(Collections.singletonList(vectorList))
-                    .withTopK(DEFAULT_TOP_K)
-                    .withMetricType(MetricType.COSINE)
-                    .withOutFields(Arrays.asList("content", "metadata"))   // 只取需要的字段
-                    .build();
+            // 并行搜索两个向量字段
+            long t2 = System.currentTimeMillis();
+            CompletableFuture<List<RetrievedChunk>> contextFuture = CompletableFuture.supplyAsync(
+                    () -> searchByField(vectorList, VECTOR_FIELD_CONTEXT), searchChannelExecutor);
+            CompletableFuture<List<RetrievedChunk>> questionFuture = CompletableFuture.supplyAsync(
+                    () -> searchByField(vectorList, VECTOR_FIELD_QUESTION), searchChannelExecutor);
 
-            SearchResults results = milvusClient.search(searchParam).getData();
-            // 3. 解析结果
-            List<Float> scores = results.getResults().getScoresList();
-            List<FieldData> fieldsDataList = results.getResults().getFieldsDataList();
+            List<RetrievedChunk> contextResults = contextFuture.join();
+            long t3 = System.currentTimeMillis();
+            List<RetrievedChunk> questionResults = questionFuture.join();
+            long t4 = System.currentTimeMillis();
+            log.info("context search {}ms, question search {}ms, merge overhead {}ms", t3 - t2, t4 - t3, t4 - t2);
+            // 合并：以 "fileId:chunkId" 为唯一键，保留分数最高的 chunk
+            Map<String, RetrievedChunk> merged = new LinkedHashMap<>();
 
-            List<String> contentList = null;
-            List<String> metadataJsonList = null;
-
-            for (FieldData fieldData : fieldsDataList) {
-                if ("content".equals(fieldData.getFieldName())) {
-                    contentList = fieldData.getScalars().getStringData().getDataList();
-                } else if ("metadata".equals(fieldData.getFieldName())) {
-                    List<ByteString> byteStrings = fieldData.getScalars().getJsonData().getDataList();
-                    metadataJsonList = byteStrings.stream()
-                            .map(ByteString::toStringUtf8)
-                            .collect(Collectors.toList());
+            Consumer<List<RetrievedChunk>> mergeList = list -> {
+                for (RetrievedChunk chunk : list) {
+                    String key = buildUniqueKey(chunk);
+                    if (key == null) continue;
+                    RetrievedChunk existing = merged.get(key);
+                    if (existing == null || chunk.getScore() > existing.getScore()) {
+                        merged.put(key, chunk);
+                    }
                 }
-            }
-            log.info("召回的内容:{},元数据:{}",contentList,metadataJsonList);
-            // 防御性处理
-            if (contentList == null) {
-                contentList = Collections.emptyList();
-            }
-            if (metadataJsonList == null || metadataJsonList.isEmpty()) {
-                metadataJsonList = Collections.nCopies(contentList.size(), "{}");
-            }
-            if (scores.isEmpty()) {
-                scores = Collections.nCopies(contentList.size(), 0.0f);
-            }
+            };
 
-            List<RetrievedChunk> chunks = new ArrayList<>();
-            for (int i = 0; i < contentList.size(); i++) {
-                double score = (i < scores.size()) ? scores.get(i) : 0.0;
-                String metadataJson = i < metadataJsonList.size() ? metadataJsonList.get(i) : "{}";
-                Map<String, Object> metadata = parseMetadata(metadataJson);
-                chunks.add(RetrievedChunk.builder()
-                        .content(contentList.get(i))
-                        .score(score)
-                        .metadata(metadata)
-                        .build());
-            }
-            log.info("向量召回文档分数:{}",chunks.stream().map(RetrievedChunk::getScore).toList());
-            return chunks;
+            mergeList.accept(contextResults);
+            mergeList.accept(questionResults);
+
+            List<RetrievedChunk> finalChunks = new ArrayList<>(merged.values());
+            finalChunks.sort(Comparator.comparingDouble(RetrievedChunk::getScore).reversed());
+
+            log.info("双向量融合后分数: {}", finalChunks.stream().map(RetrievedChunk::getScore).toList());
+            return finalChunks;
+
         } catch (Exception e) {
-            log.error("原生 Milvus 检索失败", e);
+            log.error("双向量检索失败", e);
             return List.of();
         }
     }
 
     /**
-     * 将 metadata JSON 字符串解析为 Map
+     * 针对指定向量字段进行一次搜索
      */
+    private List<RetrievedChunk> searchByField(List<Float> vectorList, String vectorFieldName) {
+        SearchParam searchParam = SearchParam.newBuilder()
+                .withDatabaseName(databaseName)
+                .withCollectionName(defaultCollectionName)
+                .withVectorFieldName(vectorFieldName)
+                .withFloatVectors(Collections.singletonList(vectorList))
+                .withTopK(DEFAULT_TOP_K)
+                .withMetricType(MetricType.COSINE)
+                .withOutFields(Arrays.asList("doc_id", "content", "metadata"))
+                .build();
+
+        R<SearchResults> searchResponse = milvusClient.search(searchParam);
+        if (searchResponse.getStatus() != R.Status.Success.getCode()) {
+            log.warn("[向量搜索] {} 搜索失败: {}", vectorFieldName, searchResponse.getMessage());
+            return List.of();
+        }
+        SearchResults results = searchResponse.getData();
+        if (results == null) {
+            log.warn("[向量搜索] {} 返回空结果", vectorFieldName);
+            return List.of();
+        }
+
+        List<Float> scores = results.getResults().getScoresList();
+
+        List<FieldData> fieldsDataList = results.getResults().getFieldsDataList();
+        if (fieldsDataList.isEmpty()) {
+            log.warn("[向量搜索] {} 无字段数据, scores={}", vectorFieldName, scores.size());
+            // 即使没有字段数据，也可能有分数（纯向量搜索）
+            if (scores.isEmpty()) return List.of();
+        }
+
+        List<String> docIdList = null;
+        List<String> contentList = null;
+        List<String> metadataJsonList = null;
+
+        for (FieldData fieldData : fieldsDataList) {
+            String fieldName = fieldData.getFieldName();
+            if ("doc_id".equals(fieldName)) {
+                docIdList = fieldData.getScalars().getStringData().getDataList();
+            } else if ("content".equals(fieldName)) {
+                contentList = fieldData.getScalars().getStringData().getDataList();
+            } else if ("metadata".equals(fieldName)) {
+                List<ByteString> byteStrings = fieldData.getScalars().getJsonData().getDataList();
+                metadataJsonList = byteStrings.stream()
+                        .map(ByteString::toStringUtf8)
+                        .toList();
+            }
+        }
+
+        if (docIdList == null) docIdList = Collections.emptyList();
+        if (contentList == null) contentList = Collections.emptyList();
+        if (metadataJsonList == null || metadataJsonList.isEmpty())
+            metadataJsonList = Collections.nCopies(contentList.size(), "{}");
+        if (scores.isEmpty()) scores = Collections.nCopies(contentList.size(), 0.0f);
+        List<RetrievedChunk> chunks = new ArrayList<>();
+        for (int i = 0; i < contentList.size(); i++) {
+            double score = i < scores.size() ? scores.get(i) : 0.0;
+            String metadataJson = i < metadataJsonList.size() ? metadataJsonList.get(i) : "{}";
+            Map<String, Object> metadata = parseMetadata(metadataJson);
+            String docId = i < docIdList.size() ? docIdList.get(i) : null;
+            if (docId != null && !docId.isBlank()) {
+                metadata.put("doc_id", docId);
+            }
+            chunks.add(RetrievedChunk.builder()
+                    .id(docId)
+                    .content(contentList.get(i))
+                    .score(score)
+                    .metadata(metadata)
+                    .build());
+        }
+        return chunks;
+    }
+
+    /**
+     * 构建唯一标识：优先使用 doc_id（Milvus 主键）。
+     */
+    private String buildUniqueKey(RetrievedChunk chunk) {
+        if (chunk == null) return null;
+        if (chunk.getId() != null && !chunk.getId().isBlank()) {
+            return chunk.getId();
+        }
+        Map<String, Object> meta = chunk.getMetadata();
+        if (meta == null) return null;
+        Object docId = meta.get("doc_id");
+        if (docId == null) return null;
+        String s = String.valueOf(docId);
+        return s.isBlank() ? null : s;
+    }
+
     private Map<String, Object> parseMetadata(String raw) {
         if (raw == null || raw.isBlank()) return Collections.emptyMap();
         try {

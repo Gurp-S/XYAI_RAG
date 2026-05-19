@@ -1,12 +1,10 @@
 package com.XYai.myai.config;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
-
-import jakarta.annotation.PostConstruct;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**

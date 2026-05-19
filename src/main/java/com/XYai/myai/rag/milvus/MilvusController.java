@@ -4,11 +4,13 @@ import com.XYai.myai.config.Result;
 import com.XYai.myai.mapper.UserMapper;
 import com.XYai.myai.user.LoginUserInfoManager;
 import com.XYai.myai.user.pojo.User;
+import com.XYai.myai.user.userChat.UserChatService;
 import com.XYai.myai.user.userChat.pojo.FileMessage;
 import com.XYai.myai.user.userChat.pojo.UserChatRequest;
-import com.XYai.myai.user.userChat.UserChatService;
+import com.github.benmanes.caffeine.cache.Cache;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -61,6 +63,12 @@ public class MilvusController {
             return Result.error(1, "未加载");
         }
         return Result.success(milvusFileManager.getUserCollectionFiles(collectionName));
+    }
+
+    @GetMapping("/metadata/user")
+    public Result<List<Map<String, Object>>> getUserFiles() {
+        //是否有权限（若没有权限则返回错误）
+        return Result.success(milvusFileManager.getUserFiles());
     }
 
     /**
@@ -149,7 +157,7 @@ public class MilvusController {
             @RequestParam String fileId,
             @RequestParam String collectionName) {
         log.info("文件:{}集合:{}", fileId, collectionName);
-        if (!milvusAclManager.getCollectionAcl(collectionName) || !milvusAclManager.getFileAcl(fileId)) {
+        if (!milvusAclManager.getCollectionAcl(collectionName) || !milvusAclManager.getFileChunkAcl(fileId, Math.toIntExact(chunkId))) {
             log.info("dropDocumentNoACl:{}", collectionName);
             return Result.error(1, "无权限访问");
         }
@@ -179,7 +187,8 @@ public class MilvusController {
             @RequestParam String collectionName,
             @RequestParam String fileId,
             @RequestParam Long userId,
-            @RequestParam(required = false) Integer chunkId) {
+            @RequestParam(required = false) Integer chunkId,
+            @RequestParam(required = false) String fileName) {
         User sender = LoginUserInfoManager.getUser();
         if (sender == null || sender.getId() == null) {
             return Result.error(401, "未登录");
@@ -193,15 +202,12 @@ public class MilvusController {
         if (userMapper.selectById(userId) == null) {
             return Result.error(404, "用户不存在");
         }
-        if (!milvusAclManager.getCollectionAcl(collectionName) || !milvusAclManager.getFileAcl(fileId)) {
-            log.info("shareFilesMessageNoAcl: {}", collectionName);
-            return Result.error(1, "无权限访问");
-        }
-
-        Integer normalizedChunkId = (chunkId != null && chunkId > 0) ? chunkId : null;
+        Integer normalizedChunkId = chunkId != null && chunkId > 0 ? chunkId : null;
+        String safeFileName = (fileName != null && !fileName.isBlank()) ? fileName.replace("\"", "\\\"").replace("\\", "\\\\") : "";
         String payload = "{\"type\":\"file_share\",\"collectionName\":\"" + collectionName
                 + "\",\"fileId\":\"" + fileId + "\",\"chunkId\":"
-                + (normalizedChunkId == null ? "null" : normalizedChunkId) + "}";
+                + (normalizedChunkId == null ? "null" : normalizedChunkId)
+                + ",\"fileName\":\"" + safeFileName + "\"}";
 
         UserChatRequest request = new UserChatRequest(
                 payload,
@@ -210,7 +216,8 @@ public class MilvusController {
                 "user",
                 String.valueOf(userId),
                 null,
-                sender.getName()
+                sender.getName(),
+                "pending"
         );
         UserChatService.UserChatSendResult sendResult = userChatService.send(request);
 
@@ -245,10 +252,68 @@ public class MilvusController {
      */
     @PostMapping("/share")
     public Result<String> shareFiles(String collectionName ,String fileId , Long userId , int chunkId){
-        if (!milvusAclManager.getCollectionAcl(collectionName) || !milvusAclManager.getFileAcl(fileId)) {
-            log.info("shareFilesNoAcl:{}", collectionName);
-            return Result.error(1, "无权限访问");
-        }
         return milvusFileManager.shareFiles(collectionName, fileId , userId , chunkId);
+    }
+
+    /**
+     * 接收方接受文件分享 — 由接收方调用，直接授予权限
+     * @param collectionName 集合名称
+     * @param fileId 完整 doc_id（格式 filePart:000042）或 fileId
+     * @param chunkId 分块 ID（可选）
+     * @param senderId 发送方用户 ID（用于验证）
+     * @return
+     */
+    @PostMapping("/share/accept")
+    public Result<String> acceptShare(
+            @RequestParam String collectionName,
+            @RequestParam String fileId,
+            @RequestParam(required = false) Integer chunkId,
+            @RequestParam Long senderId) {
+        User recipient = LoginUserInfoManager.getUser();
+        if (recipient == null || recipient.getId() == null) {
+            return Result.error(401, "未登录");
+        }
+
+        String actualFileId = fileId;
+        int actualChunkId = (chunkId != null && chunkId > 0) ? chunkId : 0;
+        int colonIdx = fileId.lastIndexOf(':');
+        if (colonIdx > 0 && colonIdx < fileId.length() - 1) {
+            actualFileId = fileId.substring(0, colonIdx);
+            if (actualChunkId == 0) {
+                try {
+                    actualChunkId = Integer.parseInt(fileId.substring(colonIdx + 1));
+                } catch (NumberFormatException ignored) {}
+            }
+        }
+
+        if (recipient.getId().equals(senderId)) {
+            return Result.error(400, "不能接受自己的分享");
+        }
+
+        log.info("接受文件分享: recipient={} collection={} fileId={} chunkId={}",
+                recipient.getId(), collectionName, actualFileId, actualChunkId);
+        return milvusFileManager.shareFiles(collectionName, actualFileId, recipient.getId(), actualChunkId);
+    }
+
+    /**
+     * 接收方拒绝文件分享 — 删除聊天消息
+     * @param conversationId 对话 ID
+     * @param messageId 消息 ID
+     * @return
+     */
+    @PostMapping("/share/reject")
+    public Result<String> rejectShare(
+            @RequestParam String conversationId,
+            @RequestParam Long messageId) {
+        User recipient = LoginUserInfoManager.getUser();
+        if (recipient == null || recipient.getId() == null) {
+            return Result.error(401, "未登录");
+        }
+        boolean deleted = userChatService.deleteMessage(conversationId, messageId);
+        if (deleted) {
+            log.info("拒绝文件分享，已删除消息: conversationId={} messageId={}", conversationId, messageId);
+            return Result.success("已拒绝并删除消息");
+        }
+        return Result.error(1, "消息不存在或已被删除");
     }
 }

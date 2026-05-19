@@ -13,6 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * 管道定义工厂
+ * 根据 PipelineProperties 中配置的 nodes（有序、可开关）动态构建 PipelineDefinition
+ */
 @Component
 public class PipelineDefinitionFactory {
 
@@ -24,116 +28,101 @@ public class PipelineDefinitionFactory {
     }
 
     public PipelineDefinition createUploadPipeline(String fileName, MultipartFile file) {
-        return buildPipeline(fileName, false, resolveChunkSize(file), resolveChunkOverlap(file));
+        return buildPipeline(resolveChunkSize(file), resolveChunkOverlap(file));
     }
 
     public PipelineDefinition createSourcePipeline(String sourceLabel, String sourceType) {
-        boolean includeFetcher = true;
-        int chunkSize = pipelineProperties.getDefaultChunkSize();
-        int overlapSize = pipelineProperties.getDefaultOverlapSize();
-        return buildPipeline(sourceLabel, includeFetcher, chunkSize, overlapSize);
+        // 使用文本类的默认值，因为 sourcePipeline 通常处理结构化较弱的文本
+        return buildPipeline(pipelineProperties.getTextChunkSize(), pipelineProperties.getTextOverlapSize());
     }
 
-    public PipelineDefinition createInlinePipeline(String sourceLabel) {
-        return buildPipeline(sourceLabel, false, pipelineProperties.getDefaultChunkSize(), pipelineProperties.getDefaultOverlapSize());
-    }
-
-    private PipelineDefinition buildPipeline(String pipelineName,
-                                             boolean includeFetcher,
-                                             int chunkSize,
-                                             int overlapSize) {
-        ObjectNode chunkSettings = JsonNodeFactory.instance.objectNode();
-        chunkSettings.put("chunkSize", chunkSize);
-        chunkSettings.put("overlapSize", overlapSize);
-
+    /**
+     * 根据 PipelineProperties.nodes 构建管道定义
+     * 仅包含已启用的节点，按列表顺序串联（nextNodeType 决定连接关系）
+     */
+    private PipelineDefinition buildPipeline(int chunkSize, int overlapSize) {
         List<NodeConfig> nodes = new ArrayList<>();
+        List<PipelineProperties.PipelineNodeDef> enabledDefs = pipelineProperties.getNodes().stream()
+                .filter(PipelineProperties.PipelineNodeDef::isEnabled)
+                .toList();
 
-        if (includeFetcher) {
-            NodeConfig fetcher = NodeConfig.builder()
-                    .nodeId("fetcher")
-                    .nodeType("fetcher")
-                    .nextNodeId("parser")
-                    .build();
-            nodes.add(fetcher);
+        if (enabledDefs.isEmpty()) {
+            // 保底：至少需要一个节点
+            enabledDefs = List.of(
+                    new PipelineProperties.PipelineNodeDef("parser", "解析文档", true, null));
         }
 
-        // 原顺序：parser → enricher → chunker → indexer
-// 新顺序：parser → chunker → enricher → indexer
+        for (int i = 0; i < enabledDefs.size(); i++) {
+            PipelineProperties.PipelineNodeDef def = enabledDefs.get(i);
+            String nextId = (i + 1 < enabledDefs.size()) ? enabledDefs.get(i + 1).getNodeType() : null;
 
-        NodeConfig parser = NodeConfig.builder()
-                .nodeId("parser")
-                .nodeType("parser")
-                .nextNodeId("chunker")   // 直接指向 chunker
-                .build();
-        nodes.add(parser);
+            ObjectNode settings = null;
+            if ("chunker".equals(def.getNodeType())) {
+                settings = JsonNodeFactory.instance.objectNode();
+                settings.put("chunkSize", chunkSize);
+                settings.put("overlapSize", overlapSize);
+                settings.put("minMergeSize", pipelineProperties.getMinChunkSizeChars());
+                settings.put("maxNumChunks", pipelineProperties.getMaxNumChunks());
+            }
 
-        NodeConfig chunker = NodeConfig.builder()
-                .nodeId("chunker")
-                .nodeType("chunker")
-                .settings(chunkSettings)
-                .nextNodeId(pipelineProperties.getEnricherEnable() ? "enricher" : "indexer")
-                .build();
-        nodes.add(chunker);
-
-        if (pipelineProperties.getEnricherEnable()) {
-            NodeConfig enricher = NodeConfig.builder()
-                    .nodeId("enricher")
-                    .nodeType("enricher")
-                    .nextNodeId("indexer")
+            NodeConfig node = NodeConfig.builder()
+                    .nodeId(def.getNodeType())
+                    .nodeType(def.getNodeType())
+                    .nextNodeId(nextId)
+                    .settings(settings)
                     .build();
-            nodes.add(enricher);
+            nodes.add(node);
         }
-
-        NodeConfig indexer = NodeConfig.builder()
-                .nodeId("indexer")
-                .nodeType("indexer")
-                .build();
-        nodes.add(indexer);
 
         return PipelineDefinition.builder()
                 .id(UUID.randomUUID().toString())
-                .name(pipelineName + "-etl-pipeline")
-                .description("upload ->parser -> chunker  -> enricher -> indexer")
+                .name("etl-pipeline")
+                .description("ETL管道: " + String.join(" → ", nodes.stream().map(NodeConfig::getNodeType).toList()))
                 .nodes(nodes)
                 .build();
     }
 
     /**
-     * 分块大小
-     *
-     * @param file 上传文件
-     * @return 分块大小
+     * 解析文件分块大小
+     * 策略：从 PipelineProperties 按文件类型读取，消除硬编码
      */
     private int resolveChunkSize(MultipartFile file) {
-        String type = file.getContentType() == null ? "" : file.getContentType().toLowerCase();
         String fileName = safeFileName(file).toLowerCase();
-        if (type.contains("pdf") || fileName.endsWith(".pdf")) {
-            return 1200;
-        }
-        if (type.contains("word") || fileName.endsWith(".doc") || fileName.endsWith(".docx")) {
-            return 1000;
-        }
-        if (type.contains("plain") || fileName.endsWith(".txt") || fileName.endsWith(".md")) {
-            return pipelineProperties.getDefaultChunkSize();
-        }
-        return pipelineProperties.getDefaultChunkSize();
+        if (fileName.endsWith(".pdf")) return pipelineProperties.getPdfChunkSize();
+        if (fileName.endsWith(".doc") || fileName.endsWith(".docx")) return pipelineProperties.getWordChunkSize();
+        if (fileName.endsWith(".txt") || fileName.endsWith(".md") || fileName.endsWith(".markdown"))
+            return pipelineProperties.getTextChunkSize();
+        if (fileName.endsWith(".csv") || fileName.endsWith(".xls") || fileName.endsWith(".xlsx"))
+            return pipelineProperties.getTableChunkSize();
+        if (isCodeFile(fileName)) return pipelineProperties.getCodeChunkSize();
+        if (fileName.endsWith(".html") || fileName.endsWith(".xml")) return pipelineProperties.getHtmlChunkSize();
+        // 默认值：使用文本类的分块大小
+        return pipelineProperties.getTextChunkSize();
     }
 
     /**
-     * 分块重叠大小
-     *
-     * @param file 上传文件
-     * @return 重叠大小
+     * 解析分块重叠大小
+     * 策略：从 PipelineProperties 按文件类型读取，消除硬编码
      */
     private int resolveChunkOverlap(MultipartFile file) {
-        String type = file.getContentType() == null ? "" : file.getContentType().toLowerCase();
-        if (type.contains("pdf")) {
-            return 180;
-        }
-        if (type.contains("word")) {
-            return 150;
-        }
-        return 120;
+        String fileName = safeFileName(file).toLowerCase();
+        if (fileName.endsWith(".pdf")) return pipelineProperties.getPdfOverlapSize();
+        if (fileName.endsWith(".doc") || fileName.endsWith(".docx")) return pipelineProperties.getWordOverlapSize();
+        if (fileName.endsWith(".txt") || fileName.endsWith(".md") || fileName.endsWith(".markdown"))
+            return pipelineProperties.getTextOverlapSize();
+        if (fileName.endsWith(".csv") || fileName.endsWith(".xls") || fileName.endsWith(".xlsx"))
+            return pipelineProperties.getTableOverlapSize();
+        if (isCodeFile(fileName)) return pipelineProperties.getCodeOverlapSize();
+        if (fileName.endsWith(".html") || fileName.endsWith(".xml")) return pipelineProperties.getHtmlOverlapSize();
+        // 默认值：使用文本类的重叠大小
+        return pipelineProperties.getTextOverlapSize();
+    }
+
+    private boolean isCodeFile(String fileName) {
+        return fileName.endsWith(".java") || fileName.endsWith(".py") ||
+                fileName.endsWith(".js") || fileName.endsWith(".ts") ||
+                fileName.endsWith(".go") || fileName.endsWith(".rs") ||
+                fileName.endsWith(".cpp") || fileName.endsWith(".c");
     }
 
     private String safeFileName(MultipartFile file) {
@@ -141,4 +130,3 @@ public class PipelineDefinitionFactory {
         return (original == null || original.isBlank()) ? "unknown" : original;
     }
 }
-

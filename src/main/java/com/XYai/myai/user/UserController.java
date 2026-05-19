@@ -16,11 +16,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -159,7 +161,7 @@ public class UserController {
     @GetMapping("/history/conversation")
     public Result<List<ChatConversation>> conversationHistory(
             String conversationId,
-            @RequestParam(required = false) LocalDateTime cursor,
+            @RequestParam(required = false) String cursor,
             @RequestParam(defaultValue = "20") int limit) {
         return userService.conversationHistory(conversationId, cursor, limit);
     }
@@ -233,18 +235,46 @@ public class UserController {
     // ================================ 文件分享 ================================
 
     /**
-     * 文件/知识库分享接口
-     * TODO 暂未实现：分享文件到其他用户/组
-     *
-     * @param collectionName 集合名称
-     * @param kbId           知识库ID
-     * @param fileId         文件ID
-     * @return 分享结果
+     * 文件/知识库分享接口（待后续版本实现）
      */
     @PostMapping("/share")
     public Result<String> shareFile(String collectionName, String kbId, String fileId) {
-        // TODO 实现文件/知识库分享功能
-        return Result.success("TODO：未实现分享功能");
+        return Result.error(501, "分享功能尚未实现");
+    }
+
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+
+    // ================================ 公告接口 ================================
+
+    private static final String ANNOUNCEMENT_REDIS_KEY = "xyai:admin:announcement:list";
+
+    /**
+     * 获取所有公告（用户端）
+     */
+    @GetMapping("/announcement/list")
+    public Result<List<Map<String, Object>>> getUserAnnouncements() {
+        List<String> jsons = stringRedisTemplate.opsForList().range(ANNOUNCEMENT_REDIS_KEY, 0, -1);
+        if (jsons == null || jsons.isEmpty()) {
+            return Result.success(List.of());
+        }
+        List<Map<String, Object>> result = jsons.stream()
+                .map(json -> {
+                    try {
+                        com.alibaba.fastjson2.JSONObject obj = com.alibaba.fastjson2.JSON.parseObject(json);
+                        if (obj != null) {
+                            Map<String, Object> map = new LinkedHashMap<>();
+                            map.put("id", obj.getString("id"));
+                            map.put("content", obj.getString("content"));
+                            map.put("timestamp", obj.getLong("timestamp"));
+                            return map;
+                        }
+                    } catch (Exception ignored) {}
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .toList();
+        return Result.success(result);
     }
 
     // ================================ Token 刷新 ================================

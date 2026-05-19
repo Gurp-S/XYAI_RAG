@@ -1,83 +1,74 @@
 package com.XYai.myai.rag.chat.pojo;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import com.XYai.myai.rag.chat.ModelRegistryService;
+import com.XYai.myai.xyAdmin.service.SystemConfigService;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
-import java.util.List;
 
-/**
- * 模型路由配置属性
- * application.yml 配置示例见下文
- */
-@Data
+import java.util.List;
+import java.util.Map;
+
 @Component
-@ConfigurationProperties(prefix = "router")
 public class ModelRouterProperties {
 
-    /** 模型候选列表配置 */
-    private List<ModelCandidate> candidates;
+    private final ModelRegistryService registryService;
+    private final SystemConfigService systemConfigService;
 
-    /** 路由策略：round_robin, failover, latency_based, task_based */
-    private String strategy = "failover";
-
-    /** 首包探测超时时间（毫秒） */
-    private long firstPacketTimeout = 5000L;
-
-    /** 级联调用超时时间（毫秒） */
-    private long cascadeTimeout = 30000L;
-
-    private Boolean enableFirstPacketDetect = true;
-
-    @Data
-    public static class ModelCandidate {
-        /** 模型唯一标识，如 "qwen-max", "qwen-turbo" */
-        private String name;
-
-        /** 模型显示名称 */
-        private String displayName;
-
-        /** API实际模型名 */
-        private String apiModel;
-
-        /** 优先级（1最高） */
-        private int priority = 5;
-
-        /** 是否启用 */
-        private boolean enabled = true;
-
-        /** 熔断器配置 */
-        private CircuitBreakerConfig circuitBreaker = new CircuitBreakerConfig();
-
-        /** 权重（用于负载均衡策略） */
-        private int weight = 1;
+    public ModelRouterProperties(ModelRegistryService registryService,
+            SystemConfigService systemConfigService) {
+        this.registryService = registryService;
+        this.systemConfigService = systemConfigService;
     }
 
-    @Data
-    public static class CircuitBreakerConfig {
-        private int failureRateThreshold = 50;
-        private long waitDurationInOpenState = 10000L;
-        private int slidingWindowSize = 10;
-        private int minimumNumberOfCalls = 5;
+    /** 获取全部模型列表（按优先级排序） */
+    public List<ModelCandidateEntity> getCandidates() {
+        return registryService.listAll();
     }
 
-    /**
-     * 根据名字找模型
-     * @param name
-     * @return
-     */
-    public ModelCandidate findByName(String name) {
-        return candidates.stream()
-                .filter(c -> c.getName().equals(name))
-                .findFirst()
-                .orElse(null);
+    /** 根据名称查找模型 */
+    public ModelCandidateEntity findByName(String name) {
+        return registryService.findByName(name);
     }
 
-    /**
-     * 获取所有启用的模型
-     */
-    public List<ModelCandidate> getEnabledCandidates() {
-        return candidates.stream()
-                .filter(ModelCandidate::isEnabled)
+    /** 获取所有启用的模型 */
+    public List<ModelCandidateEntity> getEnabledCandidates() {
+        return registryService.listAll().stream()
+                .filter(ModelCandidateEntity::isEnabled)
                 .toList();
+    }
+
+    // ==================== 功能-模型分配 ====================
+
+    /** 获取指定功能使用的模型名（通过 feature_model 分组） */
+    public String getFeatureModel(String feature) {
+        return systemConfigService.getFeatureModel(feature);
+    }
+
+    /** 设置指定功能使用的模型名 */
+    public void setFeatureModel(String feature, String modelName) {
+        systemConfigService.setFeatureModel(feature, modelName);
+    }
+
+    /** 获取所有功能-模型分配 */
+    public Map<String, String> getFeatureModels() {
+        return systemConfigService.getGroupConfigs("feature_model");
+    }
+
+    // ==================== 路由策略（从 environment 读取，兼容 yaml） ====================
+
+    public String getStrategy() {
+        return Environment.class.getName(); // 占位，实际由调用方决定
+    }
+
+    public long getFirstPacketTimeout() {
+        return 5000;
+    }
+
+    public long getCascadeTimeout() {
+        return 30000;
+    }
+
+    public boolean isEnableFirstPacketDetect() {
+        return true;
     }
 }

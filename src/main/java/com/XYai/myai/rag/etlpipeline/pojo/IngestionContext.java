@@ -47,7 +47,7 @@ public class IngestionContext implements Serializable {
     public static final String META_FILE_ID = "fileId";
     public static final String META_TIME_CREATE = "createTime";
     public static final String META_VISIBILITY = "visibility";   // 可见范围 private/group/public
-    public static final String META_COPY_CHUNK = "copy_chunk";   // 可见范围 private/group/public
+    public static final String META_SKIP_CHUNK = "copy_chunk";   // 可见范围 private/group/public
     public static final String META_INTENT_NODE = "intentNode";
     @Serial
     private static final long serialVersionUID = 1L;

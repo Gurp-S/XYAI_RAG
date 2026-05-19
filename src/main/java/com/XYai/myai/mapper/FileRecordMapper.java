@@ -3,6 +3,7 @@ package com.XYai.myai.mapper;
 import com.XYai.myai.rag.milvus.pojo.FileRecord;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * 文件主记录 Mapper。
@@ -10,5 +11,8 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface FileRecordMapper extends BaseMapper<FileRecord> {
+
+    @Select("select sum(xy_file_record.use_count) from xy_file_record")
+    Long sumTotal();
 }
 

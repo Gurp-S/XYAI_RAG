@@ -9,12 +9,6 @@ import org.springframework.util.StringUtils;
 @Component
 public class ConditionEvaluator {
 
-    /**
-     * 最小学习版条件：
-     * - 空条件 => true
-     * - {"enabled": false} => false
-     * - {"field":"mimeType", "equals":"application/pdf"} => 按字段匹配
-     */
     public boolean evaluate(JsonNode condition, IngestionContext context) {
         if (condition == null || condition.isNull() || condition.isEmpty()) {
             return true;

@@ -18,30 +18,15 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("xy_file_record")//用于记录文件
+@TableName("xy_file_record")
 public class FileRecord {
 
-    @TableId(value = "file_id", type = IdType.INPUT)
-    private String fileId;
+    @TableId(value = "file_chunk_id", type = IdType.INPUT)
+    private String fileChunkId;
+
+    @TableField("use_count")
+    private Long fileUsingCount;
 
     @TableField("file_name")
     private String fileName;
-
-    @TableField("collection_name")
-    private String collectionName;
-
-    @TableField("kb_id")
-    private String kbId;          // 知识库ID
-
-    @TableField("owner_id")
-    private String ownerId;
-
-    @TableField("group_id")
-    private String groupId;
-
-    @TableField("visibility")
-    private String visibility;
-
-    @TableField("create_time")
-    private LocalDateTime createTime;
 }

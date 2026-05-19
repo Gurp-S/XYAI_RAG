@@ -2,7 +2,6 @@ package com.XYai.myai.rag.evaluate;
 
 import com.XYai.myai.config.Result;
 import com.XYai.myai.rag.evaluate.impl.EvaluateImpl;
-import com.XYai.myai.rag.evaluate.pojo.UserEvaluatePOJO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;

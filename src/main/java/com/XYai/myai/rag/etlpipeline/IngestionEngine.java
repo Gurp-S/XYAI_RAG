@@ -179,7 +179,6 @@ public class IngestionEngine {
                 if (taskId != null && !taskId.isBlank()) {
                     uploadTaskStore.node(taskId, config.getNodeType());
                 }
-                // 检查执行条件（满足条件才执行）
                 if (conditionEvaluator.evaluate(config.getCondition(), context)) {
                     // 获得节点
                     Ingestion node = nodeMap.get(config.getNodeType().toLowerCase());

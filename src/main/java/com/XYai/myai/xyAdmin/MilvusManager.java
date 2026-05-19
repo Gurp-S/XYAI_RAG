@@ -1,99 +1,203 @@
 package com.XYai.myai.xyAdmin;
 
+import com.XYai.myai.commonUtils.redis.RedisKeyConfig;
 import com.XYai.myai.config.Result;
+import com.XYai.myai.mapper.FileRecordMapper;
 import com.XYai.myai.mapper.UserMapper;
 import com.XYai.myai.rag.milvus.MilvusAclManager;
 import com.XYai.myai.rag.milvus.MilvusCollectionService;
-import com.XYai.myai.rag.milvus.MilvusFileManager;
-import com.XYai.myai.redis.RedisKeyConfig;
 import com.XYai.myai.user.pojo.User;
+import io.milvus.client.MilvusServiceClient;
+import io.milvus.grpc.GetCollectionStatisticsResponse;
+import io.milvus.grpc.KeyValuePair;
+import io.milvus.grpc.QueryResults;
+import io.milvus.param.R;
+import io.milvus.param.collection.GetCollectionStatisticsParam;
+import io.milvus.param.dml.QueryParam;
+import io.milvus.response.QueryResultsWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RBitSet;
+import org.redisson.api.RSet;
+import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Milvus 向量库管理类
  * 提供后台管理：文件/集合/用户权限/数据处理
+ * 支持分页、搜索、排序、缓存刷新与数据清理
  */
 @Slf4j
-@Component
+@RestController
+@RequestMapping("/xyAdmin/milvus")
 public class MilvusManager {
 
-    @Resource
-    private MilvusFileManager milvusFileManager;
-
-    @Resource
-    private MilvusAclManager milvusAclManager;
-
+    private static final long CACHE_TTL_MS = 60000;
     @Resource
     private UserMapper userMapper;
-
     @Resource
-    private StringRedisTemplate stringRedisTemplate;
-
+    private RedissonClient redissonClient;
+    @Resource
+    private FileRecordMapper fileRecordMapper;
+    @Value("${spring.ai.vectorstore.milvus.collectionName:my_ai}")
+    private String defaultCollectionName;
+    @Value("${spring.ai.vectorstore.milvus.databaseName:my_xy}")
+    private String databaseName;
+    @Resource
+    private MilvusServiceClient milvusClient;
     @Resource
     private MilvusCollectionService milvusCollectionService;
+    // 缓存文件列表
+    private List<Map<String, Object>> cachedFileList = null;
+    private long cacheTimestamp = 0;
 
     /**
-     * 获取所有文件信息（从 Milvus + Redis 关联）
+     * 分页获取文件信息（支持搜索、排序）
      */
-    public Result<List<Map<String, Object>>> getAllFiles() {
+    @GetMapping("/files")
+    public Result<Map<String, Object>> getFilesPaged(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String fileId,
+            @RequestParam(defaultValue = "useCount") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortOrder) {
         try {
-            List<Map<String, Object>> resultList = new ArrayList<>();
+            List<Map<String, Object>> allFiles = getOrRefreshFileCache();
 
-            // 获取所有文件哈希相关的 Key
-            Set<String> hashKeys = stringRedisTemplate.keys(RedisKeyConfig.fileHashKey("*"));
-            if (hashKeys == null || hashKeys.isEmpty()) {
-                return Result.success(resultList);
+            // 文件ID模糊搜索
+            List<Map<String, Object>> filtered = new ArrayList<>();
+            for (Map<String, Object> file : allFiles) {
+                String fid = (String) file.get("fileId");
+                if (fileId != null && !fileId.isBlank() && (fid == null || !fid.contains(fileId))) {
+                    continue;
+                }
+                filtered.add(file);
             }
 
-            for (String hashKey : hashKeys) {
-                String fileId = stringRedisTemplate.opsForValue().get(hashKey);
-                if (fileId == null) continue;
-
-                Map<String, Object> fileInfo = new HashMap<>();
-                fileInfo.put("fileId", fileId);
-                fileInfo.put("hashKey", hashKey);
-
-                // 获取文件关联的知识库
-                Set<String> collections = getCollectionsByFileId(fileId);
-                fileInfo.put("collections", collections);
-
-                // 文件分片使用计数
-                String countKey = RedisKeyConfig.fileChunkUserCountKey(fileId, 0L);
-                String count = stringRedisTemplate.opsForValue().get(countKey);
-                fileInfo.put("useCount", count == null ? 0 : Long.parseLong(count));
-
-                resultList.add(fileInfo);
+            // 排序
+            Comparator<Map<String, Object>> comparator;
+            if ("useCount".equalsIgnoreCase(sortBy)) {
+                comparator = Comparator.comparingInt(f -> ((Number) f.getOrDefault("useCount", 0)).intValue());
+            } else {
+                comparator = Comparator.comparing(f -> (String) f.getOrDefault("fileId", ""));
             }
+            if ("desc".equalsIgnoreCase(sortOrder)) {
+                comparator = comparator.reversed();
+            }
+            filtered.sort(comparator);
 
-            log.info("获取所有文件成功，共 {} 个文件", resultList.size());
-            return Result.success(resultList);
+            // 分页
+            int total = filtered.size();
+            int fromIndex = (page - 1) * size;
+            int toIndex = Math.min(fromIndex + size, total);
+            List<Map<String, Object>> pageData = fromIndex < total ? filtered.subList(fromIndex, toIndex) : new ArrayList<>();
 
+            Map<String, Object> result = new LinkedHashMap<>();
+            result.put("total", total);
+            result.put("page", page);
+            result.put("size", size);
+            result.put("records", pageData);
+            return Result.success(result);
         } catch (Exception e) {
-            log.error("getAllFiles失败", e);
+            log.error("getFilesPaged 失败", e);
             return Result.error(500, "获取文件列表失败：" + e.getMessage());
         }
     }
 
     /**
-     * 根据文件ID获取关联的知识库
+     * 获取或刷新文件缓存（从 Redis 和 Milvus 收集所有已知文件）
+     */
+    private List<Map<String, Object>> getOrRefreshFileCache() {
+        long now = System.currentTimeMillis();
+        if (cachedFileList != null && (now - cacheTimestamp) < CACHE_TTL_MS) {
+            return cachedFileList;
+        }
+
+        Set<String> allFileIds = new LinkedHashSet<>();
+        try {
+            R<QueryResults> resp = milvusClient.query(QueryParam.newBuilder()
+                    .withDatabaseName(databaseName)
+                    .withCollectionName(defaultCollectionName)
+                    .withExpr("doc_id != \"\"")
+                    .withOutFields(List.of("doc_id"))
+                    .withLimit(10000L)
+                    .build());
+            if (resp.getStatus() == R.Status.Success.getCode() && resp.getData() != null) {
+                QueryResultsWrapper wrapper = new QueryResultsWrapper(resp.getData());
+                for (QueryResultsWrapper.RowRecord record : wrapper.getRowRecords()) {
+                    Object docId = record.get("doc_id");
+                    if (docId instanceof String s && !s.isBlank()) {
+                        int idx = s.lastIndexOf(':');
+                        if (idx > 0) allFileIds.add(s.substring(0, idx));
+                        else allFileIds.add(s);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.warn("从 Milvus 获取 fileId 失败: {}", e.getMessage());
+        }
+
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        for (String fid : allFileIds) {
+            Map<String, Object> fileInfo = new LinkedHashMap<>();
+            fileInfo.put("fileId", fid);
+            fileInfo.put("collections", getCollectionsByFileId(fid));
+            fileInfo.put("useCount", countFileUsers(fid));
+            resultList.add(fileInfo);
+        }
+
+        cachedFileList = resultList;
+        cacheTimestamp = now;
+        log.info("刷新文件缓存: {} 个文件", resultList.size());
+        return resultList;
+    }
+
+
+    /**
+     * 统计文件使用用户数
+     */
+    private long countFileUsers(String fileId) {
+        long count = 0;
+        try {
+            Iterable<String> keys = redissonClient.getKeys().getKeysByPattern(
+                    RedisKeyConfig.PREFIX + "user:filebits:*:" + fileId);
+            for (String key : keys) {
+                RBitSet bitSet = redissonClient.getBitSet(key);
+                if (bitSet.cardinality() > 0) count++;
+            }
+        } catch (Exception e) {
+            log.warn("统计文件用户失败: {}", e.getMessage());
+        }
+        return count;
+    }
+
+    /**
+     * 根据文件ID获取关联的知识库集合
      */
     private Set<String> getCollectionsByFileId(String fileId) {
         Set<String> result = new HashSet<>();
         try {
-            // 获取所有知识库
-            Set<String> collectionKeys = stringRedisTemplate.keys(RedisKeyConfig.collectionFileIds("*"));
-            if (collectionKeys != null) {
-                for (String key : collectionKeys) {
-                    Set<String> fileIds = stringRedisTemplate.opsForSet().members(key);
-                    if (fileIds != null && fileIds.contains(fileId)) {
-                        String collectionName = key.substring(key.lastIndexOf(":") + 1);
+            // 匹配所有 collection:files:* 的 key
+            Iterable<String> keys = redissonClient.getKeys().getKeysByPattern(
+                    RedisKeyConfig.PREFIX + "collection:files:*");
+
+            for (String key : keys) {
+                // 提取集合名称：key 格式为 xyai:collection:files:{collectionName}
+                String collectionName = extractCollectionNameFromKey(key);
+                if (collectionName == null) {
+                    continue;
+                }
+
+                // 检查该集合的 SET 中是否包含该 fileId 的分块
+                RSet<String> set = redissonClient.getSet(RedisKeyConfig.collectionFileIds(collectionName));
+                for (String entry : set) {
+                    if (entry != null && entry.startsWith(fileId + ":")) {
                         result.add(collectionName);
+                        break;
                     }
                 }
             }
@@ -104,141 +208,237 @@ public class MilvusManager {
     }
 
     /**
-     * 获取所有知识库集合
+     * 从 Redis Key 中提取知识库名称
+     * 支持格式：xyai:collection:files:{collectionName}
      */
-    public Result<Set<String>> getAllCollections() {
-        try {
-            Set<String> collections = new HashSet<>();
-            Set<String> collectionKeys = stringRedisTemplate.keys(RedisKeyConfig.collectionFileIds("*"));
+    private String extractCollectionNameFromKey(String key) {
+        if (key == null || !key.startsWith(RedisKeyConfig.PREFIX)) {
+            return null;
+        }
+        String withoutPrefix = key.substring(RedisKeyConfig.PREFIX.length());
+        String[] parts = withoutPrefix.split(":");
+        if (parts.length >= 3 && "collection".equals(parts[0]) && "files".equals(parts[1])) {
+            return withoutPrefix.substring("collection:files:".length());
+        }
+        return null;
+    }
 
-            if (collectionKeys != null) {
-                for (String key : collectionKeys) {
-                    String collectionName = key.substring(key.lastIndexOf(":") + 1);
-                    collections.add(collectionName);
+    // --------------------------- 知识库相关 ---------------------------
+
+    @GetMapping("/collections")
+    public Result<Map<String, Object>> getCollectionsPaged(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String name,
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder) {
+        try {
+            Set<String> allNames = new LinkedHashSet<>();
+            Iterable<String> keys = redissonClient.getKeys().getKeysByPattern(
+                    RedisKeyConfig.PREFIX + "collection:files:*");
+            for (String key : keys) {
+                String collectionName = extractCollectionNameFromKey(key);
+                if (collectionName == null || collectionName.isBlank()) {
+                    continue;
                 }
+                // 可选的过滤条件
+                if (name != null && !name.isBlank() && !collectionName.contains(name)) {
+                    continue;
+                }
+                allNames.add(collectionName);
             }
 
-            log.info("获取所有知识库成功，共 {} 个", collections.size());
-            return Result.success(collections);
+            List<Map<String, Object>> list = new ArrayList<>();
+            for (String collName : allNames) {
+                Map<String, Object> info = new LinkedHashMap<>();
+                info.put("name", collName);
+                info.put("fileCount", countCollectionFiles(collName));
+                info.put("userCount", countCollectionUsers(collName));
+                list.add(info);
+            }
 
+            // 排序
+            Comparator<Map<String, Object>> comparator;
+            if ("fileCount".equalsIgnoreCase(sortBy)) {
+                comparator = Comparator.comparingInt(c -> (Integer) c.getOrDefault("fileCount", 0));
+            } else {
+                comparator = Comparator.comparing(c -> (String) c.getOrDefault("name", ""));
+            }
+            if ("desc".equalsIgnoreCase(sortOrder)) {
+                comparator = comparator.reversed();
+            }
+            list.sort(comparator);
+
+            int total = list.size();
+            int from = (page - 1) * size;
+            int to = Math.min(from + size, total);
+            List<Map<String, Object>> pageData = from < total ? list.subList(from, to) : new ArrayList<>();
+
+            Map<String, Object> result = new LinkedHashMap<>();
+            result.put("total", total);
+            result.put("page", page);
+            result.put("size", size);
+            result.put("records", pageData);
+            return Result.success(result);
         } catch (Exception e) {
             log.error("获取知识库列表失败", e);
             return Result.error(500, "获取知识库列表失败：" + e.getMessage());
         }
     }
 
-    /**
-     * 获取某个知识库的授权用户列表
-     */
-    public Result<List<User>> getCollectionUsers(String collectionName) {
+    private Integer countCollectionFiles(String collectionName) {
+        try {
+            RSet<String> set = redissonClient.getSet(RedisKeyConfig.collectionFileIds(collectionName));
+            return set.size();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+
+    private Integer countCollectionUsers(String collectionName) {
+        int count = 0;
+        try {
+            Iterable<String> userKeys = redissonClient.getKeys().getKeysByPattern(
+                    RedisKeyConfig.PREFIX + "user:collections:*");
+            for (String key : userKeys) {
+                if (key.contains(":unloaded:")) continue;
+                RSet<String> set = redissonClient.getSet(key);
+                if (set.contains(collectionName)) count++;
+            }
+        } catch (Exception e) {
+            log.warn("统计知识库用户失败", e);
+        }
+        return count;
+    }
+
+    @GetMapping("/collection/users")
+    public Result<Map<String, Object>> getCollectionUsersPaged(
+            @RequestParam String collectionName,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size) {
         try {
             if (collectionName == null || collectionName.isBlank()) {
                 return Result.error(400, "知识库名称不能为空");
             }
-
-            // 获取所有用户
+            List<User> authorizedUsers = new ArrayList<>();
             List<User> allUsers = userMapper.selectList(null);
+            for (User user : allUsers) {
+                if (user.getId() != null) {
+                    RSet<String> set = redissonClient.getSet(RedisKeyConfig.userLoadCollectionsKey(user.getId()));
+                    if (set.contains(collectionName)) {
+                        user.setPassword(null);
+                        authorizedUsers.add(user);
+                    }
+                }
+            }
 
-            // 这里可以根据 collectionName 过滤有权限的用户
-            List<User> authorizedUsers = allUsers.stream()
-                    .filter(user -> user.getStatus() != null && user.getStatus())
-                    .collect(Collectors.toList());
+            int total = authorizedUsers.size();
+            int from = (page - 1) * size, to = Math.min(from + size, total);
+            List<User> pageData = from < total ? authorizedUsers.subList(from, to) : new ArrayList<>();
 
-            log.info("获取知识库 [{}] 授权用户成功，共 {} 人", collectionName, authorizedUsers.size());
-            return Result.success(authorizedUsers);
-
+            Map<String, Object> result = new LinkedHashMap<>();
+            result.put("total", total);
+            result.put("page", page);
+            result.put("size", size);
+            result.put("records", pageData);
+            return Result.success(result);
         } catch (Exception e) {
             log.error("获取知识库用户失败", e);
             return Result.error(500, "获取知识库用户失败：" + e.getMessage());
         }
     }
 
-    /**
-     * 获取某个文件分片的使用用户
-     */
-    public Result<List<Map<String, Object>>> getFileUsers(String fileId, int chunkId) {
+    @PostMapping("/cache/refresh")
+    public Result<String> refreshCache() {
+        cachedFileList = null;
+        cacheTimestamp = 0;
+        getOrRefreshFileCache();
+        return Result.success("缓存已刷新");
+    }
+
+
+    @GetMapping("/file/users")
+    public Result<Map<String, Object>> getFileUsersPaged(
+            @RequestParam String fileId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size) {
         try {
-            List<Map<String, Object>> userList = new ArrayList<>();
-
-            if (fileId == null || fileId.isBlank()) {
-                return Result.error(400, "文件ID不能为空");
-            }
-
-            // 获取所有用户加载的知识库
-            Set<String> userCollectionKeys = stringRedisTemplate.keys(RedisKeyConfig.userLoadCollectionsKey(0L).replace("0", "*"));
-
-            if (userCollectionKeys != null) {
-                for (String key : userCollectionKeys) {
-                    // 从key中提取用户ID
-                    String userIdStr = key.substring(key.lastIndexOf(":") + 1);
-                    Long userId = Long.parseLong(userIdStr);
-
-                    // 检查用户是否有该文件权限
-                    String bitKey = RedisKeyConfig.userFileBitKey(userId, fileId);
-                    Boolean hasPermission = stringRedisTemplate.opsForValue().getBit(bitKey, chunkId);
-
-                    if (Boolean.TRUE.equals(hasPermission)) {
-                        Map<String, Object> userInfo = new HashMap<>();
-                        userInfo.put("userId", userId);
-                        userInfo.put("fileId", fileId);
-                        userInfo.put("chunkId", chunkId);
-
-                        // 获取用户信息
-                        User user = userMapper.selectById(userId);
-                        if (user != null) {
-                            userInfo.put("userName", user.getName());
-                            userInfo.put("userRank", user.getUserRank());
-                        }
-                        userList.add(userInfo);
+            List<User> authorizedUsers = new ArrayList<>();
+            // 查找所有用户的 user:filebits:userId:fileId 键
+            Iterable<String> keys = redissonClient.getKeys().getKeysByPattern(
+                    RedisKeyConfig.PREFIX + "user:filebits:*:" + fileId);
+            for (String key : keys) {
+                String[] parts = key.split(":");
+                if (parts.length >= 4) {
+                    long userId = Long.parseLong(parts[3]);
+                    User user = userMapper.selectById(userId);
+                    if (user != null) {
+                        user.setPassword(null);
+                        authorizedUsers.add(user);
                     }
                 }
             }
 
-            log.info("获取文件 [{}] 分片 {} 的使用用户成功，共 {} 人", fileId, chunkId, userList.size());
-            return Result.success(userList);
+            int total = authorizedUsers.size();
+            int from = (page - 1) * size, to = Math.min(from + size, total);
+            List<User> pageData = from < total ? authorizedUsers.subList(from, to) : new ArrayList<>();
 
+            Map<String, Object> result = new LinkedHashMap<>();
+            result.put("total", total);
+            result.put("page", page);
+            result.put("size", size);
+            result.put("records", pageData);
+            return Result.success(result);
         } catch (Exception e) {
             log.error("获取文件用户失败", e);
             return Result.error(500, "获取文件用户失败：" + e.getMessage());
         }
     }
 
+    // --------------------------- 数据处理 ---------------------------
+
     /**
-     * 后台处理文件：清理、重建、统计
+     * 后台处理文件：清理无效文件（无关联知识库的文件）
+     * 同时删除 Redis 中相关键和 xy_file_record 表中的记录
      */
+    @PostMapping("/process/files")
     public Result<String> processorFiles() {
         try {
-            int cleanedCount = 0;
-
-            // 获取所有文件哈希 Key
-            Set<String> hashKeys = stringRedisTemplate.keys(RedisKeyConfig.fileHashKey("*"));
-            if (hashKeys == null || hashKeys.isEmpty()) {
-                return Result.success("没有需要处理的文件");
-            }
-
+            int cleanedRedis = 0;
+            int cleanedDb = 0;
+            // 获取所有 file:hash:* 键
+            Iterable<String> hashKeys = redissonClient.getKeys().getKeysByPattern(
+                    RedisKeyConfig.PREFIX + "file:hash:*");
             for (String hashKey : hashKeys) {
-                String fileId = stringRedisTemplate.opsForValue().get(hashKey);
-                if (fileId == null) continue;
-
-                // 检查文件是否被任何知识库引用
-                Set<String> collections = getCollectionsByFileId(fileId);
-                if (collections.isEmpty()) {
-                    // 没有被引用的文件，清理掉
+                // fileHashKey 存储的是 Set，包含关联的 collectionName，所以需要遍历成员
+                RSet<String> hashSet = redissonClient.getSet(hashKey);
+                boolean hasCollections = false;
+                for (String member : hashSet) {
+                    // 成员就是 collectionName
+                    if (member != null && !member.isBlank()) {
+                        hasCollections = true;
+                        break;
+                    }
+                }
+                if (!hasCollections) {
+                    // 删除该哈希键
+                    redissonClient.getKeys().delete(hashKey);
+                    cleanedRedis++;
+                    // 可选：从 key 中提取 fileId 并删除 xy_file_record 记录
+                    String fileId = hashKey.substring(hashKey.lastIndexOf(":") + 1);
                     try {
-                        //milvusFileManager.deleteDocument(fileId);
-                        stringRedisTemplate.delete(hashKey);
-                        cleanedCount++;
-                        log.info("清理无效文件: {}", fileId);
-                    } catch (Exception e) {
-                        log.warn("清理文件失败: {}", fileId, e);
+                        fileRecordMapper.deleteById(fileId);
+                        cleanedDb++;
+                    } catch (Exception ex) {
+                        log.warn("删除 xy_file_record 记录失败: {}", fileId, ex);
                     }
                 }
             }
-
-            String message = String.format("文件处理完成，共清理无效文件：%d 个", cleanedCount);
-            log.info(message);
-            return Result.success(message);
-
+            // 清除缓存
+            cachedFileList = null;
+            return Result.success(String.format(
+                    "文件处理完成，清理 Redis 键: %d 个，数据库记录: %d 条", cleanedRedis, cleanedDb));
         } catch (Exception e) {
             log.error("文件处理失败", e);
             return Result.error(500, "文件处理失败：" + e.getMessage());
@@ -246,51 +446,166 @@ public class MilvusManager {
     }
 
     /**
-     * 后台处理知识库：重建索引、清理空集合
-     * @param collectionName 知识库名称，为空则处理所有
+     * 后台处理知识库：删除空集合（没有文件的集合）
      */
-    public Result<String> processorCollections(String collectionName) {
+    @PostMapping("/process/collections")
+    public Result<String> processorCollections(@RequestParam(required = false) String collectionName) {
         try {
-            if (collectionName == null || collectionName.isBlank()) {
-                // 处理所有空集合
-                Set<String> collections = getAllCollections().getData();
-                if (collections != null) {
-                    for (String coll : collections) {
-                        processSingleCollection(coll);
-                    }
-                }
-                return Result.success("所有知识库处理完成");
-            } else {
-                // 处理指定集合
+            if (collectionName != null && !collectionName.isBlank()) {
                 processSingleCollection(collectionName);
                 return Result.success("知识库 [" + collectionName + "] 处理完成");
+            } else {
+                // 处理所有知识库
+                Iterable<String> keys = redissonClient.getKeys().getKeysByPattern(
+                        RedisKeyConfig.PREFIX + "collection:files:*");
+                int count = 0;
+                for (String key : keys) {
+                    String suffix = key.substring(RedisKeyConfig.PREFIX.length());
+                    String[] parts = suffix.split(":");
+                    String candidate = key.substring(key.lastIndexOf(":") + 1);
+                    if (!candidate.matches("^[a-zA-Z0-9_]{1,64}$")) continue;
+                    String coll = parts[2];
+                    processSingleCollection(coll);
+                    count++;
+                }
+                return Result.success("所有知识库处理完成，共处理 " + count + " 个");
             }
-
         } catch (Exception e) {
-            log.error("知识库处理失败: {}", collectionName, e);
+            log.error("知识库处理失败", e);
             return Result.error(500, "知识库处理失败：" + e.getMessage());
         }
     }
 
-    /**
-     * 处理单个知识库
-     */
     private void processSingleCollection(String collectionName) {
         try {
-            // 检查集合是否为空
-            String fileIdsKey = RedisKeyConfig.collectionFileIds(collectionName);
-            Long fileCount = stringRedisTemplate.opsForSet().size(fileIdsKey);
-
-            if (fileCount == null || fileCount == 0) {
-                // 空集合，删除
+            RSet<String> fileSet = redissonClient.getSet(RedisKeyConfig.collectionFileIds(collectionName));
+            if (fileSet.isEmpty()) {
+                // 删除 Milvus 物理集合（如果存在）
                 milvusCollectionService.drop(collectionName);
-                stringRedisTemplate.delete(fileIdsKey);
+                // 删除 Redis 中的集合文件键
+                fileSet.delete();
                 log.info("清理空集合: {}", collectionName);
-            } else {
-                log.info("集合 [{}] 包含 {} 个文件，跳过清理", collectionName, fileCount);
             }
         } catch (Exception e) {
             log.error("处理集合失败: {}", collectionName, e);
+        }
+    }
+
+    // --------------------------- 物理集合统计与查询 ---------------------------
+
+    @GetMapping("/stats/physical")
+    public Result<Map<String, Object>> getPhysicalCollectionStats() {
+        try {
+            R<GetCollectionStatisticsResponse> resp = milvusClient.getCollectionStatistics(
+                    GetCollectionStatisticsParam.newBuilder()
+                            .withDatabaseName(databaseName)
+                            .withCollectionName(defaultCollectionName)
+                            .build());
+            Map<String, Object> stats = new LinkedHashMap<>();
+            stats.put("collectionName", defaultCollectionName);
+            stats.put("databaseName", databaseName);
+            long rowCount = 0;
+            if (resp != null && resp.getStatus() == R.Status.Success.getCode() && resp.getData() != null) {
+                for (KeyValuePair kv : resp.getData().getStatsList()) {
+                    if ("row_count".equals(kv.getKey())) {
+                        rowCount = Long.parseLong(kv.getValue());
+                        break;
+                    }
+                }
+            }
+            stats.put("rowCount", rowCount);
+            return Result.success(stats);
+        } catch (Exception e) {
+            log.error("获取统计失败", e);
+            return Result.error(500, "查询失败");
+        }
+    }
+
+    @GetMapping("/query")
+    public Result<List<Map<String, Object>>> queryMilvus(
+            @RequestParam(defaultValue = "doc_id != \"\"") String expr,
+            @RequestParam(defaultValue = "10") int limit) {
+        try {
+            QueryParam param = QueryParam.newBuilder()
+                    .withDatabaseName(databaseName)
+                    .withCollectionName(defaultCollectionName)
+                    .withExpr(expr)
+                    .withOutFields(List.of("doc_id", "metadata"))
+                    .withLimit((long) limit)
+                    .build();
+            R<QueryResults> response = milvusClient.query(param);
+            if (response.getStatus() != R.Status.Success.getCode()) {
+                return Result.error(500, response.getMessage());
+            }
+            List<Map<String, Object>> result = new ArrayList<>();
+            QueryResultsWrapper wrapper = new QueryResultsWrapper(response.getData());
+            for (QueryResultsWrapper.RowRecord record : wrapper.getRowRecords()) {
+                result.add(new LinkedHashMap<>(record.getFieldValues()));
+            }
+            return Result.success(result);
+        } catch (Exception e) {
+            log.error("Milvus 查询异常", e);
+            return Result.error(500, "查询异常: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/process/files/unused")
+    public Result<String> cleanUnusedFiles() {
+        int removed = 0;
+        try {
+            List<Map<String, Object>> allFiles = getOrRefreshFileCache();
+            for (Map<String, Object> file : allFiles) {
+                String fid = (String) file.get("fileId");
+                if (countFileUsers(fid) == 0) {
+                    // 删除 Redis 中与该文件相关的键（如 file:hash:* 和集合中的条目）
+                    // 先清理 file:hash: 键
+                    Iterable<String> hashKeys = redissonClient.getKeys().getKeysByPattern(
+                            RedisKeyConfig.PREFIX + "file:hash:" + fid);
+                    for (String hk : hashKeys) {
+                        redissonClient.getKeys().delete(hk);
+                    }
+                    // 清理 collection:files:* 中涉及该文件的条目
+                    Iterable<String> collKeys = redissonClient.getKeys().getKeysByPattern(
+                            RedisKeyConfig.PREFIX + "collection:files:*");
+                    for (String ck : collKeys) {
+                        RSet<String> set = redissonClient.getSet(ck);
+                        set.removeIf(entry -> entry != null && entry.startsWith(fid + ":"));
+                    }
+                    removed++;
+                    log.info("清理无用户文件: {}", fid);
+                }
+            }
+            // 刷新缓存
+            cachedFileList = null;
+            return Result.success("已清理 " + removed + " 个无用户文件");
+        } catch (Exception e) {
+            return Result.error(500, "清理失败: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/process/collections/unused")
+    public Result<String> cleanUnusedCollections() {
+        int removed = 0;
+        try {
+            Set<String> allNames = new LinkedHashSet<>();
+            Iterable<String> keys = redissonClient.getKeys().getKeysByPattern(
+                    RedisKeyConfig.PREFIX + "collection:files:*");
+            for (String key : keys) {
+                String candidate = key.substring(key.lastIndexOf(":") + 1);
+                if (!candidate.matches("^[a-zA-Z0-9_]{1,64}$")) continue;
+            }
+            for (String coll : allNames) {
+                if (countCollectionUsers(coll) == 0) {
+                    // 删除 Redis 中的集合信息，并尝试删除 Milvus 物理集合
+                    redissonClient.getSet(RedisKeyConfig.collectionFileIds(coll)).delete();
+                    milvusCollectionService.drop(coll);
+                    removed++;
+                    log.info("清理无用户集合: {}", coll);
+                }
+            }
+            return Result.success("已清理 " + removed + " 个无用户集合");
+        } catch (Exception e) {
+            return Result.error(500, "清理失败: " + e.getMessage());
         }
     }
 }

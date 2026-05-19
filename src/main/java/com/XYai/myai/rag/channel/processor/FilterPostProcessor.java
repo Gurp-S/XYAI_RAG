@@ -3,49 +3,88 @@ package com.XYai.myai.rag.channel.processor;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
+import com.XYai.myai.commonUtils.redis.RedisKeyConfig;
+import com.XYai.myai.rag.aop.annotation.RagTraceNode;
+import com.XYai.myai.rag.channel.pojo.RetrievalProperties;
 import com.XYai.myai.rag.channel.pojo.RetrievedChunk;
 import com.XYai.myai.rag.channel.pojo.SearchContext;
 import com.XYai.myai.rag.milvus.MilvusAclManager;
-import com.XYai.myai.rag.milvus.MilvusFileManager;
-import com.XYai.myai.redis.RedisKeyConfig;
 import com.XYai.myai.user.LoginUserInfoManager;
+import com.github.benmanes.caffeine.cache.Cache;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 过滤后处理器。
- *
- * <p>定位：召回后处理中间阶段（去重之后、重排之前），负责做“硬规则”剔除。</p>
- * <p>目标：把明显不合格候选提前过滤，避免污染 Rerank 输入。</p>
+ * <p>
+ * 定位：召回后处理中间阶段（去重之后、重排之前），负责做“硬规则”剔除。
+ * 目标：把明显不合格候选提前过滤，避免污染 Rerank 输入。
+ * </p>
  */
 @Slf4j
 @Component
 public class FilterPostProcessor implements SearchResultPostProcessor {
 
     private static final String NAME = "filter-processor";
+    private final RedissonClient redissonClient;
     @Resource
-    private RedissonClient redissonClient;
-    @Autowired
+    private RetrievalProperties retrievalProperties;
+    @Resource
     private MilvusAclManager milvusAclManager;
+    @Resource
+    @Qualifier("defaultCache")
+    private Cache<String, Object> localCache;
+
+    public FilterPostProcessor(RedissonClient redissonClient) {
+        this.redissonClient = redissonClient;
+    }
+
+    private static String resolveDocId(RetrievedChunk chunk) {
+        if (chunk == null) return null;
+        String id = chunk.getId();
+        if (StrUtil.isNotBlank(id)) return id;
+        Map<String, Object> meta = chunk.getMetadata();
+        if (meta == null) return null;
+        Object v = meta.get("doc_id");
+        if (v == null) return null;
+        String s = String.valueOf(v);
+        return StrUtil.isBlank(s) ? null : s;
+    }
+
+    private static DocIdParts parseDocId(String docId) {
+        if (StrUtil.isBlank(docId)) return null;
+        int idx = docId.lastIndexOf(':');
+        if (idx <= 0 || idx >= docId.length() - 1) return null;
+        String fileId = docId.substring(0, idx);
+        String chunkStr = docId.substring(idx + 1);
+        if (StrUtil.isBlank(fileId) || StrUtil.isBlank(chunkStr)) return null;
+        try {
+            int chunkId = Integer.parseInt(chunkStr);
+            return new DocIdParts(fileId, chunkId);
+        } catch (NumberFormatException ignored) {
+            return null;
+        }
+    }
 
     @Override
     public String getName() {
         return NAME;
     }
 
+    // ========== 内部辅助类 ==========
     @Override
     public int getOrder() {
-        return 5;  // 在去重之后，Rerank之前
+        return 5; // 在去重之后，Rerank之前
     }
 
     @Override
+    @RagTraceNode(name = "过滤处理", type = "process")
     public List<RetrievedChunk> process(List<RetrievedChunk> chunks, SearchContext context) {
         if (chunks == null || chunks.isEmpty()) {
             return List.of();
@@ -57,119 +96,199 @@ public class FilterPostProcessor implements SearchResultPostProcessor {
             return List.of();
         }
 
+        // 预加载用户已授权文件ID集合（仅用于私有文档）
+        Set<String> authorizedFileIds = loadAuthorizedFileIds(userId);
+
+        // 用于文件级去重（每个文件仅保留第一个通过的chunk）
+        Map<String, Boolean> fileExistMap = new HashMap<>();
+
+        // 先解析每个chunk的docId和parts，缓存避免重复解析
         return chunks.stream()
                 .filter(Objects::nonNull)
-                .filter(chunk -> {
-                    if (!FilterPostProcessor.filterComplete(chunk)) {
-                        log.warn("[filterComplete] 丢弃 chunk: fileId={}, chunkId={}",
-                                chunk.getMetadata() != null ? chunk.getMetadata().get("fileId") : null,
-                                chunk.getMetadata() != null ? chunk.getMetadata().get("chunkId") : null);
+                .map(chunk -> {
+                    String docId = resolveDocId(chunk);
+                    DocIdParts parts = parseDocId(docId);
+                    return new ChunkWithMeta(chunk, docId, parts);
+                })
+                .filter(this::filterComplete)
+                .filter(meta -> filterDistinctFileChunk(meta, fileExistMap))
+                .filter(meta -> filterContentLength(meta.chunk()))
+                .filter(meta -> filterScore(meta.chunk()))
+                // 公开文档直接放行，私有文档才进入后续检查
+                .filter(meta -> {
+                    if (isPublicDocument(meta.chunk())) {
+                        log.debug("公开文档放行: docId={}", meta.docId());
+                        return true;
+                    }
+                    // 私有文档：检查授权集合
+                    if (!filterUnloadCollection(meta, authorizedFileIds)) {
+                        log.debug("私有文档授权集合检查失败: docId={}", meta.docId());
+                        return false;
+                    }
+                    // 私有文档：检查细粒度权限
+                    if (!filterPermission(meta)) {
+                        log.debug("私有文档权限检查失败: docId={}", meta.docId());
                         return false;
                     }
                     return true;
                 })
-                .filter(chunk -> {
-                    if (!filterScore(chunk)) {
-                        log.warn("[filterScore] 丢弃 chunk: score={}, bm25={}, chunkId={}",
-                                chunk.getScore(), chunk.getBm25Score(),
-                                chunk.getMetadata().get("chunkId"));
-                        return false;
-                    }
-                    return true;
-                })
-                .filter(chunk -> {
-                    if (!filterPermission(chunk, userId)) {
-                        log.warn("[filterPermission] 丢弃 chunk: fileId={}, chunkId={}, visibility={}",
-                                chunk.getMetadata().get("fileId"),
-                                chunk.getMetadata().get("chunkId"),
-                                chunk.getMetadata().get("visibility"));
-                        return false;
-                    }
-                    return true;
-                })
-                .filter(chunk -> {
-                    if (!filterContentLength(chunk)) {
-                        log.warn("[filterContentLength] 丢弃 chunk: length={}, chunkId={}",
-                                chunk.getContent() != null ? chunk.getContent().length() : 0,
-                                chunk.getMetadata().get("chunkId"));
-                        return false;
-                    }
-                    return true;
-                })
+                .map(ChunkWithMeta::chunk)
                 .toList();
     }
 
-    private boolean filterUnloadCollection(RetrievedChunk chunk) {
-        // 加载的集合
-        Long userId = LoginUserInfoManager.getUserId();
-        RSet<String> loadCollections = redissonClient.getSet(RedisKeyConfig.userLoadCollectionsKey(userId));
-        // 集合下fileIdChunk
-        Set<Object> fileChunkIds = loadCollections.stream()
-                .map(loadCollection ->
-                        redissonClient.getSet(RedisKeyConfig.collectionFileIds(loadCollection)))
-                .flatMap(Collection::stream)
-                .collect(Collectors.toSet());
-        return fileChunkIds.contains(chunk.getMetadata().get("fileId"));
+    // ========== 预加载授权文件ID ==========
+    private Set<String> loadAuthorizedFileIds(Long userId) {
+        String cacheKey = "user:fileIdSet" + userId;
+        @SuppressWarnings("unchecked")
+        Set<String> cached = (Set<String>) localCache.getIfPresent(cacheKey);
+        if (cached != null) {
+            return cached;
+        }
+
+        Set<String> authorizedFileIds = new HashSet<>();
+        try {
+            RSet<String> loadCollections = redissonClient.getSet(RedisKeyConfig.userLoadCollectionsKey(userId));
+            if (loadCollections != null && !loadCollections.isEmpty()) {
+                for (String collectionName : loadCollections) {
+                    RSet<String> fileChunkSet = redissonClient.getSet(RedisKeyConfig.collectionFileIds(collectionName));
+                    if (fileChunkSet != null && !fileChunkSet.isEmpty()) {
+                        for (String fileChunkId : fileChunkSet) {
+                            if (StrUtil.isNotBlank(fileChunkId)) {
+                                String fileId = extractFileIdFromChunkId(fileChunkId);
+                                if (fileId != null) {
+                                    authorizedFileIds.add(fileId);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("加载用户授权文件ID失败，userId={}", userId, e);
+        }
+
+        localCache.put(cacheKey, authorizedFileIds);
+        return authorizedFileIds;
+    }
+
+    private String extractFileIdFromChunkId(String fileChunkId) {
+        if (StrUtil.isBlank(fileChunkId)) return null;
+        int idx = fileChunkId.lastIndexOf(':');
+        if (idx <= 0) return null;
+        return fileChunkId.substring(0, idx);
+    }
+
+    // ========== 过滤条件实现 ==========
+    private boolean isPublicDocument(RetrievedChunk chunk) {
+        Map<String, Object> metadata = chunk.getMetadata();
+        return !MapUtil.isEmpty(metadata)
+                && "public".equalsIgnoreCase(Convert.toStr(metadata.get("visibility")));
+    }
+
+    private boolean filterComplete(ChunkWithMeta meta) {
+        if (meta.chunk() == null || meta.chunk().getContent() == null) {
+            log.debug("[filterComplete] 丢弃: content为空");
+            return false;
+        }
+        if (meta.parts() == null || StrUtil.isBlank(meta.parts().fileId()) || meta.parts().chunkId() == null) {
+            log.debug("[filterComplete] 丢弃: docId解析失败, docId={}", meta.docId());
+            return false;
+        }
+        // 内容不能全是空白
+        if (StrUtil.isBlank(meta.chunk().getContent())) {
+            log.debug("[filterComplete] 丢弃: content为空白字符串");
+            return false;
+        }
+        return true;
     }
 
     private boolean filterContentLength(RetrievedChunk chunk) {
         String content = chunk.getContent();
         if (content == null) return false;
-        int chunkLength = content.length();
-        return chunkLength >= 5 && chunkLength <= 2000;
+        int len = content.length();
+        boolean valid = len >= retrievalProperties.getMinContentLength() && len <= retrievalProperties.getMaxContentLength();
+        if (!valid) {
+            log.debug("[filterContentLength] 丢弃: length={}", len);
+        }
+        return valid;
     }
 
     private boolean filterScore(RetrievedChunk chunk) {
         Double score = chunk.getScore();
-        Double bm25Score = chunk.getBm25Score();
         if (score == null) return false;
-        boolean commonScore = score > 0.5 && bm25Score > 0.5;
-        boolean highAndLowScore = (score > 0.82 && bm25Score >0.2) ||
-               (bm25Score > 0.82 && score > 0.2);
-        return commonScore || highAndLowScore ;
-    }
 
-    private static Boolean filterComplete(RetrievedChunk chunk) {
-        if (chunk == null) return false;
-        if (chunk.getContent() == null) return false;
-        Map<String, Object> meta = chunk.getMetadata();
-        if (meta == null) return false;
-        Object fileId = meta.get("fileId");
-        Object chunkId = meta.get("chunkId");
-        return fileId != null && chunkId != null;
+        Double bm25Score = chunk.getBm25Score();
+        // 纯向量召回（无BM25分）
+        if (bm25Score == null) {
+            boolean pass = score > retrievalProperties.getVectorOnlyThreshold();
+            if (!pass) log.debug("[filterScore] 纯向量召回丢弃: score={}", score);
+            return pass;
+        }
+
+        double bm25 = bm25Score;
+        boolean commonScore = score > retrievalProperties.getCommonScoreThreshold() && bm25 > retrievalProperties.getCommonScoreThreshold();
+        boolean highAndLowScore = (score > retrievalProperties.getHighScoreThreshold() && bm25 > retrievalProperties.getLowScoreThreshold())
+                || (bm25 > retrievalProperties.getHighScoreThreshold() && score > retrievalProperties.getLowScoreThreshold());
+        boolean pass = commonScore || highAndLowScore;
+        if (!pass) {
+            log.debug("[filterScore] 丢弃: score={}, bm25={}", score, bm25);
+        }
+        return pass;
     }
 
     /**
-     * 权限过滤
-     *
-     * @param chunk
-     * @param userId
+     * 私有文档的授权集合检查（用户是否加载了包含该文件任何chunk的集合）
      */
-    private boolean filterPermission(RetrievedChunk chunk, long userId) {
-        try {
-            // 1. 元数据空值校验
-            Map<String, Object> metadata = chunk.getMetadata();
-            if (MapUtil.isEmpty(metadata)) {
-                return false;
-            }
-
-            // 2. 获取 fileId
-            String fileId = Convert.toStr(metadata.get("fileId"));
-            if (StrUtil.isBlank(fileId)) {
-                return false;
-            }
-
-            // 3. 安全解析 chunkId
-            int chunkId = (int) metadata.get("chunkId");
-
-            boolean hasPermission = milvusAclManager.getFileChunkAcl(fileId,chunkId);
-            // 4. 权限判断：用户有权限 OR 文档公开
-
-            boolean isPublic = "public".equalsIgnoreCase(Convert.toStr(metadata.get("visibility")));
-            return hasPermission || isPublic;
-        } catch (Exception e) {
-            log.error("权限校验异常", e);
+    private boolean filterUnloadCollection(ChunkWithMeta meta, Set<String> authorizedFileIds) {
+        if (meta.parts() == null || StrUtil.isBlank(meta.parts().fileId())) {
             return false;
         }
+        return authorizedFileIds.contains(meta.parts().fileId());
+    }
+
+
+    // ========== 静态工具方法 ==========
+
+    /**
+     * 私有文档的细粒度权限检查
+     */
+    private boolean filterPermission(ChunkWithMeta meta) {
+        try {
+            String fileId = meta.parts().fileId();
+            Integer chunkId = meta.parts().chunkId();
+            if (fileId == null || chunkId == null) return false;
+            return milvusAclManager.getFileChunkAcl(fileId, chunkId);
+        } catch (Exception e) {
+            log.error("权限校验异常，docId={}", meta.docId(), e);
+            return false;
+        }
+    }
+
+    /**
+     * 文件级去重：每个文件只保留第一个通过的chunk
+     */
+    private boolean filterDistinctFileChunk(ChunkWithMeta meta, Map<String, Boolean> existMap) {
+        if (meta.parts() == null || StrUtil.isBlank(meta.parts().fileId())) {
+            // 无有效fileId的chunk（如summary/memory）不受去重限制
+            return true;
+        }
+        String docId = meta.docId();
+        if (existMap.containsKey(docId)) {
+            log.debug("[filterDistinctFileChunk] 丢弃: 文件 {} 已保留过", docId);
+            return false;
+        }
+        existMap.put(docId, true);
+        return true;
+    }
+
+    /**
+     * 缓存解析结果，避免重复解析docId
+     */
+    private record ChunkWithMeta(RetrievedChunk chunk, String docId, DocIdParts parts) {
+
+    }
+
+    private record DocIdParts(String fileId, Integer chunkId) {
+
     }
 }

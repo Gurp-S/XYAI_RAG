@@ -1,12 +1,14 @@
 package com.XYai.myai.rag.milvus;
 
+import com.XYai.myai.commonUtils.redis.RedisKeyConfig;
 import com.XYai.myai.config.Result;
-import com.XYai.myai.redis.RedisKeyConfig;
 import com.XYai.myai.user.LoginUserInfoManager;
+import com.github.benmanes.caffeine.cache.Cache;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +27,8 @@ public class MilvusCollectionService {
     private MilvusAclManager milvusAclManager;
     @Resource
     private RedissonClient redissonClient;
+    @Qualifier("defaultCache")
+    private Cache<String, Object> localCache;
 
     // ====================== 生命周期,添加创建,删除,重构 ======================
 

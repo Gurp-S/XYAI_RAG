@@ -18,6 +18,16 @@ spring:
       port: ${SPRING_REDIS_PORT:6379}
       database: ${SPRING_REDIS_DB:0}
       timeout: 3s
+      lettuce:
+        pool:
+          max-active: 16
+          max-idle: 8
+          min-idle: 2
+  neo4j:
+    uri: bolt://localhost:7687
+    authentication:
+      username: ${spring.neo4j.authentication.username}
+      password: ${spring.neo4j.authentication.username:}
   ai:
     # OpenAI兼容模式（统一使用阿里云百炼）
     openai:
@@ -28,6 +38,10 @@ spring:
           model: qwen-turbo  # 默认使用最强模型
           temperature: 0.3
           max-tokens: 1000
+      embedding:
+        options:
+          model: text-embedding-v4
+
     # Anthropic兼容模式（同样通过百炼）
     anthropic:
       api-key: ${ALIYUN_BAILIAN_API_KEY:}
@@ -40,8 +54,12 @@ spring:
     ollama:
       base-url: http://localhost:11434
       embedding:
+        enabled: false
         options:
           model: qwen3-embedding
+      rerank:
+        options:
+          model: qwen3-reranker-0.6b
     # Milvus向量存储
     vectorstore:
       milvus:
@@ -50,7 +68,7 @@ spring:
           port: 19530
         database-name: my_xy
         collection-name: my_ai
-        embedding-dimension: 4096
+        embedding-dimension: 1024
         metric-type: COSINE
         initialize-schema: true
         index-type: ivf_flat
@@ -63,6 +81,7 @@ spring:
           enabled: true
         name: mcp-client
         type: async
+
 
 # 模型路由配置（顶级配置）
 router:
@@ -215,8 +234,8 @@ jwt:
   access-token-exp-sec: 900
   refresh-token-exp-sec: 1209600
   refresh-cookie-name: refresh_token
-  header: Authorization
-  prefix: Bearer
-  http-secure: false
-  rsa-private-key-path: D:/lea/xyai/config/keys/private_pkcs8.pem
-  rsa-public-key-path: D:/lea/xyai/config/keys/public_x509.pem
+  http-secure: true
+  rsa-private-key-path: classpath:keys/private_pkcs8.pem
+  rsa-public-key-path: classpath:keys/public_x509.pem
+retrieval:
+  rerank-l-lM: false

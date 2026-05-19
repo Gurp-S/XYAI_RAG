@@ -1,8 +1,10 @@
 package com.XYai.myai.rag.milvus;
 
 import cn.hutool.core.util.StrUtil;
-import com.XYai.myai.redis.RedisKeyConfig;
+import com.XYai.myai.commonUtils.redis.RedisKeyConfig;
+import com.XYai.myai.rag.graph.Neo4jKnowledgeGraphService;
 import com.XYai.myai.user.LoginUserInfoManager;
+import com.github.benmanes.caffeine.cache.Cache;
 import io.milvus.client.MilvusClient;
 import io.milvus.param.dml.DeleteParam;
 import jakarta.annotation.Resource;
@@ -12,6 +14,7 @@ import org.redisson.api.RBitSet;
 import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.ai.document.Document;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
@@ -32,6 +35,9 @@ public class MilvusAclManager {
     private StringRedisTemplate stringRedisTemplate;
 
     @Resource
+    private Neo4jKnowledgeGraphService neo4jKnowledgeGraphService;
+
+    @Resource
     private MilvusClient milvusClient;
 
     @Value("${spring.ai.vectorstore.milvus.collectionName:my_ai}")
@@ -39,6 +45,9 @@ public class MilvusAclManager {
 
     @Value("${spring.ai.vectorstore.milvus.databaseName:my_xy}")
     private String databaseName;
+
+    @Qualifier("defaultCache")
+    private Cache<String, Object> localCache;
 
     /**
      * 获取当前用户可见的集合列表（跨实例共享，Redis 优先）。
@@ -96,8 +105,6 @@ public class MilvusAclManager {
     public Boolean getFileAcl(String fileId) {
         Long userId = LoginUserInfoManager.getUserId();
         if (fileId == null || fileId.isBlank()) return false;
-
-
         RBitSet bitSet = redissonClient.getBitSet(RedisKeyConfig.userFileBitKey(userId, fileId));
         try {
             return bitSet != null && bitSet.cardinality() > 0;
@@ -107,7 +114,7 @@ public class MilvusAclManager {
         }
     }
 
-    public Boolean getFileChunkAcl(String fileId,int chunkId) {
+    public Boolean getFileChunkAcl(String fileId, int chunkId) {
         Long userId = LoginUserInfoManager.getUserId();
         if (fileId == null || fileId.isBlank()) return false;
 
@@ -176,7 +183,7 @@ public class MilvusAclManager {
             }
         }
 
-        // 原来确实有权限 TODO该用户只有一个集合拥有此文件分块才进行真正删除
+        // 原来确实有权限 该用户只有一个集合拥有此文件分块才进行真正删除
         if (hadAcl) {
             RAtomicLong cnt = redissonClient.getAtomicLong(RedisKeyConfig.fileChunkUserCountKey(fileId, chunkId));
             long fileChunkUserCount = 0;
@@ -189,7 +196,14 @@ public class MilvusAclManager {
                     }
                     // 当计数为0时执行删除动作（删除 Milvus 中的文档）
                     deleteNoAclFileChunk(fileId, chunkId);
-
+                    // 同步清理 Neo4j 中的 Chunk 节点及相关关系（异常不影响后续清理）
+                    String docId = null;
+                    try {
+                        docId = fileId + ":" + String.format("%06d", chunkId);
+                        neo4jKnowledgeGraphService.deleteChunkRelations(Collections.singleton(docId));
+                    } catch (Exception e) {
+                        log.error("清理 Neo4j chunk {} 失败，文件 {} chunk {}", docId, fileId, chunkId, e);
+                    }
                     // 同步更新各 collection 中该文件的位图，清除该 chunk 位；若某 collection 不再包含任何分片则清理相应索引
                     try {
                         RSet<String> collections = redissonClient.getSet(RedisKeyConfig.fileHashKey(fileId));
@@ -242,11 +256,9 @@ public class MilvusAclManager {
     }
 
     public void deleteNoAclFileChunk(String fileId, Long chunkId) {
-        fileId = fileId.replace("\"", "\\\"").replace("'", "''");
         // 构建
-        String expr = String.format(
-                "(metadata[\"fileId\"] == \"%s\" AND metadata['chunkId'] == %s)",
-                fileId, chunkId);
+        String expectedId = fileId + ":" + String.format("%06d", chunkId);
+        String expr = String.format("doc_id == \"%s\"", expectedId);
         milvusClient.delete(DeleteParam.newBuilder()
                 .withDatabaseName(databaseName)
                 .withCollectionName(physicalCollectionName)
@@ -284,14 +296,12 @@ public class MilvusAclManager {
         if (documents == null || documents.isEmpty()) return;
         Long userId = LoginUserInfoManager.getUserId();
         Document firstDoc = documents.getFirst();
-        String fileId = firstDoc.getMetadata().get("fileId").toString();
+        String docId = firstDoc.getId();
+        String fileId = docId.substring(0, docId.lastIndexOf(":"));
         long chunkSize = Long.parseLong(firstDoc.getMetadata().get("chunkSize").toString());
 
         List<Long> chunkIds = documents.stream()
-                .map(doc -> doc.getMetadata().get("chunkId"))
-                .filter(Objects::nonNull)
-                .map(Object::toString)
-                .map(Long::parseLong)
+                .map(doc -> Long.parseLong(doc.getId().substring(doc.getId().lastIndexOf(":") + 1)))
                 .toList();
 
         setUserFileChunks(userId, fileId, chunkIds, chunkSize);
@@ -361,6 +371,7 @@ public class MilvusAclManager {
             if (Boolean.TRUE.equals(exists)) return true;
 
             stringRedisTemplate.opsForSet().add(loadKey, collectionName);
+            localCache.invalidate("user:fileIdSet:" + userId);
             return true;
         } catch (Exception e) {
             log.error("moveCollectionToLoaded failed", e);
@@ -384,6 +395,7 @@ public class MilvusAclManager {
             if (Boolean.TRUE.equals(exists)) return true;
 
             stringRedisTemplate.opsForSet().add(unloadKey, collectionName);
+            localCache.invalidate("user:fileIdSet:" + userId);
             return true;
         } catch (Exception e) {
             log.error("moveCollectionToUnloaded failed", e);

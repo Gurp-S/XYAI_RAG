@@ -1,26 +1,28 @@
 package com.XYai.myai.rag.milvus;
 
+import com.XYai.myai.commonUtils.redis.RedisKeyConfig;
 import com.XYai.myai.config.Result;
-import com.XYai.myai.rag.etlpipeline.pojo.SkipFileInfo;
 import com.XYai.myai.rag.etlpipeline.UploadTaskStore;
-import com.XYai.myai.redis.RedisKeyConfig;
+import com.XYai.myai.rag.etlpipeline.pojo.SkipFileInfo;
 import com.XYai.myai.user.LoginUserInfoManager;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.milvus.client.MilvusServiceClient;
-import io.milvus.grpc.QueryResults;
+import io.milvus.grpc.*;
 import io.milvus.param.R;
+import io.milvus.param.dml.DeleteParam;
+import io.milvus.param.dml.InsertParam;
 import io.milvus.param.dml.QueryParam;
+import io.milvus.param.dml.SearchParam;
 import io.milvus.response.QueryResultsWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.redisson.api.RBitSet;
 import org.redisson.api.RedissonClient;
-import org.springframework.ai.document.Document;
-import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,6 +31,7 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -42,17 +45,17 @@ public class MilvusFileManager {
     @Resource
     private UploadTaskStore uploadTaskStore;
     @Value("${spring.ai.vectorstore.milvus.collectionName:my_ai}")
-    private String physicalCollectionName;
+    private String defaultCollectionName;
     @Value("${spring.ai.vectorstore.milvus.databaseName:my_xy}")
     private String databaseName;
     @Resource
-    private MilvusServiceClient milvusClient;  // 统一使用 service client
-    @Resource
-    private VectorStore vectorStore;
+    private MilvusServiceClient milvusClient;
     @Resource
     private MilvusCollectionService milvusCollectionService;
     @Resource
     private MilvusMetadataFilter milvusMetadataFilter;
+    @Resource(name = "milvusExecutor")
+    private ThreadPoolTaskExecutor milvusExecutor;
 
     /**
      * 解析 Milvus 查询结果为 Map 列表，过滤掉 Google Gson 对象。
@@ -215,7 +218,7 @@ public class MilvusFileManager {
         }
 
         // 构建查询表达式（使用 OR 连接多个文件分块条件）
-        String expr =  buildFileChunkExpr(fileChunkIds);
+        String expr = buildFileChunkExpr(fileChunkIds);
         if (expr == null || expr.isBlank()) {
             return Collections.emptyList();
         }
@@ -225,7 +228,7 @@ public class MilvusFileManager {
 
         QueryParam queryParam = QueryParam.newBuilder()
                 .withDatabaseName(databaseName)
-                .withCollectionName(physicalCollectionName)
+                .withCollectionName(defaultCollectionName)
                 .withExpr(expr)
                 .withOutFields(Arrays.asList("doc_id", "content", "metadata"))
                 .build();
@@ -274,16 +277,16 @@ public class MilvusFileManager {
     // 从 doc_id 中提取 fileId（例如 "abc-000001" → "abc"）
     private String extractFileIdFromDocId(Map<String, Object> m) {
         String docId = (String) m.get("doc_id");
-        if (docId == null || !docId.contains("-")) return null;
-        return docId.substring(0, docId.lastIndexOf("-"));
+        if (docId == null || !docId.contains(":")) return null;
+        return docId.substring(0, docId.lastIndexOf(":"));
     }
 
     // 从 doc_id 中提取 chunkId 数值（例如 "abc-000001" → 1）
     private long extractChunkIdFromDocId(Map<String, Object> m) {
         String docId = (String) m.get("doc_id");
-        if (docId == null || !docId.contains("-")) return 0;
+        if (docId == null || !docId.contains(":")) return 0;
         try {
-            return Long.parseLong(docId.substring(docId.lastIndexOf("-") + 1));
+            return Long.parseLong(docId.substring(docId.lastIndexOf(":") + 1));
         } catch (NumberFormatException e) {
             return 0;
         }
@@ -320,15 +323,9 @@ public class MilvusFileManager {
             if (fc == null || !fc.contains(":")) continue;
             String[] parts = fc.split(":", 2);
             String fileId = parts[0];
-            String chunkId = parts[1];
-
-            // 转义单引号
-            String escFid = fileId.replace("'", "\\'");
-            String escCid = chunkId.replace("'", "\\'");
-            clauses.add(String.format(
-                    "(metadata[\"fileId\"] == '%s' AND metadata[\"chunkId\"] == %s)",
-                    escFid, escCid)
-            );
+            String chunkId = String.format("%06d", Integer.parseInt(parts[1]));
+            String docId = fileId + ":" + chunkId;
+            clauses.add(String.format("doc_id == '%s'", docId.replace("'", "\\'")));
         }
         return clauses.isEmpty() ? null : "(" + String.join(" OR ", clauses) + ")";
     }
@@ -426,11 +423,30 @@ public class MilvusFileManager {
         log.info("分享文件权限: userId={} fileId={} chunks={}", userId, fileId, chunkIds.size());
     }
 
-    public Result<String> updateFileChunk(String fileId,int chunkId,Map<String, Object> fileInfo){
-        Long userId = LoginUserInfoManager.getUserId();
-
-
-
+    public Result<String> updateFileChunk(String docId, String content) {
+        // 删除旧数据
+        String[] split = docId.split(":");
+        String fileId = split[0];
+        Long chunkId = Long.valueOf(split[1]);
+        deleteDocument(chunkId,fileId);
+        // 插入管道
         return Result.success();
+    }
+
+    public List<Map<String, Object>> getUserFiles() {
+        List<String> allCollectionNames = milvusCollectionService.getAllCollectionNames();
+        List<CompletableFuture<List<Map<String, Object>>>> futures = allCollectionNames.stream()
+                .map(collectionName ->
+                        CompletableFuture.supplyAsync(() -> {
+                            List<Map<String, Object>> files = getUserCollectionFiles(collectionName);
+                            return files.stream()
+                                    .map(original -> {
+                                        Map<String, Object> newMap = new HashMap<>(original);
+                                        newMap.put("collectionName", collectionName);
+                                        return newMap;
+                                    }).toList();
+                        }, milvusExecutor)
+                ).toList();
+        return futures.stream().map(CompletableFuture::join).flatMap(List::stream).toList();
     }
 }

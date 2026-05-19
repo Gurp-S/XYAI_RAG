@@ -16,96 +16,55 @@ import java.time.format.DateTimeFormatter;
 @Service
 public class TraceRecordServiceIml implements TraceRecordService {
 
+    // 定义日期时间格式
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     @Resource
     private TraceRecordMapper traceRecordMapper;
-
     @Resource
     private NodeRecordMapper nodeRecordMapper;
 
-    // 定义日期时间格式
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
     @Override
     public void startRun(String traceId, String name) {
-        try {
-            TraceRecord record = TraceRecord.builder()
-                    .traceId(traceId)
-                    .name(name)
-                    .startTime(LocalDateTime.now()) // 使用 LocalDateTime
-                    .status("RUNNING")
-                    .build();
-
-            long t1 = System.currentTimeMillis();
-            int result = traceRecordMapper.insert(record);
-        } catch (Exception e) {
-            log.error("[TRACE_DB] ⚠ startRun 插入失败! traceId={}, name='{}', error={}",
-                    traceId, name, e.getMessage(), e);
-        }
+        TraceRecord record = TraceRecord.builder()
+                .traceId(traceId)
+                .name(name)
+                .startTime(LocalDateTime.now())
+                .status("RUNNING")
+                .build();
+        traceRecordMapper.insert(record);
     }
 
     @Override
-    public void recordNode(String traceId, String nodeId, Object name, Object type, long costTime) {
-        try {
+    public void recordNode(String traceId, String nodeId, Object name, Object type) {
+        NodeRecord record = NodeRecord.builder()
+                .nodeId(nodeId)
+                .traceId(traceId)
+                .nodeName(name != null ? name.toString() : null)
+                .nodeType(type != null ? type.toString() : null)
+                .startTime(LocalDateTime.now())
+                .status("RUNNING")
+                .build();
+        nodeRecordMapper.insert(record);
+    }
 
-            NodeRecord record = NodeRecord.builder()
-                    .nodeId(nodeId)
-                    .traceId(traceId)
-                    .nodeName(name != null ? name.toString() : null)
-                    .nodeType(type != null ? type.toString() : null)
-                    .costTime(costTime)
-                    .status("SUCCESS")
-                    .build();
 
-            long t1 = System.currentTimeMillis();
-            int result = nodeRecordMapper.updateById(record);
-
-        } catch (Exception e) {
-            log.error("[TRACE_DB] ⚠ recordNode 插入失败! traceId={}, nodeId={}, error={}",
-                    traceId, nodeId, e.getMessage(), e);
-        }
+    @Override
+    public void updateNode(String traceId, String nodeId, Object name, Object type, long costTime) {
+        nodeRecordMapper.updateNodeStatus(nodeId, "SUCCESS", LocalDateTime.now(), costTime, null);
     }
 
     @Override
     public void recordNodeError(String traceId, String nodeId, String message) {
-        try {
-            log.info("[TRACE_DB] >>> recordNodeError: traceId={}, nodeId={}, error='{}'",
-                    traceId, nodeId, message);
+        nodeRecordMapper.updateNodeStatus(nodeId, "ERROR", LocalDateTime.now(), null, message);
+    }
 
-            NodeRecord record = new NodeRecord();
-            record.setNodeId(nodeId);
-            record.setTraceId(traceId);
-            record.setStatus("ERROR");
-            record.setErrorMessage(message);
-
-            long t1 = System.currentTimeMillis();
-            int result = nodeRecordMapper.updateById(record);
-            log.info("[TRACE_DB] <<< recordNodeError 更新完成, result={}, traceId={}, 耗时={}ms",
-                    result, traceId, System.currentTimeMillis() - t1);
-
-        } catch (Exception e) {
-            log.error("[TRACE_DB] ⚠ recordNodeError 更新失败! traceId={}, nodeId={}, error={}",
-                    traceId, nodeId, e.getMessage(), e);
-        }
+    @Override
+    public void finishRun(String traceId, long coseTime) {
+        traceRecordMapper.updateByTraceId(traceId, "SUCCESS", LocalDateTime.now(), coseTime, null);
     }
 
     @Override
     public void recordError(String traceId, String message) {
-        try {
-            log.info("[TRACE_DB] >>> recordError: traceId={}, error='{}'", traceId, message);
-
-            TraceRecord record = new TraceRecord();
-            record.setTraceId(traceId);
-            record.setStatus("ERROR");
-            record.setErrorMessage(message);
-
-            long t1 = System.currentTimeMillis();
-            int result = traceRecordMapper.updateById(record);
-            log.info("[TRACE_DB] <<< recordError 更新完成, result={}, traceId={}, 耗时={}ms",
-                    result, traceId, System.currentTimeMillis() - t1);
-
-        } catch (Exception e) {
-            log.error("[TRACE_DB] ⚠ recordError 更新失败! traceId={}, error={}",
-                    traceId, e.getMessage(), e);
-        }
+        traceRecordMapper.updateByTraceId(traceId, "ERROR", LocalDateTime.now(), null, message);
     }
 }

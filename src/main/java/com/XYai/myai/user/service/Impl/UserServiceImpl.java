@@ -1,5 +1,6 @@
 package com.XYai.myai.user.service.Impl;
 
+import com.XYai.myai.commonUtils.redis.RedisKeyConfig;
 import com.XYai.myai.config.Result;
 import com.XYai.myai.mapper.ChatConversationMapper;
 import com.XYai.myai.mapper.ChatSessionRecordMapper;
@@ -7,8 +8,8 @@ import com.XYai.myai.mapper.GroupMapper;
 import com.XYai.myai.mapper.UserMapper;
 import com.XYai.myai.rag.memory.pojo.ChatConversation;
 import com.XYai.myai.rag.memory.pojo.ChatSessionRecord;
-import com.XYai.myai.redis.RedisKeyConfig;
 import com.XYai.myai.security.JwtUtil;
+import com.XYai.myai.security.model.SecurityUser;
 import com.XYai.myai.security.pojo.JwtProperties;
 import com.XYai.myai.security.service.JwtService;
 import com.XYai.myai.user.LoginUserInfoManager;
@@ -29,10 +30,10 @@ import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -53,9 +54,9 @@ public class UserServiceImpl implements UserService {
     @Resource
     private ChatConversationMapper chatConversationMapper;
     @Resource
-    private StringRedisTemplate stringRedisTemplate;
-    @Resource
     private RedissonClient redissonClient;
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
     @Resource
     private PasswordEncoder passwordEncoder;
     @Resource
@@ -68,11 +69,6 @@ public class UserServiceImpl implements UserService {
     private JwtProperties jwtProperties;
 
     /**
-     * 查询对话内容（会话内的消息）
-     * /** 获取好友
-     */
-
-    /**
      * 查询会话内的消息记录 - 基于游标（时间戳）的懒加载
      *
      * @param conversationId 会话ID
@@ -80,14 +76,14 @@ public class UserServiceImpl implements UserService {
      * @param limit
      * @return 消息列表（按时间升序）
      */
-    public Result<List<ChatConversation>> conversationHistory(String conversationId, LocalDateTime cursor, int limit) {
+    public Result<List<ChatConversation>> conversationHistory(String conversationId, String cursor, int limit) {
         log.info("查询对话数据，conversationId: {}, cursor: {}, limit: {}", conversationId, cursor, limit);
         if (conversationId == null || conversationId.isBlank()) {
             return Result.error(404, "会话无记录");
         }
         int pageSize = limit < 1 ? 20 : Math.min(limit, 100);
 
-        // 首次加载：没有游标，返回最新的 pageSize 条消息
+        // 首次加载：无游标，返回最新的 pageSize 条消息
         if (cursor == null) {
             LambdaQueryWrapper<ChatConversation> descWrapper = new LambdaQueryWrapper<ChatConversation>()
                     .select(ChatConversation::getChatMessageId,
@@ -97,18 +93,18 @@ public class UserServiceImpl implements UserService {
                             ChatConversation::getCreatedAt,
                             ChatConversation::getFeedback)
                     .eq(ChatConversation::getConversationId, conversationId)
-                    .orderByDesc(ChatConversation::getCreatedAt)
+                    .orderByDesc(ChatConversation::getChatMessageId)   // 主键降序 = 最新消息在前
                     .last("limit " + pageSize);
             List<ChatConversation> descRecords = chatConversationMapper.selectList(descWrapper);
             if (descRecords == null) {
                 descRecords = Collections.emptyList();
             } else {
-                Collections.reverse(descRecords); // 反转成升序，方便前端按时间顺序渲染
+                Collections.reverse(descRecords); // 反转成升序，方便前端按顺序渲染
             }
             return Result.success(descRecords);
         }
 
-        // 有游标：加载比 cursor 更早的消息（向上滚动历史）
+        // 有游标：加载比 cursor 更早的消息（chatMessageId 更小）
         LambdaQueryWrapper<ChatConversation> queryWrapper = new LambdaQueryWrapper<ChatConversation>()
                 .select(ChatConversation::getChatMessageId,
                         ChatConversation::getConversationId,
@@ -117,31 +113,16 @@ public class UserServiceImpl implements UserService {
                         ChatConversation::getCreatedAt,
                         ChatConversation::getFeedback)
                 .eq(ChatConversation::getConversationId, conversationId)
-                .lt(ChatConversation::getCreatedAt, cursor)
-                .orderByAsc(ChatConversation::getCreatedAt)
+                .lt(ChatConversation::getChatMessageId, cursor)    // 主键小于当前游标
+                .orderByAsc(ChatConversation::getChatMessageId)    // 升序，获取更早的消息
                 .last("limit " + pageSize);
 
         List<ChatConversation> records = chatConversationMapper.selectList(queryWrapper);
         if (records == null) {
             records = Collections.emptyList();
         }
-        // 异步更新摘要（保留原有注释逻辑）
-        // setSummary(conversationId);
         return Result.success(records);
     }
-
-//    private void setSummary(String conversationId) {
-//        CompletableFuture.runAsync(() -> {
-//            // TODO: 将会话摘要逻辑实现进来（或调用 ConversationMemorySummaryService）
-//            ChatSessionRecord chatSessionRecord = chatSessionRecordMapper.selectById(conversationId);
-//            if (chatSessionRecord == null) {
-//                return;
-//            }
-//            Long userId = LoginUserInfoManager.get().getId();
-//            String summaryKey = RedisKeyConfig.userSummaryRecord(userId,conversationId);
-//            stringRedisTemplate.opsForValue().set(summaryKey, chatSessionRecord.getSummaryText());
-//        });
-//    }
 
     /**
      * 用户登出
@@ -155,14 +136,18 @@ public class UserServiceImpl implements UserService {
             return Result.success("登出成功");
         }
 
-        Long userId = user.getId(); // 或从 SecurityContext 取
+        Long userId = user.getId();
         // 1.撤销此用户所有 refresh tokens
         refreshTokenService.revokeAllForUser(userId);
         // 2.cookie 已在前面统一清除
-        // 3.TODO把当前 access 的 jti 写入 Redis 黑名单（需要前端把 jti 传回或从 token 解析）
-
-        // String jti = jwtService.getJti(currentAccessToken);
-        // redis.opsForValue().set("jwt:blacklist:"+jti, "1", TTL)
+        // 3.把当前 access token 的 jti 写入 Redis 黑名单，TTL 对齐 token 剩余有效期
+        String jti = LoginUserInfoManager.getJti();
+        if (jti != null && !jti.isBlank()) {
+            long expEpoch = LoginUserInfoManager.getTokenExp();
+            long nowEpoch = System.currentTimeMillis() / 1000;
+            long remainingSec = expEpoch > nowEpoch ? expEpoch - nowEpoch : 60;
+            stringRedisTemplate.opsForValue().set("jwt:blacklist:" + jti, "1", Duration.ofSeconds(remainingSec));
+        }
         // 4. 设置用户状态
         user.setStatus(false);
         userMapper.updateById(user);
@@ -201,10 +186,10 @@ public class UserServiceImpl implements UserService {
             return Result.error(400, "密码错误");
         }
 
-        // 2. 生成 jti 和 access token（先通过 CustomUserDetailsService 构造 UserDetails）
-        UserDetails ud = customUserDetailsService.loadUserByUsername(String.valueOf(userId));
+        // 2. 生成 jti 和 access token（先通过 CustomUserDetailsService 构造 SecurityUser）
+        SecurityUser su = (SecurityUser) customUserDetailsService.loadUserByUsername(String.valueOf(userId));
         String jti = UUID.randomUUID().toString();
-        String accessToken = jwtService.generateAccessToken(ud, jti);
+        String accessToken = jwtService.generateAccessToken(su, jti);
         // 3. 生成 refresh token 原文，并在服务端存储其哈希
         String refreshToken = refreshTokenService.generateSecureRandomToken();
         String hashRefreshToken = refreshTokenService.hashTokenSHA256(refreshToken);
@@ -398,9 +383,8 @@ public class UserServiceImpl implements UserService {
 
         // 生成新的 access token（新的 jti）
         String jti = UUID.randomUUID().toString();
-        // 加载 UserDetails 用于构建 token（不要将 domain User 强转为 UserDetails）
-        UserDetails ud = customUserDetailsService.loadUserByUsername(String.valueOf(userId));
-        String newAccessToken = jwtService.generateAccessToken(ud, jti);
+        SecurityUser su = (SecurityUser) customUserDetailsService.loadUserByUsername(String.valueOf(userId));
+        String newAccessToken = jwtService.generateAccessToken(su, jti);
 
         // 可选但推荐：旋转 refresh token（生成新的 refresh 并撤销旧的）
         String newRefresh = refreshTokenService.generateSecureRandomToken();

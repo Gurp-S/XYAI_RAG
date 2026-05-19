@@ -1,5 +1,6 @@
 package com.XYai.myai.rag.etlpipeline;
 
+import com.XYai.myai.rag.etlpipeline.pojo.TaskState;
 import com.XYai.myai.rag.milvus.MilvusCollectionService;
 import com.alibaba.fastjson2.JSON;
 import jakarta.annotation.Resource;
@@ -17,12 +18,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class UploadTaskStore {
 
-    private static final String TASK_KEY_PREFIX = "UploadTask:";
     private static final String REDIS_TASK_MAP = "xyai:upload:tasks";
     @Resource
     private RedissonClient redissonClient;
     @Autowired(required = false)
-    private MilvusCollectionService milvusCollectionService;
 
     public TaskState start(String taskId) {
         TaskState state = TaskState.builder()
@@ -197,23 +196,5 @@ public class UploadTaskStore {
             case "copy" -> 70;
             default -> 10;
         };
-    }
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class TaskState {
-        private String taskId;
-        private String status;
-        private String currentNodeType;
-        private String nodeLabel;
-        private String message;
-        private String displayText;
-        private String eventType;
-        private Integer progress;
-        private Long startTime;
-        private Long endTime;
-        private String errorMessage;
     }
 }

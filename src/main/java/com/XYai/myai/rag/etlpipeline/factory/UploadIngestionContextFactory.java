@@ -101,7 +101,7 @@ public class UploadIngestionContextFactory {
         metadata.put(IngestionContext.META_FILE_NAME, fileName == null ? sourceUri : fileName);
         metadata.put(IngestionContext.META_FILE_SIZE, fileSize);
         metadata.put(IngestionContext.META_FILE_CONTENT_TYPE, mimeType);
-        metadata.put(IngestionContext.META_COPY_CHUNK, copyChunks);
+        metadata.put(IngestionContext.META_SKIP_CHUNK, copyChunks);
         metadata.put(IngestionContext.META_TIME_CREATE,
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 

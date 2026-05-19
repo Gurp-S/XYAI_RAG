@@ -1,8 +1,9 @@
 package com.XYai.myai.security.config;
 
-import com.XYai.myai.security.filter.JwtAuthenticationFilter;
+import com.XYai.myai.security.filter.LoginUserInfoFilter;
 import com.XYai.myai.security.handler.CustomAccessDeniedHandler;
-import jakarta.annotation.Resource;
+import com.XYai.myai.security.handler.CustomAuthenticationEntryPoint;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,54 +14,82 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
+import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.context.DelegatingSecurityContextRepository;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
+
+import java.util.Set;
 
 @Configuration
-/**
- * Spring Security 配置类：
- *
- * 主要职责：
- * - 配置安全过滤链（SecurityFilterChain），使用无状态的会话策略（STATELESS）适配 JWT；
- * - 配置哪些路径无需认证（如登录 /user/login、刷新 /user/refresh、静态资源等）；
- * - 将自定义的 `JwtAuthenticationFilter` 插入到 UsernamePasswordAuthenticationFilter
- * 之前，
- * 以便在请求到达 Controller 之前完成基于 JWT 的认证与 SecurityContext 的设置。
- */
 @Slf4j
 public class SecurityConfig {
-    @Resource
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    private static final Set<String> PUBLIC_PATHS = Set.of(
+            "/user/login", "/user/registry", "/user/reset-password", "/user/refresh",
+            "/static", "/public", "/error","/xyAdmin/**");
+
+    private final JwtDecoder jwtDecoder;
+
+    public SecurityConfig(JwtDecoder jwtDecoder) {
+        this.jwtDecoder = jwtDecoder;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // 使用 lambda DSL 保持与 Spring Security 6.x 的兼容性
+        CustomAuthenticationEntryPoint entryPoint = new CustomAuthenticationEntryPoint();
+
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .securityContext(securityContext -> securityContext
-                        .securityContextRepository(new DelegatingSecurityContextRepository(
-                                new RequestAttributeSecurityContextRepository(),
-                                new HttpSessionSecurityContextRepository()
-                        ))
-                )
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .bearerTokenResolver(publicPathAwareBearerTokenResolver())
+                        .jwt(jwt -> jwt
+                                .decoder(jwtDecoder)
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                        .authenticationEntryPoint(entryPoint))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/user/login", "/user/registry", "/user/reset-password", "/user/refresh",
-                                "/static/**", "/public/**", "/error")
+                        .requestMatchers(PUBLIC_PATHS.toArray(new String[0]))
                         .permitAll()
-                        .anyRequest().authenticated());
-
-        // 然后再注册 JWT 认证过滤器，负责正常业务认证
-        log.info("jwt验证");
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-        // 使用自定义的 AccessDeniedHandler，避免在 response 已经被提交时尝试 forward/redirect 导致二次提交错误
-        http.exceptionHandling(ex -> ex.accessDeniedHandler(new CustomAccessDeniedHandler()));
+                        .anyRequest().authenticated())
+                .addFilterAfter(loginUserInfoFilter(), BearerTokenAuthenticationFilter.class)
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(entryPoint)
+                        .accessDeniedHandler(new CustomAccessDeniedHandler()));
 
         return http.build();
+    }
+
+    private BearerTokenResolver publicPathAwareBearerTokenResolver() {
+        DefaultBearerTokenResolver defaultResolver = new DefaultBearerTokenResolver();
+        return (HttpServletRequest request) -> {
+            String path = request.getRequestURI();
+            for (String pub : PUBLIC_PATHS) {
+                if (path.startsWith(pub)) {
+                    return null;
+                }
+            }
+            return defaultResolver.resolve(request);
+        };
+    }
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
+        grantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
+        return converter;
+    }
+
+    @Bean
+    public LoginUserInfoFilter loginUserInfoFilter() {
+        return new LoginUserInfoFilter();
     }
 
     @Bean

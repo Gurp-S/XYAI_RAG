@@ -51,7 +51,7 @@ public interface UserService {
      * @param limit
      * @return 会话内消息列表
      */
-    Result<List<ChatConversation>> conversationHistory(String conversationId, LocalDateTime cursor, int limit);
+    Result<List<ChatConversation>> conversationHistory(String conversationId, String cursor, int limit);
 
     void register(UserDTO userDTO);
 

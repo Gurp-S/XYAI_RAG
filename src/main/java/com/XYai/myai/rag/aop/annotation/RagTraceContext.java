@@ -2,6 +2,7 @@ package com.XYai.myai.rag.aop.annotation;
 
 import com.alibaba.ttl.TransmittableThreadLocal;
 
+import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.LinkedList;
 
@@ -14,7 +15,7 @@ public class RagTraceContext {
 
     // 使用 TransmittableThreadLocal 确保跨线程传递
     private static final ThreadLocal<String> TRACE_ID_HOLDER = new TransmittableThreadLocal<>();
-    private static final ThreadLocal<Deque<String>> NODE_STACK = new TransmittableThreadLocal<>();
+    private static final ThreadLocal<Deque<String>> NODE_STACK = ThreadLocal.withInitial(ArrayDeque::new);
 
     public static void clear() {
         // 清除由当前线程保存的 TRACE_ID_HOLDER 和 NODE_STACK 的内容，调用 remove() 防止内存泄露
@@ -49,11 +50,12 @@ public class RagTraceContext {
         }
     }
 
-    public static String getCurrentNodeId() {
-        Deque<String> nodes = NODE_STACK.get();
-        if (nodes != null && !nodes.isEmpty()) {
-            return nodes.peek();
-        }
-        return null;
+    public static Deque<String> getNodeStackSnapshot() {
+        return new ArrayDeque<>(NODE_STACK.get());
+    }
+
+    public static void restoreNodeStack(Deque<String> snapshot) {
+        NODE_STACK.remove();
+        NODE_STACK.set(snapshot);
     }
 }

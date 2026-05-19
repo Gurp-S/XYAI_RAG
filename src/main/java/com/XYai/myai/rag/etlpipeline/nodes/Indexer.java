@@ -1,13 +1,15 @@
 package com.XYai.myai.rag.etlpipeline.nodes;
 
+import com.XYai.myai.mapper.FileRecordMapper;
 import com.XYai.myai.rag.aop.annotation.RagTraceNode;
 import com.XYai.myai.rag.etlpipeline.pojo.IngestionContext;
 import com.XYai.myai.rag.etlpipeline.pojo.NodeConfig;
 import com.XYai.myai.rag.etlpipeline.pojo.NodeResult;
 import com.XYai.myai.rag.etlpipeline.pojo.UploadProperties;
+import com.XYai.myai.rag.graph.Neo4jKnowledgeGraphService;
 import com.XYai.myai.rag.milvus.MilvusAclManager;
 import com.XYai.myai.rag.milvus.MilvusMetadataFilter;
-import com.XYai.myai.rag.milvus.pojo.MilvusMetadata;
+import com.XYai.myai.rag.milvus.pojo.FileRecord;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.JsonObject;
 import io.milvus.client.MilvusServiceClient;
@@ -43,6 +45,12 @@ public class Indexer implements Ingestion {
     @Resource
     private EmbeddingModel embeddingModel;
 
+    @Resource
+    private FileRecordMapper fileRecordMapper;
+
+    @Resource
+    private Neo4jKnowledgeGraphService neo4jService;
+
     @Value("${spring.ai.vectorstore.milvus.collectionName:my_ai}")
     private String defaultCollectionName;
 
@@ -76,18 +84,17 @@ public class Indexer implements Ingestion {
                 return NodeResult.fail("当前用户无权限写入集合: " + collectionName);
             }
 
-            // 注意：不再在此处调用 milvusMetadataFilter.filter(chunks)
-            // 过滤逻辑移至 processChunk 内部，以确保 hypothetical_questions 不被误删
-
             try {
                 batchInsertWithParallelEmbedding(chunks);
             } catch (Exception e) {
-                throw new RuntimeException("插入Milvus失败", e);
-            } finally {
-                // 权限仍然基于原始 chunks 进行写入
-                milvusAclManager.addFileUserACl(chunks, collectionName);
+                log.info("插入Milvus失败 docId:{}", context.getDocument().getId());
+                return NodeResult.fail("插入Milvus失败");
             }
-
+            // 文件记录
+            saveFileRecord(chunks);
+            // 权限写入
+            milvusAclManager.addFileUserACl(chunks, collectionName);
+            CompletableFuture.runAsync(() -> neo4jService.triggerCommunityMaintenanceIfNeeded(), executor);
             log.info("向量入库成功 → 集合名: {}, 分块数量: {}", collectionName, chunks.size());
             return NodeResult.ok("向量入库完成，集合名=" + collectionName + "，分块数量=" + chunks.size());
         } catch (Exception e) {
@@ -96,10 +103,57 @@ public class Indexer implements Ingestion {
         }
     }
 
+    private void saveFileRecord(List<Document> chunks) {
+        if (chunks == null || chunks.isEmpty()) {
+            return;
+        }
+
+        // 1. 提取去重后的文件ID
+        Map<String, String> distinctFiles = new LinkedHashMap<>();
+        for (Document chunk : chunks) {
+            String chunkId = chunk.getId();
+            if (!StringUtils.hasText(chunkId)) continue;
+            if (!distinctFiles.containsKey(chunkId)) {
+                Object fileNameObj = chunk.getMetadata().get(IngestionContext.META_FILE_NAME);
+                String fileName = fileNameObj != null ? fileNameObj.toString() : "";
+                distinctFiles.put(chunkId, fileName);
+            }
+        }
+
+        if (distinctFiles.isEmpty()) {
+            return;
+        }
+
+        // 3. 构建待插入记录
+        List<FileRecord> toInsert = new ArrayList<>();
+        for (Map.Entry<String, String> entry : distinctFiles.entrySet()) {
+            FileRecord record = new FileRecord();
+            record.setFileChunkId(entry.getKey());
+            record.setFileName(entry.getValue());
+            record.setFileUsingCount(0L);
+            toInsert.add(record);
+        }
+
+        // 4. 批量插入
+        try {
+            fileRecordMapper.insert(toInsert);
+            log.info("新增文件记录 {} 条", toInsert.size());
+        } catch (Exception e) {
+            log.error("批量插入文件记录失败，受影响条数：{}", toInsert.size(), e);
+        }
+    }
+
     private void batchInsertWithParallelEmbedding(List<Document> chunks) {
         try {
             List<CompletableFuture<Map<String, Object>>> futures = chunks.stream()
-                    .map(chunk -> CompletableFuture.supplyAsync(() -> processChunk(chunk), executor))
+                    .map(chunk -> CompletableFuture.supplyAsync(() -> {
+                        try {
+                            return processChunk(chunk);
+                        } catch (Exception e) {
+                            log.error("chunk {} embedding 失败，已跳过", chunk.getId(), e);
+                            return null;
+                        }
+                    }, executor))
                     .toList();
 
             List<Map<String, Object>> insertDataList = futures.stream()
@@ -108,27 +162,34 @@ public class Indexer implements Ingestion {
 
             List<String> docIds = new ArrayList<>();
             List<String> contents = new ArrayList<>();
-            List<List<Float>> embeddings = new ArrayList<>();
+            List<List<Float>> contextEmbeddings = new ArrayList<>();
+            List<List<Float>> questionEmbeddings = new ArrayList<>();
             List<JsonObject> metadataList = new ArrayList<>();
 
             for (Map<String, Object> data : insertDataList) {
                 docIds.add((String) data.get("docId"));
                 contents.add((String) data.get("content"));
 
-                float[] arr = (float[]) data.get("embedding");
-                List<Float> vec = new ArrayList<>(arr.length);
-                for (float v : arr) {
-                    vec.add(v);
+                float[] contextVector = (float[]) data.get("embedding_context");
+                float[] questionVector = (float[]) data.get("embedding_question");
+                List<Float> cVec = new ArrayList<>(contextVector.length);
+                List<Float> qVec = new ArrayList<>(contextVector.length);
+                for (float v : contextVector) {
+                    cVec.add(v);
                 }
-                embeddings.add(vec);
-
+                for (float v : questionVector) {
+                    qVec.add(v);
+                }
+                contextEmbeddings.add(cVec);
+                questionEmbeddings.add(qVec);
                 metadataList.add((JsonObject) data.get("metadata"));
             }
 
             List<InsertParam.Field> fields = Arrays.asList(
                     new InsertParam.Field("doc_id", docIds),
                     new InsertParam.Field("content", contents),
-                    new InsertParam.Field("embedding", embeddings),
+                    new InsertParam.Field("embedding_context", contextEmbeddings),
+                    new InsertParam.Field("embedding_question", questionEmbeddings),
                     new InsertParam.Field("metadata", metadataList)
             );
 
@@ -150,32 +211,38 @@ public class Indexer implements Ingestion {
         String originalText = chunk.getText();
 
         // 1. 从原始 metadata 中提取 hypothetical_questions（过滤前取值）
-        String questions = (String) chunk.getMetadata().get("hypothetical_questions");
-        if (questions == null || questions.isBlank()) {
-            questions = originalText;   // 回退使用原文
+        Object questionObj = chunk.getMetadata().get("hypothetical_questions");
+        String question = questionObj.toString();
+        if (question == null || question.isBlank()) {
+            question = originalText;
         }
-        log.info("indexer processChunk 生成的问题: {}", questions);
+        log.info("indexer processChunk 生成的问题: {}", question);
 
-        // 2. 用问题文本生成向量（而非原文）
-        float[] vectorArray = embeddingModel.embed(questions);
 
-        // 3. 对 metadata 进行白名单过滤（保留业务字段，移除 hypothetical_questions 等）
+        // 2. 用问题文本和原文生成向量
+        float[] questionVector = null;
+        if (question != null) {
+            questionVector = embeddingModel.embed(question);
+        }
+        float[] contextVector = null;
+        if (originalText != null) {
+            contextVector = embeddingModel.embed(originalText);
+        }
+
+        // 3. 对 metadata 进行白名单
         Map<String, Object> rawMeta = new HashMap<>(chunk.getMetadata());
-        rawMeta.remove("hypothetical_questions");      // 不存入 Milvus
-        rawMeta.remove("knowledge_triples");           // 不存入 Milvus
+        rawMeta.remove("hypothetical_questions");
+        rawMeta.remove("knowledge_triples");
         Map<String, Object> filteredMeta = milvusMetadataFilter.filter(rawMeta);
 
-        // 4. 将过滤后的 metadata 转换为 Gson JsonObject（Milvus 要求）
+        // 4. 将过滤后的 metadata 转换为 Gson JsonObject
         JsonObject metadataJson = new JsonObject();
         filteredMeta.forEach((k, v) -> {
-            if (v instanceof String) {
-                metadataJson.addProperty(k, (String) v);
-            } else if (v instanceof Number) {
-                metadataJson.addProperty(k, (Number) v);
-            } else if (v instanceof Boolean) {
-                metadataJson.addProperty(k, (Boolean) v);
-            } else {
-                metadataJson.addProperty(k, v.toString());
+            switch (v) {
+                case String s -> metadataJson.addProperty(k, s);
+                case Number number -> metadataJson.addProperty(k, number);
+                case Boolean b -> metadataJson.addProperty(k, b);
+                default -> metadataJson.addProperty(k, v.toString());
             }
         });
 
@@ -183,7 +250,8 @@ public class Indexer implements Ingestion {
         Map<String, Object> result = new HashMap<>();
         result.put("docId", chunk.getId());
         result.put("content", originalText);
-        result.put("embedding", vectorArray);
+        result.put("embedding_context", contextVector);
+        result.put("embedding_question", questionVector);
         result.put("metadata", metadataJson);
         return result;
     }

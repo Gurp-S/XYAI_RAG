@@ -15,6 +15,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChatMessage {
     /**
+     * 消息ID，格式 conversationId:seqNo
+     */
+    String chatMessageId;
+
+    /**
      * 用户的原始输入消息
      */
     String userMessage;
@@ -28,4 +33,15 @@ public class ChatMessage {
      * 用户的唯一标识ID
      */
     Long userId;
+
+    /** Token 用量 */
+    Integer promptTokens;
+    Integer completionTokens;
+    Integer totalTokens;
+
+    /** 使用的模型名称 */
+    String modelName;
+
+    /** 耗时（毫秒） */
+    Long costMs;
 }

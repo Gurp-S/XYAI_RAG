@@ -14,23 +14,33 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpLoadAccumulator {
+
     /**
-     * 所有解析并分块后的 Document 列表，准备加入向量数据库或后续处理。
+     * 所有解析并分块后的 Document 列表
      */
+    @Builder.Default
     private List<Document> allChunks = new ArrayList<>();
 
     /**
-     * 上传到 OSS 后返回的 URL 列表，用于记录已成功上传的文件地址。
+     * 上传到 OSS 后返回的 URL 列表
      */
+    @Builder.Default
     private List<String> uploadedUrls = new ArrayList<>();
 
     /**
-     * 处理失败的文件名列表（或标识），用于返回给前端或日志记录。
+     * 处理失败的文件名列表
      */
+    @Builder.Default
     private List<String> failedFiles = new ArrayList<>();
 
     /**
-     * 本次请求的任务ID（traceId）。
+     * 本次请求的任务ID（traceId）
      */
     private String taskId;
+
+    /**
+     * OSS 上传失败的文件
+     */
+    @Builder.Default
+    private List<String> ossFailedFiles = new ArrayList<>();
 }

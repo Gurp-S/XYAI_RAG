@@ -22,20 +22,20 @@ spring:
   ai:
     openai:
       api-key: sk-37744335322d444d90d4111bd932837c
+  neo4j:
+    authentication:
+      username: neo4j
+      password: 727Gx724
 jwt:
   server:
-    # 监听所有 IPv6 地址（本地开发可设置为 :: 使服务在 IPv6 上可达），也可改为 0.0.0.0 监听 IPv4/IPv6
     address: "::"
   issuer: XYai
   access-token-exp-sec: 900
   refresh-token-exp-sec: 1209600
   refresh-cookie-name: refresh_token
-  header: Authorization
-  prefix: Bearer
   http-secure: false
-  # 下面使用你刚才放置的绝对路径
-  rsa-private-key-path: D:/lea/xyai/config/keys/private_pkcs8.pem
-  rsa-public-key-path: D:/lea/xyai/config/keys/public_x509.pem
+  rsa-private-key-path: file:D:/lea/xyai/config/keys/private_pkcs8.pem
+  rsa-public-key-path: file:D:/lea/xyai/config/keys/public_x509.pem
 tool:
   amap:
     api-key: daceb403e4a6c3d58c283d8a4db885eb

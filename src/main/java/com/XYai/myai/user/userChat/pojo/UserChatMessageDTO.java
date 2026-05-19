@@ -22,4 +22,5 @@ public class UserChatMessageDTO {
     String senderName;
     String content;
     long timestamp;
+    String status;
 }

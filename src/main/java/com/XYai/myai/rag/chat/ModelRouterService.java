@@ -1,7 +1,8 @@
 package com.XYai.myai.rag.chat;
 
-import org.springframework.stereotype.Service;
+import com.XYai.myai.rag.chat.pojo.StreamResult;
 import reactor.core.publisher.Flux;
+
 import java.util.Map;
 
 /**
@@ -41,7 +42,7 @@ public interface ModelRouterService {
      * @param sessionId 会话ID
      * @return 模型响应流
      */
-    Flux<String> routeStream(String prompt, String sessionId);
+    StreamResult routeStream(String prompt, String sessionId);
 
     /**
      * 指定首选模型流式调用（失败自动降级）
@@ -50,7 +51,7 @@ public interface ModelRouterService {
      * @param sessionId 会话ID
      * @return 模型响应流
      */
-    Flux<String> routeWithPreferredStream(String prompt, String preferredModel, String sessionId);
+    StreamResult routeWithPreferredStream(String prompt, String preferredModel, String sessionId);
 
     /**
      * 快速模式流式调用（并发调用，取最快响应）
@@ -58,7 +59,7 @@ public interface ModelRouterService {
      * @param sessionId 会话ID
      * @return 模型响应流
      */
-    Flux<String> routeFastStream(String prompt, String sessionId);
+    StreamResult routeFastStream(String prompt, String sessionId);
 
     /**
      * 获取所有模型的健康状态

@@ -1,20 +1,34 @@
 package com.XYai.myai.rag.intent.pojo;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+@Builder
 @Data
 @NoArgsConstructor
 @Component
-@ConfigurationProperties(prefix = "intent")
+@AllArgsConstructor
 public class IntentProperties {
-    Boolean updateIntentEnabled;    //是否启用摘要压缩功能，开发环境关闭便于调试历史消息
-    Boolean intentEnabled;    //是否启用摘要压缩功能，开发环境关闭便于调试历史消息
-    Boolean DBEnabled;    //是否启用摘要压缩功能，开发环境关闭便于调试历史消息
-    Boolean redisEnabled;    //是否启用摘要压缩功能，开发环境关闭便于调试历史消息
-    Boolean vectorEnabled;    //是否启用摘要压缩功能，开发环境关闭便于调试历史消息
-    Boolean cacheTreeToRedisEnabled;
-}
 
+    @Builder.Default
+    private Boolean updateIntentEnabled = true;
+
+    @Builder.Default
+    private Boolean intentEnabled = true;
+
+    @Builder.Default
+    private Boolean DBEnabled =true;
+
+    @Builder.Default
+    private Boolean redisEnabled= true;
+
+    @Builder.Default
+    private Boolean vectorEnabled = true;
+
+    @Builder.Default
+    private Boolean cacheTreeToRedisEnabled = true;
+}

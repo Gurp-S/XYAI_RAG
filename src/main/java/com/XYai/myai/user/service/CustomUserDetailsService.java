@@ -1,16 +1,14 @@
 package com.XYai.myai.user.service;
 
 import com.XYai.myai.mapper.UserMapper;
+import com.XYai.myai.security.model.SecurityUser;
 import com.XYai.myai.user.pojo.User;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.annotation.Resource;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -35,14 +33,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (user == null)
             throw new UsernameNotFoundException("User not found: " + username);
 
-        boolean enabled = user.getStatus() == null || user.getStatus();
-        List<SimpleGrantedAuthority> auths = List.of(new SimpleGrantedAuthority("ROLE_USER"));
-
-        return org.springframework.security.core.userdetails.User
-                .withUsername(String.valueOf(user.getId()))
-                .password(user.getPassword())
-                .authorities(auths)
-                .disabled(!enabled)
-                .build();
+        return new SecurityUser(user);
     }
 }

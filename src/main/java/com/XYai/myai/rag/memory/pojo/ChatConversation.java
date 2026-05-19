@@ -36,6 +36,22 @@ public class ChatConversation {
     @TableField("created_at")
     private LocalDateTime createdAt;
 
-    @TableField("`feedback`")    // 避免 MySQL 关键字冲突
-    private Integer feedback;    // 1-点赞，0-点踩
+    @TableField("`feedback`") // 避免 MySQL 关键字冲突
+    private Integer feedback; // 1-点赞，0-点踩
+
+    /** Token 追踪字段 */
+    @TableField("prompt_tokens")
+    private Integer promptTokens;
+
+    @TableField("completion_tokens")
+    private Integer completionTokens;
+
+    @TableField("total_tokens")
+    private Integer totalTokens;
+
+    @TableField("model_name")
+    private String modelName;
+
+    @TableField("cost_ms")
+    private Long costMs;
 }

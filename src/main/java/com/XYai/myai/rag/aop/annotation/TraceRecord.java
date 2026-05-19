@@ -1,12 +1,13 @@
 package com.XYai.myai.rag.aop.annotation;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.time.LocalDateTime;
 
@@ -35,4 +36,9 @@ public class TraceRecord {
 
     /** 错误消息（若发生异常） */
     private String errorMessage;
+
+    @TableField("cost_time")
+    private long coseTime;
+
+    private LocalDateTime endTime;
 }

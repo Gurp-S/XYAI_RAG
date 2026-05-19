@@ -150,7 +150,7 @@ public class OssServiceImpl implements OssService {
 
     private String buildUrl(String objectKey) {
         // 使用 OssConfig 中的 endpoint 构建 URL
-        String endpointHost = Optional.ofNullable(ossConfig.getEndpoint()).orElse("oss-cn-XXXX.aliyuncs.com");
+        String endpointHost = ossConfig.getEndpoint();
         return String.format("https://%s.%s/%s", bucket, endpointHost, objectKey);
     }
 

@@ -3,9 +3,9 @@ package com.XYai.myai.rag.etlpipeline.oss;
 import cn.hutool.core.util.IdUtil;
 import com.XYai.myai.config.OssConfig;
 import com.XYai.myai.config.Result;
+import com.XYai.myai.rag.etlpipeline.IngestionEngine;
 import com.XYai.myai.rag.etlpipeline.factory.PipelineDefinitionFactory;
 import com.XYai.myai.rag.etlpipeline.factory.UploadIngestionContextFactory;
-import com.XYai.myai.rag.etlpipeline.IngestionEngine;
 import com.XYai.myai.rag.etlpipeline.pojo.IngestionContext;
 import com.XYai.myai.user.LoginUserInfoManager;
 import com.XYai.myai.user.pojo.User;
@@ -190,7 +190,4 @@ public class OssController {
             return Result.error(500, "生成 presigned URL 失败: " + ex.getMessage());
         }
     }
-
-    // 注意：生产推荐不要使用 policy 签名长期方案，而是用 STS（临时凭证）
-    // 你可实现另一个接口 /oss/sts 来返回临时凭证（AssumeRole），前端用这些临时凭证和 OSS SDK 直接上传。
 }

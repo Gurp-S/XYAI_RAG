@@ -34,6 +34,7 @@
         <spring-ai.version>1.0.0</spring-ai.version>
         <mybatis-plus.version>3.5.7</mybatis-plus.version>
         <tika.version>3.0.0</tika.version>
+        <lettuce.version>6.3.0.RELEASE</lettuce.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -76,12 +77,6 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-config</artifactId>
         </dependency>
-        <!-- RedisGraph 客户端（基于 Lettuce） -->
-        <dependency>
-            <groupId>com.redis</groupId>
-            <artifactId>lettucemod</artifactId>
-            <version>4.0.0</version>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
@@ -89,6 +84,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-neo4j</artifactId>
         </dependency>
         <dependency>
             <groupId>com.baomidou</groupId>
@@ -111,6 +110,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
         </dependency>
         <dependency>
             <groupId>cn.hutool</groupId>
@@ -206,6 +209,16 @@
             <version>0.12.3</version>
             <scope>runtime</scope>
         </dependency>
+
+        <!-- Caffeine 本地缓存 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -247,6 +260,13 @@
         <repository>
             <id>spring-snapshots</id>
             <url>https://repo.spring.io/snapshot</url>
+        </repository>
+        <repository>
+            <id>redis-maven-public</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/public/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
 
     </repositories>

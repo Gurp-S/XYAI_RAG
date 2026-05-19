@@ -1,7 +1,7 @@
 package com.XYai.myai.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.XYai.myai.rag.evaluate.pojo.UserEvaluatePOJO;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper

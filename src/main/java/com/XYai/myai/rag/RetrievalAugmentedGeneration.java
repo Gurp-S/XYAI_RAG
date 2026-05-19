@@ -3,8 +3,7 @@ package com.XYai.myai.rag;
 import com.XYai.myai.rag.aop.annotation.RagTraceNode;
 import com.XYai.myai.rag.channel.MultiChannelRetrievalEngine;
 import com.XYai.myai.rag.channel.pojo.RetrievedChunk;
-import com.XYai.myai.rag.intent.IntentResult;
-import com.XYai.myai.rag.intent.pojo.SubQuestionIntent;
+import com.XYai.myai.rag.graph.Neo4jKnowledgeGraphService;
 import com.XYai.myai.rag.mcp.ToolDecisionManager;
 import com.XYai.myai.rag.mcp.pojo.ToolProcessorResult;
 import com.XYai.myai.rag.memory.ConversationMemorySummaryService;
@@ -22,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -39,6 +39,7 @@ public class RetrievalAugmentedGeneration {
             工具调用结果:<<%s>>
             更早的历史对话摘要:<<%s>>
             历史对话:<<%s>>
+            用户提交文档:<<%s>>
             用户消息:<<%s>>
             """;
 
@@ -46,7 +47,7 @@ public class RetrievalAugmentedGeneration {
     private QueryRewriter queryRewriter;
 
     @Resource
-    private IntentResult intentResult;
+    private Neo4jKnowledgeGraphService neo4jKnowledgeGraphService;
 
     @Resource
     private MultiChannelRetrievalEngine multiChannelRetrievalEngine;
@@ -75,13 +76,13 @@ public class RetrievalAugmentedGeneration {
     // ==================== 步骤2：异步加载MCP工具结果 ====================
 
     @RagTraceNode(name = "加载MCP工具", type = "MCP工具")
-    public CompletableFuture<List<ToolProcessorResult>> loadMCPToolsAsync(String message,LoadSession memorySession) {
+    public CompletableFuture<List<ToolProcessorResult>> loadMCPToolsAsync(String message,LoadSession memorySession,String conversationId,String chatMessageId) {
         log.info("[RAG] 步骤2: 提交MCP工具异步任务, thread={}", Thread.currentThread().getName());
         return CompletableFuture.supplyAsync(
                 () -> {
                     log.info("[RAG] 步骤2.mcp: MCP任务开始执行, thread={}", Thread.currentThread().getName());
                     long t1 = System.currentTimeMillis();
-                    List<ToolProcessorResult> results = toolDecisionManager.toolProcessor(message, memorySession);
+                    List<ToolProcessorResult> results = toolDecisionManager.toolProcessor(message, memorySession,conversationId,chatMessageId);
                     log.info("[RAG] 步骤2.mcp: MCP任务完成, 结果数={}, 耗时={}ms",
                             results.size(), System.currentTimeMillis() - t1);
                     return results;
@@ -104,39 +105,39 @@ public class RetrievalAugmentedGeneration {
 
     // ==================== 步骤4：同步执行查询重写 ====================
     @RagTraceNode(name = "查询重写", type = "查询重写")
-    public RewriteResult rewriteQuery(String message) {
+    public RewriteResult rewriteQuery(String message,String conversationId,String chatMessageId) {
         log.info("[RAG] 步骤4: 查询重写, thread={}", Thread.currentThread().getName());
         long t1 = System.currentTimeMillis();
-        RewriteResult result = queryRewriter.rewrite(message, null);
+        RewriteResult result = queryRewriter.rewrite(message,conversationId,chatMessageId);
         log.info("[RAG] 步骤4完成: rewritten='{}', 耗时={}ms",
                 result != null ? result.getRewrittenQuery() : "null",
                 System.currentTimeMillis() - t1);
         return result;
     }
 
-    // ==================== 步骤5：同步执行意图识别 ====================
-    @RagTraceNode(name = "意图识别", type = "意图识别")
-    public List<SubQuestionIntent> recognizeIntent(RewriteResult rewritten) {
-        log.info("[RAG] 步骤5: 意图识别, thread={}", Thread.currentThread().getName());
+    // ==================== 步骤5：同步执行实体识别 ====================
+    @RagTraceNode(name = "实体识别", type = "实体识别")
+    public Map<String, Integer> recognizeIntent(String rewrittenUserMessage) {
+        log.info("[RAG] 步骤5: 实体识别, thread={}", Thread.currentThread().getName());
         long t1 = System.currentTimeMillis();
-        List<SubQuestionIntent> intents = intentResult.recognize(rewritten, null);
-        log.info("[RAG] 步骤5完成: intents数量={}, 耗时={}ms",
-                intents != null ? intents.size() : 0,
+        Map<String, Integer> fileChunkIds = neo4jKnowledgeGraphService.getUserMessageFileChunkId(rewrittenUserMessage);
+        log.info("[RAG] 步骤5完成: fileChunkId数量={}, 耗时={}ms",
+                fileChunkIds != null ? fileChunkIds.size() : 0,
                 System.currentTimeMillis() - t1);
-        return intents;
+        return fileChunkIds;
     }
 
     // ==================== 步骤6：同步执行多通道文档检索 ====================
     @RagTraceNode(name = "多通道文档检索", type = "文档检索")
     public List<RetrievedChunk> retrieveDocuments(
-            List<SubQuestionIntent> intents,
+            Map<String, Integer> userMessageEntityFileChunkIds,
             RewriteResult rewritten,
             String conversationId,
             String originalMessage) {
-        log.info("[RAG] 步骤6: 多通道文档检索, intents数={}, thread={}",
-                intents != null ? intents.size() : 0, Thread.currentThread().getName());
+        log.info("[RAG] 步骤6: 多通道文档检索, entity数={}, thread={}",
+                userMessageEntityFileChunkIds != null ? userMessageEntityFileChunkIds.size() : 0, Thread.currentThread().getName());
         long t1 = System.currentTimeMillis();
-        List<RetrievedChunk> results = multiChannelRetrievalEngine.retrieve(intents, rewritten, conversationId,
+        List<RetrievedChunk> results = multiChannelRetrievalEngine.retrieve(userMessageEntityFileChunkIds, rewritten, conversationId,
                 originalMessage);
         log.info("[RAG] 步骤6完成: retrieved数量={}, 耗时={}ms",
                 results != null ? results.size() : 0,
@@ -156,7 +157,13 @@ public class RetrievalAugmentedGeneration {
         log.info("[RAG] 步骤7: 等待异步结果并构建RAGResult, thread={}", Thread.currentThread().getName());
 
         long t1 = System.currentTimeMillis();
-        List<ToolProcessorResult> toolResults = mcpFuture.getNow(List.of());
+        List<ToolProcessorResult> toolResults;
+        try {
+            toolResults = mcpFuture.get(30, java.util.concurrent.TimeUnit.SECONDS);
+        } catch (Exception e) {
+            log.warn("[RAG] 步骤7.mcp: 等待超时或异常, 使用空结果: {}", e.getMessage());
+            toolResults = List.of();
+        }
         log.info("[RAG] 步骤7.mcp: MCP结果获取成功, 共{}个, 耗时={}ms",
                 toolResults.size(), System.currentTimeMillis() - t1);
 
@@ -183,7 +190,7 @@ public class RetrievalAugmentedGeneration {
 
     // ==================== 步骤8：格式化最终Prompt ====================
     @RagTraceNode(name = "Prompt", type = "Prompt")
-    public String formatFinalPrompt(RAGResult ragResult, String systemMessage) {
+    public String formatFinalPrompt(RAGResult ragResult, String systemMessage,String fileContent) {
         log.info("[RAG] 步骤8: 格式化最终Prompt, thread={}", Thread.currentThread().getName());
         log.info("[RAG] 步骤8: systemMessage长度={}, mcpText长度={}, retrieveText长度={}",
                 systemMessage != null ? systemMessage.length() : 0,
@@ -195,6 +202,7 @@ public class RetrievalAugmentedGeneration {
                 ragResult.getMcpText(),
                 ragResult.getSummaryText(),
                 ragResult.getHistoryText(),
+                fileContent,
                 ragResult.getOriginalMessage());
 
         String finalPrompt = systemMessage + "\n\n" + userMessage;

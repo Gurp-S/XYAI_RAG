@@ -1,8 +1,6 @@
 package com.XYai.myai.rag.etlpipeline.pojo;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,11 +10,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 
-/**
- * 大文件持久化实现：持有你自己创建的临时 File。
- */
-@RequiredArgsConstructor
-@Getter
+
+@Data
+@Builder
+@NoArgsConstructor(force = true)
+@AllArgsConstructor
 public class FileBackedMultipartFile implements MultipartFile {
 
     // 表单字段名
@@ -33,6 +31,7 @@ public class FileBackedMultipartFile implements MultipartFile {
     @NonNull
     private final File file;
 
+    @NotNull
     @Override
     public String getName() {
         return name;

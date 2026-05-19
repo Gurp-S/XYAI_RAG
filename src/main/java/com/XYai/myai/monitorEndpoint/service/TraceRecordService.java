@@ -11,10 +11,16 @@ public interface TraceRecordService {
      */
     void recordNodeError(String traceId, String nodeId, String message);
 
+
+    void finishRun(String traceId,long startTimeMs);
+
     /**
      * 记录整个链路级别报错信息
      */
     void recordError(String traceId, String message);
+
+
+    void recordNode(String traceId, String nodeId, Object name, Object type);
 
     /**
      * 开始记录新的一条执行链路
@@ -24,5 +30,5 @@ public interface TraceRecordService {
     /**
      * 记录当前节点的执行情况
      */
-    void recordNode(String traceId, String nodeId, Object name, Object type, long costTime);
+    void updateNode(String traceId, String nodeId, Object name, Object type, long costTime);
 }

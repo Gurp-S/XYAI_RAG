@@ -1,447 +1,432 @@
+# -- auto-generated definition
+# create table chat_conversation
+# (
+#     chat_message_id   varchar(128)                       not null
+#         primary key,
+#     user_id           bigint                             not null comment '用户ID',
+#     conversation_id   varchar(128)                       null,
+#     assistant_message text                               null,
+#     user_message      text                               null,
+#     created_at        datetime default CURRENT_TIMESTAMP not null,
+#     feedback          int      default -1                not null comment '反馈：1-点赞，0-点踩，-1-未评价',
+#     prompt_tokens     int      default 0                 null comment 'Prompt tokens',
+#     completion_tokens int      default 0                 null comment 'Completion tokens',
+#     total_tokens      int      default 0                 null comment 'Total tokens',
+#     model_name        varchar(64)                        null comment '模型名称',
+#     cost_ms           bigint   default 0                 null comment '耗时(毫秒)'
+# )
+#     collate = utf8mb4_unicode_ci;
 #
-# -- 用户表
-# CREATE TABLE IF NOT EXISTS xy_user (
-#     id bigint(20) NOT NULL,
-#     group_id varchar(64),
-#     user_rank bigint(20),
-#     name varchar(100) NOT NULL,
-#     password varchar(255) NOT NULL,
-#     PRIMARY KEY (id)
+# create index idx_conversation_id
+#     on chat_conversation (conversation_id);
+#
+# create index idx_feedback
+#     on chat_conversation (feedback);
+#
+# create index idx_user_conversation
+#     on chat_conversation (user_id, conversation_id);
+#
+# -- auto-generated definition
+# create table chat_memory_interaction
+# (
+#     conversation_id varchar(128)                       not null
+#         primary key,
+#     user_id         bigint                             null,
+#     title           varchar(255)                       null,
+#     summary_text    text                               null,
+#     created_at      datetime default CURRENT_TIMESTAMP not null
+# )
+#     collate = utf8mb4_unicode_ci;
+#
+# create index idx_title
+#     on chat_memory_interaction (title);
+#
+# create index idx_user_id
+#     on chat_memory_interaction (user_id);
+#
+# -- auto-generated definition
+# create table chat_message_id
+# (
+#     chat_message_id   varchar(64)                           not null comment '消息ID（主键）'
+#         primary key,
+#     conversation_id   varchar(64)                           null comment '会话ID',
+#     user_id           bigint                                null comment '用户ID',
+#     model_name        varchar(64)                           null comment '模型名称',
+#     prompt_tokens     int         default 0                 null comment 'Prompt tokens',
+#     completion_tokens int         default 0                 null comment 'Completion tokens',
+#     total_tokens      int         default 0                 null comment 'Total tokens',
+#     cost_ms           bigint      default 0                 null comment '耗时(毫秒)',
+#     call_type         varchar(32) default 'chat'            null comment '调用类型：chat/mcp/fast/enhance',
+#     created_at        datetime    default CURRENT_TIMESTAMP null
+# )
+#     comment 'Token用量记录表';
+#
+# create index idx_conversation
+#     on chat_message_id (conversation_id);
+#
+# create index idx_created_at
+#     on chat_message_id (created_at);
+#
+# create index idx_model
+#     on chat_message_id (model_name);
+#
+# create index idx_user
+#     on chat_message_id (user_id);
+#
+# -- auto-generated definition
+# create table intent_node
+# (
+#     name            varchar(255)                        not null
+#         primary key,
+#     kb_id           varchar(255)                        null,
+#     node_id         varchar(255)                        not null,
+#     description     text                                null,
+#     parent_name     varchar(255)                        null,
+#     examples        json                                null,
+#     collection_name varchar(255)                        null,
+#     mcp_tool_id     varchar(255)                        null,
+#     top_k           int                                 null,
+#     prompt_template text                                null,
+#     children_count  int       default 0                 not null,
+#     created_at      timestamp default CURRENT_TIMESTAMP null,
+#     updated_at      timestamp default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
+#     constraint fk_intent_parent
+#         foreign key (parent_name) references intent_node (name)
+#             on update cascade on delete set null
+# )
+#     collate = utf8mb4_unicode_ci;
+#
+# create index idx_children_count
+#     on intent_node (children_count);
+#
+# create index idx_node_id
+#     on intent_node (node_id);
+#
+# create index idx_parent_id
+#     on intent_node (parent_name);
+#
+# -- auto-generated definition
+# create table node_record
+# (
+#     node_id       varchar(64)  not null comment '节点唯一 ID'
+#         primary key,
+#     trace_id      varchar(64)  not null comment '所属 traceId',
+#     node_name     varchar(255) null comment '节点名称',
+#     node_type     varchar(64)  null comment '节点类型',
+#     cost_time     bigint       null comment '节点耗时(毫秒)',
+#     status        varchar(32)  null comment '节点状态(SUCCESS/ERROR)',
+#     error_message text         null comment '节点异常信息',
+#     start_time    datetime     null comment '节点开始时间'
+# )
+#     comment 'RAG 链路节点记录表';
+#
+# create index idx_trace_id
+#     on node_record (trace_id);
+#
+# -- auto-generated definition
+# create table trace_record
+# (
+#     trace_id      varchar(64)  not null comment '全链路唯一 traceId'
+#         primary key,
+#     name          varchar(255) null comment '根节点名称或任务名',
+#     start_time    datetime     null comment '链路开始时间',
+#     status        varchar(32)  null comment '链路状态(RUNNING/SUCCESS/ERROR)',
+#     error_message text         null comment '错误消息'
+# )
+#     comment 'RAG 全链路追踪记录表';
+#
+# -- auto-generated definition
+# create table xy_collection_file
+# (
+#     id              bigint auto_increment
+#         primary key,
+#     collection_name varchar(255)                       not null comment '集合名（对应 POJO collectionName）',
+#     file_id         varchar(128)                       not null comment '文件标识（对应 POJO fileChunkId）',
+#     chunk_size      int      default 0                 not null comment '文件分片总数（对应 POJO chunkSize）',
+#     present_chunks  text                               null comment 'collection 中已存在的 chunk id 列表（POJO presentChunks，格式例如: [1,2,5]）',
+#     created_at      datetime default CURRENT_TIMESTAMP null comment '创建时间',
+#     constraint ux_collection_file
+#         unique (collection_name, file_id)
+# )
+#     comment 'collection 与 file 的映射（对应 CollectionRecord POJO）' collate = utf8mb4_unicode_ci;
+#
+# create index idx_file_id
+#     on xy_collection_file (file_id);
+#
+# -- auto-generated definition
+# create table xy_file_record
+# (
+#     file_id         varchar(128)                       not null comment '文件标识（与 POJO fileChunkId 对应）'
+#         primary key,
+#     collection_name varchar(255)                       null comment 'collection 名（对应 POJO collectionName）',
+#     visibility      varchar(64)                        null comment '可见性（对应 POJO visibility）',
+#     create_time     datetime default CURRENT_TIMESTAMP null comment '创建时间'
+# )
+#     comment '文件主记录表（与 FileRecord POJO 对应）' collate = utf8mb4_unicode_ci;
+#
+# -- auto-generated definition
+# create table xy_knowledge_triple
+# (
+#     id              bigint auto_increment
+#         primary key,
+#     head            varchar(500)                       not null,
+#     relation        varchar(500)                       not null,
+#     tail            varchar(500)                       not null,
+#     chunk_id        varchar(100)                       not null,
+#     file_id         varchar(100)                       null,
+#     collection_name varchar(100)                       null,
+#     create_time     datetime default CURRENT_TIMESTAMP null
 # );
 #
-# -- 用户组表
-# CREATE TABLE IF NOT EXISTS xy_user_group (
-#     group_id varchar(64) NOT NULL,
-#     group_name varchar(100) NOT NULL,
-#     create_time datetime,
-#     PRIMARY KEY (group_id)
+# -- auto-generated definition
+# create table xy_model_candidate
+# (
+#     name                varchar(50)                             not null comment '模型唯一标识，如 qwen-max'
+#         primary key,
+#     display_name        varchar(100)                            null comment '前端显示名',
+#     api_model           varchar(100)                            not null comment '实际调用模型名',
+#     priority            int           default 5                 not null,
+#     enabled             tinyint(1)    default 1                 not null,
+#     weight              int           default 1                 not null,
+#     temperature         decimal(3, 2) default 0.30              not null comment '温度参数',
+#     max_tokens          int           default 2000              not null comment '最大 Token',
+#     purpose             varchar(200)                            null comment '模型用途说明（如：通用对话、代码生成、翻译）',
+#     failure_threshold   int           default 50                null,
+#     wait_duration_open  bigint        default 10000             null,
+#     sliding_window_size int           default 10                null,
+#     minimum_calls       int           default 5                 null,
+#     created_at          datetime      default CURRENT_TIMESTAMP null,
+#     updated_at          datetime      default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
+#     constraint name
+#         unique (name)
 # );
 #
-# -- 好友关系表（双向存储）
-# CREATE TABLE IF NOT EXISTS xy_user_friend (
-#     user_id bigint(20) NOT NULL,
-#     friend_id bigint(20) NOT NULL,
-#     create_time datetime,
-#     pair_low_id bigint(20) GENERATED ALWAYS AS (LEAST(user_id, friend_id)) STORED,
-#     pair_high_id bigint(20) GENERATED ALWAYS AS (GREATEST(user_id, friend_id)) STORED,
-#     PRIMARY KEY (user_id, friend_id),
-#     UNIQUE KEY uk_user_friend_pair (pair_low_id, pair_high_id)
+# -- auto-generated definition
+# create table xy_refresh_token
+# (
+#     id         bigint auto_increment
+#         primary key,
+#     user_id    bigint               not null,
+#     token_hash varchar(512)         null,
+#     issued_at  datetime             not null,
+#     expires_at datetime             not null,
+#     revoked    tinyint(1) default 0 not null,
+#     constraint uk_token_hash
+#         unique (token_hash)
+# )
+#     collate = utf8mb4_unicode_ci;
+#
+# create index idx_user_id
+#     on xy_refresh_token (user_id);
+#
+# -- auto-generated definition
+# create table xy_system_config
+# (
+#     id           bigint auto_increment comment '主键ID'
+#         primary key,
+#     config_group varchar(64)                        not null comment '配置分组：feature_model/pipeline_node/system',
+#     config_key   varchar(128)                       not null comment '配置键',
+#     config_value text                               null comment '配置值（JSON格式）',
+#     description  varchar(255)                       null comment '中文描述',
+#     created_at   datetime default CURRENT_TIMESTAMP null,
+#     updated_at   datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
+#     constraint uk_config
+#         unique (config_group, config_key)
+# )
+#     comment '系统配置持久化表';
+#
+# create index idx_config_group
+#     on xy_system_config (config_group);
+#
+# -- auto-generated definition
+# create table xy_system_evaluate
+# (
+#     chat_message_id        varchar(64)                             not null comment '对话消息 ID（主键）'
+#         primary key,
+#     conversation_id        varchar(64)                             not null comment '所属会话 ID',
+#     user_id                bigint                                  null comment '用户 ID',
+#     overall_score          decimal(5, 4)                           null comment '综合 F1',
+#     retrieval_score        decimal(5, 4)                           null comment '检索 F1',
+#     faithfulness_score     decimal(5, 4)                           null comment '忠实度 F1',
+#     answer_relevance_score decimal(5, 4)                           null comment '答案相关性 F1',
+#     completeness_score     decimal(5, 4)                           null comment '完整性 F1',
+#     rule_score             decimal(5, 4) default 0.0000            null comment '规则评估分数',
+#     rerank_score           decimal(5, 4) default 0.0000            null comment '重排评估分数',
+#     llm_score              decimal(5, 4) default 0.0000            null comment '大模型评估分数',
+#     retrieved_doc_count    int                                     null comment '检索到的文档数',
+#     latency_ms             bigint                                  null comment '响应延迟（毫秒）',
+#     model_name             varchar(50)                             null comment '使用的模型名',
+#     create_time            datetime      default CURRENT_TIMESTAMP null comment '创建时间',
+#     update_time            datetime                                null on update CURRENT_TIMESTAMP comment '最后更新时间',
+#     extra_json             json                                    null comment '扩展评估指标'
+# )
+#     comment 'RAG 系统评估表（以消息 ID 为主键）';
+#
+# create index idx_conversation
+#     on xy_system_evaluate (conversation_id);
+#
+# create index idx_create_time
+#     on xy_system_evaluate (create_time);
+#
+# create index idx_user
+#     on xy_system_evaluate (user_id);
+#
+# -- auto-generated definition
+# create table xy_user
+# (
+#     id              bigint                             not null
+#         primary key,
+#     group_id        varchar(64)                        null,
+#     user_rank       bigint                             null,
+#     name            varchar(100)                       not null,
+#     password        varchar(255)                       not null,
+#     avatar          varchar(500)                       null comment '用户头像URL',
+#     phone           varchar(20)                        null comment '手机号',
+#     email           varchar(100)                       null comment '邮箱',
+#     create_time     datetime default CURRENT_TIMESTAMP null comment '创建时间',
+#     update_time     datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP comment '更新时间',
+#     last_login_time datetime                           null comment '最后登录时间',
+#     remark          varchar(500)                       null comment '备注',
+#     status          tinyint(1)                         null comment '账号状态：1启用 0禁用'
 # );
 #
-# -- ==================== 测试数据：组 ====================
-# INSERT IGNORE INTO xy_user_group(group_id, group_name, create_time) VALUES
-# ('g-1001', '研发组', NOW()),
-# ('g-1002', '产品组', NOW()),
-# ('admins', '管理员组', NOW());
+# -- auto-generated definition
+# create table xy_user_evaluate
+# (
+#     message_id      varchar(64)                        not null comment '消息ID，主键'
+#         primary key,
+#     conversation_id varchar(64)                        not null comment '对话ID',
+#     user_id         bigint                             not null comment '用户ID',
+#     feedback        tinyint                            not null comment '1-赞,0-踩',
+#     create_time     datetime default CURRENT_TIMESTAMP null comment '创建时间',
+#     update_time     datetime default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP comment '更新时间'
+# )
+#     comment '用户点赞点踩评价表';
 #
-# -- ==================== 测试数据：用户 ====================
-# INSERT IGNORE INTO xy_user(id, group_id, user_rank, name, password) VALUES
-# (1001, 'admins', 0, 'XY_admin', '123456'),
-# (1002, 'g-1001', 2, 'bob', '123456'),
-# (1003, 'g-1001', 2, 'carol', '123456'),
-# (1004, 'g-1002', 2, 'david', '123456'),
-# (1005, 'g-1002', 2, 'eric', '123456');
+# create index idx_conversation
+#     on xy_user_evaluate (conversation_id);
 #
-# -- ==================== 测试数据：好友关系 ====================
-# INSERT IGNORE INTO xy_user_friend(user_id, friend_id, create_time) VALUES
-# (1001, 1002, NOW()),
-# (1001, 1003, NOW()),
-# (1004, 1005, NOW());
-# #
-# ALTER TABLE xy_user ADD COLUMN avatar VARCHAR(500) DEFAULT NULL COMMENT '用户头像URL';
+# create index idx_user
+#     on xy_user_evaluate (user_id);
 #
-# ALTER TABLE xy_user
-#     ADD COLUMN phone VARCHAR(20) DEFAULT NULL COMMENT '手机号',
-#     ADD COLUMN email VARCHAR(100) DEFAULT NULL COMMENT '邮箱',
-#     ADD COLUMN create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-#     ADD COLUMN update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-#     ADD COLUMN last_login_time DATETIME DEFAULT NULL COMMENT '最后登录时间',
-#     ADD COLUMN remark VARCHAR(500) DEFAULT NULL COMMENT '备注';
--- 只添加缺失的 status 字段
-# ALTER TABLE xy_user ADD COLUMN status tinyint(1) NULL COMMENT '账号状态：1启用 0禁用';
+# -- auto-generated definition
+# create table xy_user_friend
+# (
+#     user_id      bigint   not null,
+#     friend_id    bigint   not null,
+#     create_time  datetime null,
+#     pair_low_id  bigint as (least(`user_id`, `friend_id`)) stored,
+#     pair_high_id bigint as (greatest(`user_id`, `friend_id`)) stored,
+#     primary key (user_id, friend_id),
+#     constraint uk_user_friend_pair
+#         unique (pair_low_id, pair_high_id)
+# );
 #
-# CREATE TABLE IF NOT EXISTS xy_refresh_token (
-#                                                 id BIGINT NOT NULL AUTO_INCREMENT,
-#                                                 user_id BIGINT NOT NULL,
-#                                                 token_hash VARBINARY(32) NOT NULL,  -- 存二进制 SHA-256（32 字节）
-#                                                 issued_at DATETIME NOT NULL,
-#                                                 expires_at DATETIME NOT NULL,
-#                                                 revoked TINYINT(1) NOT NULL DEFAULT 0,
-#                                                 PRIMARY KEY (id),
-#                                                 UNIQUE KEY uk_token_hash (token_hash(32)),
-#                                                 INDEX idx_user_id (user_id)
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+# -- auto-generated definition
+# create table xy_user_group
+# (
+#     group_id    varchar(64)  not null
+#         primary key,
+#     group_name  varchar(100) not null,
+#     create_time datetime     null
+# );
+#
+# -- ==================== xy_system_evaluate 重建 ====================
+# -- DROP TABLE IF EXISTS xy_system_evaluate;
+# CREATE TABLE IF NOT EXISTS xy_system_evaluate (
+#     chat_message_id         VARCHAR(64)  NOT NULL COMMENT '对话消息 ID（主键）',
+#     conversation_id         VARCHAR(64)  NOT NULL COMMENT '所属会话 ID',
+#     user_id                 BIGINT       NULL     COMMENT '用户 ID',
+#
+#     overall_score           DECIMAL(5,4) NULL     COMMENT '综合 F1',
+#
+#     retrieval_score         DECIMAL(5,4) NULL     COMMENT '检索 F1',
+#     faithfulness_score      DECIMAL(5,4) NULL     COMMENT '忠实度 F1',
+#     answer_relevance_score  DECIMAL(5,4) NULL     COMMENT '答案相关性 F1',
+#     completeness_score      DECIMAL(5,4) NULL     COMMENT '完整性 F1',
+#
+#     rule_score              DECIMAL(5,4) DEFAULT 0.0000 NULL COMMENT '规则评估分数',
+#     rerank_score            DECIMAL(5,4) DEFAULT 0.0000 NULL COMMENT '重排评估分数',
+#     llm_score               DECIMAL(5,4) DEFAULT 0.0000 NULL COMMENT '大模型评估分数',
+#
+#     retrieved_doc_count     INT          NULL     COMMENT '检索到的文档数',
+#     latency_ms              BIGINT       NULL     COMMENT '响应延迟（毫秒）',
+#     model_name              VARCHAR(50)  NULL     COMMENT '使用的模型名',
+#
+#     create_time             DATETIME     DEFAULT CURRENT_TIMESTAMP NULL COMMENT '创建时间',
+#     update_time             DATETIME     NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '最后更新时间',
+#     extra_json              JSON         NULL     COMMENT '扩展评估指标',
+#
+#     PRIMARY KEY (chat_message_id),
+#     INDEX idx_conversation (conversation_id),
+#     INDEX idx_user (user_id),
+#     INDEX idx_create_time (create_time)
+# ) COMMENT 'RAG 系统评估表（以消息 ID 为主键）';
+#
+-- ==================== node_record 补充时间字段 ====================
+# ALTER TABLE trace_record
+#     ADD COLUMN  end_time DATETIME DEFAULT NULL COMMENT '节点结束时间' AFTER start_time;
+# CREATE TABLE xy_file_record
+# (
+#     file_chunk_id VARCHAR(64) NOT NULL COMMENT '文件分块ID（主键）',
+#     use_count     BIGINT DEFAULT 0 COMMENT '使用次数',
+#     PRIMARY KEY (file_chunk_id)
+# ) COMMENT '文件记录表';
+#
+#
+#
+-- auto-generated definition
+-- auto-generated definition
 
-# ALTER TABLE xy_refresh_token MODIFY COLUMN token_hash VARCHAR(512);
+-- ==================== user_chat_message 用户聊天消息表 ====================
+# CREATE TABLE IF NOT EXISTS user_chat_message (
+#     id              BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '消息ID',
+#     conversation_id VARCHAR(255) NOT NULL COMMENT '会话ID',
+#     target_type     VARCHAR(20)  NOT NULL DEFAULT 'user' COMMENT '目标类型：user/group',
+#     target_id       VARCHAR(100) NOT NULL COMMENT '目标ID',
+#     sender_id       VARCHAR(100) NOT NULL COMMENT '发送方用户ID',
+#     sender_name     VARCHAR(100) DEFAULT '' COMMENT '发送方显示名',
+#     content         TEXT         NULL     COMMENT '消息内容（纯文本或JSON)',
+#     created_at      BIGINT       NOT NULL COMMENT '创建时间戳(毫秒)',
+#     INDEX idx_conversation_id (conversation_id),
+#     INDEX idx_created_at (created_at),
+#     INDEX idx_target (target_type, target_id)
+#     status          VARCHAR(20)  DEFAULT 'active' COMMENT '消息状态：active/accepted/rejected',
+-- 1. 先添加 status 字段（在 created_at 字段之后）
+# ALTER TABLE user_chat_message
+#     ADD COLUMN status VARCHAR(20) DEFAULT 'active' COMMENT '消息状态：active/accepted/rejected' AFTER created_at;
+#
+# -- 2. 为 status 字段创建普通索引（提升查询效率）
+# ALTER TABLE user_chat_message
+#     ADD INDEX idx_status (status);
+# ALTER TABLE trace_record
+#     ADD COLUMN cost_time BIGINT NULL COMMENT '链路总耗时（毫秒）' AFTER error_message;
 
-#
-# CREATE TABLE `xy_file_record` (
-#                                   `file_id` BIGINT NOT NULL COMMENT '文件ID',
-#                                   `file_name` VARCHAR(255) NOT NULL COMMENT '文件名',
-#                                   `kb_id` VARCHAR(64) NOT NULL COMMENT '知识库ID',
-#                                   `owner_id` VARCHAR(64) NOT NULL COMMENT '创建者/拥有者ID',
-#                                   `group_id` VARCHAR(64) DEFAULT NULL COMMENT '所属组ID',
-#                                   `visibility` VARCHAR(16) NOT NULL DEFAULT 'private' COMMENT '可见性：private/group/public',
-#                                   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-#                                   PRIMARY KEY (`file_id`),
-#                                   KEY `idx_kb_id` (`kb_id`),
-#                                   KEY `idx_owner_id` (`owner_id`),
-#                                   KEY `idx_group_id` (`group_id`),
-#                                   KEY `idx_visibility` (`visibility`)
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文件主记录表';
-# CREATE TABLE `xy_file_permission` (
-#                                       `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-#                                       `file_id` BIGINT NOT NULL COMMENT '文件ID',
-#                                       `user_id` VARCHAR(64) NOT NULL COMMENT '授权用户ID',
-#                                       `permission_type` VARCHAR(16) NOT NULL COMMENT '权限类型：read/write',
-#                                       `expire_time` BIGINT DEFAULT NULL COMMENT '过期时间（毫秒时间戳）',
-#                                       PRIMARY KEY (`id`),
-#                                       UNIQUE KEY `uk_file_user_perm` (`file_id`, `user_id`, `permission_type`),
-#                                       KEY `idx_file_id` (`file_id`),
-#                                       KEY `idx_user_id` (`user_id`)
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文件权限关联表';
-# CREATE TABLE `xy_file_milvus` (
-#                                   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-#                                   `group_id` BIGINT DEFAULT NULL COMMENT '组ID',
-#                                   `owner_id` BIGINT NOT NULL COMMENT '上传者用户ID',
-#                                   `shared_with` JSON DEFAULT NULL COMMENT '共享用户ID列表',
-#                                   `visibility` VARCHAR(16) NOT NULL DEFAULT 'private' COMMENT '可见范围：private/group/public',
-#                                   PRIMARY KEY (`id`),
-#                                   KEY `idx_owner_id` (`owner_id`),
-#                                   KEY `idx_group_id` (`group_id`),
-#                                   KEY `idx_visibility` (`visibility`)
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Milvus 文档权限主体表';
 
-# ALTER TABLE xy_file_record
-#     ADD COLUMN collection_name VARCHAR(255) DEFAULT NULL COMMENT '集合名';
-# ALTER TABLE `xy_file_record`
-#     MODIFY COLUMN `file_id` VARCHAR(64) NOT NULL COMMENT '文件ID',
-#     MODIFY COLUMN `kb_id` VARCHAR(64) DEFAULT NULL COMMENT '知识库ID',
-#     MODIFY COLUMN `owner_id` VARCHAR(64) DEFAULT NULL COMMENT '拥有者ID',
-#     MODIFY COLUMN `group_id` VARCHAR(64) DEFAULT NULL COMMENT '组ID',
-#     ADD COLUMN `collection_name` VARCHAR(255) DEFAULT NULL COMMENT '集合名';
--- 保证 canonical hash 唯一（如果你希望以 hash 为主键），否则调整为适合你现有 schema
-# ALTER TABLE xy_file_record
-#     ADD UNIQUE INDEX ux_xy_file_record_file_id (file_id);
-#
-# -- 保证短 id 唯一（用于快速查重/展示）
-# CREATE UNIQUE INDEX ux_xy_file_record_short_id ON xy_file_record (short_id);
 
--- 先备份表
--- ALTER TABLE 前建议备份
-# ALTER TABLE `xy_file_record`
-#     MODIFY COLUMN `file_id` VARCHAR(128) NOT NULL COMMENT '文件ID（canonical hash）';
-#
-# -- 可选索引
-# CREATE UNIQUE INDEX ux_xy_file_record_file_id ON `xy_file_record` (`file_id`);
-# CREATE UNIQUE INDEX ux_xy_file_record_short_id ON `xy_file_record` (`short_id`);
--- =========================
--- xy_file_record 建表 + 兼容性迁移脚本
--- 说明：
---  - file_id 存放 canonical hash (SHA-256 hex = 64 chars)
---  - short_id 为展示用短ID (UUID)
---  - kb_id/owner_id/group_id: 允许 NULL，避免 insert 因无默认值失败
---  - extra_metadata: JSON 字段，用于存放较大 metadata（可选，减少 Milvus metadata 体积）
--- 运行环境建议：MySQL 8.0+
--- 备份提醒：执行前请先备份 xy_file_record 表
--- =========================
 
--- 1) 如果表不存在，则创建表（新环境）
-# CREATE TABLE IF NOT EXISTS `xy_file_record` (
-#                                                 `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '自增主键',
-#                                                 `file_id` VARCHAR(64) NOT NULL COMMENT '文件ID（canonical SHA-256 hex）',
-#                                                 `short_id` VARCHAR(36) DEFAULT NULL COMMENT '短 ID（展示用，UUID）',
-#                                                 `file_name` VARCHAR(255) DEFAULT NULL COMMENT '文件名',
-#                                                 `collection_name` VARCHAR(128) DEFAULT NULL COMMENT 'Milvus/Collection 名称',
-#                                                 `kb_id` BIGINT DEFAULT NULL COMMENT '知识库 id，可为空',
-#                                                 `owner_id` BIGINT DEFAULT NULL COMMENT '拥有者 id，可为空',
-#                                                 `group_id` BIGINT DEFAULT NULL COMMENT '分组 id，可为空',
-#                                                 `visibility` TINYINT DEFAULT 1 COMMENT '可见性，默认 1',
-#                                                 `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-#                                                 `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-#                                                 `extra_metadata` JSON DEFAULT NULL COMMENT '额外元数据（可存较大 JSON）',
-#                                                 PRIMARY KEY (`id`)
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='文件记录表';
-#
-# -- 2) 针对已有表的兼容性修改（按需执行）
-# -- 修改 file_id 长度为 64（如果已经是或更大则不会丢信息）
-# ALTER TABLE `xy_file_record`
-#     MODIFY COLUMN `file_id` VARCHAR(64) NOT NULL COMMENT '文件ID（canonical SHA-256 hex）';
-#
-# -- 增加 short_id 字段（若不存在）
-# ALTER TABLE `xy_file_record`
-#     ADD COLUMN IF NOT EXISTS `short_id` VARCHAR(36) DEFAULT NULL COMMENT '短 ID（展示用）';
-#
-# -- 增加 kb_id/owner_id/group_id 字段的 NULL 默认（若这些字段存在但非 NULL，略过）
-# ALTER TABLE `xy_file_record`
-#     MODIFY COLUMN `kb_id` BIGINT DEFAULT NULL,
-#     MODIFY COLUMN `owner_id` BIGINT DEFAULT NULL,
-#     MODIFY COLUMN `group_id` BIGINT DEFAULT NULL;
-#
-# -- 增加 extra_metadata 字段（若不存在）
-# ALTER TABLE `xy_file_record`
-#     ADD COLUMN IF NOT EXISTS `extra_metadata` JSON DEFAULT NULL COMMENT '额外元数据（可选）';
-#
-# -- 3) 索引：先删除可能存在的旧索引，再创建期望的索引
-# -- 注意：DROP INDEX IF EXISTS 在 MySQL 8 可用；如果你的 MySQL 不支持 IF EXISTS，请手动确认并删除旧索引
-# DROP INDEX IF EXISTS `ux_xy_file_record_file_id` ON `xy_file_record`;
-# CREATE UNIQUE INDEX `ux_xy_file_record_file_id` ON `xy_file_record` (`file_id`);
-#
-# -- short_id 可能不是全局唯一，使用普通索引以便查询/展示，不强制唯一
-# DROP INDEX IF EXISTS `ux_xy_file_record_short_id` ON `xy_file_record`;
-# CREATE INDEX `idx_xy_file_record_short_id` ON `xy_file_record` (`short_id`);
-#
-# -- 为 collection_name 建索引（便于根据 collection 查找）
-# DROP INDEX IF EXISTS `idx_xy_file_record_collection_name` ON `xy_file_record`;
-# CREATE INDEX `idx_xy_file_record_collection_name` ON `xy_file_record` (`collection_name`);
-#
-# -- 4) 为已有行生成 short_id（仅在 short_id 为空时）
-# -- 使用 UUID() 生成，保证展示短 id 有值
-# UPDATE `xy_file_record`
-# SET `short_id` = UUID()
-# WHERE `short_id` IS NULL;
 
--- 5) 可选：如果你想保留一个更短的可读 id（例如 8 字符哈希），你可以另外生成并保存
--- 例如保存前 8 字符的 base36/hex 再转 UUID name 或直接保存短串（注意短串可能冲突）
--- 下面示例仅做参考（如果需要，请在团队讨论后启用）：
--- ALTER TABLE `xy_file_record` ADD COLUMN IF NOT EXISTS `display_id` VARCHAR(16) DEFAULT NULL;
--- UPDATE `xy_file_record` SET `display_id` = LEFT(file_id, 8) WHERE display_id IS NULL;
 
--- 6) 小结：现在表结构为：
--- id (PK), file_id (canonical hash, unique), short_id (display), file_name, collection_name, kb_id, owner_id, group_id, visibility, create_time, update_time, extra_metadata
+# -- ==================== xy_daily_file_usage ====================
+# CREATE TABLE IF NOT EXISTS xy_daily_file_usage (
+#     `date`       DATE         NOT NULL COMMENT '日期',
+#     `use_count`  BIGINT       DEFAULT 0 COMMENT '当日文件使用次数',
+#     `updated_at` DATETIME     DEFAULT CURRENT_TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+#     PRIMARY KEY (`date`)
+# ) COMMENT '每日文件使用计数表（持久化存储，供仪表盘文件使用趋势图使用）';
 
--- =========================
--- 额外说明（建议/注意）
--- - canonical hash (file_id) 使用 SHA-256 hex（长度 64）。如果未来改用其他更长的 ID，请同步调整 VARCHAR 长度并考虑对索引性能的影响。
--- - short_id 用于 UI 展示（UUID），避免直接在前端展示长 file_id；如果你需要更短可读（比如 base62(8)），需要在插入/查询处保证冲突检测。
--- - 为避免将大量 metadata 写入 Milvus 的每个文档 metadata 字段（导致 milvus 查询慢或索引大），建议：
---    1) 在 Milvus metadata 只存非常必要的字段（例如 short_id / file_id / doc_id），
---    2) 把大 metadata 存到 DB（`xy_file_record.extra_metadata` 或单独表），并通过 short_id/file_id 关联检索完整信息。
--- - 在复制文档到其它 collection 时，确保传给 Milvus 的 metadata 字段包含 "fileId"（与 DB 中 file_id 对应），不要把整个大 JSON 当成 metadata 写入 Milvus。
--- =========================
-# CREATE TABLE IF NOT EXISTS `xy_file_record` (
-#                                                 `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键 id',
-#                                                 `file_id` VARCHAR(128) NOT NULL COMMENT '文件 ID (canonical hash hex)',
-#                                                 `short_id` VARCHAR(32) DEFAULT NULL COMMENT '短 id（用于 UI 展示，非唯一判断依据）',
-#                                                 `file_name` VARCHAR(512) DEFAULT NULL COMMENT '原始文件名',
-#                                                 `collection_name` VARCHAR(255) DEFAULT NULL COMMENT 'Milvus collection 名',
-#                                                 `kb_id` VARCHAR(64) DEFAULT NULL COMMENT '知识库 ID，可空',
-#                                                 `owner_id` BIGINT DEFAULT NULL COMMENT '文件所有者 userId，可空',
-#                                                 `group_id` BIGINT DEFAULT NULL COMMENT '组织/分组 id，可空',
-#                                                 `visibility` TINYINT DEFAULT 1 COMMENT '可见性，1=公开 0=私有',
-#                                                 `meta` JSON DEFAULT NULL COMMENT '可扩展的元信息（可选）',
-#                                                 `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-#                                                 `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-#                                                 PRIMARY KEY (`id`),
-#                                                 UNIQUE KEY `ux_xy_file_record_file_id` (`file_id`),
-#                                                 KEY `idx_xy_file_record_short_id` (`short_id`),
-#                                                 KEY `idx_xy_file_record_collection` (`collection_name`)
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='文件记录表';
-# INSERT INTO intent_node (name, node_id, description, parent_name, top_k, children_count)
-# VALUES
-# -- 问候
-# ('问候', '聊天-问候', '问候总入口', NULL, NULL, 9),
-# ('你好', '聊天-问候', '你好类问候', '问候', 5, 0),
-# ('早上好', '聊天-问候', '早晨问候', '问候', 5, 0),
-# ('下午好', '聊天-问候', '下午问候', '问候', 5, 0),
-# ('晚上好', '聊天-问候', '晚上问候', '问候', 5, 0),
-# ('在吗', '聊天-问候', '在线询问', '问候', 5, 0),
-# ('你是谁', '聊天-问候', '身份询问', '问候', 5, 0),
-# ('谢谢', '聊天-问候', '感谢表达', '问候', 5, 0),
-# ('再见', '聊天-问候', '告别表达', '问候', 5, 0),
-# ('辛苦了', '聊天-问候', '礼貌问候', '问候', 5, 0),
-#
-# -- 请假
-# ('请假', '人事-请假', '请假总入口', NULL, NULL, 9),
-# ('年假', '人事-请假', '年假相关', '请假', 8, 0),
-# ('病假', '人事-请假', '病假相关', '请假', 8, 0),
-# ('事假', '人事-请假', '事假相关', '请假', 8, 0),
-# ('调休', '人事-请假', '调休相关', '请假', 8, 0),
-# ('婚假', '人事-请假', '婚假相关', '请假', 8, 0),
-# ('产假', '人事-请假', '产假相关', '请假', 8, 0),
-# ('陪产假', '人事-请假', '陪产假相关', '请假', 8, 0),
-# ('丧假', '人事-请假', '丧假相关', '请假', 8, 0),
-# ('远程办公', '人事-请假', '远程办公相关', '请假', 8, 0),
-#
-# -- 报销
-# ('报销', '财务-报销', '报销总入口', NULL, NULL, 9),
-# ('交通报销', '财务-报销', '交通报销相关', '报销', 8, 0),
-# ('差旅报销', '财务-报销', '差旅报销相关', '报销', 8, 0),
-# ('餐补报销', '财务-报销', '餐补报销相关', '报销', 8, 0),
-# ('招待报销', '财务-报销', '招待报销相关', '报销', 8, 0),
-# ('办公报销', '财务-报销', '办公报销相关', '报销', 8, 0),
-# ('培训报销', '财务-报销', '培训报销相关', '报销', 8, 0),
-# ('住宿报销', '财务-报销', '住宿报销相关', '报销', 8, 0),
-# ('发票', '财务-报销', '发票相关', '报销', 8, 0),
-# ('打款时间', '财务-报销', '打款时间相关', '报销', 8, 0),
-#
-# -- 工资
-# ('工资', '人事-工资', '工资总入口', NULL, NULL, 9),
-# ('工资条', '人事-工资', '工资条相关', '工资', 8, 0),
-# ('发薪日', '人事-工资', '发薪日相关', '工资', 8, 0),
-# ('奖金', '人事-工资', '奖金相关', '工资', 8, 0),
-# ('个税', '人事-工资', '个税相关', '工资', 8, 0),
-# ('社保', '人事-工资', '社保相关', '工资', 8, 0),
-# ('公积金', '人事-工资', '公积金相关', '工资', 8, 0),
-# ('加班费', '人事-工资', '加班费相关', '工资', 8, 0),
-# ('调薪', '人事-工资', '调薪相关', '工资', 8, 0),
-# ('年终奖', '人事-工资', '年终奖相关', '工资', 8, 0),
-#
-# -- 招聘
-# ('招聘', '人事-招聘', '招聘总入口', NULL, NULL, 9),
-# ('校招', '人事-招聘', '校招相关', '招聘', 8, 0),
-# ('社招', '人事-招聘', '社招相关', '招聘', 8, 0),
-# ('面试', '人事-招聘', '面试相关', '招聘', 8, 0),
-# ('简历', '人事-招聘', '简历相关', '招聘', 8, 0),
-# ('offer', '人事-招聘', 'offer相关', '招聘', 8, 0),
-# ('背调', '人事-招聘', '背调相关', '招聘', 8, 0),
-# ('入职', '人事-招聘', '入职相关', '招聘', 8, 0),
-# ('试用期', '人事-招聘', '试用期相关', '招聘', 8, 0),
-# ('转正', '人事-招聘', '转正相关', '招聘', 8, 0),
-#
-# -- 技术支持
-# ('技术支持', '技术-支持', '技术支持总入口', NULL, NULL, 9),
-# ('登录', '技术-支持', '登录相关', '技术支持', 8, 0),
-# ('密码', '技术-支持', '密码相关', '技术支持', 8, 0),
-# ('账号冻结', '技术-支持', '账号冻结相关', '技术支持', 8, 0),
-# ('软件安装', '技术-支持', '软件安装相关', '技术支持', 8, 0),
-# ('电脑故障', '技术-支持', '电脑故障相关', '技术支持', 8, 0),
-# ('打印机', '技术-支持', '打印机相关', '技术支持', 8, 0),
-# ('VPN', '技术-支持', 'VPN相关', '技术支持', 8, 0),
-# ('邮箱', '技术-支持', '邮箱相关', '技术支持', 8, 0),
-# ('工单', '技术-支持', '工单相关', '技术支持', 8, 0),
-#
-# -- 网络
-# ('网络', '技术-网络', '网络总入口', NULL, NULL, 9),
-# ('断网', '技术-网络', '断网相关', '网络', 8, 0),
-# ('速度慢', '技术-网络', '速度慢相关', '网络', 8, 0),
-# ('WiFi', '技术-网络', 'WiFi相关', '网络', 8, 0),
-# ('内网', '技术-网络', '内网相关', '网络', 8, 0),
-# ('外网', '技术-网络', '外网相关', '网络', 8, 0),
-# ('DNS', '技术-网络', 'DNS相关', '网络', 8, 0),
-# ('代理', '技术-网络', '代理相关', '网络', 8, 0),
-# ('防火墙', '技术-网络', '防火墙相关', '网络', 8, 0),
-# ('路由器', '技术-网络', '路由器相关', '网络', 8, 0),
-#
-# -- 账号
-# ('账号', '技术-账号', '账号总入口', NULL, NULL, 9),
-# ('注册', '技术-账号', '注册相关', '账号', 8, 0),
-# ('绑定手机', '技术-账号', '绑定手机相关', '账号', 8, 0),
-# ('重置密码', '技术-账号', '重置密码相关', '账号', 8, 0),
-# ('修改邮箱', '技术-账号', '修改邮箱相关', '账号', 8, 0),
-# ('修改手机号', '技术-账号', '修改手机号相关', '账号', 8, 0),
-# ('登录异常', '技术-账号', '登录异常相关', '账号', 8, 0),
-# ('权限申请', '技术-账号', '权限申请相关', '账号', 8, 0),
-# ('账号注销', '技术-账号', '账号注销相关', '账号', 8, 0),
-# ('多因子认证', '技术-账号', '多因子认证相关', '账号', 8, 0),
-#
-# -- 客服
-# ('客服', '服务-支持', '客服总入口', NULL, NULL, 9),
-# ('退款', '服务-支持', '退款相关', '客服', 8, 0),
-# ('退货', '服务-支持', '退货相关', '客服', 8, 0),
-# ('物流', '服务-支持', '物流相关', '客服', 8, 0),
-# ('发货', '服务-支持', '发货相关', '客服', 8, 0),
-# ('签收异常', '服务-支持', '签收异常相关', '客服', 8, 0),
-# ('修改地址', '服务-支持', '修改地址相关', '客服', 8, 0),
-# ('取消订单', '服务-支持', '取消订单相关', '客服', 8, 0),
-# ('投诉', '服务-支持', '投诉相关', '客服', 8, 0),
-# ('售后', '服务-支持', '售后相关', '客服', 8, 0),
-#
-# -- 教务
-# ('教务', '教育-教务', '教务总入口', NULL, NULL, 9),
-# ('课程', '教育-教务', '课程相关', '教务', 8, 0),
-# ('报名', '教育-教务', '报名相关', '教务', 8, 0),
-# ('退课', '教育-教务', '退课相关', '教务', 8, 0),
-# ('考试', '教育-教务', '考试相关', '教务', 8, 0),
-# ('成绩', '教育-教务', '成绩相关', '教务', 8, 0),
-# ('补考', '教育-教务', '补考相关', '教务', 8, 0),
-# ('证书', '教育-教务', '证书相关', '教务', 8, 0),
-# ('学费', '教育-教务', '学费相关', '教务', 8, 0),
-# ('课表', '教育-教务', '课表相关', '教务', 8, 0);
--- 只加 user_id 字段（如果你之前没加）
-# ALTER TABLE chat_conversation
-#     ADD COLUMN `user_id` bigint NOT NULL COMMENT '用户ID' AFTER `chat_message_id`;
-#
-# -- 加上索引
-# ALTER TABLE chat_conversation
-#     ADD INDEX idx_user_conversation (`user_id`,`conversation_id`);
--- 用户评估表
-# CREATE TABLE `xy_user_evaluate` (
-#                                  `id` BIGINT NOT NULL AUTO_INCREMENT,
-#                                  `conversation_id` VARCHAR(64) NOT NULL,
-#                                  `message_id` VARCHAR(64) NOT NULL,
-#                                  `user_id` BIGINT NOT NULL,
-#                                  `feedback` TINYINT NOT NULL COMMENT '1-赞,0-踩',
-#                                  `reason` VARCHAR(100) DEFAULT NULL COMMENT '点踩原因分类',
-#                                  `comment` VARCHAR(500) DEFAULT NULL,
-#                                  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
-#                                  `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-#                                  PRIMARY KEY (`id`),
-#                                  KEY `idx_message` (`message_id`),
-#                                  KEY `idx_user` (`user_id`)
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-#
-# -- 系统评估表
-# CREATE TABLE `xy_system_evaluate` (
-#                                    `id` BIGINT NOT NULL AUTO_INCREMENT,
-#                                    `conversation_id` VARCHAR(64) NOT NULL,
-#                                    `message_id` VARCHAR(64) NOT NULL,
-#                                    `user_id` BIGINT DEFAULT NULL,
-#                                    `overall_score` DECIMAL(5,4) DEFAULT NULL,
-#                                    `retrieval_score` DECIMAL(5,4) DEFAULT NULL,
-#                                    `faithfulness_score` DECIMAL(5,4) DEFAULT NULL,
-#                                    `answer_relevance_score` DECIMAL(5,4) DEFAULT NULL,
-#                                    `completeness_score` DECIMAL(5,4) DEFAULT NULL,
-#                                    `retrieved_doc_count` INT DEFAULT NULL,
-#                                    `latency_ms` BIGINT DEFAULT NULL,
-#                                    `model_name` VARCHAR(50) DEFAULT NULL,
-#                                    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
-#                                    PRIMARY KEY (`id`),
-#                                    KEY `idx_message` (`message_id`)
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-# CREATE TABLE `xy_user_evaluate` (
-#                                     `message_id`      VARCHAR(64) NOT NULL COMMENT '消息ID，主键',
-#                                     `conversation_id` VARCHAR(64) NOT NULL COMMENT '对话ID',
-#                                     `user_id`         BIGINT      NOT NULL COMMENT '用户ID',
-#                                     `feedback`        TINYINT     NOT NULL COMMENT '1-赞,0-踩',
-#                                     `create_time`     DATETIME    DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-#                                     `update_time`     DATETIME    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-#                                     PRIMARY KEY (`message_id`)
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户点赞点踩评价表';
-#
-# -- 可选：为用户ID创建索引（便于查询某个用户的所有评价）
-# CREATE INDEX `idx_user` ON `xy_user_evaluate` (`user_id`);
-#
-# -- 可选：为会话ID创建索引（便于查询某个会话的评价）
-# CREATE INDEX `idx_conversation` ON `xy_user_evaluate` (`conversation_id`);
-# ALTER TABLE trace_record MODIFY start_time DATETIME COMMENT '执行开始时间';
+# -- auto-generated definition
+# create table xy_file_record
+# (
+#     file_chunk_id varchar(128)     not null
+#         primary key,
+#     use_count     bigint default 0 null comment '使用次数',
+#     file_name     varchar(255)     null comment '来源文件名'
+# )
+#     comment '文件记录表';
 
--- ==================== RAG 全链路追踪表 ====================
-# CREATE TABLE IF NOT EXISTS `trace_record` (
-#     `trace_id` VARCHAR(64) NOT NULL COMMENT '全链路唯一 traceId',
-#     `name` VARCHAR(255) DEFAULT NULL COMMENT '根节点名称或任务名',
-#     `start_time` DATETIME DEFAULT NULL COMMENT '链路开始时间',
-#     `status` VARCHAR(32) DEFAULT NULL COMMENT '链路状态(RUNNING/SUCCESS/ERROR)',
-#     `error_message` TEXT DEFAULT NULL COMMENT '错误消息',
-#     PRIMARY KEY (`trace_id`)
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='RAG 全链路追踪记录表';
-#
-# CREATE TABLE IF NOT EXISTS `node_record` (
-#     `node_id` VARCHAR(64) NOT NULL COMMENT '节点唯一 ID',
-#     `trace_id` VARCHAR(64) NOT NULL COMMENT '所属 traceId',
-#     `node_name` VARCHAR(255) DEFAULT NULL COMMENT '节点名称',
-#     `node_type` VARCHAR(64) DEFAULT NULL COMMENT '节点类型',
-#     `cost_time` BIGINT DEFAULT NULL COMMENT '节点耗时(毫秒)',
-#     `status` VARCHAR(32) DEFAULT NULL COMMENT '节点状态(SUCCESS/ERROR)',
-#     `error_message` TEXT DEFAULT NULL COMMENT '节点异常信息',
-#     PRIMARY KEY (`node_id`),
-#     KEY `idx_trace_id` (`trace_id`)
-# ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='RAG 链路节点记录表';
 
-# ALTER TABLE `chat_conversation`
-#     ADD COLUMN `feedback` INT NOT NULL DEFAULT -1 COMMENT '反馈：1-点赞，0-点踩，-1-未评价';
-# ALTER TABLE `chat_conversation` ADD INDEX idx_feedback (`feedback`);
 
 
 

@@ -1,7 +1,7 @@
 package com.XYai.myai.config;
 
-import com.XYai.myai.rag.aop.annotation.RagTraceContext;
 import com.XYai.myai.user.LoginUserInfoManager;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,13 +9,13 @@ import org.springframework.core.task.TaskDecorator;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 
+@Data
 @Configuration
 public class ThreadPoolConfig {
 
@@ -23,13 +23,13 @@ public class ThreadPoolConfig {
     private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
     // IO 密集型：线程数可设为 CPU 核数 * 2（理论值，需结合实际性能测试）
     private static final int IO_CORE = Math.max(CPU_COUNT * 2, 4);
-    private static final int IO_MAX  = Math.max(CPU_COUNT * 3, 12);
+    private static final int IO_MAX = Math.max(CPU_COUNT * 3, 12);
     // 混合型（兼顾 IO 与计算）
     private static final int MIXED_CORE = CPU_COUNT;
-    private static final int MIXED_MAX  = CPU_COUNT * 2;
+    private static final int MIXED_MAX = CPU_COUNT * 2;
 
-    private static final int QUEUE_CAPACITY = 200;         // 适当增大缓冲
-    private static final int KEEP_ALIVE_SECONDS = 120;     // 非核心线程存活时间
+    private static final int QUEUE_CAPACITY = 200; // 适当增大缓冲
+    private static final int KEEP_ALIVE_SECONDS = 120; // 非核心线程存活时间
     private static final int AWAIT_TERMINATION_SECONDS = 60;
 
     // ======================== 统一装饰器（单例，减少重复创建） ========================
@@ -37,21 +37,16 @@ public class ThreadPoolConfig {
     public TaskDecorator userContextDecorator() {
         return runnable -> {
             // ★ 在父线程（提交任务时）捕获当前上下文
-            String traceId = RagTraceContext.getTraceId();
             Long userId = LoginUserInfoManager.getUserId();
             SecurityContext securityContext = SecurityContextHolder.getContext();
 
             return () -> {
                 // 保存子线程原有上下文（用于恢复）
-                String originalTraceId = RagTraceContext.getTraceId();
                 Long originalUserId = LoginUserInfoManager.getUserId();
                 SecurityContext originalSecurity = SecurityContextHolder.getContext();
 
                 try {
                     // 注入父线程上下文
-                    if (traceId != null && !traceId.isBlank()) {
-                        RagTraceContext.setTraceId(traceId);
-                    }
                     if (userId != null) {
                         LoginUserInfoManager.setUserId(userId);
                     }
@@ -62,11 +57,6 @@ public class ThreadPoolConfig {
                     runnable.run();
                 } finally {
                     // 恢复子线程原上下文（避免内存泄漏 & 干扰后续任务）
-                    if (originalTraceId != null) {
-                        RagTraceContext.setTraceId(originalTraceId);
-                    } else {
-                        RagTraceContext.clear();
-                    }
                     if (originalUserId != null) {
                         LoginUserInfoManager.setUserId(originalUserId);
                     } else {
@@ -118,11 +108,16 @@ public class ThreadPoolConfig {
     // 如果需要保留旧 Bean 名称以兼容已有注入，可添加别名
     @Bean("userExecutor")
     public ThreadPoolTaskExecutor userExecutor(@Qualifier("taskUserExecutor") ThreadPoolTaskExecutor taskExecutor) {
-        return taskExecutor;   // 直接指向 taskExecutor
+        return taskExecutor; // 直接指向 taskExecutor
     }
 
     @Bean("memeryExecutor")
     public ThreadPoolTaskExecutor memeryExecutor(@Qualifier("ioBoundExecutor") ThreadPoolTaskExecutor ioBoundExecutor) {
+        return ioBoundExecutor;
+    }
+
+    @Bean("summaryExecutor")
+    public ThreadPoolTaskExecutor summaryExecutor(@Qualifier("ioBoundExecutor") ThreadPoolTaskExecutor ioBoundExecutor) {
         return ioBoundExecutor;
     }
 
@@ -131,13 +126,29 @@ public class ThreadPoolConfig {
         return ioBoundExecutor;
     }
 
+    @Bean("neo4jExecutor")
+    public ThreadPoolTaskExecutor neo4jExecutor(@Qualifier("ioBoundExecutor") ThreadPoolTaskExecutor ioBoundExecutor) {
+        return ioBoundExecutor;
+    }
+
     @Bean("searchChannelExecutor")
-    public ThreadPoolTaskExecutor searchChannelExecutor(@Qualifier("ioBoundExecutor") ThreadPoolTaskExecutor ioBoundExecutor) {
+    public ThreadPoolTaskExecutor searchChannelExecutor(
+            @Qualifier("ioBoundExecutor") ThreadPoolTaskExecutor ioBoundExecutor) {
         return ioBoundExecutor;
     }
 
     @Bean("intentExecutor")
     public ThreadPoolTaskExecutor intentExecutor(@Qualifier("ioBoundExecutor") ThreadPoolTaskExecutor ioBoundExecutor) {
+        return ioBoundExecutor;
+    }
+
+    @Bean("graphExecutor")
+    public ThreadPoolTaskExecutor graphExecutor(@Qualifier("ioBoundExecutor") ThreadPoolTaskExecutor ioBoundExecutor) {
+        return ioBoundExecutor;
+    }
+
+    @Bean("milvusExecutor")
+    public ThreadPoolTaskExecutor milvusExecutor(@Qualifier("ioBoundExecutor") ThreadPoolTaskExecutor ioBoundExecutor) {
         return ioBoundExecutor;
     }
 
@@ -153,6 +164,16 @@ public class ThreadPoolConfig {
     public ThreadPoolTaskExecutor traceExecutor(TaskDecorator userContextDecorator) {
         return buildExecutor("trace-", 2, 4, 200,
                 new ThreadPoolExecutor.CallerRunsPolicy(), userContextDecorator);
+    }
+
+    /**
+     * 系统评估专用线程池（异步 + 轻量，不阻塞主流程）
+     */
+    @Bean("evaluateExecutor")
+    public ThreadPoolTaskExecutor evaluateExecutor(TaskDecorator userContextDecorator) {
+        return buildExecutor("eval-", 2, 4, 100,
+                (r, e) -> {
+                }, userContextDecorator);
     }
 
     // ======================== Reactor Scheduler（TTL 感知） ========================

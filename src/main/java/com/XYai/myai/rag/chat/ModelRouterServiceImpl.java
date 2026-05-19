@@ -1,10 +1,7 @@
 package com.XYai.myai.rag.chat;
 
 
-import com.XYai.myai.rag.chat.ModelHealthStore;
-import com.XYai.myai.rag.chat.ModelRouterService;
-import com.XYai.myai.rag.chat.ModelRoutingExecutor;
-import com.XYai.myai.rag.chat.ModelSelector;
+import com.XYai.myai.rag.chat.pojo.StreamResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,19 +40,19 @@ public class ModelRouterServiceImpl implements ModelRouterService {
     }
 
     @Override
-    public Flux<String> routeStream(String prompt, String sessionId) {
+    public StreamResult routeStream(String prompt, String sessionId) {
         log.debug("流式路由调用 - sessionId: {}", sessionId);
         return routingExecutor.executeStream(prompt, sessionId);
     }
 
     @Override
-    public Flux<String> routeWithPreferredStream(String prompt, String preferredModel, String sessionId) {
+    public StreamResult routeWithPreferredStream(String prompt, String preferredModel, String sessionId) {
         log.debug("指定模型流式路由 - 首选模型: {}, sessionId: {}", preferredModel, sessionId);
         return routingExecutor.executeWithPreferredStream(prompt, preferredModel, sessionId);
     }
 
     @Override
-    public Flux<String> routeFastStream(String prompt, String sessionId) {
+    public StreamResult routeFastStream(String prompt, String sessionId) {
         log.debug("快速模式流式路由 - sessionId: {}", sessionId);
         return routingExecutor.executeConcurrentStream(prompt, sessionId, 5000L);
     }

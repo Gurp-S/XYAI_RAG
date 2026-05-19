@@ -1,14 +1,15 @@
 package com.XYai.myai.config;
 
 import jakarta.annotation.Resource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskDecorator;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.resource.PathResourceResolver;
 
 /**
  * Web MVC 配置类，统一定义接口跨域访问策略。
@@ -33,6 +34,32 @@ public class MvcConfiguration implements WebMvcConfigurer {
         executor.setTaskDecorator(userContextDecorator);  // ★ 添加装饰器
         executor.initialize();
         return executor;
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/xyAdmin/**")
+                .addResourceLocations("classpath:/static/xyAdmin/")
+                .resourceChain(true)
+                .addResolver(new PathResourceResolver() {
+                    @Override
+                    protected org.springframework.core.io.Resource getResource(
+                            String resourcePath, org.springframework.core.io.Resource location) {
+                        try {
+                            org.springframework.core.io.Resource resource = location.createRelative(resourcePath);
+                            if (resource.exists() && resource.isReadable()) {
+                                return resource;
+                            }
+                        } catch (Exception e) {
+                            // fall through to index.html fallback
+                        }
+                        try {
+                            return location.createRelative("index.html");
+                        } catch (Exception e) {
+                            return null;
+                        }
+                    }
+                });
     }
 
     @Override

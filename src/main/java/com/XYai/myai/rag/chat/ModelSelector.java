@@ -1,5 +1,6 @@
 package com.XYai.myai.rag.chat;
 
+import com.XYai.myai.rag.chat.pojo.ModelCandidateEntity;
 import com.XYai.myai.rag.chat.pojo.ModelRouterProperties;
 import jakarta.annotation.Resource;
 import lombok.Data;
@@ -29,19 +30,19 @@ public class ModelSelector {
      * 路由策略
      */
     public enum Strategy {
-        PRIORITY,      // 优先级优先（默认）
-        HEALTH_FIRST,  // 健康优先
-        ROUND_ROBIN    // 轮询
+        PRIORITY, // 优先级优先（默认）
+        HEALTH_FIRST, // 健康优先
+        ROUND_ROBIN // 轮询
     }
 
     /**
      * 获取所有可用模型（健康 + 启用）
      */
-    public List<ModelRouterProperties.ModelCandidate> getAvailableModels() {
+    public List<ModelCandidateEntity> getAvailableModels() {
         return routerProperties.getCandidates().stream()
-                .filter(ModelRouterProperties.ModelCandidate::isEnabled)
+                .filter(ModelCandidateEntity::isEnabled)
                 .filter(candidate -> healthStore.isHealthy(candidate.getName()))
-                .sorted(Comparator.comparingInt(ModelRouterProperties.ModelCandidate::getPriority))
+                .sorted(Comparator.comparingInt(ModelCandidateEntity::getPriority))
                 .collect(Collectors.toList());
     }
 
@@ -50,7 +51,7 @@ public class ModelSelector {
      */
     public List<String> getFallbackChain() {
         return getAvailableModels().stream()
-                .map(ModelRouterProperties.ModelCandidate::getName)
+                .map(ModelCandidateEntity::getName)
                 .collect(Collectors.toList());
     }
 
@@ -58,7 +59,7 @@ public class ModelSelector {
      * 选择最优模型
      */
     public String selectBestModel(Strategy strategy) {
-        List<ModelRouterProperties.ModelCandidate> candidates = getAvailableModels();
+        List<ModelCandidateEntity> candidates = getAvailableModels();
 
         if (candidates.isEmpty()) {
             log.warn("没有可用的模型，返回第一个启用的模型");
@@ -75,26 +76,28 @@ public class ModelSelector {
     /**
      * 优先级策略：返回优先级最高的
      */
-    private String prioritySelect(List<ModelRouterProperties.ModelCandidate> candidates) {
-        if (candidates.isEmpty()) return getFirstEnabledModel();
+    private String prioritySelect(List<ModelCandidateEntity> candidates) {
+        if (candidates.isEmpty())
+            return getFirstEnabledModel();
         return candidates.getFirst().getName();
     }
 
     /**
      * 健康优先策略：返回成功率最高的
      */
-    private String healthFirstSelect(List<ModelRouterProperties.ModelCandidate> candidates) {
+    private String healthFirstSelect(List<ModelCandidateEntity> candidates) {
         return candidates.stream()
                 .max(Comparator.comparingDouble(c -> healthStore.getSuccessRate(c.getName())))
-                .map(ModelRouterProperties.ModelCandidate::getName)
+                .map(ModelCandidateEntity::getName)
                 .orElse(getFirstEnabledModel());
     }
 
     /**
      * 轮询策略
      */
-    private String roundRobinSelect(List<ModelRouterProperties.ModelCandidate> candidates) {
-        if (candidates.isEmpty()) return getFirstEnabledModel();
+    private String roundRobinSelect(List<ModelCandidateEntity> candidates) {
+        if (candidates.isEmpty())
+            return getFirstEnabledModel();
         int index = (int) (System.currentTimeMillis() / 1000 % candidates.size());
         return candidates.get(index).getName();
     }
@@ -104,16 +107,16 @@ public class ModelSelector {
      */
     private String getFirstEnabledModel() {
         return routerProperties.getCandidates().stream()
-                .filter(ModelRouterProperties.ModelCandidate::isEnabled)
+                .filter(ModelCandidateEntity::isEnabled)
                 .findFirst()
-                .map(ModelRouterProperties.ModelCandidate::getName)
+                .map(ModelCandidateEntity::getName)
                 .orElse("qwen-turbo");
     }
 
     /**
      * 获取模型配置
      */
-    public ModelRouterProperties.ModelCandidate getCandidateByName(String name) {
+    public ModelCandidateEntity getCandidateByName(String name) {
         return routerProperties.getCandidates().stream()
                 .filter(c -> c.getName().equals(name))
                 .findFirst()

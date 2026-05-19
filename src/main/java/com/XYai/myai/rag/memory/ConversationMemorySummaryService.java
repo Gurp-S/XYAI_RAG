@@ -1,16 +1,18 @@
 package com.XYai.myai.rag.memory;
 
+import com.XYai.myai.commonUtils.redis.RedisKeyConfig;
 import com.XYai.myai.mapper.ChatConversationMapper;
 import com.XYai.myai.mapper.ChatSessionRecordMapper;
 import com.XYai.myai.rag.aop.annotation.RagTraceNode;
+import com.XYai.myai.rag.chat.ModelInvocationService;
 import com.XYai.myai.rag.chat.pojo.ChatMessage;
 import com.XYai.myai.rag.memory.pojo.ChatConversation;
 import com.XYai.myai.rag.memory.pojo.ChatSessionRecord;
 import com.XYai.myai.rag.memory.pojo.LoadSession;
 import com.XYai.myai.rag.memory.pojo.MemoryProperties;
-import com.XYai.myai.redis.RedisKeyConfig;
 import com.XYai.myai.user.LoginUserInfoManager;
 import com.alibaba.fastjson2.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -21,28 +23,62 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 /**
- * 会话记忆与摘要服务类（无锁优化版）
- * 核心思想：允许重复压缩，通过幂等性保证最终一致性
+ * 会话记忆与摘要服务（优化版）
+ * <p>
+ * 改进点：
+ * 1. 摘要提示词结构化，提高摘要质量
+ * 2. 线程池隔离：摘要生成使用独立线程池，避免阻塞快速任务
+ * 3. 数据库清理改为清理旧对话消息，而非会话记录
+ * 4. 历史加载只取最近 keepTurns 轮，避免全量拉取
+ * 5. 标题截断按字符数处理，防止乱码
  */
 @Slf4j
 @Service
 public class ConversationMemorySummaryService {
 
-    private static final String SUMMARY_PLACEHOLDER = "无";
-    private static final int MAX_TITLE_LENGTH = 10;
-    private static final int MAX_DB_RECORDS = 10;
+    private static final String systemMessage = """
+                    你是对话摘要助手。请根据「新对话」和「历史摘要」合并生成一个简洁的摘要。
+                    规则：
+                    - 摘要长度不超过 %d 个字。
+                    - 只保留用户的重要信息、偏好、决定或事实，去除寒暄、闲聊。
+                    - 使用流畅、中立的第三人称描述（如“用户询问了...，助手回答了...”）。
+                    - 如果历史摘要已有类似信息，不要重复，仅补充新内容。
+                    - 如果新对话无实质内容，可保持摘要不变。
+                    - 输出仅包含摘要文本，不要添加任何解释或标记。
+                    """;
+    private static final String userMessage = """
+                    历史摘要（不要复述）：
+                    %s
+                    
+                    新对话：
+                    %s
+                    
+                    输出更新后的摘要：
+                    """;
 
-    // 压缩状态标记（防止同一会话并发压缩）
+
+    private static final String SUMMARY_PLACEHOLDER = "无";
+    private static final int MAX_TITLE_LENGTH = 20;          // 标题最大字符数
+    private static final int MAX_DB_MESSAGES = 200;          // 每个会话保留的最大消息数
+
+    // 本地去重标记，防止同一会话并发压缩（轻量级）
     private final Set<String> compressingKeys = ConcurrentHashMap.newKeySet();
 
     @Resource
@@ -50,6 +86,10 @@ public class ConversationMemorySummaryService {
 
     @Resource
     private ChatModel chatModel;
+
+    @Resource
+    @Lazy
+    private ModelInvocationService modelInvocation;
 
     @Resource
     private ChatSessionRecordMapper chatSessionRecordMapper;
@@ -63,10 +103,13 @@ public class ConversationMemorySummaryService {
     @Resource(name = "memeryExecutor")
     private ThreadPoolTaskExecutor memoryCompactExecutor;
 
+    @Resource(name = "summaryExecutor")
+    private ThreadPoolTaskExecutor summaryExecutor;
+
     // ==================== 公共 API ====================
 
     /**
-     * 判断是否需要触发摘要压缩（异步入口，无锁）
+     * 异步触发摘要压缩（本地去重）
      */
     @RagTraceNode(name = "会话记忆压缩", type = "记忆压缩")
     public void compressIfNeeded(String conversationId, ChatMessage message) {
@@ -80,7 +123,7 @@ public class ConversationMemorySummaryService {
             return;
         }
 
-        // 使用 Set 防止同一会话并发压缩（轻量级，无锁）
+        // 本地去重：同一会话+用户如果正在压缩则跳过
         String compressKey = conversationId + ":" + userId;
         if (!compressingKeys.add(compressKey)) {
             log.debug("压缩任务已在执行中，跳过: {}", compressKey);
@@ -99,9 +142,8 @@ public class ConversationMemorySummaryService {
     }
 
     /**
-     * 加载会话上下文
+     * 加载会话上下文（仅加载最近 keepTurns 轮完整对话，避免全量拉取）
      */
-    @RagTraceNode(name = "加载会话记忆", type = "记忆加载")
     public LoadSession load(String conversationId) {
         Long userId = LoginUserInfoManager.getUserId();
         if (userId == null) {
@@ -114,7 +156,9 @@ public class ConversationMemorySummaryService {
         RScoredSortedSet<String> scoredSet = redissonClient.getScoredSortedSet(conversationKey);
         RBucket<String> summaryBucket = redissonClient.getBucket(summaryKey);
 
-        Collection<String> convoObjs = scoredSet.valueRange(0, -1);
+        int keepTurns = memoryProperties.getHistoryKeepTurns();
+        // 只取最后 keepTurns 条消息（score 升序，最新在末尾）
+        Collection<String> convoObjs = scoredSet.valueRange(-keepTurns, -1);
         Set<ChatMessage> conversations = parseConversations(convoObjs);
         String summary = summaryBucket.get();
 
@@ -147,7 +191,7 @@ public class ConversationMemorySummaryService {
     }
 
     /**
-     * 执行压缩（无锁，使用幂等设计）
+     * 核心压缩逻辑
      */
     private void doCompressIfNeeded(String conversationId, ChatMessage message, Long userId) {
         int maxTurns = memoryProperties.getSummaryStartTurns();
@@ -160,32 +204,30 @@ public class ConversationMemorySummaryService {
         String chatMessageKey = RedisKeyConfig.userConversationRecord(userId, conversationId);
         RScoredSortedSet<String> scoredSet = redissonClient.getScoredSortedSet(chatMessageKey);
 
-        // 1. 先保存当前消息
+        // 1. 保存当前消息
         scoredSet.add(System.currentTimeMillis(), JSON.toJSONString(message));
 
-        // 2. 异步保存到数据库（不阻塞）
+        // 2. 异步保存到数据库
         asyncSaveToDatabase(conversationId, message);
 
-        // 3. 检查是否需要压缩（基于当前大小）
+        // 3. 检查是否需要压缩
         long total = scoredSet.size();
         if (total < maxTurns) {
             return;
         }
 
-        // 4. 计算需要压缩的数量
         int toCompressCount = maxTurns - keepTurns;
         if (toCompressCount <= 0) {
             return;
         }
 
-        // 5. 原子性取出并删除（Redis 的 ZRANGE + ZREMRANGE 不是原子的，但允许重复压缩）
-        //    重复压缩时，可能取到的消息变少，通过幂等性保证最终一致
+        // 4. 获取最早的要压缩的消息
         Collection<String> toCompress = scoredSet.valueRange(0, toCompressCount - 1);
         if (toCompress == null || toCompress.isEmpty()) {
             return;
         }
 
-        // 删除已被压缩的消息
+        // 5. 删除已被压缩的消息
         scoredSet.removeAll(toCompress);
 
         // 6. 获取现有摘要
@@ -193,25 +235,25 @@ public class ConversationMemorySummaryService {
         RBucket<String> summaryBucket = redissonClient.getBucket(summaryKey);
         String existingSummary = summaryBucket.get();
 
-        // 7. 生成新摘要（异步，不阻塞）
-        generateAndSaveSummary(conversationId, userId, existingSummary, toCompress);
+        // 7. 提交摘要生成任务到专用线程池（不阻塞当前线程）
+        generateAndSaveSummary(conversationId, message.getChatMessageId(), userId, existingSummary, toCompress);
     }
 
     /**
-     * 异步生成并保存摘要
+     * 异步生成摘要并保存（使用 summaryGeneratorExecutor）
      */
-    private void generateAndSaveSummary(String conversationId, Long userId,
+    private void generateAndSaveSummary(String conversationId, String chatMessageId, Long userId,
                                         String existingSummary, Collection<String> toCompress) {
-        memoryCompactExecutor.execute(() -> {
+        summaryExecutor.execute(() -> {
             try {
-                String newSummary = generateSummary(existingSummary, toCompress);
+                String newSummary = generateSummary(existingSummary, toCompress, conversationId, chatMessageId, userId);
                 if (newSummary != null && !newSummary.equals(existingSummary)) {
-                    // 保存摘要
+                    // 保存摘要到 Redis
                     String summaryKey = RedisKeyConfig.userSummaryRecord(userId, conversationId);
                     RBucket<String> summaryBucket = redissonClient.getBucket(summaryKey);
                     summaryBucket.set(newSummary);
 
-                    // 更新数据库
+                    // 更新数据库（异步，继续使用 summaryGeneratorExecutor 或 memoryCompactExecutor）
                     asyncUpdateSummary(conversationId, newSummary);
                 }
             } catch (Exception e) {
@@ -221,36 +263,44 @@ public class ConversationMemorySummaryService {
     }
 
     /**
-     * 生成摘要（调用 LLM）
+     * 调用 LLM 生成摘要（优化后的提示词）
      */
-    private String generateSummary(String existingSummary, Collection<String> toCompress) {
+    private String generateSummary(String existingSummary, Collection<String> toCompress,
+                                   String conversationId, String chatMessageId, Long userId) {
         try {
             String historyText = formatMessagesForSummary(toCompress);
             String existing = (existingSummary == null || existingSummary.isBlank())
-                    ? SUMMARY_PLACEHOLDER : existingSummary;
-
-            String systemMessage = String.format(
-                    "合并摘要。要求：≤%d字，去寒暄，纯文本。",
-                    memoryProperties.getSummaryMaxChars());
-            String userMessage = String.format("""
-                    历史摘要（参考，不要复述）:
-                    %s
-                    新对话:
-                    %s
-                    请输出更新后的摘要:
-                    """, existing, historyText);
-
+                    ? SUMMARY_PLACEHOLDER
+                    : existingSummary;
+            String systemMessage = String.format(ConversationMemorySummaryService.systemMessage, memoryProperties.getSummaryMaxChars());
+            String userMessage = String.format(ConversationMemorySummaryService.userMessage, existing, historyText);
             Prompt prompt = new Prompt(
                     new SystemMessage(systemMessage),
-                    new UserMessage(userMessage)
-            );
-
+                    new UserMessage(userMessage));
             long startTime = System.currentTimeMillis();
-            String raw = chatModel.call(prompt).getResult().getOutput().getText();
-            long duration = System.currentTimeMillis() - startTime;
-
-            log.debug("摘要生成完成，耗时: {}ms, conversationId", duration);
-            return (raw == null || raw.isBlank()) ? existingSummary : raw;
+            CompletableFuture<String> future = CompletableFuture.supplyAsync(
+                    () -> chatModel.call(prompt).getResult().getOutput().getText(),
+                    summaryExecutor);
+            String raw;
+            try {
+                raw = future.get(15, TimeUnit.SECONDS);
+            } catch (TimeoutException e) {
+                log.warn("摘要生成超时，使用现有摘要");
+                return existingSummary;
+            }
+            long durationMs = System.currentTimeMillis() - startTime;
+            // 记录 Token 使用
+            modelInvocation.saveTokenUseAsync(
+                    conversationId,
+                    chatMessageId,
+                    (long) prompt.toString().length(),
+                    (long) raw.length(),
+                    userId,
+                    durationMs,
+                    chatModel.getDefaultOptions().getModel(),
+                    "summary");
+            log.debug("摘要生成完成，耗时: {}ms", durationMs);
+            return raw.isBlank() ? existingSummary : raw;
 
         } catch (Exception e) {
             log.error("生成摘要失败", e);
@@ -259,7 +309,7 @@ public class ConversationMemorySummaryService {
     }
 
     /**
-     * 格式化消息用于摘要
+     * 格式化消息用于摘要输入
      */
     private String formatMessagesForSummary(Collection<String> messages) {
         return messages.stream()
@@ -273,18 +323,20 @@ public class ConversationMemorySummaryService {
                     }
                 })
                 .filter(s -> !s.isBlank())
-                .collect(Collectors.joining("；"));
+                .collect(Collectors.joining("\n"));
     }
 
+    // ==================== 数据库操作 ====================
+
     /**
-     * 异步保存到数据库
+     * 异步保存会话数据到数据库
      */
     private void asyncSaveToDatabase(String conversationId, ChatMessage message) {
         memoryCompactExecutor.execute(() -> {
             try {
                 saveOrUpdateSessionRecord(conversationId, message);
                 saveConversationMessage(conversationId, message);
-                cleanupOldRecords(conversationId);
+                cleanupOldMessages(conversationId);
             } catch (Exception e) {
                 log.error("保存会话到数据库失败: conversationId={}", conversationId, e);
             }
@@ -293,7 +345,9 @@ public class ConversationMemorySummaryService {
 
     private void saveOrUpdateSessionRecord(String conversationId, ChatMessage message) {
         ChatSessionRecord existing = chatSessionRecordMapper.selectById(conversationId);
-        if (existing != null) return;
+        if (existing != null) {
+            return;
+        }
 
         String title = extractTitle(message.getUserMessage());
         ChatSessionRecord record = new ChatSessionRecord();
@@ -309,35 +363,60 @@ public class ConversationMemorySummaryService {
         }
     }
 
+    /**
+     * 提取会话标题（优化：按字符数截断，防止乱码）
+     */
     private String extractTitle(String userMessage) {
-        if (userMessage == null || userMessage.isBlank()) return "新对话";
+        if (userMessage == null || userMessage.isBlank()) {
+            return "新对话";
+        }
         String trimmed = userMessage.trim();
-        return trimmed.length() > MAX_TITLE_LENGTH ? trimmed.substring(0, MAX_TITLE_LENGTH) : trimmed;
+        if (trimmed.length() > MAX_TITLE_LENGTH) {
+            return trimmed.substring(0, MAX_TITLE_LENGTH) + "...";
+        }
+        return trimmed;
     }
 
     private void saveConversationMessage(String conversationId, ChatMessage message) {
         ChatConversation conversation = new ChatConversation();
-        conversation.setChatMessageId(UUID.randomUUID().toString());
+        conversation.setChatMessageId(message.getChatMessageId());
         conversation.setUserId(message.getUserId());
         conversation.setConversationId(conversationId);
         conversation.setUserMessage(message.getUserMessage());
         conversation.setAssistantMessage(message.getAssistantMessage());
         conversation.setCreatedAt(LocalDateTime.now().withNano(0));
-        chatConversationMapper.insert(conversation);
-    }
-
-    private void cleanupOldRecords(String conversationId) {
         try {
-            long total = chatSessionRecordMapper.countByConversationId(conversationId);
-            int deleteCount = (int) Math.max(0, total - MAX_DB_RECORDS);
-            if (deleteCount > 0) {
-                chatSessionRecordMapper.deleteOldestByLimit(conversationId, deleteCount);
-            }
-        } catch (Exception e) {
-            log.warn("清理过期记录失败: conversationId={}", conversationId, e);
+            chatConversationMapper.insert(conversation);
+        } catch (DuplicateKeyException e) {
+            log.debug("消息已存在: chatMessageId={}", message.getChatMessageId());
         }
     }
 
+    /**
+     * 清理旧消息：每个会话最多保留 MAX_DB_MESSAGES 条记录
+     */
+    private void cleanupOldMessages(String conversationId) {
+        try {
+            // 查询当前会话的消息总数
+            Long count = chatConversationMapper.selectCount(
+                    new LambdaQueryWrapper<ChatConversation>()
+                            .eq(ChatConversation::getConversationId, conversationId));
+            if (count == null) return;
+
+            int deleteCount = (int) Math.max(0, count - MAX_DB_MESSAGES);
+            if (deleteCount > 0) {
+                // 删除最旧的 deleteCount 条消息（依赖 Mapper 中实现的方法）
+                chatConversationMapper.deleteOldestMessages(conversationId, deleteCount);
+                log.debug("清理旧消息: conversationId={}, deleteCount={}", conversationId, deleteCount);
+            }
+        } catch (Exception e) {
+            log.warn("清理旧消息失败: conversationId={}", conversationId, e);
+        }
+    }
+
+    /**
+     * 异步更新数据库中的摘要字段
+     */
     private void asyncUpdateSummary(String conversationId, String summary) {
         memoryCompactExecutor.execute(() -> {
             try {

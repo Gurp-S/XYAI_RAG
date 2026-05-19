@@ -22,4 +22,5 @@ public class ChatMessage {
     String senderName;
     String content;
     long timestamp;
+    String status;
 }

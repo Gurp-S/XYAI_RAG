@@ -3,19 +3,17 @@ package com.XYai.myai.rag.intent;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import com.XYai.myai.commonUtils.IK.IKAnalyzerTokenize;
+import com.XYai.myai.commonUtils.redis.RedisKeyConfig;
 import com.XYai.myai.mapper.IntentNodeMapper;
 import com.XYai.myai.rag.intent.pojo.*;
 import com.XYai.myai.rag.memory.pojo.LoadSession;
 import com.XYai.myai.rag.milvus.MilvusVectorStoreConfig;
 import com.XYai.myai.rag.rewrite.pojo.RewriteResult;
-import com.XYai.myai.redis.RedisKeyConfig;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.jetbrains.annotations.NotNull;
 import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
@@ -24,15 +22,11 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.document.Document;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ai.vectorstore.SearchRequest;
-import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
-import org.wltea.analyzer.lucene.IKAnalyzer;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -47,7 +41,6 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 public class IntentRecognitionServiceIml implements IntentRecognitionService {
-    private static final Analyzer IK_ANALYZER = new IKAnalyzer(true);
     private static final String INTENT_NODE_NAME = "intent:tree:node:";
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -62,11 +55,11 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
     @Resource
     private IntentProperties intentProperties;
     @Resource
-    private VectorStore vectorStore;
-    @Resource
     private RedissonClient redissonClient;
     @Resource
     private MilvusVectorStoreConfig milvusVectorStoreConfig;
+    @Resource
+    private IKAnalyzerTokenize ikAnalyzerTokenize;
 
     private List<Document> docs;
 
@@ -133,9 +126,8 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
      */
     private SubQuestionIntent classifyIntent(String query, LoadSession load) {
         if (query == null || StrUtil.isBlank(query)) return null;
-        //TODO 同义词映射
-        //分词判断
-        List<String> tokenizes = tokenizeWithIk(query);
+        // 分词判断（同义词映射可在后续版本添加）
+        List<String> tokenizes = ikAnalyzerTokenize.tokenize(query);
         log.info("意图识别的问题:{}",query);
         // 读取redis意图树.有->返回,没有->数据库查询
         if (intentProperties.getRedisEnabled()) {
@@ -425,7 +417,6 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
 
     /**
      * 将意图节点缓存到 Redis，便于快速匹配。
-     * TODO修改
      *
      * @param token 要缓存的意图节点
      */
@@ -495,35 +486,5 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
                 .subIntent(matches)
                 .nodeScore(NodesScore.builder().nodeScoreList(nodeScores).build())
                 .build();
-    }
-
-    /**
-     * 使用 IKAnalyzer（Lucene 分词器）进行中文分词并做基础清洗（去空、trim）。
-     *
-     * @param text 待分词文本
-     * @return 处理后的 token 列表
-     */
-    private List<String> tokenizeWithIk(String text) {
-        if (text == null || text.isBlank()) return List.of();
-        List<String> tokens = new ArrayList<>();
-        try (TokenStream tokenStream = IK_ANALYZER.tokenStream("", text)) {
-            CharTermAttribute termAttr = tokenStream.addAttribute(CharTermAttribute.class);
-            tokenStream.reset();
-            while (tokenStream.incrementToken()) {
-                String term = termAttr.toString().trim();
-                if (!term.isEmpty()) {
-                    tokens.add(term);
-                }
-            }
-            tokenStream.end();
-        } catch (IOException e) {
-            log.warn("IKAnalyzer 分词失败，回退返回原始文本分割", e);
-            // 回退：简单按空格拆分
-            String[] parts = text.trim().split("\\s+");
-            for (String p : parts) {
-                if (!p.isBlank()) tokens.add(p.trim());
-            }
-        }
-        return tokens;
     }
 }
