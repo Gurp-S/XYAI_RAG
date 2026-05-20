@@ -54,6 +54,16 @@ public class TraceRecordServiceIml implements TraceRecordService {
     }
 
     @Override
+    public void recordNodeWarn(String traceId, String nodeId, String warnMessage, long costTime) {
+        nodeRecordMapper.updateNodeStatus(nodeId, "WARN", LocalDateTime.now(), costTime, warnMessage);
+    }
+
+    @Override
+    public void recordRunWarn(String traceId, String warnMessage, long costTime) {
+        traceRecordMapper.updateByTraceId(traceId, "WARN", LocalDateTime.now(), costTime, warnMessage);
+    }
+
+    @Override
     public void recordNodeError(String traceId, String nodeId, String message) {
         nodeRecordMapper.updateNodeStatus(nodeId, "ERROR", LocalDateTime.now(), null, message);
     }

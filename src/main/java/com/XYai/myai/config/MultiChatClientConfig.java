@@ -5,9 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.ollama.OllamaEmbeddingModel;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,16 +28,13 @@ import java.util.concurrent.ConcurrentHashMap;
 @Configuration
 public class MultiChatClientConfig {
 
+    private static final Map<String, ChatClient> map = new ConcurrentHashMap<>();
     @Value("${spring.ai.openai.api-key}")
     private String apiKey;
-
     @Value("${spring.ai.openai.base-url}")
     private String baseUrl;
-
     @Resource
     private Environment environment;
-
-    private static final Map<String, ChatClient> map = new ConcurrentHashMap<>();
 
     /**
      * 获取可变模型映射（供运行时注册新模型）
@@ -59,12 +56,18 @@ public class MultiChatClientConfig {
 
     // ==================== Embedding ====================
 
+//    @Bean
+//    @Primary
+//    public EmbeddingModel embeddingModel(OpenAiEmbeddingModel openAiEmbeddingModel) {
+//        return openAiEmbeddingModel;
+//    }
+
+
     @Bean
     @Primary
-    public EmbeddingModel embeddingModel(OpenAiEmbeddingModel openAiEmbeddingModel) {
-        return openAiEmbeddingModel;
+    public EmbeddingModel embeddingModel(OllamaEmbeddingModel ollamaEmbeddingModel) {
+        return ollamaEmbeddingModel;
     }
-
     // ==================== 结构化输出专用 Bean（兼容旧引用） ====================
 
     @Bean("structuredOutputModel")
@@ -73,7 +76,7 @@ public class MultiChatClientConfig {
         return OpenAiChatModel.builder()
                 .openAiApi(openAiApi)
                 .defaultOptions(OpenAiChatOptions.builder()
-                        .model("qwen3.6-27b")
+                        .model("deepseek-r1-distill-qwen-7b")
                         .temperature(0.1)
                         .maxTokens(2000)
                         .build())
@@ -92,10 +95,10 @@ public class MultiChatClientConfig {
     @Primary
     public ChatClient defaultChatClient() {
         ChatClient fallback = ChatClient.builder(
-                OpenAiChatModel.builder()
-                        .openAiApi(openAiApi())
-                        .defaultOptions(OpenAiChatOptions.builder().model("qwen-turbo").build())
-                        .build())
+                        OpenAiChatModel.builder()
+                                .openAiApi(openAiApi())
+                                .defaultOptions(OpenAiChatOptions.builder().model("qwen-turbo").build())
+                                .build())
                 .build();
         return map.isEmpty() ? fallback : map.values().iterator().next();
     }

@@ -1,13 +1,11 @@
 package com.XYai.myai.rag.chat;
 
-
-import com.XYai.myai.rag.chat.pojo.StreamResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * 模型路由服务实现
@@ -40,21 +38,24 @@ public class ModelRouterServiceImpl implements ModelRouterService {
     }
 
     @Override
-    public StreamResult routeStream(String prompt, String sessionId) {
+    public String routeStream(String prompt, String sessionId,
+                              Consumer<String> onChunk, Consumer<Throwable> onError, Runnable onComplete) {
         log.debug("流式路由调用 - sessionId: {}", sessionId);
-        return routingExecutor.executeStream(prompt, sessionId);
+        return routingExecutor.executeStream(prompt, sessionId, onChunk, onError, onComplete);
     }
 
     @Override
-    public StreamResult routeWithPreferredStream(String prompt, String preferredModel, String sessionId) {
+    public String routeWithPreferredStream(String prompt, String preferredModel, String sessionId,
+                                           Consumer<String> onChunk, Consumer<Throwable> onError, Runnable onComplete) {
         log.debug("指定模型流式路由 - 首选模型: {}, sessionId: {}", preferredModel, sessionId);
-        return routingExecutor.executeWithPreferredStream(prompt, preferredModel, sessionId);
+        return routingExecutor.executeWithPreferredStream(prompt, preferredModel, sessionId, onChunk, onError, onComplete);
     }
 
     @Override
-    public StreamResult routeFastStream(String prompt, String sessionId) {
+    public String routeFastStream(String prompt, String sessionId,
+                                  Consumer<String> onChunk, Consumer<Throwable> onError, Runnable onComplete) {
         log.debug("快速模式流式路由 - sessionId: {}", sessionId);
-        return routingExecutor.executeConcurrentStream(prompt, sessionId, 5000L);
+        return routingExecutor.executeConcurrentStream(prompt, sessionId, 5000L, onChunk, onError, onComplete);
     }
 
     @Override

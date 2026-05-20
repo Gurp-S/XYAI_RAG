@@ -23,6 +23,10 @@ spring:
           max-active: 16
           max-idle: 8
           min-idle: 2
+  servlet:
+    multipart:
+      max-file-size: 100MB      # 单个文件最大大小
+      max-request-size: 100MB
   neo4j:
     uri: bolt://localhost:7687
     authentication:
@@ -239,3 +243,6 @@ jwt:
   rsa-public-key-path: classpath:keys/public_x509.pem
 retrieval:
   rerank-l-lM: false
+
+
+

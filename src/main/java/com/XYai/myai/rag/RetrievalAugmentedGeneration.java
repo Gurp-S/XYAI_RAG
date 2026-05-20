@@ -1,5 +1,6 @@
 package com.XYai.myai.rag;
 
+import com.XYai.myai.rag.aop.annotation.RagTraceContext;
 import com.XYai.myai.rag.aop.annotation.RagTraceNode;
 import com.XYai.myai.rag.channel.MultiChannelRetrievalEngine;
 import com.XYai.myai.rag.channel.pojo.RetrievedChunk;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -69,7 +71,6 @@ public class RetrievalAugmentedGeneration {
     public UserContext getUserContext() {
         Long userId = LoginUserInfoManager.getUserId();
         SecurityContext securityCtx = SecurityContextHolder.getContext();
-        log.info("[RAG] 步骤1: 获取用户上下文, userId={}, thread={}", userId, Thread.currentThread().getName());
         return new UserContext(userId, securityCtx);
     }
 
@@ -77,54 +78,34 @@ public class RetrievalAugmentedGeneration {
 
     @RagTraceNode(name = "加载MCP工具", type = "MCP工具")
     public CompletableFuture<List<ToolProcessorResult>> loadMCPToolsAsync(String message,LoadSession memorySession,String conversationId,String chatMessageId) {
-        log.info("[RAG] 步骤2: 提交MCP工具异步任务, thread={}", Thread.currentThread().getName());
         return CompletableFuture.supplyAsync(
                 () -> {
-                    log.info("[RAG] 步骤2.mcp: MCP任务开始执行, thread={}", Thread.currentThread().getName());
-                    long t1 = System.currentTimeMillis();
-                    List<ToolProcessorResult> results = toolDecisionManager.toolProcessor(message, memorySession,conversationId,chatMessageId);
-                    log.info("[RAG] 步骤2.mcp: MCP任务完成, 结果数={}, 耗时={}ms",
-                            results.size(), System.currentTimeMillis() - t1);
-                    return results;
+                    return toolDecisionManager.toolProcessor(message, memorySession,conversationId,chatMessageId);
                 },
-                mcpExecutor);
+                mcpExecutor)
+                .orTimeout(35, TimeUnit.SECONDS)   // 整体超时35秒
+                .exceptionally(ex -> {
+                    log.error("MCP工具加载失败或超时", ex);
+                    return List.of();  // 降级空列表
+                });
     }
 
     // ==================== 步骤3：异步加载会话记忆 ====================
     @RagTraceNode(name = "加载会话记忆", type = "会话记忆")
     public LoadSession loadMemoryAsync(String conversationId) {
-        log.info("[RAG] 步骤3: 提交会话记忆异步任务, thread={}", Thread.currentThread().getName());
-        log.info("[RAG] 步骤3.mem: 会话记忆任务开始执行, thread={}", Thread.currentThread().getName());
-        long t1 = System.currentTimeMillis();
-        LoadSession session = conversationMemorySummaryService.load(conversationId);
-        log.info("[RAG] 步骤3.mem: 会话记忆任务完成, hasHistory={}, 耗时={}ms",
-                session != null && session.getHistoryAsText() != null,
-                System.currentTimeMillis() - t1);
-        return session;
+        return conversationMemorySummaryService.load(conversationId);
     }
 
     // ==================== 步骤4：同步执行查询重写 ====================
     @RagTraceNode(name = "查询重写", type = "查询重写")
     public RewriteResult rewriteQuery(String message,String conversationId,String chatMessageId) {
-        log.info("[RAG] 步骤4: 查询重写, thread={}", Thread.currentThread().getName());
-        long t1 = System.currentTimeMillis();
-        RewriteResult result = queryRewriter.rewrite(message,conversationId,chatMessageId);
-        log.info("[RAG] 步骤4完成: rewritten='{}', 耗时={}ms",
-                result != null ? result.getRewrittenQuery() : "null",
-                System.currentTimeMillis() - t1);
-        return result;
+        return queryRewriter.rewrite(message,conversationId,chatMessageId);
     }
 
     // ==================== 步骤5：同步执行实体识别 ====================
     @RagTraceNode(name = "实体识别", type = "实体识别")
     public Map<String, Integer> recognizeIntent(String rewrittenUserMessage) {
-        log.info("[RAG] 步骤5: 实体识别, thread={}", Thread.currentThread().getName());
-        long t1 = System.currentTimeMillis();
-        Map<String, Integer> fileChunkIds = neo4jKnowledgeGraphService.getUserMessageFileChunkId(rewrittenUserMessage);
-        log.info("[RAG] 步骤5完成: fileChunkId数量={}, 耗时={}ms",
-                fileChunkIds != null ? fileChunkIds.size() : 0,
-                System.currentTimeMillis() - t1);
-        return fileChunkIds;
+        return neo4jKnowledgeGraphService.getUserMessageFileChunkId(rewrittenUserMessage);
     }
 
     // ==================== 步骤6：同步执行多通道文档检索 ====================
@@ -134,15 +115,8 @@ public class RetrievalAugmentedGeneration {
             RewriteResult rewritten,
             String conversationId,
             String originalMessage) {
-        log.info("[RAG] 步骤6: 多通道文档检索, entity数={}, thread={}",
-                userMessageEntityFileChunkIds != null ? userMessageEntityFileChunkIds.size() : 0, Thread.currentThread().getName());
-        long t1 = System.currentTimeMillis();
-        List<RetrievedChunk> results = multiChannelRetrievalEngine.retrieve(userMessageEntityFileChunkIds, rewritten, conversationId,
+        return multiChannelRetrievalEngine.retrieve(userMessageEntityFileChunkIds, rewritten, conversationId,
                 originalMessage);
-        log.info("[RAG] 步骤6完成: retrieved数量={}, 耗时={}ms",
-                results != null ? results.size() : 0,
-                System.currentTimeMillis() - t1);
-        return results;
     }
 
     // ==================== 步骤7：等待异步结果并构建RAG结果 ====================
@@ -153,50 +127,31 @@ public class RetrievalAugmentedGeneration {
             RewriteResult rewritten,
             List<RetrievedChunk> retrieved,
             String originalMessage) throws Exception {
-
-        log.info("[RAG] 步骤7: 等待异步结果并构建RAGResult, thread={}", Thread.currentThread().getName());
-
-        long t1 = System.currentTimeMillis();
         List<ToolProcessorResult> toolResults;
         try {
             toolResults = mcpFuture.get(30, java.util.concurrent.TimeUnit.SECONDS);
         } catch (Exception e) {
-            log.warn("[RAG] 步骤7.mcp: 等待超时或异常, 使用空结果: {}", e.getMessage());
+            log.warn("mcp等待超时或异常, 使用空结果: {}", e.getMessage());
             toolResults = List.of();
         }
-        log.info("[RAG] 步骤7.mcp: MCP结果获取成功, 共{}个, 耗时={}ms",
-                toolResults.size(), System.currentTimeMillis() - t1);
-
-        long t2 = System.currentTimeMillis();
-        log.info("[RAG] 步骤7.mem: 记忆结果获取成功, 耗时={}ms", System.currentTimeMillis() - t2);
-
         String historyText = (memorySession == null) ? "无" : memorySession.getHistoryAsText();
         String summaryText = (memorySession == null) ? "无" : memorySession.getSummary();
-
         String retrieveText = retrieved.isEmpty() ? "无"
                 : retrieved.stream()
                   .map(RetrievedChunk::getContent)
                   .filter(Objects::nonNull)
                   .collect(Collectors.joining("\n---\n"));
-
         String mcpText = toolResults.isEmpty() ? "无"
                 : toolResults.stream()
                   .filter(ToolProcessorResult::isSuccess)
                   .map(t -> t.getToolName() + ":\n" + t.getResult())
                   .collect(Collectors.joining("\n----------------\n"));
-
         return new RAGResult(retrieveText, mcpText, summaryText, historyText, originalMessage);
     }
 
     // ==================== 步骤8：格式化最终Prompt ====================
     @RagTraceNode(name = "Prompt", type = "Prompt")
     public String formatFinalPrompt(RAGResult ragResult, String systemMessage,String fileContent) {
-        log.info("[RAG] 步骤8: 格式化最终Prompt, thread={}", Thread.currentThread().getName());
-        log.info("[RAG] 步骤8: systemMessage长度={}, mcpText长度={}, retrieveText长度={}",
-                systemMessage != null ? systemMessage.length() : 0,
-                ragResult.getMcpText() != null ? ragResult.getMcpText().length() : 0,
-                ragResult.getRetrieveText() != null ? ragResult.getRetrieveText().length() : 0);
-
         String userMessage = String.format(USER_MESSAGE_TEMPLATE,
                 ragResult.getRetrieveText(),
                 ragResult.getMcpText(),
@@ -204,9 +159,6 @@ public class RetrievalAugmentedGeneration {
                 ragResult.getHistoryText(),
                 fileContent,
                 ragResult.getOriginalMessage());
-
-        String finalPrompt = systemMessage + "\n\n" + userMessage;
-        log.info("[RAG] 步骤8完成: finalPrompt总长度={}", finalPrompt.length());
-        return finalPrompt;
+        return systemMessage + "\n\n" + userMessage;
     }
 }

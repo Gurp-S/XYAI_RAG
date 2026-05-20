@@ -210,15 +210,14 @@ public class Indexer implements Ingestion {
     private Map<String, Object> processChunk(Document chunk) {
         String originalText = chunk.getText();
 
-        // 1. 从原始 metadata 中提取 hypothetical_questions（过滤前取值）
+        String question = null;
         Object questionObj = chunk.getMetadata().get("hypothetical_questions");
-        String question = questionObj.toString();
+        if (questionObj != null) {
+            question = questionObj.toString();
+        }
         if (question == null || question.isBlank()) {
             question = originalText;
         }
-        log.info("indexer processChunk 生成的问题: {}", question);
-
-
         // 2. 用问题文本和原文生成向量
         float[] questionVector = null;
         if (question != null) {

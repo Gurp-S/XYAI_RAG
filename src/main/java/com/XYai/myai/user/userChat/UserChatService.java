@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
-import reactor.core.publisher.Flux;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -54,18 +54,23 @@ public class UserChatService {
     // ===================== 兼容旧接口 =====================
 
     /**
-     * 兼容旧接口：前端若仍调用 /chat，会退化为"发送消息并回传 delivery 事件"。
+     * 兼容旧接口：发送消息并通过 SseEmitter 回传 delivery 事件。
      */
-    public Flux<String> chat(UserChatRequest request) {
-        UserChatSendResult result = send(request);
-        String deliveryEvent = "{\"type\":\"delivery\",\"conversationId\":\""
-                + result.conversationId()
-                + "\",\"messageId\":"
-                + result.messageId()
-                + ",\"timestamp\":"
-                + result.timestamp()
-                + "}";
-        return Flux.just(deliveryEvent);
+    public void chat(UserChatRequest request, SseEmitter emitter) {
+        try {
+            UserChatSendResult result = send(request);
+            String deliveryEvent = "{\"type\":\"delivery\",\"conversationId\":\""
+                    + result.conversationId()
+                    + "\",\"messageId\":"
+                    + result.messageId()
+                    + ",\"timestamp\":"
+                    + result.timestamp()
+                    + "}";
+            emitter.send(SseEmitter.event().data(deliveryEvent));
+            emitter.complete();
+        } catch (IOException e) {
+            emitter.completeWithError(e);
+        }
     }
 
     // ===================== 消息发送 =====================

@@ -1,25 +1,23 @@
 package com.XYai.myai.rag.chat;
 
+import com.XYai.myai.rag.aop.annotation.RagTraceContext;
 import com.XYai.myai.rag.aop.annotation.RagTraceNode;
 import com.XYai.myai.rag.chat.pojo.ChatMessage;
-import com.XYai.myai.rag.chat.pojo.StreamResult;
 import com.XYai.myai.rag.memory.ConversationMemorySummaryService;
 import com.XYai.myai.xyAdmin.mapper.SystemConfigMapper;
 import com.XYai.myai.xyAdmin.mapper.TokenRecordMapper;
 import com.XYai.myai.xyAdmin.pojo.SystemConfig;
 import com.XYai.myai.xyAdmin.pojo.TokenRecord;
-import com.XYai.myai.xyAdmin.service.SystemConfigService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Flux;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 /**
  * 模型调用服务
@@ -54,20 +52,22 @@ public class ModelInvocationService {
     @Resource(name = "memeryExecutor")
     private ThreadPoolTaskExecutor memoryExecutor;
 
-    // ==================== 步骤9：调用模型（流式，自动降级） ====================
+    // ==================== 步骤9：调用模型（流式，回调模式） ====================
 
     @RagTraceNode(name = "模型路由流式调用", type = "模型路由")
-    public StreamResult callModelStream(String finalPrompt, String conversationId) {
+    public String callModelStream(String finalPrompt, String conversationId,
+                                  Consumer<String> onChunk, Consumer<Throwable> onError, Runnable onComplete) {
         log.debug("调用模型路由，conversationId: {}", conversationId);
-        return modelRouterService.routeStream(finalPrompt, conversationId);
+
+        return modelRouterService.routeStream(finalPrompt, conversationId, onChunk, onError, onComplete);
     }
 
-    // ==================== 步骤10：调用模型快速模式（并发） ====================
+    // ==================== 步骤10：调用模型快速模式 ====================
 
     @RagTraceNode(name = "快速模式路由调用", type = "模型路由")
-    public StreamResult callModelFastStream(String finalPrompt, String conversationId) {
-        log.debug("快速模式调用模型，conversationId: {}", conversationId);
-        return modelRouterService.routeFastStream(finalPrompt, conversationId);
+    public String callModelFastStream(String finalPrompt, String conversationId,
+                                      Consumer<String> onChunk, Consumer<Throwable> onError, Runnable onComplete) {
+        return modelRouterService.routeFastStream(finalPrompt, conversationId, onChunk, onError, onComplete);
     }
 
     // ==================== 步骤11：异步保存对话记忆 ====================
@@ -81,11 +81,8 @@ public class ModelInvocationService {
             Long userId) {
 
         if (userId == null || conversationId == null) {
-            log.debug("跳过保存记忆：userId或conversationId为空");
-            CompletableFuture.completedFuture(null);
             return;
         }
-
         ChatMessage chatMsg = ChatMessage.builder()
                 .chatMessageId(chatMessageId)
                 .userMessage(userMessage)
@@ -96,15 +93,14 @@ public class ModelInvocationService {
         CompletableFuture.runAsync(() -> {
             try {
                 conversationMemorySummaryService.compressIfNeeded(conversationId, chatMsg);
-                log.debug("记忆保存成功，conversationId={}, chatMessageId={}", conversationId, chatMessageId);
             } catch (Exception e) {
                 log.error("记忆保存失败: {}", e.getMessage(), e);
             }
         }, memoryExecutor);
     }
 
-    // ==================== 步骤11：异步保存对话记忆 ====================
-
+    // ==================== 异步保存Token消耗 ====================
+    @RagTraceNode(name = "保存token消耗", type = "token保存")
     public void saveTokenUseAsync(
             String conversationId,
             String chatMessageId,
@@ -114,10 +110,8 @@ public class ModelInvocationService {
             Long costMs,
             String modelName,
             String callType) {
-
         if (userId == null || conversationId == null) {
             log.debug("跳过Token消耗：userId或conversationId为空");
-            CompletableFuture.completedFuture(null);
             return;
         }
         long pt = promptTokens != null ? promptTokens : 0L;
@@ -125,7 +119,6 @@ public class ModelInvocationService {
 
         CompletableFuture.runAsync(() -> {
             try {
-                // "chat_default" -> "默认对话模型";
                 SystemConfig systemConfig = systemConfigMapper.selectOne(
                     new QueryWrapper<SystemConfig>().eq("config_key", modelName));
                 tokenRecordMapper.insert(TokenRecord.builder()

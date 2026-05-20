@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-import reactor.core.publisher.Flux;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -127,7 +127,7 @@ public class UserChatController {
     }
 
     @PostMapping(value = "/chat", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> chat(@RequestBody UserChatRequest request) {
+    public SseEmitter chat(@RequestBody UserChatRequest request) {
         Long userId = requireLoginUserId();
         UserChatRequest sanitized = new UserChatRequest(
                 request.message(),
@@ -138,7 +138,9 @@ public class UserChatController {
                 request.targetName(),
                 request.senderName(),
                 null);
-        return userChatService.chat(sanitized);
+        SseEmitter emitter = new SseEmitter(0L);
+        userChatService.chat(sanitized, emitter);
+        return emitter;
     }
 
     @PostMapping("/messages/{messageId}/status")

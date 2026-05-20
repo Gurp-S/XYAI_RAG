@@ -1,5 +1,6 @@
 package com.XYai.myai.rag.etlpipeline.nodes;
 
+import com.XYai.myai.rag.aop.annotation.RagTraceContext;
 import com.XYai.myai.rag.aop.annotation.RagTraceNode;
 import com.XYai.myai.rag.etlpipeline.pojo.IngestionContext;
 import com.XYai.myai.rag.etlpipeline.pojo.NodeConfig;
@@ -118,7 +119,7 @@ public class Parser implements Ingestion {
         ParseContext parseContext = new ParseContext();
 
         try (ByteArrayInputStream input = new ByteArrayInputStream(rawBytes)) {
-            WriteOutContentHandler handler = new WriteOutContentHandler(pipelineProperties.getDefaultMaxParseChars());
+            WriteOutContentHandler handler = new WriteOutContentHandler(10000000);
             AutoDetectParser parser = new AutoDetectParser();
             parser.parse(input, handler, metadata, parseContext);
             String text = handler.toString();
@@ -143,6 +144,7 @@ public class Parser implements Ingestion {
                 }
             }
             log.warn("Tika parse failed for mime={}, error={}", mimeType, ex.getMessage());
+            RagTraceContext.setNodeWarn("Tika解析长度受限: " + ex.getMessage());
         }
         return null;
     }

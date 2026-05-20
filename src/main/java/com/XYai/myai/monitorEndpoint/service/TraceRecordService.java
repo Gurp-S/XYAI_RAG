@@ -31,4 +31,9 @@ public interface TraceRecordService {
      * 记录当前节点的执行情况
      */
     void updateNode(String traceId, String nodeId, Object name, Object type, long costTime);
+
+    // 在 TraceRecordService 接口或实现类中添加
+    void recordNodeWarn(String traceId, String nodeId, String warnMessage, long costTime);
+
+    void recordRunWarn(String traceId, String warnMessage, long costTime);
 }

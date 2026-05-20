@@ -62,7 +62,6 @@ public class MultiChannelRetrievalEngine {
      * <p>3) 合并所有通道的 chunks 后，进入 SearchResultPostProcessor 链路做质量提升。</p>
      * <p>4) 当前后处理采用固定顺序调用（非动态排序）：Deduplication -> Filter -> Rerank。</p>
      */
-    @RagTraceRoot(name = "多通道召回", conversationIdArg = "", taskIdArg = "多通道召回")
     public List<RetrievedChunk> retrieve(Map<String, Integer> userMessageEntityFileChunkIds, RewriteResult query, String conversationId, String originalQuery) {
         // 构建查找对象
         SearchContext context = new SearchContext();

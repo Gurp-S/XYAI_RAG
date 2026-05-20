@@ -48,7 +48,7 @@ public class BM25PostProcessor implements SearchResultPostProcessor {
     private double preB;             // b
 
     // ---------- 归一化 ----------
-    @Value("${bm25.normalize:false}")
+    @Value("${bm25.normalize:true}")
     private boolean normalize;
 
     // ---------- 并行阈值 ----------

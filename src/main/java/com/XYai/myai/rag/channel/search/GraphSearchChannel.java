@@ -1,5 +1,6 @@
 package com.XYai.myai.rag.channel.search;
 
+import com.XYai.myai.rag.aop.annotation.RagTraceContext;
 import com.XYai.myai.rag.aop.annotation.RagTraceNode;
 import com.XYai.myai.rag.channel.pojo.RetrievedChunk;
 import com.XYai.myai.rag.channel.pojo.SearchChannel;

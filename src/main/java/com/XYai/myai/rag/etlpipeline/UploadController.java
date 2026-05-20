@@ -19,11 +19,16 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.alibaba.fastjson2.JSON;
+import org.springframework.http.MediaType;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +39,10 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RestController
@@ -104,6 +113,62 @@ public class UploadController {
 
         return Result.success(taskId);
     }
+
+    /**
+     * 查询上传任务状态（JSON）
+     */
+    @GetMapping("task")
+    public Result<Object> getTask(@RequestParam String taskId) {
+        TaskState state = uploadTaskStore.get(taskId);
+        if (state == null) {
+            return Result.error(404, "任务不存在: " + taskId);
+        }
+        return Result.success(state);
+    }
+
+    /**
+     * SSE 实时推送任务状态更新。
+     * 建立连接后持续推送任务快照，直到任务完成或连接超时（10 分钟）。
+     * 前端可通过 EventSource 消费。
+     */
+    @GetMapping(value = "task/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter streamTask(@RequestParam String taskId) {
+        SseEmitter emitter = new SseEmitter(600_000L); // 10 min timeout
+
+        ScheduledFuture<?> future = sseScheduler.scheduleAtFixedRate(() -> {
+            try {
+                TaskState state = uploadTaskStore.get(taskId);
+                if (state == null) {
+                    emitter.send(SseEmitter.event().name("error").data("任务不存在"));
+                    emitter.complete();
+                    return;
+                }
+                emitter.send(SseEmitter.event()
+                        .name("snapshot")
+                        .data(JSON.toJSONString(state), MediaType.APPLICATION_JSON));
+
+                String status = state.getStatus();
+                if ("SUCCESS".equals(status) || "ERROR".equals(status)) {
+                    emitter.send(SseEmitter.event().name("complete").data(status));
+                    emitter.complete();
+                }
+            } catch (Exception e) {
+                try { emitter.complete(); } catch (Exception ignored) {}
+            }
+        }, 0, 500, TimeUnit.MILLISECONDS);
+
+        emitter.onCompletion(() -> future.cancel(false));
+        emitter.onTimeout(() -> future.cancel(false));
+        emitter.onError(e -> future.cancel(false));
+
+        return emitter;
+    }
+
+    private static final ScheduledExecutorService sseScheduler = new ScheduledThreadPoolExecutor(2, r -> {
+        Thread t = new Thread(r, "upload-sse-poller");
+        t.setDaemon(true);
+        return t;
+    });
 
     // ==================== 步骤方法 ====================
 

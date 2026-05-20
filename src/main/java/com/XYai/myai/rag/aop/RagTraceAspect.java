@@ -11,16 +11,16 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.reactivestreams.Publisher;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Method;
 import java.util.Deque;
 import java.util.concurrent.CompletableFuture;
 
-
+/**
+ * RAG 链路追踪切面（非响应式版）
+ * 支持同步方法和 CompletableFuture 返回值。
+ */
 @Slf4j
 @Aspect
 @Component
@@ -31,145 +31,148 @@ public class RagTraceAspect {
 
     /**
      * 环绕通知：在带 {@link RagTraceRoot} 注解的方法执行前后进行全链路 traceId 管理与记录。
-     *
-     * @param joinPoint 切入点
-     * @return 目标方法执行结果
+     * 支持同步返回和 CompletableFuture 返回（在 future 完成时记录结束）。
      */
     @Around("@annotation(com.XYai.myai.rag.aop.annotation.RagTraceRoot)")
     public Object aroundRoot(ProceedingJoinPoint joinPoint) throws Throwable {
-        // 从 joinPoint 获取注解实例
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
         RagTraceRoot traceRoot = method.getAnnotation(RagTraceRoot.class);
         if (traceRoot == null) {
             return joinPoint.proceed();
         }
-        // 1. 优先复用外部已经放入上下文的 traceId/taskId
+
         String traceId = IdUtil.getSnowflakeNextIdStr();
-        // 2. 记录链路开始信息（存入数据库）
         traceRecordService.startRun(traceId, traceRoot.name());
-        // 3. 将traceId存入上下文（ThreadLocal，保证线程安全）
         RagTraceContext.setTraceId(traceId);
-        // 4. 执行目标方法（业务逻辑）
-        long startTime = System.currentTimeMillis();
+
+        long startTime = System.nanoTime();
         Object result = joinPoint.proceed();
-        // 5. 处理响应式返回值（Flux/Mono）：延迟清理 traceId 到流终止时
-        if (result instanceof Publisher<?> publisher) {
-            return wrapReactiveResult(publisher, traceId,startTime);
+
+        if (result instanceof CompletableFuture<?> future) {
+            return future.whenComplete((res, ex) -> {
+                long costTime = System.nanoTime() - startTime;
+                try {
+                    if (ex != null) {
+                        log.error("[TRACE_ROOT] CompletableFuture异常, traceId={}, error={}", traceId, ex.getMessage());
+                        traceRecordService.recordError(traceId, ex.getMessage());
+                    } else {
+                        String runWarn = RagTraceContext.getAndClearRunWarn();
+                        if (runWarn != null) {
+                            traceRecordService.recordRunWarn(traceId, runWarn, costTime / 1_000_000);
+                        } else {
+                            traceRecordService.finishRun(traceId, costTime / 1_000_000);
+                        }
+                    }
+                } catch (Exception e) {
+                    log.error("[TRACE_ROOT] 更新trace记录失败, traceId={}, error={}", traceId, e.getMessage(), e);
+                } finally {
+                    RagTraceContext.clear();
+                }
+            });
         }
-        // 6. 同步返回值：正常清理
-        long costTime = System.currentTimeMillis() - startTime;
-        traceRecordService.finishRun(traceId, costTime);
+
+        // 同步返回值：正常记录（优先检查 warn 消息）
+        long costTime = System.nanoTime() - startTime;
+        String runWarn = RagTraceContext.getAndClearRunWarn();
+        if (runWarn != null) {
+            traceRecordService.recordRunWarn(traceId, runWarn, costTime / 1_000_000);
+        } else {
+            traceRecordService.finishRun(traceId, costTime / 1_000_000);
+        }
         RagTraceContext.clear();
         return result;
     }
 
     /**
-     * 包装响应式结果（Flux/Mono）：在流终止/出错时记录状态并清理 traceId。
-     * 避免同步 finally 提前清除 ThreadLocal 导致后续节点获取不到 traceId。
-     */
-    private Object wrapReactiveResult(Publisher<?> publisher, String traceId, long startTime) {
-        if (publisher instanceof Flux<?> flux) {
-            return flux
-                    .doOnNext(v -> {
-                        // 首次订阅时确保 traceId 仍然可用
-                        if (RagTraceContext.getTraceId() == null) {
-                            RagTraceContext.setTraceId(traceId);
-                        }
-                    })
-                    .doOnComplete(() -> {
-                        long costTime = System.currentTimeMillis() - startTime;
-                        traceRecordService.finishRun(traceId, costTime);
-                    })
-                    .doOnError(e -> {
-                        log.error("[TRACE_ROOT] Flux异常, traceId={}, error={}", traceId, e.getMessage());
-                        traceRecordService.recordError(traceId, e.getMessage());
-                    })
-                    .doFinally(signal -> {
-                        RagTraceContext.clear();
-                    });
-        }
-        if (publisher instanceof Mono<?> mono) {
-            log.info("[TRACE_ROOT] 包装Mono, traceId={} 将在流终止时清理", traceId);
-            return mono
-                    .doOnSuccess(v -> {
-                        if (RagTraceContext.getTraceId() == null) {
-                            RagTraceContext.setTraceId(traceId);
-                        }
-                        long costTime = System.currentTimeMillis() - startTime;
-                        traceRecordService.finishRun(traceId, costTime);
-                    })
-                    .doOnError(e -> {
-                        traceRecordService.recordError(traceId, e.getMessage());
-                    })
-                    .doFinally(signal -> {
-                        RagTraceContext.clear();
-                    });
-        }
-        // 其他 Publisher 类型，保守处理
-        log.warn("[TRACE_ROOT] 未知的Publisher类型: {}, 不做包装处理", publisher.getClass().getName());
-        return publisher;
-    }
-
-    /**
-     * 环绕通知：为带 {@link RagTraceNode} 注解的方法创建节点记录（nodeId），并在方法完成后记录耗时与状态。
-     *
-     * @param joinPoint 切入点
-     * @param traceNode 注解实例，包含节点名称与类型
-     * @return 目标方法执行结果
+     * 环绕通知：为带 {@link RagTraceNode} 注解的方法创建节点记录，
+     * 在方法/CompletableFuture 完成后记录耗时与状态。
+     * 自动拼接父节点名称生成显示名，如 "bm25打分(记忆召回)"。
      */
     @Around("@annotation(traceNode)")
     public Object aroundNode(ProceedingJoinPoint joinPoint, RagTraceNode traceNode) throws Throwable {
         String traceId = RagTraceContext.getTraceId();
-        if (traceId == null) return joinPoint.proceed();
+        if (traceId == null || traceId.trim().isEmpty()) {
+            return joinPoint.proceed();
+        }
+
+        // 拼接父节点名称，生成更具辨识度的显示名
+        String parentName = RagTraceContext.getParentNodeName();
+        String rawName = traceNode.name();
+        String displayName = parentName != null ? rawName + "(" + parentName + ")" : rawName;
 
         String nodeId = IdUtil.getSnowflakeNextIdStr();
-        String nodeName = traceNode.name();
-        String nodeType = traceNode.type();
-
-        traceRecordService.recordNode(traceId, nodeId, nodeName, nodeType);
         Deque<String> stackSnapshot = RagTraceContext.getNodeStackSnapshot();
-        RagTraceContext.pushNode(nodeId);
+        Deque<String> namesSnapshot = RagTraceContext.getNodeNamesSnapshot();
+        RagTraceContext.pushNode(nodeId, displayName);
+        traceRecordService.recordNode(traceId, nodeId, displayName, traceNode.type());
 
-        Object result = null;
+        boolean isCfPath = false;
         try {
-            long startTimeMs = System.currentTimeMillis();
-            result = joinPoint.proceed();
+            long startTimeMs = System.nanoTime();
+            Object result = joinPoint.proceed();
+
             if (result instanceof CompletableFuture<?> future) {
-                // 异步节点：弹出刚才入栈的当前节点（因为回调中会重新入栈）
+                isCfPath = true;
                 RagTraceContext.popNode();
-                return wrapCompletableFuture(future, traceId, nodeId, nodeName, nodeType, startTimeMs, stackSnapshot);
+                return wrapCompletableFutureNode(future, traceId, nodeId,
+                        displayName, traceNode.type(), startTimeMs, stackSnapshot, namesSnapshot);
             }
-            long cost = System.currentTimeMillis() - startTimeMs;
-            traceRecordService.updateNode(traceId, nodeId, nodeName, nodeType, cost);
+
+            // 同步返回：直接记录节点完成（优先检查 warn 消息）
+            long cost = System.nanoTime() - startTimeMs;
+            String warnMsg = RagTraceContext.getAndClearNodeWarn();
+            if (warnMsg != null) {
+                traceRecordService.recordNodeWarn(traceId, nodeId, warnMsg, cost / 1_000_000);
+            } else {
+                traceRecordService.updateNode(traceId, nodeId, displayName, traceNode.type(), cost / 1_000_000);
+            }
             return result;
+
         } catch (Exception e) {
             traceRecordService.recordNodeError(traceId, nodeId, e.getMessage());
             throw e;
         } finally {
-            if (!(result instanceof CompletableFuture)) {
+            if (!isCfPath) {
                 RagTraceContext.popNode();
             }
         }
     }
 
-    private CompletableFuture<?> wrapCompletableFuture(CompletableFuture<?> future,
-                                                       String traceId,
-                                                       String nodeId,
-                                                       String nodeName,
-                                                       String nodeType,
-                                                       long startTimeMs,
-                                                       Deque<String> stackSnapshot) {
+    /**
+     * 包装 CompletableFuture 节点：在 future 完成时记录节点耗时和状态。
+     * 调用前当前节点已从栈中弹出（popNode），回调中重新入栈再弹出，
+     * 以模拟正常调用栈生命周期，并确保在 future 线程中恢复上下文。
+     */
+    private CompletableFuture<?> wrapCompletableFutureNode(CompletableFuture<?> future,
+                                                           String traceId, String nodeId,
+                                                           String nodeName, String nodeType,
+                                                           long startTimeMs,
+                                                           Deque<String> stackSnapshot,
+                                                           Deque<String> namesSnapshot) {
         return future.whenComplete((result, ex) -> {
-            long cost = System.currentTimeMillis() - startTimeMs;
+            long cost = System.nanoTime() - startTimeMs;
             RagTraceContext.setTraceId(traceId);
             RagTraceContext.restoreNodeStack(stackSnapshot);
-            RagTraceContext.pushNode(nodeId);
+            RagTraceContext.restoreNodeNames(namesSnapshot);
+            RagTraceContext.pushNode(nodeId, nodeName);
             try {
                 if (ex != null) {
                     traceRecordService.recordNodeError(traceId, nodeId, ex.getMessage());
                 } else {
-                    traceRecordService.updateNode(traceId, nodeId, nodeName, nodeType, cost);
+                    String warnMsg = RagTraceContext.getAndClearNodeWarn();
+                    if (warnMsg != null) {
+                        traceRecordService.recordNodeWarn(traceId, nodeId, warnMsg, cost / 1_000_000);
+                    } else {
+                        traceRecordService.updateNode(traceId, nodeId, nodeName, nodeType, cost / 1_000_000);
+                    }
+                }
+            } catch (Exception e) {
+                log.error("[TRACE_NODE] 更新节点记录失败, traceId={}, nodeId={}, nodeName={}, error={}",
+                        traceId, nodeId, nodeName, e.getMessage(), e);
+                try {
+                    traceRecordService.recordNodeError(traceId, nodeId, "update failed: " + e.getMessage());
+                } catch (Exception ignored) {
                 }
             } finally {
                 RagTraceContext.popNode();

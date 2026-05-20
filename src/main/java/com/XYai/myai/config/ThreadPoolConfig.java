@@ -1,20 +1,20 @@
 package com.XYai.myai.config;
 
+import com.alibaba.ttl.TtlRunnable;
 import com.XYai.myai.user.LoginUserInfoManager;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskDecorator;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import reactor.core.scheduler.Scheduler;
-import reactor.core.scheduler.Schedulers;
 
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 
+@Slf4j
 @Data
 @Configuration
 public class ThreadPoolConfig {
@@ -32,171 +32,47 @@ public class ThreadPoolConfig {
     private static final int KEEP_ALIVE_SECONDS = 120; // 非核心线程存活时间
     private static final int AWAIT_TERMINATION_SECONDS = 60;
 
-    // ======================== 统一装饰器（单例，减少重复创建） ========================
+    // ======================== 统一的 TaskDecorator ========================
     @Bean
-    public TaskDecorator userContextDecorator() {
+    public TaskDecorator taskDecorator() {
         return runnable -> {
-            // ★ 在父线程（提交任务时）捕获当前上下文
-            Long userId = LoginUserInfoManager.getUserId();
+            // 捕获父线程上下文
             SecurityContext securityContext = SecurityContextHolder.getContext();
+            Long userId = LoginUserInfoManager.getUserId();
 
-            return () -> {
-                // 保存子线程原有上下文（用于恢复）
-                Long originalUserId = LoginUserInfoManager.getUserId();
+            // 先手动传递非 TTL 的上下文，再用 TtlRunnable 包装
+            Runnable wrapped = () -> {
                 SecurityContext originalSecurity = SecurityContextHolder.getContext();
-
+                Long originalUserId = LoginUserInfoManager.getUserId();
                 try {
-                    // 注入父线程上下文
-                    if (userId != null) {
-                        LoginUserInfoManager.setUserId(userId);
-                    }
                     if (securityContext != null && securityContext.getAuthentication() != null) {
                         SecurityContextHolder.setContext(securityContext);
                     }
-                    // 执行实际任务
+                    if (userId != null) {
+                        LoginUserInfoManager.setUserId(userId);
+                    }
                     runnable.run();
                 } finally {
-                    // 恢复子线程原上下文（避免内存泄漏 & 干扰后续任务）
+                    if (originalSecurity != null && originalSecurity.getAuthentication() != null) {
+                        SecurityContextHolder.setContext(originalSecurity);
+                    } else {
+                        SecurityContextHolder.clearContext();
+                    }
                     if (originalUserId != null) {
                         LoginUserInfoManager.setUserId(originalUserId);
                     } else {
                         LoginUserInfoManager.remove();
                     }
-                    SecurityContextHolder.setContext(originalSecurity);
                 }
             };
+            // TTL 自动传递所有 TransmittableThreadLocal
+            return TtlRunnable.get(wrapped);
         };
     }
 
-    // ======================== 业务线程池定义 ========================
-
-    /**
-     * 通用 IO 密集型池：用于记忆压缩、意图识别、搜索通道等轻逻辑（原 memory / intent / search 合并）
-     */
-    @Bean("ioBoundExecutor")
-    public ThreadPoolTaskExecutor ioBoundExecutor(TaskDecorator userContextDecorator) {
-        return buildExecutor("io-bound-", IO_CORE, IO_MAX, QUEUE_CAPACITY,
-                new ThreadPoolExecutor.CallerRunsPolicy(), userContextDecorator);
-    }
-
-    /**
-     * 用户请求处理池：同时作为 Spring 默认异步池，避免与 @Async 混用造成资源争抢
-     * 保留独立名称，方便日志追踪。
-     */
-    @Bean("taskUserExecutor")
-    public ThreadPoolTaskExecutor taskExecutor(TaskDecorator userContextDecorator) {
-        // 用户请求通常混合 IO/CPU，但偏 IO，可使用混合参数
-        ThreadPoolTaskExecutor executor = buildExecutor("user-task-", MIXED_CORE, MIXED_MAX, QUEUE_CAPACITY,
-                new ThreadPoolExecutor.CallerRunsPolicy(), userContextDecorator);
-        // 指定为 Spring 默认异步执行器
-        executor.setThreadNamePrefix("task-");
-        return executor;
-    }
-
-    /**
-     * 文件上传专用池（IO 极重，队列适当加大，拒绝策略改为 CallerRuns 保证不丢）
-     */
-    @Bean("uploadExecutor")
-    public ThreadPoolTaskExecutor uploadExecutor(TaskDecorator userContextDecorator) {
-        int uploadCore = Math.max(CPU_COUNT / 2, 2);
-        int uploadMax = Math.max(CPU_COUNT * 2, 8);
-        // 文件上传任务耗时长，队列可更大
-        return buildExecutor("upload-", uploadCore, uploadMax, 500,
-                new ThreadPoolExecutor.CallerRunsPolicy(), userContextDecorator);
-    }
-
-    // 如果需要保留旧 Bean 名称以兼容已有注入，可添加别名
-    @Bean("userExecutor")
-    public ThreadPoolTaskExecutor userExecutor(@Qualifier("taskUserExecutor") ThreadPoolTaskExecutor taskExecutor) {
-        return taskExecutor; // 直接指向 taskExecutor
-    }
-
-    @Bean("memeryExecutor")
-    public ThreadPoolTaskExecutor memeryExecutor(@Qualifier("ioBoundExecutor") ThreadPoolTaskExecutor ioBoundExecutor) {
-        return ioBoundExecutor;
-    }
-
-    @Bean("summaryExecutor")
-    public ThreadPoolTaskExecutor summaryExecutor(@Qualifier("ioBoundExecutor") ThreadPoolTaskExecutor ioBoundExecutor) {
-        return ioBoundExecutor;
-    }
-
-    @Bean("mcpExecutor")
-    public ThreadPoolTaskExecutor mcpExecutor(@Qualifier("ioBoundExecutor") ThreadPoolTaskExecutor ioBoundExecutor) {
-        return ioBoundExecutor;
-    }
-
-    @Bean("neo4jExecutor")
-    public ThreadPoolTaskExecutor neo4jExecutor(@Qualifier("ioBoundExecutor") ThreadPoolTaskExecutor ioBoundExecutor) {
-        return ioBoundExecutor;
-    }
-
-    @Bean("searchChannelExecutor")
-    public ThreadPoolTaskExecutor searchChannelExecutor(
-            @Qualifier("ioBoundExecutor") ThreadPoolTaskExecutor ioBoundExecutor) {
-        return ioBoundExecutor;
-    }
-
-    @Bean("intentExecutor")
-    public ThreadPoolTaskExecutor intentExecutor(@Qualifier("ioBoundExecutor") ThreadPoolTaskExecutor ioBoundExecutor) {
-        return ioBoundExecutor;
-    }
-
-    @Bean("graphExecutor")
-    public ThreadPoolTaskExecutor graphExecutor(@Qualifier("ioBoundExecutor") ThreadPoolTaskExecutor ioBoundExecutor) {
-        return ioBoundExecutor;
-    }
-
-    @Bean("milvusExecutor")
-    public ThreadPoolTaskExecutor milvusExecutor(@Qualifier("ioBoundExecutor") ThreadPoolTaskExecutor ioBoundExecutor) {
-        return ioBoundExecutor;
-    }
-
-    @Bean("chatExecutor")
-    public ThreadPoolTaskExecutor chatExecutor(@Qualifier("ioBoundExecutor") ThreadPoolTaskExecutor ioBoundExecutor) {
-        return ioBoundExecutor;
-    }
-
-    /**
-     * 链路追踪记录专用线程池（轻量级，只做 DB 插入）。
-     */
-    @Bean("traceExecutor")
-    public ThreadPoolTaskExecutor traceExecutor(TaskDecorator userContextDecorator) {
-        return buildExecutor("trace-", 2, 4, 200,
-                new ThreadPoolExecutor.CallerRunsPolicy(), userContextDecorator);
-    }
-
-    /**
-     * 系统评估专用线程池（异步 + 轻量，不阻塞主流程）
-     */
-    @Bean("evaluateExecutor")
-    public ThreadPoolTaskExecutor evaluateExecutor(TaskDecorator userContextDecorator) {
-        return buildExecutor("eval-", 2, 4, 100,
-                (r, e) -> {
-                }, userContextDecorator);
-    }
-
-    // ======================== Reactor Scheduler（TTL 感知） ========================
-
-    /**
-     * 替代 Schedulers.boundedElastic() 的 TTL 感知调度器。
-     * 基于 Spring 管理的 ThreadPoolTaskExecutor（已配置 userContextDecorator），
-     * 保证 LoginUserInfoManager 的 ThreadLocal 在响应式链中正确传递。
-     */
-    @Bean("reactorBoundedElasticScheduler")
-    public Scheduler reactorBoundedElasticScheduler(TaskDecorator userContextDecorator) {
-        ThreadPoolTaskExecutor executor = buildExecutor(
-                "reactor-ttl-", CPU_COUNT * 2, CPU_COUNT * 4, Integer.MAX_VALUE / 2,
-                new ThreadPoolExecutor.CallerRunsPolicy(), userContextDecorator);
-        executor.setKeepAliveSeconds(60);
-        executor.initialize();
-        return Schedulers.fromExecutor(executor);
-    }
-
-    // ======================== 工具方法 ========================
+    // ======================== 工具方法：创建线程池 ========================
     private ThreadPoolTaskExecutor buildExecutor(String prefix, int core, int max, int queue,
-                                                 RejectedExecutionHandler rejectionHandler,
-                                                 TaskDecorator decorator) {
+                                                 RejectedExecutionHandler rejectionHandler) {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(core);
         executor.setMaxPoolSize(max);
@@ -204,11 +80,110 @@ public class ThreadPoolConfig {
         executor.setKeepAliveSeconds(KEEP_ALIVE_SECONDS);
         executor.setThreadNamePrefix(prefix);
         executor.setRejectedExecutionHandler(rejectionHandler);
-        executor.setTaskDecorator(decorator);
-        // 优雅停机设置
+        executor.setTaskDecorator(taskDecorator());
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(AWAIT_TERMINATION_SECONDS);
         executor.initialize();
         return executor;
+    }
+
+    // ======================== 业务线程池定义 ========================
+
+    /**
+     * 通用 IO 密集型池：用于记忆压缩、意图识别、搜索通道等轻逻辑
+     */
+    @Bean("ioBoundExecutor")
+    public ThreadPoolTaskExecutor ioBoundExecutor() {
+        return buildExecutor("io-bound-", IO_CORE, IO_MAX, QUEUE_CAPACITY,
+                new ThreadPoolExecutor.CallerRunsPolicy());
+    }
+
+    /**
+     * 用户请求处理池：同时作为 Spring 默认异步池
+     */
+    @Bean("taskUserExecutor")
+    public ThreadPoolTaskExecutor taskUserExecutor() {
+        return buildExecutor("user-task-", MIXED_CORE, MIXED_MAX, QUEUE_CAPACITY,
+                new ThreadPoolExecutor.CallerRunsPolicy());
+    }
+
+    /**
+     * 文件上传专用池（IO 极重）
+     */
+    @Bean("uploadExecutor")
+    public ThreadPoolTaskExecutor uploadExecutor() {
+        int uploadCore = Math.max(CPU_COUNT / 2, 2);
+        int uploadMax = Math.max(CPU_COUNT * 2, 8);
+        return buildExecutor("upload-", uploadCore, uploadMax, 500,
+                new ThreadPoolExecutor.CallerRunsPolicy());
+    }
+
+    // 兼容旧 Bean 名称
+    @Bean("userExecutor")
+    public ThreadPoolTaskExecutor userExecutor() {
+        return taskUserExecutor();
+    }
+
+    @Bean("memeryExecutor")
+    public ThreadPoolTaskExecutor memeryExecutor() {
+        return ioBoundExecutor();
+    }
+
+    @Bean("summaryExecutor")
+    public ThreadPoolTaskExecutor summaryExecutor() {
+        return ioBoundExecutor();
+    }
+
+    @Bean("mcpExecutor")
+    public ThreadPoolTaskExecutor mcpExecutor() {
+        return ioBoundExecutor();
+    }
+
+    @Bean("neo4jExecutor")
+    public ThreadPoolTaskExecutor neo4jExecutor() {
+        return ioBoundExecutor();
+    }
+
+    @Bean("searchChannelExecutor")
+    public ThreadPoolTaskExecutor searchChannelExecutor() {
+        return ioBoundExecutor();
+    }
+
+    @Bean("intentExecutor")
+    public ThreadPoolTaskExecutor intentExecutor() {
+        return ioBoundExecutor();
+    }
+
+    @Bean("graphExecutor")
+    public ThreadPoolTaskExecutor graphExecutor() {
+        return ioBoundExecutor();
+    }
+
+    @Bean("milvusExecutor")
+    public ThreadPoolTaskExecutor milvusExecutor() {
+        return ioBoundExecutor();
+    }
+
+    @Bean("chatExecutor")
+    public ThreadPoolTaskExecutor chatExecutor() {
+        return ioBoundExecutor();
+    }
+
+    /**
+     * 链路追踪记录专用线程池（轻量级）
+     */
+    @Bean("traceExecutor")
+    public ThreadPoolTaskExecutor traceExecutor() {
+        return buildExecutor("trace-", 2, 4, 200,
+                new ThreadPoolExecutor.CallerRunsPolicy());
+    }
+
+    /**
+     * 系统评估专用线程池
+     */
+    @Bean("evaluateExecutor")
+    public ThreadPoolTaskExecutor evaluateExecutor() {
+        return buildExecutor("eval-", 2, 4, 100,
+                (r, e) -> log.warn("评估任务被丢弃"));
     }
 }

@@ -51,6 +51,7 @@ public class Enricher implements Ingestion {
 
     @RagTraceNode(name = "增强", type = "上传管道")
     public NodeResult execute(IngestionContext context, NodeConfig config) {
+        if(pipelineProperties.getEnricherEnable()){return NodeResult.ok("增强未开启，跳过增强");}
         List<Document> chunks = context.getChunks();
         if (chunks == null || chunks.isEmpty()) {
             return NodeResult.ok("无分块，跳过增强");

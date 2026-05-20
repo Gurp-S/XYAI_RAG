@@ -184,7 +184,7 @@
         <!-- Model Context Protocol (MCP) -->
         <dependency>
             <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-starter-mcp-client-webflux</artifactId>
+            <artifactId>spring-ai-starter-mcp-client</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.resilience4j</groupId>

@@ -25,8 +25,8 @@ public class PipelineProperties {
     @Builder.Default
     private Boolean enricherQuestionEnable = true;
 
-    @Builder.Default
-    private int defaultMaxParseChars = 10000;
+//    @Builder.Default
+    private int defaultMaxParseChars = 10_000_000;
 
     @Builder.Default
     private Boolean enricherTriplesEnable = true;
@@ -40,10 +40,10 @@ public class PipelineProperties {
     @Builder.Default
     private int maxNumChunks = 1024;
     @Builder.Default
-    private int minChunkSizeChars = 12;
+    private int minChunkSizeChars = 384;
     /** 默认分块重叠大小 */
     @Builder.Default
-    private int defaultOverlapSize = 64;
+    private int defaultOverlapSize = 128;
     /** PDF 分块大小 */
     @Builder.Default
     private int pdfChunkSize = 1200;
@@ -62,11 +62,11 @@ public class PipelineProperties {
 
     /** 纯文本/Markdown 分块大小 */
     @Builder.Default
-    private int textChunkSize = 300;
+    private int textChunkSize = 800;
 
     /** 纯文本/Markdown 分块重叠大小 */
     @Builder.Default
-    private int textOverlapSize = 200;
+    private int textOverlapSize = 50;
 
     /** CSV/Excel 表格分块大小 */
     @Builder.Default

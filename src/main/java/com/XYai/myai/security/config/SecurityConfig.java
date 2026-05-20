@@ -30,7 +30,7 @@ public class SecurityConfig {
 
     private static final Set<String> PUBLIC_PATHS = Set.of(
             "/user/login", "/user/registry", "/user/reset-password", "/user/refresh",
-            "/static", "/public", "/error","/xyAdmin/**");
+            "/static", "/public", "/error","/xyAdmin/**", "/upload/task/**");
 
     private final JwtDecoder jwtDecoder;
 
