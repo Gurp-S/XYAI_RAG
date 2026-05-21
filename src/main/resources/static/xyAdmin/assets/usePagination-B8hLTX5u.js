@@ -1,0 +1,1 @@
+import{h as n,q as u}from"./index-BbYgK7HM.js";function g(l=16){const e=n(1),a=n(0),s=n(!1),o=l,t=u(()=>Math.ceil(a.value/o)||1),c=u(()=>e.value<t.value);function i(){e.value=1,a.value=0}function v(){e.value<t.value&&e.value++}function f(){e.value>1&&e.value--}return{page:e,total:a,totalPages:t,hasMore:c,loading:s,size:o,reset:i,nextPage:v,prevPage:f}}export{g as u};

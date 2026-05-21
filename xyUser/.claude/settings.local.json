@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls d:/lea/xyai/ 2>/dev/null)",
+      "Read(//d/lea/xyai/**)",
+      "Bash(mysql -h localhost -P 3306 -u root -p727Gx724 my_ai -e \"CREATE TABLE IF NOT EXISTS user_chat_message \\( id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '消息ID', conversation_id VARCHAR\\(255\\) NOT NULL COMMENT '会话ID', target_type VARCHAR\\(20\\) NOT NULL DEFAULT 'user' COMMENT '目标类型：user/group', target_id VARCHAR\\(100\\) NOT NULL COMMENT '目标ID', sender_id VARCHAR\\(100\\) NOT NULL COMMENT '发送方用户ID', sender_name VARCHAR\\(100\\) DEFAULT '' COMMENT '发送方显示名', content TEXT NULL COMMENT '消息内容（纯文本或JSON\\)', created_at BIGINT NOT NULL COMMENT '创建时间戳\\(毫秒\\)', INDEX idx_conversation_id \\(conversation_id\\), INDEX idx_created_at \\(created_at\\), INDEX idx_target \\(target_type, target_id\\) \\) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户聊天消息持久化表';\")",
+      "Bash(mysql -u root -p727Gx724 my_ai -e \"ALTER TABLE user_chat_message ADD COLUMN status VARCHAR\\(20\\) DEFAULT 'active' COMMENT '消息状态：active/accepted/rejected' AFTER created_at;\")",
+      "Bash(mysql -u root -p727Gx724 my_ai -e \"DESCRIBE user_chat_message;\")",
+      "Bash(python3 -c ' *)",
+      "Bash(' in content  # these are fine *)"
+    ],
+    "additionalDirectories": [
+      "d:\\lea\\xyai\\src\\main\\resources\\sql",
+      "d:\\lea\\xyai\\src\\main\\java\\com\\XYai\\myai\\user\\userChat",
+      "d:\\lea\\xyai\\src\\main\\java\\com\\XYai\\myai\\rag\\milvus"
+    ]
+  }
+}
