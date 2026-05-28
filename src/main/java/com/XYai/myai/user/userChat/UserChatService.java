@@ -14,12 +14,12 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import cn.hutool.core.util.IdUtil;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 /**
@@ -48,8 +47,9 @@ public class UserChatService {
     private final UserChatMessageMapper messageMapper;
 
     /** 内存消息队列，作为缓存和兼容旧版消息的暂存区 */
-    private final Map<String, Deque<ChatMessage>> conversationStore = new ConcurrentHashMap<>();
-    private final AtomicLong messageIdGenerator = new AtomicLong(1L);
+    private final Map<Long, Deque<ChatMessage>> conversationStore = new ConcurrentHashMap<>();
+    /** conversationId 缓存（确定性key → 雪花ID），重启后存量数据仍可通过旧key查询 */
+    private final Map<String, Long> conversationIdCache = new ConcurrentHashMap<>();
 
     // ===================== 兼容旧接口 =====================
 
@@ -91,13 +91,15 @@ public class UserChatService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "发送方用户ID不能为空");
         }
 
-        String conversationId = buildConversationId(request.userId(), targetType, targetId);
+        Long conversationId = resolveConversationId(request);
         long now = System.currentTimeMillis();
+        Long msgId = IdUtil.getSnowflakeNextId();
 
         String messageStatus = request.status() != null ? request.status() : "active";
 
         // 1. 持久化到 MySQL
         UserChatMessageEntity entity = UserChatMessageEntity.builder()
+                .id(msgId)
                 .conversationId(conversationId)
                 .targetType(targetType)
                 .targetId(targetId)
@@ -110,10 +112,8 @@ public class UserChatService {
         try {
             messageMapper.insert(entity);
         } catch (Exception e) {
-            log.error("持久化用户聊天消息失败", e);
+            log.error("持久化用户聊天消息失败, conversationId={}", conversationId, e);
         }
-
-        long msgId = entity.getId() != null ? entity.getId() : messageIdGenerator.getAndIncrement();
 
         // 2. 写入内存缓存
         ChatMessage message = new ChatMessage(
@@ -142,22 +142,22 @@ public class UserChatService {
      * @param limit  每页数量（默认20，最大100）
      */
     public List<UserChatMessageDTO> getMessages(Long userId, String targetType, String targetId,
-                                                 Long cursor, Integer limit) {
+                                                 String cursor, Integer limit) {
         if (userId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "用户ID不能为空");
         }
 
         String normalizedType = normalizeTargetType(targetType);
         String normalizedTargetId = normalizeTargetId(targetId);
-        String conversationId = buildConversationId(userId, normalizedType, normalizedTargetId);
+        Long conversationId = buildConversationId(userId, normalizedType, normalizedTargetId);
 
         int pageSize = (limit == null || limit < 1) ? 20 : Math.min(limit, 100);
 
         // ---------- 游标分页（加载更早的历史消息） ----------
-        if (cursor != null && cursor > 0) {
+        if (cursor != null && !cursor.isBlank()) {
             LambdaQueryWrapper<UserChatMessageEntity> wrapper = new LambdaQueryWrapper<UserChatMessageEntity>()
                     .eq(UserChatMessageEntity::getConversationId, conversationId)
-                    .lt(UserChatMessageEntity::getId, cursor)
+                    .lt(UserChatMessageEntity::getId, Long.parseLong(cursor))
                     .orderByDesc(UserChatMessageEntity::getId)
                     .last("LIMIT " + pageSize);
             List<UserChatMessageEntity> records = messageMapper.selectList(wrapper);
@@ -182,19 +182,19 @@ public class UserChatService {
         List<UserChatMessageDTO> memoryMessages = new ArrayList<>();
         if (memoryQueue != null) {
             for (ChatMessage msg : memoryQueue) {
-                if (!dbIds.contains(msg.getId())) {
+                if (msg.getId() != null && !dbIds.contains(msg.getId())) {
                     memoryMessages.add(toDTO(msg));
                 }
             }
         }
 
-        // 合并、按 id 升序排序
+        // 合并、按 id 升序排序（雪花ID为定长数字字符串，字典序即时间序）
         List<UserChatMessageDTO> result = new ArrayList<>();
         for (UserChatMessageEntity e : records) {
             result.add(toDTO(e));
         }
         result.addAll(memoryMessages);
-        result.sort(Comparator.comparingLong(UserChatMessageDTO::getId));
+        result.sort((a, b) -> a.getId().compareTo(b.getId()));
 
         return result;
     }
@@ -203,7 +203,7 @@ public class UserChatService {
      * 旧版接口（无游标），向前端返回消息用于轮询。
      */
     public List<UserChatMessageDTO> getMessages(Long userId, String targetType, String targetId) {
-        return getMessages(userId, targetType, targetId, null, null);
+        return getMessages(userId, targetType, targetId, (String) null, null);
     }
 
     // ===================== 本地文件分享 =====================
@@ -216,8 +216,9 @@ public class UserChatService {
     public UserChatSendResult shareLocalFile(Long userId, String targetType, String targetId,
                                               String senderName, String originalFileName,
                                               long fileSize, String fileId) throws IOException {
-        String convId = buildConversationId(userId, normalizeTargetType(targetType),
-                normalizeTargetId(targetId));
+        String targetTypeNorm = normalizeTargetType(targetType);
+        String targetIdNorm = normalizeTargetId(targetId);
+        Long convId = resolveConversationIdFromParams(userId, targetTypeNorm, targetIdNorm);
 
         if (fileId == null || fileId.isBlank()) {
             fileId = UUID.randomUUID().toString().replace("-", "");
@@ -228,12 +229,14 @@ public class UserChatService {
                 escapeJson(senderName != null ? senderName : "用户-" + userId));
 
         long now = System.currentTimeMillis();
+        Long msgId = IdUtil.getSnowflakeNextId();
 
         // 写入 MySQL
         UserChatMessageEntity entity = UserChatMessageEntity.builder()
+                .id(msgId)
                 .conversationId(convId)
-                .targetType(normalizeTargetType(targetType))
-                .targetId(normalizeTargetId(targetId))
+                .targetType(targetTypeNorm)
+                .targetId(targetIdNorm)
                 .senderId(String.valueOf(userId))
                 .senderName(senderName != null ? senderName : "用户-" + userId)
                 .content(content)
@@ -241,11 +244,10 @@ public class UserChatService {
                 .status("accepted")
                 .build();
         messageMapper.insert(entity);
-        long msgId = entity.getId();
 
         // 写入内存缓存
         ChatMessage message = new ChatMessage(msgId, convId,
-                normalizeTargetType(targetType), normalizeTargetId(targetId),
+                targetTypeNorm, targetIdNorm,
                 String.valueOf(userId),
                 senderName != null ? senderName : "用户-" + userId,
                 content, now, "accepted");
@@ -297,17 +299,15 @@ public class UserChatService {
     /**
      * 删除指定对话中的某条消息（用于拒绝文件分享等场景）。
      */
-    public boolean deleteMessage(String conversationId, long messageId) {
+    public boolean deleteMessage(Long conversationId, Long messageId) {
         try {
-            LambdaQueryWrapper<UserChatMessageEntity> wrapper = new LambdaQueryWrapper<UserChatMessageEntity>()
-                    .eq(UserChatMessageEntity::getId, messageId);
-            messageMapper.delete(wrapper);
+            messageMapper.deleteById(messageId);
         } catch (Exception e) {
             log.error("从 MySQL 删除消息失败", e);
         }
         Deque<ChatMessage> queue = conversationStore.get(conversationId);
         if (queue == null || queue.isEmpty()) return false;
-        return queue.removeIf(msg -> msg.getId() == messageId);
+        return queue.removeIf(msg -> messageId.equals(msg.getId()));
     }
 
     // ===================== 私有工具方法 =====================
@@ -337,7 +337,36 @@ public class UserChatService {
         return "用户-" + request.userId();
     }
 
-    String buildConversationId(Long userId, String targetType, String targetId) {
+    /**
+     * 生成确定性key（兼容存量数据查询）
+     */
+    Long buildConversationId(Long userId, String targetType, String targetId) {
+        String deterministicKey = deterministicConversationKey(userId, targetType, targetId);
+        return conversationIdCache.computeIfAbsent(deterministicKey, k -> IdUtil.getSnowflakeNextId());
+    }
+
+    /**
+     * 从请求中解析或生成 conversationId
+     */
+    private Long resolveConversationId(UserChatRequest request) {
+        if (request.conversationId() != null) {
+            return request.conversationId();
+        }
+        return buildConversationId(request.userId(), normalizeTargetType(request.targetType()),
+                normalizeTargetId(request.targetId()));
+    }
+
+    /**
+     * 从参数中解析或生成 conversationId（shareLocalFile 使用）
+     */
+    private Long resolveConversationIdFromParams(Long userId, String targetType, String targetId) {
+        return buildConversationId(userId, targetType, targetId);
+    }
+
+    /**
+     * 构建确定性key用于缓存查找
+     */
+    private String deterministicConversationKey(Long userId, String targetType, String targetId) {
         if ("group".equals(targetType)) {
             return "group:" + targetId;
         }
@@ -392,6 +421,6 @@ public class UserChatService {
                 .replace("\t", "\\t");
     }
 
-    public record UserChatSendResult(String conversationId, long messageId, long timestamp) {
+    public record UserChatSendResult(Long conversationId, Long messageId, long timestamp) {
     }
 }

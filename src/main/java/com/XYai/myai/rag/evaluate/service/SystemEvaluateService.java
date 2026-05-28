@@ -14,7 +14,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -38,7 +38,7 @@ public class SystemEvaluateService {
     @Resource
     private SystemConfigMapper systemConfigMapper;
     @Resource(name = "evaluateExecutor")
-    private ThreadPoolTaskExecutor evaluateExecutor;
+    private TaskExecutor evaluateExecutor;
 
     /** 三层开关（默认全开，volatile保证多线程可见性，setter 自动持久化） */
     @Getter
@@ -79,11 +79,11 @@ public class SystemEvaluateService {
     /**
      * 异步提交评估任务（不阻塞主流程）
      */
-    public void submitEvaluate(String conversationId, ChatMessage message,
+    public void submitEvaluate(Long conversationId, ChatMessage message,
             List<String> retrievedChunks, long latencyMs,
             String userQuestion) {
         // 空值防护
-        if (message == null || conversationId == null || conversationId.isBlank()) {
+        if (message == null || conversationId == null) {
             log.warn("[EVAL] 跳过评估：参数不完整 conversationId={}", conversationId);
             return;
         }
@@ -125,7 +125,7 @@ public class SystemEvaluateService {
      * 核心评估逻辑：规则+重排+LLM 三路评估
      */
     public EvaluateResult evaluate(ChatMessage message, List<String> retrievedChunks,
-                                   long latencyMs, String userQuestion, String conversationId) {
+                                   long latencyMs, String userQuestion, Long conversationId) {
         // 空答案直接跳过
         String answer = message.getAssistantMessage();
         if (answer == null || answer.isBlank()) {

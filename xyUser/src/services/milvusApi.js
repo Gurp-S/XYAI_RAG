@@ -42,16 +42,31 @@ export function getCollectionMetadata(collectionName, options = {}) {
   if (collectionName !== undefined && collectionName !== null) {
     params.append("collectionName", String(collectionName));
   }
+  if (options.cursor) {
+    params.append("cursor", options.cursor);
+  }
+  if (options.pageSize) {
+    params.append("pageSize", String(options.pageSize));
+  }
   const nextHeaders = {
     "Content-Type": "application/x-www-form-urlencoded",
     ...(options.headers || {}),
   };
+  // Don't pass cursor/pageSize in options to avoid polluting fetch options
+  const { cursor, pageSize, ...fetchOptions } = options;
   return requestMilvusJson("/milvus/metadata", {
-    ...options,
+    ...fetchOptions,
     method: "POST",
     headers: nextHeaders,
     body: params.toString(),
   });
+}
+
+export function getCollectionFileNumber(collectionName) {
+  return requestMilvusJson(
+    `/milvus/metadata/number?collectionName=${encodeURIComponent(collectionName)}`,
+    { method: "GET" },
+  );
 }
 
 export function createCollection(collectionName) {

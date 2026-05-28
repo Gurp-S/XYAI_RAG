@@ -26,8 +26,6 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RSet;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -54,8 +52,6 @@ public class UserServiceImpl implements UserService {
     @Resource
     private ChatConversationMapper chatConversationMapper;
     @Resource
-    private RedissonClient redissonClient;
-    @Resource
     private StringRedisTemplate stringRedisTemplate;
     @Resource
     private PasswordEncoder passwordEncoder;
@@ -76,9 +72,9 @@ public class UserServiceImpl implements UserService {
      * @param limit
      * @return 消息列表（按时间升序）
      */
-    public Result<List<ChatConversation>> conversationHistory(String conversationId, String cursor, int limit) {
+    public Result<List<ChatConversation>> conversationHistory(Long conversationId, Long cursor, int limit) {
         log.info("查询对话数据，conversationId: {}, cursor: {}, limit: {}", conversationId, cursor, limit);
-        if (conversationId == null || conversationId.isBlank()) {
+        if (conversationId == null) {
             return Result.error(404, "会话无记录");
         }
         int pageSize = limit < 1 ? 20 : Math.min(limit, 100);
@@ -254,10 +250,8 @@ public class UserServiceImpl implements UserService {
         Long userId = user.getId() != null ? user.getId() : userDTO.getId();
         if (userId != null) {
             try {
-                RSet<String> loadSet = redissonClient.getSet(RedisKeyConfig.userLoadCollectionsKey(userId));
-                RSet<String> unLoadSet = redissonClient.getSet(RedisKeyConfig.userUnloadCollectionsKey(userId));
-                loadSet.clear();
-                unLoadSet.clear();
+                stringRedisTemplate.delete(RedisKeyConfig.userLoadCollectionsKey(userId));
+                stringRedisTemplate.delete(RedisKeyConfig.userUnloadCollectionsKey(userId));
             } catch (Exception e) {
                 log.warn("初始化用户分区缓存失败, userId={}", userId, e);
             }
@@ -403,8 +397,8 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    public Result<String> deleteHistory(Long userId, String conversationId) {
-        if (conversationId == null || conversationId.isBlank()) {
+    public Result<String> deleteHistory(Long userId, Long conversationId) {
+        if (conversationId == null) {
             return Result.error(400, "conversationId 不能为空");
         }
 
@@ -428,7 +422,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public Result<String> updateHistory(ChatSessionRecord chatSessionRecord) {
-        if (chatSessionRecord == null || chatSessionRecord.getConversationId() == null || chatSessionRecord.getConversationId().isBlank()) {
+        if (chatSessionRecord == null || chatSessionRecord.getConversationId() == null) {
             return Result.error(400, "conversationId 不能为空");
         }
 

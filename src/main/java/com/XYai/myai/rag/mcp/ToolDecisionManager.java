@@ -1,5 +1,7 @@
 package com.XYai.myai.rag.mcp;
 
+import cn.hutool.core.util.IdUtil;
+import com.XYai.myai.rag.aop.annotation.RagTraceContext;
 import com.XYai.myai.rag.aop.annotation.RagTraceNode;
 import com.XYai.myai.rag.chat.ModelInvocationService;
 import com.XYai.myai.rag.mcp.pojo.McpToolDecision;
@@ -17,7 +19,7 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -74,7 +76,7 @@ public class ToolDecisionManager {
     @Resource(name = "structuredOutputModel")
     private ChatModel chatModel;
     @Resource(name = "mcpExecutor")
-    private ThreadPoolTaskExecutor mcpExecutor;
+    private TaskExecutor mcpExecutor;
     @Resource
     private ToolCallbackProvider allToolsProvider;
     @Resource
@@ -124,7 +126,7 @@ public class ToolDecisionManager {
                 toolCallbackMap.size(), toolCallbackMap.keySet());
     }
 
-    public List<ToolProcessorResult> toolProcessor(String query, LoadSession memorySession, String conversationId, String chatMessageId) {
+    public List<ToolProcessorResult> toolProcessor(String query, LoadSession memorySession, Long conversationId, Long chatMessageId) {
         // 增强点：传入 memorySession 以利用对话历史
         List<McpToolDecision> toolDecisionList = decideByRules(query, memorySession);
         if (toolDecisionList.isEmpty()) {
@@ -157,7 +159,7 @@ public class ToolDecisionManager {
      * @param memorySession 对话记忆，用于构建 prompt 上下文
      * @return 工具执行的顺序和参数
      */
-    public List<McpToolDecision> toolDecision(String query, LoadSession memorySession, String conversationId, String chatMessageId) {
+    public List<McpToolDecision> toolDecision(String query, LoadSession memorySession, Long conversationId, Long chatMessageId) {
         Map<String, String> tools = getTools();
         if (tools.isEmpty()) {
             log.warn("没有可用的MCP工具，跳过工具决策");
@@ -173,9 +175,10 @@ public class ToolDecisionManager {
                 rawResponse.length() > 300 ? rawResponse.substring(0, 300) + "..." : rawResponse);
         String cleaned = cleanJsonResponse(rawResponse);
         log.info("[MCP_DECISION] 清理后的JSON: {}", cleaned);
+        RagTraceContext.setPhase("MCP决策");
         modelInvocation.saveTokenUseAsync(
                 conversationId,
-                chatMessageId + ":mcp",
+                IdUtil.getSnowflakeNextId(),
                 (long) prompt.toString().length(),
                 (long) rawResponse.length(),
                 LoginUserInfoManager.getUserId(),

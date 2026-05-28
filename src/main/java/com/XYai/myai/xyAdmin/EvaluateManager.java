@@ -5,6 +5,7 @@ import com.XYai.myai.mapper.SystemEvaluateMapper;
 import com.XYai.myai.rag.evaluate.pojo.SystemEvaluatePOJO;
 import com.XYai.myai.rag.evaluate.service.SystemEvaluateService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -52,19 +53,14 @@ public class EvaluateManager {
         boolean isAsc = "asc".equalsIgnoreCase(sortOrder);
         wrapper.orderBy(true, isAsc, orderColumn);
 
-        // 先获取总数（此时尚未添加分页 LIMIT）
-        long total = systemEvaluateMapper.selectCount(wrapper);
-
-        // 再设置分页
-        int offset = (page - 1) * size;
-        wrapper.last("LIMIT " + size + " OFFSET " + offset);
-        List<SystemEvaluatePOJO> list = systemEvaluateMapper.selectList(wrapper);
+        Page<SystemEvaluatePOJO> pageResult = systemEvaluateMapper.selectPage(
+                new Page<>(page, size), wrapper);
 
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("total", total);
-        result.put("page", page);
-        result.put("size", size);
-        result.put("records", list);
+        result.put("total", pageResult.getTotal());
+        result.put("page", pageResult.getCurrent());
+        result.put("size", pageResult.getSize());
+        result.put("records", pageResult.getRecords());
         return Result.success(result);
     }
 
@@ -137,7 +133,7 @@ public class EvaluateManager {
      * 删除评估记录
      */
     @PostMapping("/delete")
-    public Result<String> delete(@RequestParam String chatMessageId) {
+    public Result<String> delete(@RequestParam Long chatMessageId) {
         systemEvaluateMapper.deleteById(chatMessageId);
         return Result.success("已删除");
     }

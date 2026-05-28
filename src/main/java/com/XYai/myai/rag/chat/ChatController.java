@@ -67,8 +67,8 @@ public class ChatController {
     public SseEmitter chat(
             @Parameter(description = "用户消息", example = "你好")
             @RequestParam(value = "message", defaultValue = DEFAULT_MESSAGE) String message,
-            @Parameter(description = "会话ID", example = "session-123")
-            @RequestParam(value = "conversationId") String conversationId,
+            @Parameter(description = "会话ID(雪花ID)，为空则后端自动生成", example = "1829475612345678848")
+            @RequestParam(value = "conversationId", required = false) Long conversationId,
             @RequestParam(value = "chatFile", required = false) String file) {
         SseEmitter emitter = new SseEmitter(0L);
         chatOrchestrator.chat(message, conversationId, file == null ? "无" : file, emitter);
@@ -91,8 +91,8 @@ public class ChatController {
     public SseEmitter chatFast(
             @Parameter(description = "用户消息", example = "你好")
             @RequestParam(value = "message", defaultValue = DEFAULT_MESSAGE) String message,
-            @Parameter(description = "会话ID", example = "session-123")
-            @RequestParam(value = "conversationId") String conversationId,
+            @Parameter(description = "会话ID(雪花ID)", example = "1829475612345678848")
+            @RequestParam(value = "conversationId", required = false) Long conversationId,
             @RequestParam(value = "chatFile", required = false) String file) {
         log.info("快速模式 - conversationId: {}", conversationId);
         SseEmitter emitter = new SseEmitter(0L);

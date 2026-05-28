@@ -63,6 +63,7 @@ public class PipelineDefinitionFactory {
                 settings.put("overlapSize", overlapSize);
                 settings.put("minMergeSize", pipelineProperties.getMinChunkSizeChars());
                 settings.put("maxNumChunks", pipelineProperties.getMaxNumChunks());
+                settings.put("splitLevel", pipelineProperties.getTitleSplitLevel());
             }
 
             NodeConfig node = NodeConfig.builder()

@@ -48,6 +48,15 @@ const CUSTOM_BORDER_KEY = "xy-custom-border";
 const AI_AVATAR_KEY = "aiAvatar";
 const BOT_BUBBLE_KEY = "botBubbleEnabled";
 const SIDEBAR_MODE_KEY = "sidebarMode";
+const BUBBLE_SKIN_KEY = "bubbleSkin";
+const VALID_BUBBLE_SKINS = new Set(["default", "helloKitty", "cat", "dog", "fish"]);
+function readBubbleSkin() {
+  try {
+    const raw = localStorage.getItem(BUBBLE_SKIN_KEY);
+    if (raw && VALID_BUBBLE_SKINS.has(raw)) return raw;
+  } catch (_) { /* ignore */ }
+  return "default";
+}
 const CONVERSATION_CACHE_KEY = "conversationCache";
 const CONVERSATION_CACHE_ORDER_KEY = "conversationCacheOrder";
 const USER_CHAT_SESSIONS_KEY = "userChatSessions";
@@ -490,17 +499,6 @@ function buildContactConversationId(type, currentUserId, targetId) {
     : `user:${normalizedTargetId}:${current}`;
 }
 
-function createConversationId() {
-  if (
-    typeof crypto !== "undefined" &&
-    typeof crypto.randomUUID === "function"
-  ) {
-    return crypto.randomUUID();
-  }
-
-  return `conv_${Date.now()}_${Math.random().toString(16).slice(2)}`;
-}
-
 function toCssUrl(value) {
   if (!value) return "none";
   const safe = String(value).replace(/["\\\n\r]/g, "\\$&");
@@ -627,10 +625,11 @@ function injectCustomColors(customPrimary, customBorder) {
   }
 
   if (customBorder) {
-    // Store as full hex; getComputedStyle returns it as rgb(...)
     body.style.setProperty("--panel-border", customBorder);
+    body.style.setProperty("--custom-border", customBorder);
   } else {
     body.style.removeProperty("--panel-border");
+    body.style.removeProperty("--custom-border");
   }
 }
 
@@ -644,6 +643,7 @@ function applyBodyAppearance(
   borderContrast,
   customPrimary,
   customBorder,
+  bubbleSkin = "default",
 ) {
   const body = document.body;
   if (!body) return;
@@ -700,19 +700,25 @@ function applyBodyAppearance(
   );
 
   // Inject <style> overrides for surface variable alpha when opacity < 1.
-  // Uses known theme base colors — no getComputedStyle needed, works across
-  // all Chrome versions and CSS color formats.
   const surfaceOpacity = clampBackgroundOpacity(backgroundOpacity);
   if (surfaceOpacity < 1) {
     injectSurfaceOpacityStyle(darkMode, !!backgroundImage, surfaceOpacity);
   } else {
-    // Clear injected overrides, let CSS-defined styles take over
     const existing = document.getElementById(SURFACE_STYLE_ID);
     if (existing) existing.textContent = "";
   }
 
   injectCustomColors(customPrimary, customBorder);
   injectBorderContrastStyle(clampBorderContrast(borderContrast));
+
+  // Apply bubble skin class
+  const skinClassList = Array.from(body.classList).filter((cls) =>
+    cls.startsWith("bubble-skin-"),
+  );
+  skinClassList.forEach((cls) => body.classList.remove(cls));
+  if (bubbleSkin && bubbleSkin !== "default" && VALID_BUBBLE_SKINS.has(bubbleSkin)) {
+    body.classList.add(`bubble-skin-${bubbleSkin}`);
+  }
 }
 
 function runAppearanceTransition(
@@ -812,13 +818,23 @@ export const useUiStore = defineStore("ui", {
     chatMode: "ai", // 'ai' | 'user' | 'group'
     chatTarget: null,
     chatHistory: applyPinnedOrdering(
-      JSON.parse(localStorage.getItem("chatHistory")) || [],
+      (() => {
+        const raw = JSON.parse(localStorage.getItem("chatHistory"));
+        return Array.isArray(raw)
+          ? raw
+              .filter((item) => item && typeof item.conversationId !== "number")
+              .map((item) => {
+                if (item.conversationId != null) item.conversationId = String(item.conversationId);
+                return item;
+              })
+          : [];
+      })(),
       readPinnedConversationIds(),
     ),
     loadingHistory: false,
     loadingOlder: false,
     hasMoreMessages: true,
-    activeConversationId: createConversationId(),
+    activeConversationId: null,
     lastAiConversationId:
       localStorage.getItem(LAST_AI_CONVERSATION_KEY) || null,
     currentMessages: [],
@@ -838,6 +854,7 @@ export const useUiStore = defineStore("ui", {
     conversationCacheOrder: readConversationCacheOrder(readConversationCache()),
     userChatSessions: readJsonStorage(USER_CHAT_SESSIONS_KEY, {}),
     aiAvatar: readAiAvatar(),
+    bubbleSkin: readBubbleSkin(),
     pinnedConversationIds: readPinnedConversationIds(),
   }),
   getters: {
@@ -872,14 +889,12 @@ export const useUiStore = defineStore("ui", {
         this.initAuthSession();
         this.fetchHistory(true);
 
-        // 登录后始终创建一个新对话作为默认激活项
+        // 登录后不生成默认对话，由首次消息触发后端创建
         this.pendingInputText = "";
-        const newId = createConversationId();
-        this.activeConversationId = newId;
-        this.lastAiConversationId = newId;
-        localStorage.setItem(LAST_AI_CONVERSATION_KEY, newId);
+        this.activeConversationId = null;
+        this.lastAiConversationId = null;
+        localStorage.removeItem(LAST_AI_CONVERSATION_KEY);
         this.currentMessages = [];
-        this.ensureAiConversationEntry(newId);
       } catch (error) {
         console.error("Auth bootstrap failed:", error);
         clearAccessToken();
@@ -914,14 +929,12 @@ export const useUiStore = defineStore("ui", {
         this.showLogin = false;
         this.fetchHistory(true);
 
-        // 登录后始终创建一个新对话作为默认激活项
+        // 登录后不生成默认对话，由首次消息触发后端创建
         this.pendingInputText = "";
-        const newId = createConversationId();
-        this.activeConversationId = newId;
-        this.lastAiConversationId = newId;
-        localStorage.setItem(LAST_AI_CONVERSATION_KEY, newId);
+        this.activeConversationId = null;
+        this.lastAiConversationId = null;
+        localStorage.removeItem(LAST_AI_CONVERSATION_KEY);
         this.currentMessages = [];
-        this.ensureAiConversationEntry(newId);
         return true;
       }
 
@@ -953,7 +966,17 @@ export const useUiStore = defineStore("ui", {
         this.borderContrast,
         this.customPrimary,
         this.customBorder,
+        this.bubbleSkin,
       );
+    },
+    setBubbleSkin(skin) {
+      const next = VALID_BUBBLE_SKINS.has(skin) ? skin : "default";
+      if (next === this.bubbleSkin) return;
+      this.bubbleSkin = next;
+      try {
+        localStorage.setItem(BUBBLE_SKIN_KEY, this.bubbleSkin);
+      } catch (_) { /* ignore */ }
+      this.applyAppearance();
     },
     setDarkMode(darkMode) {
       const next = !!darkMode;
@@ -1134,9 +1157,6 @@ export const useUiStore = defineStore("ui", {
           (item) => item?.conversationId,
         )?.conversationId;
       }
-      if (!nextConversationId) {
-        nextConversationId = createConversationId();
-      }
 
       this.chatMode = "ai";
       this.chatTarget = null;
@@ -1237,7 +1257,7 @@ export const useUiStore = defineStore("ui", {
         return;
       }
 
-      const nextConversationId = stableConversationId || createConversationId();
+      const nextConversationId = stableConversationId || null;
       this.activeConversationId = nextConversationId;
       this.currentMessages = [];
       this.userChatSessions[key] = {
@@ -1280,7 +1300,7 @@ export const useUiStore = defineStore("ui", {
 
       const key = `${this.chatMode}:${this.chatTarget.id}`;
       this.userChatSessions[key] = {
-        conversationId: this.activeConversationId || createConversationId(),
+        conversationId: this.activeConversationId,
         target: this.chatTarget,
         messages: safeMessages,
         updatedAt: new Date().toISOString(),
@@ -1423,14 +1443,14 @@ export const useUiStore = defineStore("ui", {
 
       this.chatMode = "ai";
       this.chatTarget = null;
-      this.lastAiConversationId = session.conversationId;
-      localStorage.setItem(LAST_AI_CONVERSATION_KEY, this.lastAiConversationId);
+      this.lastAiConversationId = String(session.conversationId);
+      try { localStorage.setItem(LAST_AI_CONVERSATION_KEY, this.lastAiConversationId); } catch (e) {}
 
-      const convId = session.conversationId;
+      const convId = String(session.conversationId);
 
       // 1. 如果点击的是当前已激活的对话，且消息已经存在，绝对拦截
       if (
-        this.activeConversationId === convId &&
+        String(this.activeConversationId) === convId &&
         this.currentMessages.length > 0
       ) {
         return;
@@ -1566,6 +1586,12 @@ export const useUiStore = defineStore("ui", {
         }
 
         const nextHistory = Array.isArray(result.data) ? [...result.data] : [];
+        // 统一 conversationId 为字符串（旧版后端可能返回 Number，新版 @JsonSerialize 返回 String）
+        nextHistory.forEach((item) => {
+          if (item && item.conversationId != null) {
+            item.conversationId = String(item.conversationId);
+          }
+        });
         nextHistory.sort((a, b) => {
           const ta = new Date(a?.createdAt || 0).getTime();
           const tb = new Date(b?.createdAt || 0).getTime();
@@ -1577,14 +1603,14 @@ export const useUiStore = defineStore("ui", {
           if (!item?.optimistic) return false;
           if (
             nextHistory.some(
-              (remote) => remote?.conversationId === item?.conversationId,
+              (remote) => String(remote?.conversationId) === String(item?.conversationId),
             )
           ) {
             return false;
           }
 
           // 保留当前激活的乐观对话（即使是空的"新对话"）
-          if (item.conversationId === this.activeConversationId) return true;
+          if (String(item.conversationId) === String(this.activeConversationId)) return true;
 
           const cachedMessages = Array.isArray(
             this.conversationCache[item?.conversationId],
@@ -1643,19 +1669,31 @@ export const useUiStore = defineStore("ui", {
         // 保留既有的非乐观条目以防后端返回空列表（例如查询参数类型错误导致无记录）
         const existingRemote = this.chatHistory.filter((item) => {
           if (item?.optimistic) return false;
+          // 旧版后端返回的 Number ID 已因 JS 精度丢失损坏（如 1829475612345678848 → 1829475612345679000）
+          // 直接丢弃，信任新版 API 返回的正确 String ID
+          if (item?.conversationId != null && typeof item.conversationId === "number") return false;
           if (
             normalizedHistory.some(
-              (r) => r?.conversationId === item?.conversationId,
+              (r) => String(r?.conversationId) === String(item?.conversationId),
             )
           )
             return false;
           return true;
         });
 
-        this.chatHistory = applyPinnedOrdering(
-          [...existingRemote, ...optimisticLocal, ...normalizedHistory],
-          this.pinnedConversationIds,
-        );
+        // 按 conversationId 去重（保留最后出现的条目，优先信任 API 返回的数据）
+        const merged = [...existingRemote, ...optimisticLocal, ...normalizedHistory];
+        const seenIds = new Set();
+        const deduped = [];
+        for (let i = merged.length - 1; i >= 0; i--) {
+          const item = merged[i];
+          const id = item?.conversationId;
+          if (id && seenIds.has(id)) continue;
+          if (id) seenIds.add(id);
+          deduped.unshift(item);
+        }
+
+        this.chatHistory = applyPinnedOrdering(deduped, this.pinnedConversationIds);
         localStorage.setItem("chatHistory", JSON.stringify(this.chatHistory));
       } catch (err) {
         console.error("Failed to fetch history:", err);
@@ -1865,11 +1903,20 @@ export const useUiStore = defineStore("ui", {
       };
       localStorage.setItem("chatHistory", JSON.stringify(this.chatHistory));
     },
+    /** 处理 SSE start 事件：保存后端返回的 conversationId 并创建侧栏条目 */
+    handleSseStart(conversationId, chatMessageId, userMessage) {
+      if (!conversationId) return;
+      this.activeConversationId = conversationId;
+      this.lastAiConversationId = conversationId;
+      localStorage.setItem(LAST_AI_CONVERSATION_KEY, conversationId);
+      this.ensureAiConversationEntry(conversationId, userMessage);
+      this.setConversationPreviewTitle(conversationId, userMessage);
+    },
     ensureAiConversationEntry(conversationId, seedText = "") {
       if (!conversationId) return;
 
       const exists = this.chatHistory.some(
-        (item) => item?.conversationId === conversationId,
+        (item) => String(item?.conversationId) === String(conversationId),
       );
       if (exists) return;
 
@@ -1926,13 +1973,11 @@ export const useUiStore = defineStore("ui", {
         localStorage.setItem("chatHistory", JSON.stringify(this.chatHistory));
       }
 
-      const nextConversationId = createConversationId();
-      this.activeConversationId = nextConversationId;
-      this.lastAiConversationId = nextConversationId;
-      localStorage.setItem(LAST_AI_CONVERSATION_KEY, this.lastAiConversationId);
+      this.activeConversationId = null;
+      this.lastAiConversationId = null;
+      localStorage.removeItem(LAST_AI_CONVERSATION_KEY);
       this.currentMessages = [];
       this.pendingInputText = "";
-      this.ensureAiConversationEntry(nextConversationId);
       this.setView("chat");
       // 确保点击"新对话"后重新同步后端历史，防止本地历史丢失
       try {

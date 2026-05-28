@@ -12,15 +12,24 @@ import java.util.List;
 public interface ModelCandidateMapper extends BaseMapper<ModelCandidateEntity> {
 
     /** 查询所有启用的模型 */
-    @Select("SELECT * FROM xy_model_candidate WHERE enabled = 1 ORDER BY priority ASC")
+    @Select("SELECT name, display_name, api_model, priority, enabled, weight, temperature, " +
+            "max_tokens, purpose, failure_threshold, wait_duration_open, sliding_window_size, " +
+            "minimum_calls, created_at, updated_at " +
+            "FROM xy_model_candidate WHERE enabled = 1 ORDER BY priority ASC")
     List<ModelCandidateEntity> findAllEnabled();
 
     /** 查询全部（按优先级升序） */
-    @Select("SELECT * FROM xy_model_candidate ORDER BY priority ASC")
+    @Select("SELECT name, display_name, api_model, priority, enabled, weight, temperature, " +
+            "max_tokens, purpose, failure_threshold, wait_duration_open, sliding_window_size, " +
+            "minimum_calls, created_at, updated_at " +
+            "FROM xy_model_candidate ORDER BY priority ASC")
     List<ModelCandidateEntity> findAllOrderByPriority();
 
     /** 根据名称查找 */
-    @Select("SELECT * FROM xy_model_candidate WHERE name = #{name}")
+    @Select("SELECT name, display_name, api_model, priority, enabled, weight, temperature, " +
+            "max_tokens, purpose, failure_threshold, wait_duration_open, sliding_window_size, " +
+            "minimum_calls, created_at, updated_at " +
+            "FROM xy_model_candidate WHERE name = #{name}")
     ModelCandidateEntity findByName(String name);
 
     /**

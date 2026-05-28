@@ -53,14 +53,14 @@
 
     <!-- Traces Table -->
     <el-card v-show="activeTab === 'traces'" shadow="never" class="card-table">
-      <el-table :data="traceData" stripe v-loading="traceLoading" @sort-change="traceSortChange" :max-height="tableHeight">>
+      <el-table :data="traceData" stripe v-loading="traceLoading" @sort-change="traceSortChange" :max-height="tableHeight">
         <el-table-column prop="traceId" label="Trace ID" min-width="240" show-overflow-tooltip sortable="custom" />
         <el-table-column prop="name" label="根名称" width="160" sortable="custom" />
         <el-table-column prop="startTime" label="开始时间" width="170" sortable="custom" />
         <el-table-column prop="endTime" label="结束时间" width="170" sortable="custom" />
-        <el-table-column prop="coseTime" label="耗时" width="100" sortable="custom" align="right">
+        <el-table-column prop="costTime" label="耗时" width="100" sortable="custom" align="right">
           <template #default="{ row }">
-            <span :class="durationClass(row.coseTime)">{{ formatDuration(row.coseTime) }}</span>
+            <span :class="durationClass(row.costTime)">{{ formatDuration(row.costTime) }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="status" label="状态" width="100" align="center">
@@ -86,7 +86,7 @@
 
     <!-- Nodes Table -->
     <el-card v-show="activeTab === 'nodes'" shadow="never" class="card-table">
-      <el-table :data="nodeData" stripe v-loading="nodeLoading" @sort-change="nodeSortChange" :max-height="tableHeight">>
+      <el-table :data="nodeData" stripe v-loading="nodeLoading" @sort-change="nodeSortChange" :max-height="tableHeight">
         <el-table-column prop="traceId" label="Trace ID" min-width="240" show-overflow-tooltip sortable="custom" />
         <el-table-column prop="nodeName" label="节点名" width="160" sortable="custom" />
         <el-table-column prop="startTime" label="开始时间" width="170" sortable="custom" />
@@ -121,7 +121,7 @@
           </el-descriptions-item>
           <el-descriptions-item label="根名称" :span="2">{{ detail.trace?.name }}</el-descriptions-item>
           <el-descriptions-item label="耗时">
-            <span :class="durationClass(detail.trace?.coseTime)">{{ formatDuration(detail.trace?.coseTime) }}</span>
+            <span :class="durationClass(detail.trace?.costTime)">{{ formatDuration(detail.trace?.costTime) }}</span>
           </el-descriptions-item>
           <el-descriptions-item label="状态">
             <el-tag :type="statusType(detail.trace?.status)" size="small">{{ detail.trace?.status || '-' }}</el-tag>

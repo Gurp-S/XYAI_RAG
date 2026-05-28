@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ChatRequest {
     private String message;
 
-    private String conversationId;
+    private Long conversationId;
 
     private String files;
 }

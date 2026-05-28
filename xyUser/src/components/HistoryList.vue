@@ -10,7 +10,6 @@
         'menu-open':
           menuOpen && menuSession?.conversationId && menuSession.conversationId === h.conversationId,
       }"
-      :title="h.title || h.summaryText || '新对话'"
       @click="handleSelect(h)"
     >
       <svg class="history-item-icon" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2">
@@ -24,7 +23,6 @@
       <button
         class="history-item-more"
         type="button"
-        title="更多"
         @click.stop="toggleMenu($event, h)"
       >
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">

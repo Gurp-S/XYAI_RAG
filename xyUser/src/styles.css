@@ -2,24 +2,24 @@
   --primary: #0f62fe;
   --primary-hover: #0043ce;
   --secondary: #ff6b2c;
-  --text-main: #11233f;
-  --text-muted: #617391;
-  --text-secondary: #314768;
-  --panel-border: rgba(148, 170, 209, 0.62);
-  --glass-strong: rgba(255, 255, 255, 0.86);
-  --glass-soft: rgba(247, 251, 255, 0.9);
-  --surface-solid: rgba(255, 255, 255, 0.92);
-  --surface-soft: rgba(244, 249, 255, 0.9);
+  --text-main: #061224;
+  --text-muted: #3d5a80;
+  --text-secondary: #142b4a;
+  --panel-border: rgba(112, 140, 185, 0.6);
+  --glass-strong: rgba(255, 255, 255, 0.92);
+  --glass-soft: rgba(247, 251, 255, 0.92);
+  --surface-solid: rgba(255, 255, 255, 0.94);
+  --surface-soft: rgba(244, 249, 255, 0.93);
   --hover-bg: rgba(15, 98, 254, 0.1);
   --bg-hover: rgba(15, 98, 254, 0.13);
   --bot-msg: rgba(248, 252, 255, 0.95);
   --bot-border: rgba(161, 183, 222, 0.72);
   --user-msg: #ffffff;
   --input-surface: rgba(255, 255, 255, 0.94);
-  --bg-base: #f3f7ff;
-  --bg-gradient-a: rgba(15, 98, 254, 0.22);
-  --bg-gradient-b: rgba(255, 107, 44, 0.18);
-  --bg-gradient-c: rgba(16, 185, 129, 0.14);
+  --bg-base: #f2f6fe;
+  --bg-gradient-a: rgba(15, 98, 254, 0.1);
+  --bg-gradient-b: rgba(255, 107, 44, 0.07);
+  --bg-gradient-c: rgba(16, 185, 129, 0.06);
   --shadow-md: 0 14px 34px rgba(38, 68, 126, 0.16);
   --shadow-lg: 0 26px 58px rgba(38, 68, 126, 0.22);
   --overlay-strong: rgba(255, 255, 255, 0.95);
@@ -152,12 +152,56 @@ body,
   height: 100%;
 }
 
-body {
-  margin: 0;
-  color: var(--text-main);
-  background: var(--bg-base);
+/* 全局隐藏滚动条 —— 永不显示 */
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-/* font-family 由下方 "IBM Plex Sans" 声明统一管理 */
+html::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+body {
+  overflow: hidden;
+}
+
+:root {
+  /* 无衬线字体：西文 > 中文 > emoji > 通用回退 */
+  --font-sans-serif:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Helvetica Neue",
+    Arial, "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB",
+    "HarmonyOS_Regular", "Source Han Sans SC", "Noto Sans CJK SC",
+    "WenQuanYi Micro Hei", "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", sans-serif;
+
+  /* 衬线字体：中文 > 西文，不加 emoji */
+  --font-serif:
+    "Noto Serif CJK SC", "Source Han Serif SC", STZhongsong, STSong, PMingLiu,
+    SimSun, "Times New Roman", Times, serif;
+
+  /* 等宽字体：保持不变 */
+  --font-mono:
+    ui-monospace, SFMono-Regular, "SF Mono", "Cascadia Code", "Segoe UI Mono",
+    "Source Code Pro", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+body {
+  font-family: var(--font-sans-serif);
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.gh-content > blockquote,
+.gh-content > ol,
+.gh-content > ul,
+.gh-content > dl,
+.gh-content > p {
+  font-family: var(--font-sans-serif); /* 引用变量，不再重复 */
+  font-size: 16px;
+  line-height: 1.8;
+}
 
 .floating-bg {
   position: fixed;
@@ -166,10 +210,10 @@ body {
   pointer-events: none;
   overflow: hidden;
   background-image:
-    radial-gradient(circle at 8% 16%, var(--bg-gradient-a), transparent 42%),
-    radial-gradient(circle at 85% 10%, var(--bg-gradient-b), transparent 38%),
-    radial-gradient(circle at 46% 90%, var(--bg-gradient-c), transparent 45%),
-    linear-gradient(150deg, var(--bg-base), #ffffff 112%);
+    radial-gradient(circle at 8% 16%, var(--bg-gradient-a), transparent 50%),
+    radial-gradient(circle at 85% 10%, var(--bg-gradient-b), transparent 46%),
+    radial-gradient(circle at 46% 90%, var(--bg-gradient-c), transparent 52%),
+    linear-gradient(160deg, var(--bg-base) 30%, #f8fbff 100%);
   background-size: cover;
   background-position: center;
   transition:
@@ -971,6 +1015,18 @@ body.sidebar-style-outline .sidebar.collapsed .logout-btn {
   gap: 0.45rem;
 }
 
+.bubble-layout-wrapper {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+}
+.user .bubble-layout-wrapper {
+  align-self: flex-end;
+}
+.assistant .bubble-layout-wrapper {
+  align-self: flex-start;
+}
+
 .rag-tag {
   width: fit-content;
   color: var(--primary);
@@ -1031,6 +1087,343 @@ body.sidebar-style-outline .sidebar.collapsed .logout-btn {
   background: var(--bot-msg);
   border: 1px solid var(--panel-border);
   border-top-left-radius: 4px;
+}
+
+/* ===== Bubble skins (Structural Overlays) ===== */
+/* 通用规则：保证所有形状统一透明度、线宽，并移除干扰阴影 */
+body[class*="bubble-skin-"] .message {
+  position: relative;
+  overflow: visible !important;
+  border: 2px solid var(--custom-border, rgba(161, 183, 222, 0.6)) !important;
+  background: var(--bot-msg) !important;
+  box-shadow: none !important;
+  filter: none !important;
+  z-index: 1;
+}
+body[class*="bubble-skin-"] .user .message {
+  background: var(--user-msg) !important;
+  border-color: var(--custom-border, #cbd5e1) !important;
+}
+
+.skin-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+
+/* ===== Bubble Skins General ===== */
+body[class*="bubble-skin-"] .message {
+  border-radius: 14px !important;
+  /* Add padding to prevent text from overlapping decorations */
+}
+
+/* Base shape positioning */
+.skin-decor {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  overflow: visible;
+}
+.skin-decor.top-left {
+  top: -20px;
+  left: -10px;
+  height: 40px;
+  width: 40px;
+}
+.skin-decor.top-right {
+  top: -20px;
+  right: -10px;
+  height: 40px;
+  width: 40px;
+}
+.skin-decor.bottom-left {
+  bottom: 0px;
+  left: -20px;
+  height: 30px;
+  width: 30px;
+}
+.skin-decor.bottom-right {
+  bottom: 0px;
+  right: -20px;
+  height: 30px;
+  width: 30px;
+}
+.skin-decor.center-right {
+  top: 50%;
+  right: -24px;
+  height: 40px;
+  width: 40px;
+  transform: translateY(-50%);
+}
+.skin-decor.center-left {
+  top: 50%;
+  left: -24px;
+  height: 40px;
+  width: 40px;
+  transform: translateY(-50%);
+}
+
+/* User Bubble Reversals for generic flip */
+.user .flip-for-user {
+  transform: scaleX(-1);
+}
+
+/* Colors for SVGs */
+/* Fill matches the main card background (opaque) so it cleanly hides the border behind it */
+.skin-fill { fill: var(--bot-msg, #ffffff); }
+.user .skin-fill { fill: var(--user-msg, #ffffff); }
+.skin-stroke {
+  stroke: var(--custom-border, rgba(161, 183, 222, 0.6));
+  stroke-width: 2.5px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.user .skin-stroke { stroke: var(--custom-border, #cbd5e1); }
+
+/* Solid feature elements (like eyes, noses) */
+.skin-feature { fill: var(--text-main, #333); stroke: none; }
+.skin-feature-stroke {
+  stroke: var(--text-main, #333);
+  fill: none;
+  stroke-width: 2.5px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Remove default pattern */
+body[class*="bubble-skin-"] .user .message::after {
+  display: none !important;
+}
+
+
+body[class*="bubble-skin-"] .message {
+  border-radius: 20px !important;
+  padding: 1.1rem 1.3rem !important; /* 给边缘配饰留白 */
+}
+
+/* Base shape positioning */
+.skin-decor {
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+}
+.skin-decor.top-left {
+  top: -40px;
+  left: 20px;
+  height: 44px;
+}
+.skin-decor.top-right {
+  top: -28px;
+  right: 24px;
+  height: 30px;
+}
+.skin-decor.bottom-right {
+  bottom: -18px;
+  right: 24px;
+  height: 20px;
+}
+.skin-decor.center-right {
+  top: 50%;
+  right: -22px;
+  height: 34px;
+  transform: translateY(-50%);
+}
+
+/* User Bubble Reversals */
+.user .skin-decor.top-left {
+  left: auto;
+  right: 20px;
+  transform: scaleX(-1);
+}
+.user .skin-decor.top-right {
+  right: auto;
+  left: 24px;
+  transform: scaleX(-1);
+}
+.user .skin-decor.bottom-right {
+  right: auto;
+  left: 24px;
+  transform: scaleX(-1);
+}
+.user .skin-decor.center-right {
+  right: auto;
+  left: -22px;
+  transform: translateY(-50%) scaleX(-1);
+}
+
+/* SVG Painting Vars */
+.skin-fill {
+  fill: var(--bot-msg);
+}
+.skin-stroke {
+  stroke: var(--custom-border, rgba(161, 183, 222, 0.6));
+  stroke-width: 2px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.user .skin-fill {
+  fill: var(--user-msg);
+}
+.user .skin-stroke {
+  stroke: var(--custom-border, #cbd5e1);
+}
+
+.skin-feature {
+  fill: var(--custom-border, rgba(161, 183, 222, 0.6));
+  stroke: none;
+}
+.user .skin-feature {
+  fill: var(--custom-border, #cbd5e1);
+}
+
+.skin-feature-stroke {
+  stroke: var(--custom-border, rgba(161, 183, 222, 0.6));
+  fill: none;
+  stroke-width: 2px;
+  stroke-linecap: round;
+}
+.user .skin-feature-stroke {
+  stroke: var(--custom-border, #cbd5e1);
+}
+
+/* 隐藏部分气泡的特有默认装饰 (右下角斜纹) */
+body[class*="bubble-skin-"] .user .message::after {
+  display: none !important;
+}
+
+/* Removed old skin classes since we are using inline SVGs */
+  transform: rotate(45deg);
+}
+.user .skin-fish-decor .fin {
+  background: var(--user-msg);
+  border-color: var(--custom-border, #cbd5e1);
+}
+.skin-fish-decor .fin.top {
+  top: -4px;
+  left: 60%;
+  clip-path: polygon(-50% -50%, 100% -50%, -50% 100%);
+}
+.skin-fish-decor .fin.bottom {
+  bottom: -4px;
+  left: 40%;
+  transform: rotate(225deg);
+  clip-path: polygon(-50% -50%, 100% -50%, -50% 100%);
+}
+.skin-fish-decor .gill {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 24px;
+  border-right: 2px solid var(--custom-border, rgba(161, 183, 222, 0.6));
+  border-radius: 50%;
+}
+.user .skin-fish-decor .gill {
+  border-color: var(--custom-border, #cbd5e1);
+  border-right: none;
+  border-left: 2px solid var(--custom-border, #cbd5e1);
+}
+.assistant .skin-fish-decor .gill {
+  right: 10px;
+}
+.user .skin-fish-decor .gill {
+  left: 10px;
+}
+.skin-fish-decor .eye {
+  position: absolute;
+  top: calc(50% - 14px);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 2px solid var(--custom-border, rgba(161, 183, 222, 0.6));
+  background: var(--bot-msg);
+}
+.user .skin-fish-decor .eye {
+  border-color: var(--custom-border, #cbd5e1);
+  background: var(--user-msg);
+}
+.assistant .skin-fish-decor .eye {
+  right: 16px;
+}
+.user .skin-fish-decor .eye {
+  left: 16px;
+}
+
+/* ===== 4. Hello Kitty 气泡 ===== */
+body.bubble-skin-helloKitty .message {
+  border-radius: 50% !important;
+  padding-bottom: 20px !important;
+}
+.skin-kitty-decor .bow {
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 12px;
+  z-index: 3;
+}
+.skin-kitty-decor .bow .loop {
+  position: absolute;
+  top: 0;
+  width: 14px;
+  height: 12px;
+  background: var(--bot-msg);
+  border: 2px solid var(--custom-border, rgba(161, 183, 222, 0.6));
+}
+.user .skin-kitty-decor .bow .loop {
+  background: var(--user-msg);
+  border-color: var(--custom-border, #cbd5e1);
+}
+.skin-kitty-decor .bow .loop.left {
+  left: 0;
+  border-radius: 7px 4px 4px 7px;
+  transform: rotate(20deg);
+}
+.skin-kitty-decor .bow .loop.right {
+  right: 0;
+  border-radius: 4px 7px 7px 4px;
+  transform: rotate(-20deg);
+}
+.skin-kitty-decor .bow .knot {
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  background: var(--bot-msg);
+  border: 2px solid var(--custom-border, rgba(161, 183, 222, 0.6));
+  border-radius: 2px;
+  z-index: 4;
+}
+.user .skin-kitty-decor .bow .knot {
+  background: var(--user-msg);
+  border-color: var(--custom-border, #cbd5e1);
+}
+
+.kitty-eyes-whiskers {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+.kitty-eyes-whiskers .path-solid {
+  fill: none;
+  stroke: var(--custom-border, rgba(161, 183, 222, 0.6));
+  stroke-width: 2px;
+  stroke-linecap: round;
+}
+.kitty-eyes-whiskers .feature-solid {
+  fill: none;
+  stroke: var(--custom-border, rgba(161, 183, 222, 0.6));
+  stroke-width: 2px;
+}
+.user .kitty-eyes-whiskers .path-solid,
+.user .kitty-eyes-whiskers .feature-solid {
+  stroke: var(--custom-border, #cbd5e1);
 }
 
 .empty-state {
@@ -1586,29 +1979,29 @@ body.sidebar-style-outline .sidebar.collapsed .logout-btn {
   animation: spin 1s linear infinite;
 }
 
-/* 2026 视觉重构：Atlas Editorial */
+/* 2026 视觉重构：Atlas Editorial（颜色已修正为高对比活力方案） */
 :root {
-  --primary: #1f3f69;
-  --primary-hover: #295083;
-  --secondary: #d17b2f;
-  --text-main: #1c2738;
-  --text-muted: #6d788c;
-  --text-secondary: #3d4b63;
-  --panel-border: rgba(59, 85, 122, 0.24);
-  --surface-solid: rgba(255, 252, 247, 0.94);
-  --surface-soft: rgba(255, 252, 247, 0.88);
-  --glass-strong: rgba(255, 252, 247, 0.9);
-  --glass-soft: rgba(248, 242, 234, 0.85);
-  --hover-bg: rgba(31, 63, 105, 0.1);
-  --bg-base: #efe8dd;
-  --bg-gradient-a: rgba(31, 63, 105, 0.18);
-  --bg-gradient-b: rgba(209, 123, 47, 0.16);
-  --bg-gradient-c: rgba(72, 124, 173, 0.12);
-  --bot-msg: rgba(255, 251, 245, 0.96);
-  --bot-border: rgba(78, 100, 128, 0.32);
+  --primary: #0f62fe;
+  --primary-hover: #0043ce;
+  --secondary: #ff6b2c;
+  --text-main: #061224;
+  --text-muted: #3d5a80;
+  --text-secondary: #142b4a;
+  --panel-border: rgba(112, 140, 185, 0.6);
+  --surface-solid: #ffffff;
+  --surface-soft: #f8faff;
+  --glass-strong: #ffffff;
+  --glass-soft: #f8faff;
+  --hover-bg: rgba(15, 98, 254, 0.1);
+  --bg-base: #f2f6fe;
+  --bg-gradient-a: rgba(15, 98, 254, 0.1);
+  --bg-gradient-b: rgba(255, 107, 44, 0.07);
+  --bg-gradient-c: rgba(16, 185, 129, 0.06);
+  --bot-msg: rgba(248, 252, 255, 0.95);
+  --bot-border: rgba(161, 183, 222, 0.72);
   --user-msg: #ffffff;
-  --shadow-md: 0 16px 34px rgba(43, 60, 90, 0.12);
-  --shadow-lg: 0 24px 48px rgba(35, 49, 74, 0.16);
+  --shadow-md: 0 14px 34px rgba(38, 68, 126, 0.16);
+  --shadow-lg: 0 26px 58px rgba(38, 68, 126, 0.22);
   --panel-radius: 20px;
 }
 
@@ -1632,13 +2025,6 @@ body.dark {
   --bot-msg: rgba(13, 24, 41, 0.94);
   --bot-border: rgba(92, 118, 156, 0.48);
   --user-msg: linear-gradient(145deg, #355a8f, #2a476f);
-}
-
-body {
-  font-family:
-    "IBM Plex Sans", "Source Han Sans SC", "PingFang SC", "Microsoft YaHei",
-    sans-serif;
-  letter-spacing: 0.01em;
 }
 
 body.dark.theme-deep-space {
@@ -1677,8 +2063,8 @@ body.dark.theme-cyber-violet {
     linear-gradient(
       155deg,
       color-mix(in srgb, var(--bg-base) 80%, #ffffff) 0%,
-      color-mix(in srgb, var(--bg-base) 84%, #f4eadf) 48%,
-      color-mix(in srgb, var(--bg-base) 88%, #dfd0be) 100%
+      color-mix(in srgb, var(--bg-base) 84%, #e8f0fe) 48%,
+      color-mix(in srgb, var(--bg-base) 88%, #d6e4ff) 100%
     );
 }
 
@@ -1744,13 +2130,13 @@ body.dark .message-wrapper.assistant.loading .typing-loader {
     padding: 10px 12px;
     gap: 10px;
   }
-  
+
   .message-wrapper.assistant.loading .avatar {
     width: 34px;
     height: 34px;
     border-radius: 10px;
   }
-  
+
   /* 移动端也限制一下最大宽度 */
   .message-wrapper.assistant.loading .typing-loader {
     max-width: 75%;
@@ -1760,8 +2146,8 @@ body.dark .message-wrapper.assistant.loading .typing-loader {
 .floating-bg::after {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.16),
-    rgba(255, 255, 255, 0.32)
+    rgba(255, 255, 255, 0.02),
+    rgba(255, 255, 255, 0.09)
   );
 }
 
@@ -1776,8 +2162,8 @@ body.dark .floating-bg::after {
 body.has-user-bg .floating-bg::after {
   background: linear-gradient(
     180deg,
-    rgba(250, 245, 237, 0.14),
-    rgba(250, 245, 237, 0.24)
+    rgba(240, 248, 255, 0.14),
+    rgba(240, 248, 255, 0.24)
   );
 }
 
@@ -1792,7 +2178,7 @@ body.dark.has-user-bg .floating-bg::after {
 .sidebar,
 .main-content {
   border-color: color-mix(in srgb, var(--panel-border) 88%, transparent);
-  box-shadow: 0 22px 44px rgba(36, 49, 74, 0.16);
+  box-shadow: 0 22px 44px rgba(38, 68, 126, 0.14);
 }
 
 .sidebar {
@@ -1911,9 +2297,9 @@ body.dark.has-user-bg .floating-bg::after {
 }
 
 .enterprise-badge {
-  color: #6f3f17;
-  border-color: rgba(209, 123, 47, 0.44);
-  background: rgba(255, 228, 198, 0.8);
+  color: #0043ce;
+  border-color: rgba(15, 98, 254, 0.44);
+  background: rgba(232, 244, 255, 0.8);
 }
 
 .status-badge {
@@ -1949,11 +2335,11 @@ body.dark.has-user-bg .floating-bg::after {
 }
 
 .assistant .avatar {
-  background: linear-gradient(145deg, #1f3f69, #31598c);
+  background: linear-gradient(145deg, #2563eb, #7c3aed);
 }
 
 .user .avatar {
-  background: linear-gradient(145deg, #d17b2f, #b55f25);
+  background: linear-gradient(135deg, #f43f5e, #fb7185);
 }
 
 .assistant .message {
@@ -2085,10 +2471,7 @@ body.dark .user .message {
   box-shadow: 0 14px 22px rgba(4, 10, 22, 0.5);
 }
 
-/* 2026-04 尺寸节奏微调：统一主界面比例，减少“忽大忽小”观感 */
-body {
-  font-size: 15px;
-}
+/* 2026-04 尺寸节奏微调：统一主界面比例，减少”忽大忽小”观感 */
 
 .header-title {
   font-size: 1.06rem;

@@ -28,7 +28,7 @@ public class Fetcher implements Ingestion {
         return "fetcher";
     }
 
-    @RagTraceNode(name = "分析" ,type = "上传管道")
+    @RagTraceNode(name = "分析" ,type = "上传管道",taskIdArg = "etlNode")
     public NodeResult execute(IngestionContext context, NodeConfig config) {
         Document document = context.getDocument();
         if (document == null) {

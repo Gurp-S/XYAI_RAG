@@ -27,7 +27,7 @@ public class EvaluateImpl {
     @Resource
     private SystemEvaluateMapper systemEvaluateMapper;
 
-    public Result<String> userEvaluate(String conversationId, String messageId, Integer feedback) {
+    public Result<String> userEvaluate(Long conversationId, Long messageId, Integer feedback) {
         UserEvaluatePOJO record = UserEvaluatePOJO.builder()
                 .messageId(messageId)
                 .conversationId(conversationId)
@@ -44,7 +44,7 @@ public class EvaluateImpl {
         return Result.success("评价成功");
     }
 
-    public Result<String> systemEvaluate(String conversationId, Long userId, String chatMessageId) {
+    public Result<String> systemEvaluate(Long conversationId, Long userId, Long chatMessageId) {
         ChatConversation chat = chatConversationMapper.selectById(chatMessageId);
         if (chat == null)
             return Result.error(404, "消息不存在");

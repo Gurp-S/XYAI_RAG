@@ -633,14 +633,6 @@ async function send() {
   const userText = input.value.trim();
   input.value = "";
 
-  // Ensure there is always a conversationId when sending
-  if (!store.activeConversationId) {
-    store.activeConversationId =
-      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-        ? crypto.randomUUID()
-        : `conv_${Date.now()}_${Math.random().toString(16).slice(2)}`;
-  }
-
   if (!isAiChat.value) {
     messages.value.push({
       role: "user",
@@ -985,12 +977,7 @@ async function performAiChat(message, userMsgIndex, options = {}) {
     messages.value[assistantIndex].ragData = null;
   }
 
-  const requestConversationId =
-    store.activeConversationId ||
-    (store.activeConversationId =
-      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-        ? crypto.randomUUID()
-        : `conv_${Date.now()}_${Math.random().toString(16).slice(2)}`);
+  let requestConversationId = store.activeConversationId;
   if (currentAbortController) {
     currentAbortController.abort();
   }
@@ -1058,13 +1045,15 @@ async function performAiChat(message, userMsgIndex, options = {}) {
         while (boundaryIndex !== -1) {
           const eventBlock = sseBuffer.slice(0, boundaryIndex);
           sseBuffer = sseBuffer.slice(boundaryIndex + 2);
-          processSSEEvent(eventBlock, assistantIndex);
+          const evtType = processSSEEvent(eventBlock, assistantIndex, message);
+          if (evtType === "start") requestConversationId = store.activeConversationId;
           boundaryIndex = sseBuffer.indexOf("\n\n");
         }
       }
     }
     if (sseBuffer.trim()) {
-      processSSEEvent(sseBuffer, assistantIndex);
+      const evtType = processSSEEvent(sseBuffer, assistantIndex, message);
+      if (evtType === "start") requestConversationId = store.activeConversationId;
     }
   } catch (error) {
     const shouldRetryAuto =
@@ -1241,8 +1230,11 @@ function handleVisibilityChange() {
 }
 
 // 辅助函数：处理 SSE 事件块并更新界面
-function processSSEEvent(eventBlock, assistantIndex) {
+let _sseStartUserMessage = "";
+
+function processSSEEvent(eventBlock, assistantIndex, userMessage) {
   if (!eventBlock) return;
+  if (userMessage !== undefined) _sseStartUserMessage = userMessage;
 
   const lines = eventBlock.split("\n");
   const dataLines = [];
@@ -1266,6 +1258,10 @@ function processSSEEvent(eventBlock, assistantIndex) {
   // 尝试解析 JSON 控制指令 (RAG/MCP)
   try {
     const json = JSON.parse(content.trim());
+    if (json.type === "start") {
+      store.handleSseStart(json.conversationId, json.chatMessageId, _sseStartUserMessage);
+      return "start";
+    }
     if (json.type === "rag_hits") {
       messages.value[assistantIndex].rag = true;
       messages.value[assistantIndex].ragData = json.data; // 包含命中摘要与来源
@@ -1401,8 +1397,12 @@ onUnmounted(() => {
 .db-file-meta {
   font-size: 11px;
   color: var(--text-muted);
+  flex-shrink: 0;
   margin-left: auto;
   white-space: nowrap;
+  background: color-mix(in srgb, var(--bg-hover) 40%, transparent);
+  padding: 1px 8px;
+  border-radius: 999px;
 }
 
 .chat-home-shell.streaming .message-wrapper {
@@ -1585,7 +1585,7 @@ onUnmounted(() => {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 .db-file-name {
   font-weight: 600;
@@ -1596,24 +1596,40 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 .db-file-preview {
-  font-size: 11px;
+  font-size: 11.5px;
   color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  background: color-mix(in srgb, var(--bg-hover) 55%, transparent);
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-family: "Microsoft YaHei", sans-serif;
+  letter-spacing: 0.01em;
+  display: inline-block;
+  max-width: 100%;
+  border: 1px solid color-mix(in srgb, var(--panel-border) 35%, transparent);
+  line-height: 1.5;
+}
+.db-file-preview::before {
+  content: "↳ ";
+  opacity: 0.55;
+  font-family: inherit;
 }
 .db-file-coll {
-  font-size: 12px;
+  font-size: 11.5px;
   color: var(--text-muted);
   flex-shrink: 0;
   margin-left: 8px;
-}
-.db-file-meta {
-  font-size: 11px;
-  color: var(--text-muted);
-  flex-shrink: 0;
-  margin-left: auto;
+  background: color-mix(in srgb, var(--primary) 9%, transparent);
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-weight: 530;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
+  border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
 }
 .db-file-row {
   display: flex; align-items: center; gap: 10px;
@@ -1630,14 +1646,6 @@ onUnmounted(() => {
 .db-file-icon {
   width: 18px; height: 18px; flex-shrink: 0;
   color: var(--text-muted, #617391);
-}
-.db-file-name {
-  flex: 1; font-weight: 500; font-size: 13px;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  color: var(--text-main, #11233f);
-}
-.db-file-coll {
-  font-size: 11px; color: var(--text-muted, #617391); flex-shrink: 0;
 }
 .db-file-check {
   width: 22px; height: 22px; border-radius: 50%;

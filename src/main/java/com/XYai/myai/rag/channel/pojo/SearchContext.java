@@ -30,9 +30,9 @@ public class SearchContext {
 
     /**
      * 对话ID
-     * 对话的唯一标识
+     * 对话的唯一标识（雪花ID）
      */
-    private String conversationId;
+    private Long conversationId;
 
 
     private Map<String, Integer> userMessageEntityFileChunkIds;

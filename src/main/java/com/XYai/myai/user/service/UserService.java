@@ -51,7 +51,7 @@ public interface UserService {
      * @param limit
      * @return 会话内消息列表
      */
-    Result<List<ChatConversation>> conversationHistory(String conversationId, String cursor, int limit);
+    Result<List<ChatConversation>> conversationHistory(Long conversationId, Long cursor, int limit);
 
     void register(UserDTO userDTO);
 
@@ -63,7 +63,7 @@ public interface UserService {
 
     Result<Map<String, Object>> refreshAccessToken(String refreshToken, HttpServletResponse response);
 
-    Result<String> deleteHistory(Long id, String conversationId);
+    Result<String> deleteHistory(Long id, Long conversationId);
 
     Result<String> updateHistory(ChatSessionRecord chatSessionRecord);
 }

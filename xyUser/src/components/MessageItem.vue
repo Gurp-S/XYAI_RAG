@@ -9,7 +9,9 @@
       </template>
     </div>
     <div class="message-content">
-      <div v-if="role === 'assistant' && fromName" class="sender-name">{{ fromName }}</div>
+      <div v-if="role === 'assistant' && fromName" class="sender-name">
+        {{ fromName }}
+      </div>
 
       <div v-if="role === 'assistant' && rag" class="rag-tag">
         <svg
@@ -30,7 +32,7 @@
           <summary>查看引用来源</summary>
           <ul>
             <li v-for="(item, idx) in ragData" :key="idx">
-              <span class="source-index">[{{ idx + 1 }}]</span>
+              <span class="source-index">{{ idx + 1 }}</span>
               <span class="source-content">{{ item.content || item }}</span>
             </li>
           </ul>
@@ -43,75 +45,331 @@
         {{ mcpStatusText }}
       </div>
 
-      <!-- eslint-disable-next-line vue/no-v-html -->
-      <div
-        v-if="text && !file && role === 'assistant'"
-        ref="markdownEl"
-        class="message assistant-markdown"
-        v-html="assistantMarkdownHtml"
-      ></div>
-      <div v-else-if="text && !file" class="message">{{ text }}</div>
+      <div v-if="text && !file" class="bubble-layout-wrapper">
+        <!-- 主气泡 -->
+        <div
+          v-if="role === 'assistant'"
+          ref="markdownEl"
+          class="message assistant-markdown"
+          v-html="assistantMarkdownHtml"
+        ></div>
+        <div v-else class="message">{{ text }}</div>
+
+        
+        <!-- ����Ƥ�����Զ�λ�� (������������) -->
+        <template v-if="store.bubbleSkin === 'cat'">
+          <div class="skin-overlay" :class="{ 'flip-for-user': role === 'user' }">
+            <svg class="skin-decor top-left">
+              <!-- ��� -->
+              <path d="M 0,20 Q 5,0 20,10" class="skin-stroke skin-fill" />
+              <path d="M 0,20 Q 5,0 20,10" class="skin-stroke" fill="none"/>
+              <!-- �Ҷ� -->
+              <path d="M 20,20 Q 35,0 40,10" class="skin-stroke skin-fill" />
+              <path d="M 20,20 Q 35,0 40,10" class="skin-stroke" fill="none"/>
+              <!-- �� -->
+              <path d="M 35,30 L 45,28 M 35,35 L 45,35" class="skin-stroke" fill="none" />
+            </svg>
+            <svg class="skin-decor bottom-right">
+              <!-- èβ�� -->
+              <path d="M 0,0 Q 30,10 15,30" class="skin-stroke" fill="none" />
+            </svg>
+          </div>
+        </template>
+
+        <template v-else-if="store.bubbleSkin === 'dog'">
+          <div class="skin-overlay" :class="{ 'flip-for-user': role === 'user' }">
+            <svg class="skin-decor top-left">
+              <!-- ��ͷ��ɫ -->
+              <circle cx="20" cy="20" r="16" class="skin-fill" />
+              <!-- ��ͷ�߿� -->
+              <circle cx="20" cy="20" r="16" class="skin-stroke" />
+              <!-- ���� �� -->
+              <path d="M 4,20 Q 0,35 10,25" class="skin-stroke skin-fill" />
+              <!-- ���� �� -->
+              <path d="M 36,20 Q 40,35 30,25" class="skin-stroke skin-fill" />
+              <!-- �۾� -->
+              <circle cx="12" cy="16" r="2" class="skin-feature" />
+              <circle cx="28" cy="16" r="2" class="skin-feature" />
+              <!-- ���� -->
+              <ellipse cx="20" cy="24" rx="3" ry="2" class="skin-feature" />
+              <!-- ��� -->
+              <path d="M 20,26 L 20,29 M 16,29 Q 20,32 24,29" class="skin-feature-stroke" />
+            </svg>
+            <svg class="skin-decor top-right">
+              <!-- ��β�� -->
+              <path d="M 10,20 Q 30,-5 25,15 Q 15,10 10,20" class="skin-stroke skin-fill" />
+            </svg>
+          </div>
+        </template>
+
+        <template v-else-if="store.bubbleSkin === 'fish'">
+          <div class="skin-overlay" :class="{ 'flip-for-user': role === 'user' }">
+            <svg class="skin-decor center-left">
+              <!-- ����ǰ�벿�� / �� -->
+              <path d="M 40,10 Q 5,20 40,30" class="skin-stroke skin-fill" />
+              <circle cx="25" cy="15" r="2" class="skin-feature" />
+            </svg>
+            <svg class="skin-decor center-right">
+              <!-- ��β�� -->
+              <path d="M 0,20 L 25,5 L 25,35 Z" class="skin-stroke skin-fill" />
+            </svg>
+            <svg class="skin-decor top-right" style="left: 50%; right: auto; transform: translateX(-50%);">
+              <!-- �㶥�� -->
+              <path d="M 10,35 Q 20,0 25,30" class="skin-stroke skin-fill" />
+            </svg>
+          </div>
+        </template>
+
+        <template v-else-if="store.bubbleSkin === 'helloKitty'">
+          <div class="skin-overlay" :class="{ 'flip-for-user': role === 'user' }">
+            <svg class="skin-decor top-left">
+              <!-- ��ֻ��� -->
+              <path d="M 5,20 L 10,5 L 20,15" class="skin-stroke skin-fill" />
+              <path d="M 20,15 L 30,5 L 35,20" class="skin-stroke skin-fill" />
+              <!-- ��������� -->
+              <ellipse cx="25" cy="10" rx="6" ry="4" transform="rotate(-20 25 10)" class="skin-stroke skin-fill" />
+              <ellipse cx="37" cy="14" rx="6" ry="4" transform="rotate(20 37 14)" class="skin-stroke skin-fill" />
+              <circle cx="31" cy="12" r="3" class="skin-stroke skin-fill" />
+              <!-- �۾� -->
+              <ellipse cx="15" cy="22" rx="1.5" ry="2.5" class="skin-feature" />
+              <ellipse cx="28" cy="22" rx="1.5" ry="2.5" class="skin-feature" />
+              <!-- ���� -->
+              <ellipse cx="21.5" cy="26" rx="2" ry="1.5" class="skin-feature" />
+              <!-- ���� -->
+              <path d="M 0,22 L 8,23 M 0,26 L 8,26 M 0,30 L 8,29" class="skin-stroke" />
+              <path d="M 43,22 L 35,23 M 43,26 L 35,26 M 43,30 L 35,29" class="skin-stroke" />
+            </svg>
+            <svg class="skin-decor bottom-right" style="left: 50%; right: auto; transform: translateX(-50%); height: 20px; width: 40px; bottom: -5px;">
+              <!-- צ�� -->
+              <ellipse cx="10" cy="10" rx="6" ry="4" class="skin-stroke skin-fill" />
+              <ellipse cx="30" cy="10" rx="6" ry="4" class="skin-stroke skin-fill" />
+            </svg>
+          </div>
+        </template>
+
+      </div>
 
       <!-- 文件分享卡片 -->
-      <div v-if="file" class="file-card" :class="{ pending: file.status === 'pending' && !file.isMine }">
+      <div
+        v-if="file"
+        class="file-card"
+        :class="{ pending: file.status === 'pending' && !file.isMine }"
+      >
         <div class="file-card-icon">
-          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <svg
+            viewBox="0 0 24 24"
+            width="24"
+            height="24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+          >
+            <path
+              d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+            ></path>
             <polyline points="14 2 14 8 20 8"></polyline>
             <line x1="16" y1="13" x2="8" y2="13"></line>
             <line x1="16" y1="17" x2="8" y2="17"></line>
           </svg>
         </div>
         <div class="file-card-info">
-          <div class="file-card-name" :class="{ clickable: file.type !== 'local_file_share' }" @click.stop="file.type !== 'local_file_share' && toggleDocExpanded()" :title="file.type !== 'local_file_share' ? (docExpanded ? '' : '点击显示完整ID') : ''">
-            <span class="file-card-name-text">{{ docExpanded ? (file.docId || file.fileId || '') : (file.name || '文件') }}</span>
-            <svg v-if="file.type !== 'local_file_share'" class="file-card-expand-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" :class="{ rotated: docExpanded }"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          <div
+            class="file-card-name"
+            :class="{ clickable: file.type !== 'local_file_share' }"
+            @click.stop="
+              file.type !== 'local_file_share' && toggleDocExpanded()
+            "
+          >
+            <span class="file-card-name-text">{{
+              docExpanded
+                ? file.docId || file.fileId || ""
+                : file.name || "文件"
+            }}</span>
+            <svg
+              v-if="file.type !== 'local_file_share'"
+              class="file-card-expand-icon"
+              viewBox="0 0 24 24"
+              width="12"
+              height="12"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              :class="{ rotated: docExpanded }"
+            >
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
           </div>
           <div class="file-card-meta">
-            <span v-if="file.fileSize" class="file-card-size">{{ formatFileSize(file.fileSize) }}</span>
-            <span v-if="file.collectionName" class="file-card-source">来自 {{ file.collectionName }}</span>
+            <span v-if="file.fileSize" class="file-card-size">{{
+              formatFileSize(file.fileSize)
+            }}</span>
+            <span v-if="file.collectionName" class="file-card-source"
+              >来自 {{ file.collectionName }}</span
+            >
           </div>
         </div>
         <div class="file-card-actions">
           <!-- DB 文件分享：待接收且非自己 → 接收/拒绝 -->
-          <template v-if="file.status === 'pending' && !file.isMine && file.type !== 'local_file_share'">
-            <button class="file-card-accept" type="button" @click="$emit('acceptFile', file)">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <template
+            v-if="
+              file.status === 'pending' &&
+              !file.isMine &&
+              file.type !== 'local_file_share'
+            "
+          >
+            <button
+              class="file-card-accept"
+              type="button"
+              @click="$emit('acceptFile', file)"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+              >
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
               接收
             </button>
-            <button class="file-card-reject" type="button" @click="$emit('rejectFile', file)">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <button
+              class="file-card-reject"
+              type="button"
+              @click="$emit('rejectFile', file)"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
               拒绝
             </button>
           </template>
           <!-- 本地文件分享 → 下载（仅接收方） -->
           <template v-if="file.type === 'local_file_share' && !file.isMine">
-            <button class="file-card-download" type="button" @click="$emit('downloadFile', file)">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <button
+              class="file-card-download"
+              type="button"
+              @click="$emit('downloadFile', file)"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
               下载
             </button>
           </template>
           <!-- 已接收/已完成状态标记 -->
-          <span v-if="file.status === 'accepted' && file.type !== 'local_file_share'" class="file-card-badge accepted">已接收</span>
-          <span v-else-if="file.isMine && file.status === 'pending'" class="file-card-badge">待接收</span>
-          <span v-else-if="file.type === 'local_file_share'" class="file-card-badge local-file">本地文件</span>
+          <span
+            v-if="
+              file.status === 'accepted' && file.type !== 'local_file_share'
+            "
+            class="file-card-badge accepted"
+            >已接收</span
+          >
+          <span
+            v-else-if="file.isMine && file.status === 'pending'"
+            class="file-card-badge"
+            >待接收</span
+          >
+          <span
+            v-else-if="file.type === 'local_file_share'"
+            class="file-card-badge local-file"
+            >本地文件</span
+          >
         </div>
       </div>
 
       <!-- AI 消息操作区（仅 AI 聊天显示） -->
-      <div v-if="text && role === 'assistant' && store.chatMode === 'ai'" class="msg-action-bar assistant-actions">
-         <button class="msg-action-btn" title="复制" @click="$emit('copy', text)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-         </button>
-         <button class="msg-action-btn" title="重新生成" @click="$emit('retry')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-         </button>
-         <button class="msg-action-btn" :class="{ active: props.feedback === 1 }" title="点赞" @click="$emit('like')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
-         </button>
-         <button class="msg-action-btn" :class="{ active: props.feedback === 0 }" title="踩" @click="$emit('dislike')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"></path></svg>
-         </button>
+      <div
+        v-if="text && role === 'assistant' && store.chatMode === 'ai'"
+        class="msg-action-bar assistant-actions"
+      >
+        <button class="msg-action-btn" @click="$emit('copy', text)">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path
+              d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+            ></path>
+          </svg>
+        </button>
+        <button class="msg-action-btn" @click="$emit('retry')">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+        </button>
+        <button
+          class="msg-action-btn"
+          :class="{ active: props.feedback === 1 }"
+          @click="$emit('like')"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"
+            ></path>
+          </svg>
+        </button>
+        <button
+          class="msg-action-btn"
+          :class="{ active: props.feedback === 0 }"
+          @click="$emit('dislike')"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"
+            ></path>
+          </svg>
+        </button>
       </div>
 
       <!-- 错误状态与重试按钮 -->
@@ -150,11 +408,14 @@
 
 <script setup>
 import { computed, ref, onMounted, watch, nextTick } from "vue";
-import { useUiStore } from '../store'
-import { renderAssistantMarkdown, attachImageZoom, initCodeCopyButtons } from "../services/markdown";
+import { useUiStore } from "../store";
+import {
+  renderAssistantMarkdown,
+  attachImageZoom,
+  initCodeCopyButtons,
+} from "../services/markdown";
 
 const props = defineProps({
-
   role: { type: String, default: "assistant" },
   text: { type: String, default: "" },
   rag: { type: Boolean, default: false },
@@ -170,7 +431,16 @@ const props = defineProps({
   feedback: { type: Number, default: -1 }, // -1=none, 1=like, 0=dislike
 });
 
-defineEmits(["retry", "edit", "copy", "like", "dislike", "acceptFile", "rejectFile", "downloadFile"]);
+defineEmits([
+  "retry",
+  "edit",
+  "copy",
+  "like",
+  "dislike",
+  "acceptFile",
+  "rejectFile",
+  "downloadFile",
+]);
 
 const docExpanded = ref(false);
 function toggleDocExpanded() {
@@ -178,12 +448,15 @@ function toggleDocExpanded() {
 }
 
 function formatFileSize(bytes) {
-  if (!bytes || bytes === 0) return ''
-  const units = ['B', 'KB', 'MB', 'GB']
-  let i = 0
-  let size = bytes
-  while (size >= 1024 && i < units.length - 1) { size /= 1024; i++ }
-  return size.toFixed(i > 0 ? 1 : 0) + ' ' + units[i]
+  if (!bytes || bytes === 0) return "";
+  const units = ["B", "KB", "MB", "GB"];
+  let i = 0;
+  let size = bytes;
+  while (size >= 1024 && i < units.length - 1) {
+    size /= 1024;
+    i++;
+  }
+  return size.toFixed(i > 0 ? 1 : 0) + " " + units[i];
 }
 
 const avatarText = computed(() =>
@@ -194,12 +467,12 @@ const avatarText = computed(() =>
         .toUpperCase(),
 );
 
-const store = useUiStore()
+const store = useUiStore();
 const avatarUrl = computed(() => {
-  if (props.role === 'user') return store.currentUser?.avatar || ''
-  if (props.role === 'assistant') return store.aiAvatar || ''
-  return ''
-})
+  if (props.role === "user") return store.currentUser?.avatar || "";
+  if (props.role === "assistant") return store.aiAvatar || "";
+  return "";
+});
 
 const mcpStatusText = computed(() => {
   if (props.mcpStatus === "running") return "正在调用插件工具...";
@@ -207,9 +480,23 @@ const mcpStatusText = computed(() => {
   return "";
 });
 
+const _mdRenderCache = new Map();
+const MD_RENDER_CACHE_MAX = 100;
+
 const assistantMarkdownHtml = computed(() => {
   if (props.role !== "assistant") return "";
-  return renderAssistantMarkdown(props.text);
+  const text = props.text;
+  if (!text) return "";
+  // LRU 缓存：历史消息再次进入视图时跳过完整 markdown 管线
+  const cached = _mdRenderCache.get(text);
+  if (cached) return cached;
+  const html = renderAssistantMarkdown(text);
+  if (_mdRenderCache.size >= MD_RENDER_CACHE_MAX) {
+    const firstKey = _mdRenderCache.keys().next().value;
+    _mdRenderCache.delete(firstKey);
+  }
+  _mdRenderCache.set(text, html);
+  return html;
 });
 
 const markdownEl = ref(null);
@@ -258,7 +545,9 @@ watch(assistantMarkdownHtml, () => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.15s, color 0.15s;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
 }
 .msg-action-btn:hover {
   background: var(--hover-bg);
@@ -327,7 +616,7 @@ watch(assistantMarkdownHtml, () => {
 .assistant-markdown :deep(code:not(pre code)) {
   padding: 0.08rem 0.34rem;
   border-radius: 6px;
-  font-family: "JetBrains Mono", "Consolas", monospace;
+  font-family: "Microsoft YaHei", sans-serif;
   font-size: 0.86em;
   background: color-mix(in srgb, var(--primary) 10%, var(--surface-solid));
   border: 1px solid color-mix(in srgb, var(--panel-border) 68%, transparent);
@@ -343,21 +632,26 @@ watch(assistantMarkdownHtml, () => {
     linear-gradient(180deg, rgba(10, 15, 28, 0.98), rgba(5, 10, 20, 0.98)),
     color-mix(in srgb, var(--bg-hover) 74%, transparent);
   box-shadow:
-    0 18px 34px rgba(2, 6, 23, 0.20),
+    0 18px 34px rgba(2, 6, 23, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
   overflow: auto;
   white-space: pre !important;
-  font-family: "JetBrains Mono", "Consolas", monospace;
+  font-family: "Microsoft YaHei", sans-serif;
   font-size: 0.92rem;
   line-height: 1.72;
   tab-size: 4;
   -moz-tab-size: 4;
   scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--primary) 50%, transparent) transparent;
+  scrollbar-color: color-mix(in srgb, var(--primary) 50%, transparent)
+    transparent;
 }
 body:not(.dark) .assistant-markdown :deep(pre.code-block) {
   background:
-    linear-gradient(180deg, rgba(245, 248, 252, 0.98), rgba(235, 240, 248, 0.98)),
+    linear-gradient(
+      180deg,
+      rgba(245, 248, 252, 0.98),
+      rgba(235, 240, 248, 0.98)
+    ),
     color-mix(in srgb, var(--bg-hover) 60%, transparent);
   box-shadow:
     0 8px 20px rgba(2, 6, 23, 0.08),
@@ -390,13 +684,17 @@ body:not(.dark) .assistant-markdown :deep(pre.code-block) {
     linear-gradient(180deg, rgba(10, 15, 28, 0.98), rgba(5, 10, 20, 0.98)),
     color-mix(in srgb, var(--bg-hover) 74%, transparent);
   box-shadow:
-    0 18px 34px rgba(2, 6, 23, 0.20),
+    0 18px 34px rgba(2, 6, 23, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 body:not(.dark) .assistant-markdown :deep(.code-block-wrapper) {
   background:
-    linear-gradient(180deg, rgba(245, 248, 252, 0.98), rgba(235, 240, 248, 0.98)),
+    linear-gradient(
+      180deg,
+      rgba(245, 248, 252, 0.98),
+      rgba(235, 240, 248, 0.98)
+    ),
     color-mix(in srgb, var(--bg-hover) 60%, transparent);
   box-shadow:
     0 8px 20px rgba(2, 6, 23, 0.08),
@@ -437,7 +735,9 @@ body:not(.dark) .assistant-markdown :deep(.code-lang-label) {
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 6px;
-  transition: background-color 0.15s, color 0.15s;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
 }
 .assistant-markdown :deep(.code-copy-btn:hover) {
   background: rgba(255, 255, 255, 0.08);
@@ -522,16 +822,50 @@ body:not(.dark) .assistant-markdown :deep(.code-block-divider) {
 }
 .rag-sources ul {
   margin: 8px 0 0 0;
-  padding-left: 12px;
+  padding-left: 0;
   list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 .rag-sources li {
-  margin-bottom: 4px;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface-solid) 50%, transparent);
+  border: 1px solid color-mix(in srgb, var(--panel-border) 50%, transparent);
+  line-height: 1.6;
   color: var(--text-secondary);
 }
+.rag-sources li:hover {
+  background: color-mix(in srgb, var(--surface-solid) 70%, transparent);
+  border-color: color-mix(in srgb, var(--panel-border) 70%, transparent);
+}
 .source-index {
-  font-weight: bold;
-  margin-right: 4px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+.source-content {
+  flex: 1;
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+  font-size: 12.5px;
 }
 
 .mcp-status {
@@ -587,7 +921,9 @@ body:not(.dark) .assistant-markdown :deep(.code-block-divider) {
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.85em;
-  transition: opacity 0.2s, transform 0.18s ease;
+  transition:
+    opacity 0.2s,
+    transform 0.18s ease;
 }
 .retry-btn:hover {
   opacity: 0.9;
@@ -754,7 +1090,10 @@ body:not(.dark) .assistant-markdown :deep(.code-block-divider) {
   font-weight: 500;
   cursor: pointer;
   flex-shrink: 0;
-  transition: background-color 0.12s, color 0.12s, border-color 0.12s;
+  transition:
+    background-color 0.12s,
+    color 0.12s,
+    border-color 0.12s;
 }
 .file-card-reject:hover {
   background: color-mix(in srgb, #ef4444 8%, transparent);

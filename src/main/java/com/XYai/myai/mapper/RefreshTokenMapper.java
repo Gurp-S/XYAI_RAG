@@ -8,6 +8,6 @@ import org.apache.ibatis.annotations.Select;
 
 @Mapper
 public interface RefreshTokenMapper extends BaseMapper<RefreshToken> {
-    @Select("select * from xy_refresh_token where token_hash = #{hash} limit 1")
+    @Select("SELECT id, user_id, token_hash, issued_at, expires_at, revoked FROM xy_refresh_token WHERE token_hash = #{hash} LIMIT 1")
     RefreshToken selectByTokenHash(@Param("hash") String hash);
 }

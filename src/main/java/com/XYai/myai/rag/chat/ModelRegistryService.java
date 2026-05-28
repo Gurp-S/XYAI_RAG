@@ -10,6 +10,8 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +48,7 @@ public class ModelRegistryService {
     // ======================== 查询 ========================
 
     /** 获取全部模型列表（按优先级排序） */
+    @Cacheable(value = "modelCandidates", key = "'all'")
     public List<ModelCandidateEntity> listAll() {
         return mapper.findAllOrderByPriority();
     }
@@ -58,6 +61,7 @@ public class ModelRegistryService {
     // ======================== 新增（含 priority 挤占） ========================
 
     @Transactional
+    @CacheEvict(value = "modelCandidates", allEntries = true)
     public ModelCandidateEntity add(ModelCandidateEntity entity) {
         // 1. 查重
         if (findByName(entity.getName()) != null) {
@@ -93,6 +97,7 @@ public class ModelRegistryService {
     // ======================== 删除 ========================
 
     @Transactional
+    @CacheEvict(value = "modelCandidates", allEntries = true)
     public void remove(String name) {
         ModelCandidateEntity entity = findByName(name);
         if (entity == null)
@@ -106,6 +111,7 @@ public class ModelRegistryService {
     // ======================== 启停 ========================
 
     @Transactional
+    @CacheEvict(value = "modelCandidates", allEntries = true)
     public void setEnabled(String name, boolean enabled) {
         mapper.update(null,
                 new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<ModelCandidateEntity>()
@@ -124,6 +130,7 @@ public class ModelRegistryService {
     // ======================== 更新模型配置 ========================
 
     @Transactional
+    @CacheEvict(value = "modelCandidates", allEntries = true)
     public void update(ModelCandidateEntity entity) {
         mapper.updateById(entity);
         if (entity.isEnabled()) {

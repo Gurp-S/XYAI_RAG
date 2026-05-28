@@ -11,7 +11,7 @@ import com.XYai.myai.xyAdmin.pojo.TokenRecord;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -50,12 +50,12 @@ public class ModelInvocationService {
     private SystemConfigMapper systemConfigMapper;
 
     @Resource(name = "memeryExecutor")
-    private ThreadPoolTaskExecutor memoryExecutor;
+    private TaskExecutor memoryExecutor;
 
     // ==================== 步骤9：调用模型（流式，回调模式） ====================
 
-    @RagTraceNode(name = "模型路由流式调用", type = "模型路由")
-    public String callModelStream(String finalPrompt, String conversationId,
+    @RagTraceNode(name = "模型路由流式调用", type = "模型路由",taskIdArg = "root")
+    public String callModelStream(String finalPrompt, Long conversationId,
                                   Consumer<String> onChunk, Consumer<Throwable> onError, Runnable onComplete) {
         log.debug("调用模型路由，conversationId: {}", conversationId);
 
@@ -64,18 +64,18 @@ public class ModelInvocationService {
 
     // ==================== 步骤10：调用模型快速模式 ====================
 
-    @RagTraceNode(name = "快速模式路由调用", type = "模型路由")
-    public String callModelFastStream(String finalPrompt, String conversationId,
+    @RagTraceNode(name = "快速模式路由调用", type = "模型路由",taskIdArg = "root")
+    public String callModelFastStream(String finalPrompt, Long conversationId,
                                       Consumer<String> onChunk, Consumer<Throwable> onError, Runnable onComplete) {
         return modelRouterService.routeFastStream(finalPrompt, conversationId, onChunk, onError, onComplete);
     }
 
     // ==================== 步骤11：异步保存对话记忆 ====================
 
-    @RagTraceNode(name = "保存对话记忆", type = "记忆保存")
+    @RagTraceNode(name = "保存对话记忆", type = "记忆保存",taskIdArg = "root")
     public void saveMemoryAsync(
-            String conversationId,
-            String chatMessageId,
+            Long conversationId,
+            Long chatMessageId,
             String userMessage,
             String assistantMessage,
             Long userId) {
@@ -102,8 +102,8 @@ public class ModelInvocationService {
     // ==================== 异步保存Token消耗 ====================
     @RagTraceNode(name = "保存token消耗", type = "token保存")
     public void saveTokenUseAsync(
-            String conversationId,
-            String chatMessageId,
+            Long conversationId,
+            Long chatMessageId,
             Long promptTokens,
             Long completionTokens,
             Long userId,

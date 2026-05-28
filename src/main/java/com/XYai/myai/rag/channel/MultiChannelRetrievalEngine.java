@@ -16,7 +16,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -51,7 +51,7 @@ public class MultiChannelRetrievalEngine {
     private DashboardManager dashboardManager;
 
     @Resource(name = "searchChannelExecutor")
-    private ThreadPoolTaskExecutor searchChannelExecutor;
+    private TaskExecutor searchChannelExecutor;
 
     /**
      * 多通道检索主入口：筛选启用通道 -> 并行检索 -> 合并 -> 后处理。
@@ -62,7 +62,7 @@ public class MultiChannelRetrievalEngine {
      * <p>3) 合并所有通道的 chunks 后，进入 SearchResultPostProcessor 链路做质量提升。</p>
      * <p>4) 当前后处理采用固定顺序调用（非动态排序）：Deduplication -> Filter -> Rerank。</p>
      */
-    public List<RetrievedChunk> retrieve(Map<String, Integer> userMessageEntityFileChunkIds, RewriteResult query, String conversationId, String originalQuery) {
+    public List<RetrievedChunk> retrieve(Map<String, Integer> userMessageEntityFileChunkIds, RewriteResult query, Long conversationId, String originalQuery) {
         // 构建查找对象
         SearchContext context = new SearchContext();
         context.setOriginalQuery(originalQuery);
@@ -144,7 +144,7 @@ public class MultiChannelRetrievalEngine {
         log.info("filter:{}", filterProcess.stream().map(RetrievedChunk::getScore).toList());
         // 3 重排：基于语义模型或融合策略调整最终排序。
         List<RetrievedChunk> rerankProcess = rerankPostProcessor.process(filterProcess, context);//rerank模型
-        log.info("rerank:{}", rerankProcess.stream().map(RetrievedChunk::getScore).toList());
+        log.info("rerank:{},token:{}", rerankProcess.stream().map(RetrievedChunk::getScore).toList(),rerankProcess.stream().map(RetrievedChunk::getContent).map(String::length).toList());
         // 4.异步保存文档使用次数
         rerankProcess.forEach(chunk ->
                 CompletableFuture.runAsync(

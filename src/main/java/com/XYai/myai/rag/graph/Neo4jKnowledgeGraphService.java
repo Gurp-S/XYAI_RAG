@@ -7,7 +7,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.neo4j.core.Neo4jClient;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -38,7 +38,7 @@ public class Neo4jKnowledgeGraphService {
     @Resource
     private EntityRecognizer entityRecognizer;
     @Resource(name = "neo4jExecutor")
-    private ThreadPoolTaskExecutor neo4jExecutor;
+    private TaskExecutor neo4jExecutor;
     private volatile long lastCommunityBuildTime = 0;
 
     // ==================== 定时任务与触发 ====================

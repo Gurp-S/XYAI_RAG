@@ -3,7 +3,7 @@ package com.XYai.myai.user.service.Impl;
 import com.XYai.myai.mapper.RefreshTokenMapper;
 import com.XYai.myai.user.pojo.RefreshToken;
 import com.XYai.myai.user.service.RefreshTokenService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import jakarta.annotation.Resource;
 import org.apache.commons.codec.binary.Hex;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -94,20 +93,11 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     @Transactional
     public void revokeAllForUser(Long userId) {
-        // 构建 MyBatis-Plus 查询条件：userId = ?
-        LambdaQueryWrapper<RefreshToken> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(RefreshToken::getUserId, userId);
-
-        // 查询该用户的所有刷新令牌
-        List<RefreshToken> list = refreshTokenMapper.selectList(wrapper);
-
-        // 遍历并全部标记为已吊销
-        if (list != null) {
-            for (RefreshToken t : list) {
-                t.setRevoked(true);
-                refreshTokenMapper.updateById(t);
-            }
-        }
+        refreshTokenMapper.update(
+                new LambdaUpdateWrapper<RefreshToken>()
+                        .eq(RefreshToken::getUserId, userId)
+                        .set(RefreshToken::getRevoked, true)
+        );
     }
 
     /**

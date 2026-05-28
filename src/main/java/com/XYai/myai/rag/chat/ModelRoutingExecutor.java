@@ -43,7 +43,7 @@ public class ModelRoutingExecutor {
     /**
      * 执行路由调用（自动降级）
      */
-    public String execute(String prompt, String sessionId) {
+    public String execute(String prompt, Long sessionId) {
         long startTime = System.currentTimeMillis();
         List<String> fallbackChain = modelSelector.getFallbackChain();
         log.info("降级链路: {}", fallbackChain);
@@ -72,7 +72,7 @@ public class ModelRoutingExecutor {
         return "服务繁忙，请稍后重试";
     }
 
-    public String executeWithPreferred(String prompt, String preferredModel, String sessionId) {
+    public String executeWithPreferred(String prompt, String preferredModel, Long sessionId) {
         long startTime = System.currentTimeMillis();
         if (!healthStore.isHealthy(preferredModel)) {
             log.warn("首选模型 [{}] 不健康，切换到降级链路", preferredModel);
@@ -90,7 +90,7 @@ public class ModelRoutingExecutor {
         }
     }
 
-    public String executeConcurrent(String prompt, String sessionId, long timeoutMs) {
+    public String executeConcurrent(String prompt, Long sessionId, long timeoutMs) {
         List<String> candidates = modelSelector.getAvailableModels().stream()
                 .limit(3)
                 .map(ModelCandidateEntity::getName)
@@ -140,7 +140,7 @@ public class ModelRoutingExecutor {
      *
      * @return 实际使用的模型名称
      */
-    public String executeStream(String prompt, String sessionId,
+    public String executeStream(String prompt, Long sessionId,
                                 Consumer<String> onChunk, Consumer<Throwable> onError, Runnable onComplete) {
         String defaultModel = routerProperties.getFeatureModel("chat_default");
         if (defaultModel != null && healthStore.isHealthy(defaultModel)
@@ -165,7 +165,7 @@ public class ModelRoutingExecutor {
      *
      * @return 实际使用的模型名称
      */
-    public String executeWithPreferredStream(String prompt, String preferredModel, String sessionId,
+    public String executeWithPreferredStream(String prompt, String preferredModel, Long sessionId,
                                               Consumer<String> onChunk, Consumer<Throwable> onError, Runnable onComplete) {
         if (!healthStore.isHealthy(preferredModel)) {
             log.warn("首选模型 [{}] 不健康，切换到降级链路", preferredModel);
@@ -188,7 +188,7 @@ public class ModelRoutingExecutor {
      *
      * @return 实际使用的模型名称
      */
-    public String executeConcurrentStream(String prompt, String sessionId, long timeoutMs,
+    public String executeConcurrentStream(String prompt, Long sessionId, long timeoutMs,
                                            Consumer<String> onChunk, Consumer<Throwable> onError, Runnable onComplete) {
         List<String> candidates = modelSelector.getAvailableModels().stream()
                 .limit(3)
@@ -221,7 +221,7 @@ public class ModelRoutingExecutor {
      *
      * @return 实际使用的模型名称，全部失败返回 null
      */
-    private String doFallbackStream(String prompt, String sessionId,
+    private String doFallbackStream(String prompt, Long sessionId,
                                     Consumer<String> onChunk, Consumer<Throwable> onError, Runnable onComplete) {
         List<String> fallbackChain = modelSelector.getFallbackChain();
         log.info("降级链路: {}", fallbackChain);
@@ -254,7 +254,7 @@ public class ModelRoutingExecutor {
      * 实际调用模型流式接口（内部方法，使用 Flux.toIterable() 桥接为阻塞）。
      * 成功时调用 onComplete，失败时抛出异常（由上层处理降级）。
      */
-    private void invokeModelStream(String modelName, String prompt, String sessionId,
+    private void invokeModelStream(String modelName, String prompt, Long sessionId,
                                    Consumer<String> onChunk, Runnable onComplete) {
         CircuitBreaker breaker = healthStore.getBreaker(modelName);
         if (breaker.getState() == CircuitBreaker.State.OPEN) {
@@ -288,7 +288,7 @@ public class ModelRoutingExecutor {
     /**
      * 同步调用模型（带熔断保护）
      */
-    private String callModel(String modelName, String prompt, String sessionId) throws Exception {
+    private String callModel(String modelName, String prompt, Long sessionId) throws Exception {
         CircuitBreaker breaker = healthStore.getBreaker(modelName);
         if (breaker.getState() == CircuitBreaker.State.OPEN) {
             throw new RuntimeException("模型 [" + modelName + "] 处于熔断状态");

@@ -1,5 +1,6 @@
 package com.XYai.myai.rag.channel.search;
 
+import com.XYai.myai.commonUtils.FloatArrayList;
 import com.XYai.myai.rag.aop.annotation.RagTraceNode;
 import com.XYai.myai.rag.channel.pojo.RetrievedChunk;
 import com.XYai.myai.rag.channel.pojo.SearchChannel;
@@ -19,14 +20,13 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Slf4j
 @Component
@@ -34,25 +34,19 @@ public class VectorGlobalSearchChannel implements SearchChannel {
 
     private static final double SIMILARITY_THRESHOLD = 0.5;   // COSINE 相似度阈值
     private static final int DEFAULT_TOP_K = 5;
-
-    @Resource
-    private EmbeddingModel embeddingModel;
-
-    @Resource
-    private MilvusClient milvusClient;
-
-    @Value("${spring.ai.vectorstore.milvus.collectionName:my_ai}")
-    private String defaultCollectionName;
-
-    @Value("${spring.ai.vectorstore.milvus.databaseName:my_xy}")
-    private String databaseName;
-
-    @Resource(name = "searchChannelExecutor")
-    private ThreadPoolTaskExecutor searchChannelExecutor;
-
     // 向量字段名
     private static final String VECTOR_FIELD_CONTEXT = "embedding_context";
     private static final String VECTOR_FIELD_QUESTION = "embedding_question";
+    @Resource
+    private EmbeddingModel embeddingModel;
+    @Resource
+    private MilvusClient milvusClient;
+    @Value("${spring.ai.vectorstore.milvus.collectionName:my_ai}")
+    private String defaultCollectionName;
+    @Value("${spring.ai.vectorstore.milvus.databaseName:my_xy}")
+    private String databaseName;
+    @Resource(name = "searchChannelExecutor")
+    private TaskExecutor searchChannelExecutor;
 
     @Override
     public String getName() {
@@ -75,7 +69,7 @@ public class VectorGlobalSearchChannel implements SearchChannel {
     }
 
     @Override
-    @RagTraceNode(name = "向量召回", type = "search")
+    @RagTraceNode(name = "向量召回", type = "search" , taskIdArg = "searchRoot")
     public SearchChannelResult search(SearchContext context) {
         RewriteResult rewriteResult = Optional.ofNullable(context.getRewriteQuestion())
                 .orElse(RewriteResult.builder()
@@ -125,9 +119,7 @@ public class VectorGlobalSearchChannel implements SearchChannel {
      */
     private List<RetrievedChunk> searchWithDualVectors(float[] queryVector) {
         try {
-            List<Float> vectorList = IntStream.range(0, queryVector.length)
-                    .mapToObj(i -> queryVector[i])
-                    .toList();
+            List<Float> vectorList = new FloatArrayList(queryVector);
 
             // 并行搜索两个向量字段
             long t2 = System.currentTimeMillis();
@@ -137,10 +129,12 @@ public class VectorGlobalSearchChannel implements SearchChannel {
                     () -> searchByField(vectorList, VECTOR_FIELD_QUESTION), searchChannelExecutor);
 
             List<RetrievedChunk> contextResults = contextFuture.join();
+            log.info("文本搜索分数:{}",contextResults.stream().map(RetrievedChunk::getScore).toList());
             long t3 = System.currentTimeMillis();
             List<RetrievedChunk> questionResults = questionFuture.join();
             long t4 = System.currentTimeMillis();
-            log.info("context search {}ms, question search {}ms, merge overhead {}ms", t3 - t2, t4 - t3, t4 - t2);
+            log.info("问题搜索分数:{}",contextResults.stream().map(RetrievedChunk::getScore).toList());
+            log.info("文本搜索 {}ms, 问题搜索 search {}ms, merge overhead {}ms", t3 - t2, t4 - t3, t4 - t2);
             // 合并：以 "fileId:chunkId" 为唯一键，保留分数最高的 chunk
             Map<String, RetrievedChunk> merged = new LinkedHashMap<>();
 
@@ -227,7 +221,7 @@ public class VectorGlobalSearchChannel implements SearchChannel {
         if (metadataJsonList == null || metadataJsonList.isEmpty())
             metadataJsonList = Collections.nCopies(contentList.size(), "{}");
         if (scores.isEmpty()) scores = Collections.nCopies(contentList.size(), 0.0f);
-        List<RetrievedChunk> chunks = new ArrayList<>();
+        List<RetrievedChunk> chunks = new ArrayList<>(contentList.size());
         for (int i = 0; i < contentList.size(); i++) {
             double score = i < scores.size() ? scores.get(i) : 0.0;
             String metadataJson = i < metadataJsonList.size() ? metadataJsonList.get(i) : "{}";

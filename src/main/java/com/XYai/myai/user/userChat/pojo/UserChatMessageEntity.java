@@ -16,11 +16,11 @@ import lombok.NoArgsConstructor;
 @TableName("user_chat_message")
 public class UserChatMessageEntity {
 
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
     @TableField("conversation_id")
-    private String conversationId;
+    private Long conversationId;
 
     @TableField("target_type")
     private String targetType;

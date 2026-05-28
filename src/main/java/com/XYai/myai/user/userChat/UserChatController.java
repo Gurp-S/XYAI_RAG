@@ -17,7 +17,6 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -52,7 +51,7 @@ public class UserChatController {
     public Result<List<UserChatMessageDTO>> messages(
             @RequestParam("targetType") String targetType,
             @RequestParam("targetId") String targetId,
-            @RequestParam(value = "cursor", required = false) Long cursor,
+            @RequestParam(value = "cursor", required = false) String cursor,
             @RequestParam(value = "limit", required = false) Integer limit) {
         Long userId = requireLoginUserId();
         return Result.success(userChatService.getMessages(userId, targetType, targetId, cursor, limit));
@@ -100,7 +99,7 @@ public class UserChatController {
      * 下载已分享的本地文件。
      */
     @GetMapping(value = "/files/{fileId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<org.springframework.core.io.Resource> downloadFile(@PathVariable String fileId) {
+    public ResponseEntity<Resource> downloadFile(@PathVariable String fileId) {
         requireLoginUserId();
         Path filePath = userChatService.resolveLocalFilePath(fileId);
         if (filePath == null || !Files.exists(filePath)) {

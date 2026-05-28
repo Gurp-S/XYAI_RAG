@@ -3,7 +3,9 @@ package com.XYai.myai.config;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.Data;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -59,5 +61,25 @@ public class CacheConfig {
                 .expireAfterWrite(defaultTime, TimeUnit.MINUTES)
                 .recordStats()
                 .build();
+    }
+
+    /** 会话记忆缓存 */
+    @Bean
+    public Cache<String, Object> memoryCache() {
+        return Caffeine.newBuilder()
+                .maximumSize(500)                       // 按需调整
+                .expireAfterWrite(30, TimeUnit.MINUTES) // 摘要和窗口可以存长一些
+                .recordStats()
+                .build();
+    }
+
+    /** Spring Cache 抽象层缓存管理器，支持 @Cacheable 注解 */
+    @Bean
+    public CacheManager cacheManager() {
+        CaffeineCacheManager manager = new CaffeineCacheManager();
+        manager.setCaffeine(Caffeine.newBuilder()
+                .maximumSize(200)
+                .expireAfterWrite(30, TimeUnit.MINUTES));
+        return manager;
     }
 }

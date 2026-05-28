@@ -14,9 +14,9 @@ import com.XYai.myai.user.LoginUserInfoManager;
 import com.XYai.myai.user.pojo.User;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RedissonClient;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,7 +56,7 @@ public class UploadController {
     @Resource
     private IngestionEngine ingestionEngine;
     @Resource
-    private RedissonClient redissonClient;
+    private StringRedisTemplate stringRedisTemplate;
     @Resource
     private PipelineDefinitionFactory pipelineDefinitionFactory;
     @Resource
@@ -66,7 +66,7 @@ public class UploadController {
     @Resource
     private MilvusFileManager milvusFileManager;
     @Resource(name = "uploadExecutor")
-    private ThreadPoolTaskExecutor uploadExecutor;
+    private TaskExecutor uploadExecutor;
 
     @PostMapping("up")
     @RagTraceRoot(name = "上传", conversationIdArg = "", taskIdArg = "上传")
@@ -87,7 +87,7 @@ public class UploadController {
         // 步骤3：将原始文件转换为可重复读取的安全文件，同时记录跳过的空文件
         List<MultipartFile> safeFiles;
         List<File> tempFiles = new ArrayList<>();
-        List<String> skippedEmptyFiles = new ArrayList<>();  // 记录空文件名
+        List<String> skippedEmptyFiles = new ArrayList<>(); // 记录空文件名
         try {
             safeFiles = prepareSafeFiles(files, tempFiles, skippedEmptyFiles);
         } catch (IOException e) {
@@ -153,7 +153,10 @@ public class UploadController {
                     emitter.complete();
                 }
             } catch (Exception e) {
-                try { emitter.complete(); } catch (Exception ignored) {}
+                try {
+                    emitter.complete();
+                } catch (Exception ignored) {
+                }
             }
         }, 0, 500, TimeUnit.MILLISECONDS);
 
@@ -194,14 +197,15 @@ public class UploadController {
 
     /**
      * 将原始文件转换为可安全重复读取的副本，同时记录被跳过的空文件名
-     * @param originals 原始上传文件列表
-     * @param tempFiles 生成的临时文件列表（输出参数，用于清理）
+     * 
+     * @param originals         原始上传文件列表
+     * @param tempFiles         生成的临时文件列表（输出参数，用于清理）
      * @param skippedEmptyFiles 被跳过的空文件名列表（输出参数）
      * @return 安全的 MultipartFile 列表
      */
     private List<MultipartFile> prepareSafeFiles(List<MultipartFile> originals,
-                                                 List<File> tempFiles,
-                                                 List<String> skippedEmptyFiles) throws IOException {
+            List<File> tempFiles,
+            List<String> skippedEmptyFiles) throws IOException {
         List<MultipartFile> safeFiles = new ArrayList<>();
         for (MultipartFile f : originals) {
             if (f == null || f.isEmpty()) {
@@ -239,7 +243,7 @@ public class UploadController {
     }
 
     private Result<String> checkSafeFilesNotEmpty(List<MultipartFile> safeFiles, String taskId,
-                                                  List<String> skippedEmptyFiles) {
+            List<String> skippedEmptyFiles) {
         if (safeFiles.isEmpty()) {
             String msg = "没有有效的文件可上传";
             if (!skippedEmptyFiles.isEmpty()) {
@@ -252,8 +256,8 @@ public class UploadController {
     }
 
     private Result<String> submitAsyncTask(String taskId, List<MultipartFile> safeFiles,
-                                           List<File> tempFiles, String collectionName,
-                                           List<String> skippedEmptyFiles) {
+            List<File> tempFiles, String collectionName,
+            List<String> skippedEmptyFiles) {
         User user = LoginUserInfoManager.getUser();
         try {
             uploadExecutor.execute(() -> processFilesInAsync(taskId, safeFiles, tempFiles,
@@ -269,8 +273,8 @@ public class UploadController {
     // ==================== 异步核心处理 ====================
 
     private void processFilesInAsync(String taskId, List<MultipartFile> safeFiles,
-                                     List<File> tempFiles, String collectionName,
-                                     User user, List<String> skippedEmptyFiles) {
+            List<File> tempFiles, String collectionName,
+            User user, List<String> skippedEmptyFiles) {
         UpLoadAccumulator accumulator = new UpLoadAccumulator();
         accumulator.setTaskId(taskId);
         int successCount = 0;
@@ -290,16 +294,18 @@ public class UploadController {
                 SkipFileInfo skipFileInfo = milvusFileManager.generateFile(fileHash, collectionName, taskId);
                 boolean fileSuccess = false;
                 try {
-                    if (SkipFileInfo.UP_FILE.equals(skipFileInfo.getSkipStatus())) {
+                    if (skipFileInfo.getSkipStatus() == SkipFileInfo.UP_FILE) {
                         log.info("进行文件上传: {}", safeFileName(file));
                         fileSuccess = processSingleFile(file, accumulator, collectionName, user, fileHash, List.of());
-                    } else if (SkipFileInfo.COPY_CHUNK.equals(skipFileInfo.getSkipStatus())) {
+                    } else if (skipFileInfo.getSkipStatus() == SkipFileInfo.UP_CHUNK) {
                         log.info("进行分块复用: {}", safeFileName(file));
                         fileSuccess = processSingleFile(file, accumulator, collectionName, user, fileHash,
-                                skipFileInfo.getCopyChunks());
+                                skipFileInfo.getUpChunks());
+                    } else {
+                        log.info("跳过文件 结果:{}", skipFileInfo.getSkipStatus());
                     }
                     if (fileSuccess) {
-                        redissonClient.getSet(RedisKeyConfig.fileHashKey(fileHash)).add(collectionName);
+                        stringRedisTemplate.opsForSet().add(RedisKeyConfig.fileHashKey(fileHash), collectionName);
                         successCount++;
                     } else {
                         failedFiles.add(safeFileName(file));
@@ -328,8 +334,8 @@ public class UploadController {
      * 处理单个文件，OSS 失败不阻断主流程。返回值表示是否成功生成分块。
      */
     private boolean processSingleFile(MultipartFile file, UpLoadAccumulator accumulator,
-                                      String collectionName, User user, String fileHashId,
-                                      List<Long> copyChunks) {
+            String collectionName, User user, String fileHashId,
+            List<Integer> copyChunks) {
         if (file == null || file.isEmpty()) {
             return false;
         }
@@ -396,7 +402,7 @@ public class UploadController {
     }
 
     private String buildDetailMessage(int successCount, List<String> failedFiles,
-                                      UpLoadAccumulator accumulator, List<String> skippedEmptyFiles) {
+            UpLoadAccumulator accumulator, List<String> skippedEmptyFiles) {
         StringBuilder sb = new StringBuilder();
         sb.append("成功文件: ").append(successCount);
         if (!failedFiles.isEmpty()) {
@@ -430,7 +436,8 @@ public class UploadController {
     }
 
     private String truncateMessage(String msg) {
-        if (msg == null) return "未知错误";
+        if (msg == null)
+            return "未知错误";
         int maxLen = uploadProperties.getMaxErrorMessageLength();
         return msg.length() > maxLen ? msg.substring(0, maxLen) + "..." : msg;
     }

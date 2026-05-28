@@ -50,11 +50,7 @@ public class OllamaRerankerService {
                 }
             }
         }
-        List<Double> scoreList = new ArrayList<>(scores.length);
-        for (double score : scores) {
-            scoreList.add(score);
-        }
-        return scoreList;
+        return new DoubleArrayList(scores);
     }
 
     // 响应体映射

@@ -1,5 +1,7 @@
 package com.XYai.myai.rag.evaluate.strategy;
 
+import cn.hutool.core.util.IdUtil;
+import com.XYai.myai.rag.aop.annotation.RagTraceContext;
 import com.XYai.myai.rag.chat.ModelInvocationService;
 import com.XYai.myai.user.LoginUserInfoManager;
 import com.alibaba.fastjson2.JSON;
@@ -38,7 +40,7 @@ public class LLMEvaluator {
             输出格式：{"faithfulness":0.9,"relevance":0.85,"completeness":0.7}
             """;
 
-    public double evaluate(String question, String answer, List<String> retrievedChunks, String conversationId,String chatMessageId) {
+    public double evaluate(String question, String answer, List<String> retrievedChunks, Long conversationId, Long chatMessageId) {
         if (answer == null || answer.isBlank())
             return 0;
 
@@ -59,9 +61,10 @@ public class LLMEvaluator {
                     new UserMessage(userPrompt))).getResult().getOutput().getText();
             long durationMs = (System.nanoTime() - startTime) / 1_000_000;
 
+            RagTraceContext.setPhase("LLM评估");
             modelInvocationService.saveTokenUseAsync(
                     conversationId,
-                    chatMessageId+":evaluate",
+                    IdUtil.getSnowflakeNextId(),
                     (long) (SYSTEM_PROMPT.length()+userPrompt.length()),
                     (long) raw.length(),
                     LoginUserInfoManager.getUserId(),

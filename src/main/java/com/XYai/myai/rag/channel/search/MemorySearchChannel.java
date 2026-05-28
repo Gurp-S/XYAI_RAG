@@ -80,7 +80,7 @@ public class MemorySearchChannel implements SearchChannel {
     }
 
     @Override
-    @RagTraceNode(name = "记忆召回", type = "search")
+    @RagTraceNode(name = "记忆召回", type = "search",taskIdArg = "searchRoot")
     public SearchChannelResult search(SearchContext context) {
         if (context == null || context.getConversationId() == null) {
             return SearchChannelResult.builder().channelName(getName()).chunks(List.of()).build();

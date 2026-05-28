@@ -8,9 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.redisson.api.RMap;
-import org.redisson.api.RedissonClient;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 // ...existing code...
@@ -20,8 +18,7 @@ public class UploadTaskStore {
 
     private static final String REDIS_TASK_MAP = "xyai:upload:tasks";
     @Resource
-    private RedissonClient redissonClient;
-    @Autowired(required = false)
+    private StringRedisTemplate stringRedisTemplate;
 
     public TaskState start(String taskId) {
         TaskState state = TaskState.builder()
@@ -118,10 +115,9 @@ public class UploadTaskStore {
     }
 
     public TaskState get(String taskId) {
-        // Primary store is Redisson map
         try {
-            RMap<String, String> map = redissonClient.getMap(REDIS_TASK_MAP);
-            String json = map.get(taskId);
+            Object raw = stringRedisTemplate.opsForHash().get(REDIS_TASK_MAP, taskId);
+            String json = raw instanceof String ? (String) raw : null;
             if (json != null && !json.isBlank()) {
                 try {
                     return JSON.parseObject(json, TaskState.class);
@@ -135,16 +131,14 @@ public class UploadTaskStore {
 
     public void remove(String taskId) {
         try {
-            RMap<String, String> map = redissonClient.getMap(REDIS_TASK_MAP);
-            map.remove(taskId);
+            stringRedisTemplate.opsForHash().delete(REDIS_TASK_MAP, taskId);
         } catch (Exception ignored) {
         }
     }
 
     private TaskState put(String taskId, TaskState state) {
         try {
-            RMap<String, String> map = redissonClient.getMap(REDIS_TASK_MAP);
-            map.put(taskId, JSON.toJSONString(state));
+            stringRedisTemplate.opsForHash().put(REDIS_TASK_MAP, taskId, JSON.toJSONString(state));
         } catch (Exception ignored) {
         }
         return state;
@@ -152,8 +146,8 @@ public class UploadTaskStore {
 
     private Long existingStartTime(String taskId) {
         try {
-            RMap<String, String> map = redissonClient.getMap(REDIS_TASK_MAP);
-            String json = map.get(taskId);
+            Object raw = stringRedisTemplate.opsForHash().get(REDIS_TASK_MAP, taskId);
+            String json = raw instanceof String ? (String) raw : null;
             if (json != null) {
                 try {
                     TaskState ts = JSON.parseObject(json, TaskState.class);

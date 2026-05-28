@@ -7,7 +7,9 @@ import com.XYai.myai.mapper.GroupMapper;
 import com.XYai.myai.mapper.UserMapper;
 import com.XYai.myai.user.pojo.Group;
 import com.XYai.myai.user.pojo.User;
+import com.XYai.myai.xyAdmin.pojo.GroupMemberCount;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -83,22 +85,16 @@ public class userManager {
             default -> wrapper.orderBy(true, isAsc, "id");
         }
         
-        // 总数
-        long total = userMapper.selectCount(wrapper);
-        
-        // 分页
-        int offset = (page - 1) * size;
-        wrapper.last("LIMIT " + size + " OFFSET " + offset);
-        List<User> users = userMapper.selectList(wrapper);
-        
+        Page<User> pageResult = userMapper.selectPage(new Page<>(page, size), wrapper);
+
         // 清除密码
-        users.forEach(u -> u.setPassword(null));
-        
+        pageResult.getRecords().forEach(u -> u.setPassword(null));
+
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("total", total);
-        result.put("page", page);
-        result.put("size", size);
-        result.put("records", users);
+        result.put("total", pageResult.getTotal());
+        result.put("page", pageResult.getCurrent());
+        result.put("size", pageResult.getSize());
+        result.put("records", pageResult.getRecords());
         return Result.success(result);
     }
 
@@ -107,15 +103,12 @@ public class userManager {
      */
     @GetMapping("/groups")
     public Result<List<Map<String, Object>>> getAllGroups() {
-        List<Group> groups = groupMapper.selectList(null);
-        List<Map<String, Object>> result = groups.stream().map(group -> {
+        List<GroupMemberCount> counts = groupMapper.selectGroupMemberCounts();
+        List<Map<String, Object>> result = counts.stream().map(c -> {
             Map<String, Object> info = new LinkedHashMap<>();
-            info.put("groupId", group.getGroupId());
-            info.put("groupName", group.getGroupId()); // 使用 groupId 作为名称
-            // 成员数统计
-            QueryWrapper<User> wrapper = new QueryWrapper<>();
-            wrapper.eq("group_id", group.getGroupId());
-            info.put("memberCount", userMapper.selectCount(wrapper));
+            info.put("groupId", c.getGroupId());
+            info.put("groupName", c.getGroupId()); // 使用 groupId 作为名称
+            info.put("memberCount", c.getMemberCount() != null ? c.getMemberCount() : 0L);
             return info;
         }).collect(Collectors.toList());
         return Result.success(result);
@@ -228,7 +221,7 @@ public class userManager {
             String unloadKey = RedisKeyConfig.userUnloadCollectionsKey(userId);
             stringRedisTemplate.delete(loadKey);
             stringRedisTemplate.delete(unloadKey);
-            Set<String> fileBitsKeys = stringRedisTemplate.keys(RedisKeyConfig.userFileBitKey(userId, "*"));
+            Set<String> fileBitsKeys = stringRedisTemplate.keys(RedisKeyConfig.userFileBitKeyPatternByUser(userId));
             if (fileBitsKeys != null) {
                 stringRedisTemplate.delete(fileBitsKeys);
             }

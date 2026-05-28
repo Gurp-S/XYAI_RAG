@@ -25,11 +25,11 @@ public class TokenRecord {
 
     /** 消息ID（主键） */
     @TableId(value = "chat_message_id", type = IdType.INPUT)
-    private String chatMessageId;
+    private Long chatMessageId;
 
     /** 会话ID */
     @TableField("conversation_id")
-    private String conversationId;
+    private Long conversationId;
 
     /** 用户ID */
     @TableField("user_id")

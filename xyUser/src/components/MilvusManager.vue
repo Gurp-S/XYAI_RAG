@@ -6,7 +6,6 @@
         <div class="title-group">
           <button
             class="icon-pulse sidebar-entry-btn"
-            :title="ui.isSidebarCollapsed ? '展开侧边栏' : '收起侧边栏'"
             type="button"
             @click="toggleSidebar"
           >
@@ -72,7 +71,6 @@
             <button
               v-if="searchQuery"
               class="clear-search-btn"
-              title="清除搜索"
               @click.stop="clearSearch"
             >
               <svg
@@ -142,7 +140,6 @@
           <button
             class="glass-btn icon-btn"
             :class="{ spinning: loading }"
-            title="同步数据"
             @click="fetchCollections(true)"
           >
             <svg
@@ -165,7 +162,6 @@
           <!-- 重新摆放的“新建合集”按钮，仅保留加号 -->
           <button
             class="glass-btn icon-btn create-btn-top"
-            title="新建向量集合"
             @click="openCreateModal"
           >
             <svg
@@ -206,7 +202,7 @@
             </span>
             <span v-if="isCollectionLoaded" class="stat-badge outline">
               有效文档：<strong class="highlight-text">{{
-                metadataList.length
+                collectionFileTotal
               }}</strong>
             </span>
             <span
@@ -480,20 +476,38 @@
               <tr
                 v-for="item in visibleMetadataList"
                 :key="item.__rowKey"
+                v-memo="[item.__rowKey, expandedRows.has(item.__rowKey)]"
                 class="hero-row"
               >
                 <td class="td-id">
-                  <div class="hash-tag" :title="item.__docId || '-'">
+                  <div class="hash-tag">
                     {{ formatDocIdDisplay(item.__docInfo, item.__meta) }}
                   </div>
                 </td>
-                <td class="td-content">
+                <td
+                  class="td-content"
+                  :class="{ expanded: expandedRows.has(item.__rowKey) }"
+                >
                   <div
                     class="text-block"
-                    :title="item.__fullContent || item.content || '-'"
+                    v-html="expandedRows.has(item.__rowKey) ? renderContent(item.__fullContent) : escapeHtmlText(item.__contentPreview)"
+                  ></div>
+                  <button
+                    class="expand-btn"
+                    @click="toggleExpand(item.__rowKey)"
                   >
-                    {{ item.__fullContent || "-" }}
-                  </div>
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                    >
+                      <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                  </button>
                 </td>
                 <td class="td-meta">
                   <div class="tag-group">
@@ -503,14 +517,13 @@
                       class="glass-tag"
                     >
                       <span class="tag-label">{{ key }}</span>
-                      <span class="tag-value" :title="val">{{ val }}</span>
+                      <span class="tag-value">{{ val }}</span>
                     </div>
                   </div>
                 </td>
                 <td class="td-actions">
                   <button
                     class="action-btn-delete"
-                    title="删除分块"
                     aria-label="删除当前文档分块"
                     @click="handleDeleteDoc(item)"
                   >
@@ -534,15 +547,12 @@
                   </button>
                 </td>
               </tr>
-              <tr v-if="hasMoreMetadataRows" class="load-more-row">
+              <tr v-if="hasMoreMetadataRows" class="load-more-row" ref="sentinelEl">
                 <td colspan="4" class="state-cell">
-                  <button
-                    class="state-action-btn"
-                    @click="loadMoreMetadataRows"
-                  >
-                    加载更多（剩余
-                    {{ metadataList.length - visibleMetadataList.length }} 条）
-                  </button>
+                  <div class="loading-fx" style="padding: 16px 0;">
+                    <div class="magic-ring" style="width: 24px; height: 24px; border-width: 2px;"></div>
+                    <span style="font-size: 12px;">滚动加载更多...</span>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -671,7 +681,7 @@
 
 <script setup>
 /* eslint-disable no-console -- error reporting requires console */
-import { ref, onMounted, watch, onUnmounted, computed } from "vue";
+import { ref, shallowRef, onMounted, watch, onUnmounted, computed, reactive, nextTick } from "vue";
 import { useRoute } from "vue-router";
 import { useUiStore } from "../store/index";
 import {
@@ -679,12 +689,14 @@ import {
   deleteCollection as apiDeleteCollection,
   deleteDocument as apiDeleteDocument,
   getCollectionMetadata,
+  getCollectionFileNumber,
   getCollectionStatus,
   listCollections,
   loadOrUnloadCollection as apiLoadOrUnloadCollection,
   rebuildCollection as apiRebuildCollection,
   searchCollections,
 } from "../services/milvusApi";
+import { renderAssistantMarkdown } from "../services/markdown";
 import { useToast } from "../composables/useToast.js";
 
 const toast = useToast();
@@ -693,7 +705,7 @@ const ui = useUiStore();
 const route = useRoute();
 const collections = ref([]);
 const selectedCollection = ref("");
-const metadataList = ref([]);
+const metadataList = shallowRef([]);
 const loading = ref(false);
 const searchQuery = ref("");
 const originalCollections = ref([]); // 用于清空搜索时恢复列表
@@ -720,10 +732,11 @@ const searchResultCache = new Map();
 const lastSearchQuery = ref("");
 const lastCollectionsFetchAt = ref(0);
 const COLLECTIONS_CACHE_TTL = 60000;
-const METADATA_PAGE_SIZE = 80;
+const METADATA_PAGE_SIZE = 30;
 const MAX_CONTENT_PREVIEW_LENGTH = 320;
 const visibleRowCount = ref(METADATA_PAGE_SIZE);
 const metadataLoading = ref(false);
+const collectionFileTotal = ref(0);
 let metadataAbortController = null;
 
 const canConfirm = computed(() => {
@@ -740,9 +753,20 @@ const visibleMetadataList = computed(() =>
   metadataList.value.slice(0, visibleRowCount.value),
 );
 
-const hasMoreMetadataRows = computed(
-  () => metadataList.value.length > visibleRowCount.value,
-);
+const hasMoreMetadataRows = computed(() => {
+  const cursorData = pageCursor.get(selectedCollection.value);
+  return cursorData ? cursorData.hasMore : false;
+});
+
+const expandedRows = reactive(new Set());
+
+function toggleExpand(rowKey) {
+  if (expandedRows.has(rowKey)) {
+    expandedRows.delete(rowKey);
+  } else {
+    expandedRows.add(rowKey);
+  }
+}
 
 function getConfirmPlaceholder() {
   if (confirmType.value === "delete") return "输入 删除 确认";
@@ -772,6 +796,22 @@ watch(
   },
 );
 
+const sentinelEl = ref(null);
+let sentinelObserver = null;
+
+function setupSentinelObserver() {
+  if (sentinelObserver) sentinelObserver.disconnect();
+  if (!sentinelEl.value) return;
+  sentinelObserver = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) {
+      if (hasMoreMetadataRows.value && !loading.value) {
+        fetchNextPage();
+      }
+    }
+  }, { rootMargin: "200px" });
+  sentinelObserver.observe(sentinelEl.value);
+}
+
 onMounted(() => {
   if (isDbRoute.value) {
     fetchCollections();
@@ -779,6 +819,7 @@ onMounted(() => {
   document.addEventListener("click", handleClickOutside);
 });
 onUnmounted(() => {
+  if (sentinelObserver) sentinelObserver.disconnect();
   document.removeEventListener("click", handleClickOutside);
   if (metadataAbortController) {
     metadataAbortController.abort();
@@ -838,7 +879,7 @@ async function selectCollection(name, options = {}) {
   selectedCollection.value = name;
   searchQuery.value = "";
   isDropdownOpen.value = false;
-  visibleRowCount.value = METADATA_PAGE_SIZE;
+  visibleRowCount.value = 0;
 
   // 先查询状态，状态查询内部会决定是否查询元数据
   await fetchCollectionStatus(name, { forceRefresh });
@@ -853,7 +894,7 @@ async function fetchCollectionStatus(name, options = {}) {
     if (isCollectionLoaded.value) {
       if (metadataCache.has(name)) {
         metadataList.value = [...metadataCache.get(name)];
-        visibleRowCount.value = METADATA_PAGE_SIZE;
+        visibleRowCount.value = metadataList.value.length;
       } else {
         await fetchMetadata(true);
       }
@@ -873,7 +914,7 @@ async function fetchCollectionStatus(name, options = {}) {
         await fetchMetadata(true);
       } else {
         metadataList.value = [...metadataCache.get(name)];
-        visibleRowCount.value = METADATA_PAGE_SIZE;
+        visibleRowCount.value = metadataList.value.length;
       }
     } else {
       metadataList.value = [];
@@ -979,8 +1020,12 @@ function clearSearch() {
   }
 }
 
+const pageCursor = reactive(new Map());
+
 function loadMoreMetadataRows() {
-  visibleRowCount.value += METADATA_PAGE_SIZE;
+  const cursorData = pageCursor.get(selectedCollection.value);
+  if (!cursorData || !cursorData.hasMore) return;
+  fetchNextPage();
 }
 
 async function fetchMetadata(forceRefresh = false) {
@@ -996,8 +1041,13 @@ async function fetchMetadata(forceRefresh = false) {
   }
   if (!forceRefresh && metadataCache.has(selectedCollection.value)) {
     metadataList.value = [...metadataCache.get(selectedCollection.value)];
-    visibleRowCount.value = METADATA_PAGE_SIZE;
+    visibleRowCount.value = metadataList.value.length;
     return;
+  }
+  if (forceRefresh) {
+    pageCursor.delete(selectedCollection.value);
+    metadataCache.delete(selectedCollection.value);
+    collectionFileTotal.value = 0;
   }
   metadataLoading.value = true;
   loading.value = true;
@@ -1007,91 +1057,29 @@ async function fetchMetadata(forceRefresh = false) {
     }
     metadataAbortController = new AbortController();
 
-    const list = await getCollectionMetadata(selectedCollection.value, {
+    const result = await getCollectionMetadata(selectedCollection.value, {
+      cursor: null,
+      pageSize: METADATA_PAGE_SIZE,
       signal: metadataAbortController.signal,
     });
-    const normalized = (Array.isArray(list) ? list : []).map((item, index) => {
-      // metadata 仅保留必要业务字段；fileId/chunkId 统一从 doc_id 解析（主键更快/更省）
-      const rawMeta = getMetadataSafe(item);
-      const docId = getDocIdFromItem(item);
-      const docInfo = parseDocId(docId);
-      const normalizedMeta = sortMetadataFields(rawMeta, docInfo);
-      const stableKey =
-        docId || `${rawMeta?.kbId || "kb"}-${docInfo?.chunkId ?? "chunk"}-${index}`;
-      // 保留原始 item.content，不覆盖；同时生成字符串形式的完整内容与预览字段用于显示
-      const rawContent =
-        item && item.content !== undefined && item.content !== null
-          ? item.content
-          : "";
-      let fullContentStr = "";
-      try {
-        fullContentStr =
-          typeof rawContent === "string"
-            ? rawContent
-            : JSON.stringify(rawContent);
-      } catch (e) {
-        fullContentStr = String(rawContent);
-      }
-      return {
-        ...item,
-        __docId: docId,
-        __docInfo: docInfo,
-        __rawMeta: rawMeta,
-        __fullContent: fullContentStr,
-        __contentPreview: clipContentPreview(fullContentStr),
-        __meta: normalizedMeta,
-        __rowKey: stableKey,
-        __contentLength: fullContentStr.length,
-      };
-    });
 
-    // 按文件创建时间（createTime，时间新到旧）排序，若 createTime 相同则按 chunkId 升序排序
-    normalized.sort((a, b) => {
-      const aMeta = a.__rawMeta || {};
-      const bMeta = b.__rawMeta || {};
-
-      const parseTime = (t) => {
-        if (t === undefined || t === null || t === "") return 0;
-        if (typeof t === "number") return Number(t);
-        let s = String(t).trim();
-        // 支持常见的 "YYYY-MM-DD hh:mm:ss" 格式
-        if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/.test(s)) {
-          s = s.replace(" ", "T");
-        }
-        const d = Date.parse(s);
-        return Number.isFinite(d) ? d : 0;
-      };
-
-      const tA = parseTime(aMeta.createTime);
-      const tB = parseTime(bMeta.createTime);
-      if (tA !== tB) return tB - tA; // 新到旧
-
-      const toNum = (v) => {
-        if (v === undefined || v === null || v === "") return NaN;
-        const n = Number(v);
-        return Number.isFinite(n) ? Math.floor(n) : NaN;
-      };
-
-      const cA = toNum(
-        (a.__docInfo && a.__docInfo.chunkId) ??
-          aMeta.chunkId ??
-          (a.__meta && a.__meta.chunkId),
-      );
-      const cB = toNum(
-        (b.__docInfo && b.__docInfo.chunkId) ??
-          bMeta.chunkId ??
-          (b.__meta && b.__meta.chunkId),
-      );
-      if (!Number.isNaN(cA) && !Number.isNaN(cB)) return cA - cB; // 升序
-      if (!Number.isNaN(cA)) return -1;
-      if (!Number.isNaN(cB)) return 1;
-      return 0;
-    });
+    const items = result && result.items ? result.items : [];
+    const normalized = normalizeMetadataItems(items);
 
     metadataList.value = normalized;
-    visibleRowCount.value = METADATA_PAGE_SIZE;
+    visibleRowCount.value = normalized.length;
+
     metadataCache.set(selectedCollection.value, normalized);
     collectionStatusCache.set(selectedCollection.value, { loaded: true });
+    pageCursor.set(selectedCollection.value, {
+      nextCursor: result ? result.nextCursor : null,
+      hasMore: result ? result.hasMore : false,
+    });
+
+    // 并行获取文件总数
+    getCollectionFileNumber(selectedCollection.value)
+      .then((num) => { collectionFileTotal.value = typeof num === "number" ? num : 0; })
+      .catch(() => {});
   } catch (err) {
     if (err?.name !== "AbortError") {
       console.error(err);
@@ -1099,7 +1087,75 @@ async function fetchMetadata(forceRefresh = false) {
   } finally {
     metadataLoading.value = false;
     loading.value = false;
+    nextTick(setupSentinelObserver);
   }
+}
+
+async function fetchNextPage() {
+  const cursorData = pageCursor.get(selectedCollection.value);
+  if (!cursorData || !cursorData.nextCursor) return;
+
+  loading.value = true;
+  try {
+    const result = await getCollectionMetadata(selectedCollection.value, {
+      cursor: cursorData.nextCursor,
+      pageSize: METADATA_PAGE_SIZE,
+    });
+
+    if (!result || !result.items || result.items.length === 0) return;
+
+    const normalized = normalizeMetadataItems(result.items);
+    const combined = [...metadataList.value, ...normalized];
+    metadataList.value = combined;
+    visibleRowCount.value += normalized.length;
+
+    metadataCache.set(selectedCollection.value, combined);
+    pageCursor.set(selectedCollection.value, {
+      nextCursor: result.nextCursor,
+      hasMore: result.hasMore,
+    });
+  } catch (err) {
+    if (err?.name !== "AbortError") {
+      console.error(err);
+    }
+  } finally {
+    loading.value = false;
+  }
+}
+
+function normalizeMetadataItems(items) {
+  return (Array.isArray(items) ? items : []).map((item, index) => {
+    const rawMeta = getMetadataSafe(item);
+    const docId = getDocIdFromItem(item);
+    const docInfo = parseDocId(docId);
+    const normalizedMeta = sortMetadataFields(rawMeta, docInfo);
+    const stableKey =
+      docId || `${rawMeta?.kbId || "kb"}-${docInfo?.chunkId ?? "chunk"}-${index}`;
+    const rawContent =
+      item && item.content !== undefined && item.content !== null
+        ? item.content
+        : "";
+    let fullContentStr = "";
+    try {
+      fullContentStr =
+        typeof rawContent === "string"
+          ? rawContent
+          : JSON.stringify(rawContent);
+    } catch (e) {
+      fullContentStr = String(rawContent);
+    }
+    return {
+      ...item,
+      __docId: docId,
+      __docInfo: docInfo,
+      __rawMeta: rawMeta,
+      __fullContent: fullContentStr,
+      __contentPreview: clipContentPreview(fullContentStr),
+      __meta: normalizedMeta,
+      __rowKey: stableKey,
+      __contentLength: fullContentStr.length,
+    };
+  });
 }
 
 /** 辅助方法：安全获取元数据对象 */
@@ -1215,6 +1271,29 @@ function formatDocIdDisplay(docInfo, meta) {
   const fileName = meta?.fileName;
   if (fileName) return `${fileName}:${chunkId}`;
   return `...${chunkId}`;
+}
+
+const _renderCache = new Map();
+const RENDER_CACHE_MAX = 50;
+function renderContent(content) {
+  if (!content) return "-";
+  const cached = _renderCache.get(content);
+  if (cached) return cached;
+  const html = renderAssistantMarkdown(content);
+  if (_renderCache.size >= RENDER_CACHE_MAX) {
+    const firstKey = _renderCache.keys().next().value;
+    _renderCache.delete(firstKey);
+  }
+  _renderCache.set(content, html);
+  return html;
+}
+
+function escapeHtmlText(str) {
+  return String(str || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 function clipContentPreview(content) {
@@ -2228,7 +2307,7 @@ onUnmounted(() => { document.body.style.overflow = ''; });
   background: color-mix(in srgb, var(--secondary) 5%, transparent);
   border: 1px solid color-mix(in srgb, var(--secondary) 10%, transparent);
   color: color-mix(in srgb, var(--secondary) 82%, var(--text-main));
-  font-family: "Fira Code", monospace;
+  font-family: "Microsoft YaHei", sans-serif;
   font-size: 11px;
   font-weight: 640;
   line-height: 1.35;
@@ -2238,18 +2317,107 @@ onUnmounted(() => { document.body.style.overflow = ''; });
   box-shadow: none;
 }
 
+.td-content {
+  position: relative;
+  padding: 10px 12px !important;
+  vertical-align: top;
+}
+
 .text-block {
-  font-size: 14px;
-  line-height: 1.7;
+  font-size: 12.5px;
+  line-height: 1.65;
   color: var(--text-main);
-  display: -webkit-box;
-  line-clamp: 4;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  font-weight: 430;
-  padding-right: 12px;
+  font-family: "Microsoft YaHei", sans-serif;
+  letter-spacing: 0.01em;
   word-break: break-word;
+  font-weight: 430;
+  max-height: 60px;
+  overflow: hidden;
+  transition: none;
+}
+.td-content.expanded .text-block {
+  max-height: 300px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+.td-content.expanded .text-block:hover {
+  scrollbar-color: color-mix(in srgb, var(--text-muted) 15%, transparent) transparent;
+}
+.td-content.expanded .text-block::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.td-content.expanded .text-block::-webkit-scrollbar-track {
+  background: transparent;
+}
+.td-content.expanded .text-block::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 999px;
+}
+.td-content.expanded .text-block:hover::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--text-muted) 15%, transparent);
+}
+.td-content.expanded .text-block::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--text-muted) 25%, transparent);
+}
+
+.expand-btn {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--primary) 12%, var(--bg-base));
+  color: var(--primary);
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.15s;
+  opacity: 0.85;
+  padding: 0;
+}
+.expand-btn:hover {
+  background: color-mix(in srgb, var(--primary) 22%, var(--bg-base));
+  opacity: 1;
+}
+.td-content.expanded .expand-btn svg {
+  transform: rotate(90deg);
+}
+
+.text-block :deep(p) {
+  margin: 0;
+}
+.text-block :deep(ul),
+.text-block :deep(ol) {
+  margin: 0;
+  padding-left: 1.2em;
+}
+.text-block :deep(h1),
+.text-block :deep(h2),
+.text-block :deep(h3),
+.text-block :deep(h4) {
+  margin: 0;
+  font-size: inherit;
+  font-weight: 600;
+}
+.text-block :deep(blockquote) {
+  margin: 0;
+  padding: 0 0.5em;
+  border-left: 2px solid color-mix(in srgb, var(--primary) 40%, transparent);
+}
+.text-block :deep(pre) {
+  margin: 4px 0;
+  font-size: inherit;
+  font-family: inherit;
+  white-space: pre-wrap;
+  background: transparent !important;
+}
+.text-block :deep(pre code.hljs) {
+  background: transparent !important;
 }
 
 /* Glass Tag 元数据设计 */

@@ -13,8 +13,7 @@ import com.XYai.myai.user.LoginUserInfoManager;
 import com.github.benmanes.caffeine.cache.Cache;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RSet;
-import org.redisson.api.RedissonClient;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +31,7 @@ import java.util.*;
 public class FilterPostProcessor implements SearchResultPostProcessor {
 
     private static final String NAME = "filter-processor";
-    private final RedissonClient redissonClient;
+    private final StringRedisTemplate stringRedisTemplate;
     @Resource
     private RetrievalProperties retrievalProperties;
     @Resource
@@ -41,8 +40,8 @@ public class FilterPostProcessor implements SearchResultPostProcessor {
     @Qualifier("defaultCache")
     private Cache<String, Object> localCache;
 
-    public FilterPostProcessor(RedissonClient redissonClient) {
-        this.redissonClient = redissonClient;
+    public FilterPostProcessor(StringRedisTemplate stringRedisTemplate) {
+        this.stringRedisTemplate = stringRedisTemplate;
     }
 
     private static String resolveDocId(RetrievedChunk chunk) {
@@ -84,7 +83,7 @@ public class FilterPostProcessor implements SearchResultPostProcessor {
     }
 
     @Override
-    @RagTraceNode(name = "过滤处理", type = "process")
+    @RagTraceNode(name = "过滤处理", type = "process",taskIdArg = "processRoot")
     public List<RetrievedChunk> process(List<RetrievedChunk> chunks, SearchContext context) {
         if (chunks == null || chunks.isEmpty()) {
             return List.of();
@@ -117,17 +116,17 @@ public class FilterPostProcessor implements SearchResultPostProcessor {
                 // 公开文档直接放行，私有文档才进入后续检查
                 .filter(meta -> {
                     if (isPublicDocument(meta.chunk())) {
-                        log.debug("公开文档放行: docId={}", meta.docId());
+                        log.info("公开文档放行: docId={}", meta.docId());
                         return true;
                     }
                     // 私有文档：检查授权集合
                     if (!filterUnloadCollection(meta, authorizedFileIds)) {
-                        log.debug("私有文档授权集合检查失败: docId={}", meta.docId());
+                        log.info("私有文档授权集合检查失败: docId={}", meta.docId());
                         return false;
                     }
                     // 私有文档：检查细粒度权限
                     if (!filterPermission(meta)) {
-                        log.debug("私有文档权限检查失败: docId={}", meta.docId());
+                        log.info("私有文档权限检查失败: docId={}", meta.docId());
                         return false;
                     }
                     return true;
@@ -147,10 +146,10 @@ public class FilterPostProcessor implements SearchResultPostProcessor {
 
         Set<String> authorizedFileIds = new HashSet<>();
         try {
-            RSet<String> loadCollections = redissonClient.getSet(RedisKeyConfig.userLoadCollectionsKey(userId));
+            Set<String> loadCollections = stringRedisTemplate.opsForSet().members(RedisKeyConfig.userLoadCollectionsKey(userId));
             if (loadCollections != null && !loadCollections.isEmpty()) {
                 for (String collectionName : loadCollections) {
-                    RSet<String> fileChunkSet = redissonClient.getSet(RedisKeyConfig.collectionFileIds(collectionName));
+                    Set<String> fileChunkSet = stringRedisTemplate.opsForSet().members(RedisKeyConfig.collectionFileIds(collectionName));
                     if (fileChunkSet != null && !fileChunkSet.isEmpty()) {
                         for (String fileChunkId : fileChunkSet) {
                             if (StrUtil.isNotBlank(fileChunkId)) {
@@ -187,16 +186,16 @@ public class FilterPostProcessor implements SearchResultPostProcessor {
 
     private boolean filterComplete(ChunkWithMeta meta) {
         if (meta.chunk() == null || meta.chunk().getContent() == null) {
-            log.debug("[filterComplete] 丢弃: content为空");
+            log.info("[filterComplete] 丢弃: content为空");
             return false;
         }
         if (meta.parts() == null || StrUtil.isBlank(meta.parts().fileId()) || meta.parts().chunkId() == null) {
-            log.debug("[filterComplete] 丢弃: docId解析失败, docId={}", meta.docId());
+            log.info("[filterComplete] 丢弃: docId解析失败, docId={}", meta.docId());
             return false;
         }
         // 内容不能全是空白
         if (StrUtil.isBlank(meta.chunk().getContent())) {
-            log.debug("[filterComplete] 丢弃: content为空白字符串");
+            log.info("[filterComplete] 丢弃: content为空白字符串");
             return false;
         }
         return true;
@@ -208,7 +207,7 @@ public class FilterPostProcessor implements SearchResultPostProcessor {
         int len = content.length();
         boolean valid = len >= retrievalProperties.getMinContentLength() && len <= retrievalProperties.getMaxContentLength();
         if (!valid) {
-            log.debug("[filterContentLength] 丢弃: length={}", len);
+            log.info("[filterContentLength] 丢弃: length={}", len);
         }
         return valid;
     }
@@ -221,7 +220,7 @@ public class FilterPostProcessor implements SearchResultPostProcessor {
         // 纯向量召回（无BM25分）
         if (bm25Score == null) {
             boolean pass = score > retrievalProperties.getVectorOnlyThreshold();
-            if (!pass) log.debug("[filterScore] 纯向量召回丢弃: score={}", score);
+            if (!pass) log.info("[filterScore] 纯向量召回丢弃: score={}", score);
             return pass;
         }
 
@@ -231,7 +230,7 @@ public class FilterPostProcessor implements SearchResultPostProcessor {
                 || (bm25 > retrievalProperties.getHighScoreThreshold() && score > retrievalProperties.getLowScoreThreshold());
         boolean pass = commonScore || highAndLowScore;
         if (!pass) {
-            log.debug("[filterScore] 丢弃: score={}, bm25={}", score, bm25);
+            log.info("[filterScore] 丢弃: score={}, bm25={}", score, bm25);
         }
         return pass;
     }
@@ -274,7 +273,7 @@ public class FilterPostProcessor implements SearchResultPostProcessor {
         }
         String docId = meta.docId();
         if (existMap.containsKey(docId)) {
-            log.debug("[filterDistinctFileChunk] 丢弃: 文件 {} 已保留过", docId);
+            log.info("[filterDistinctFileChunk] 丢弃: 文件 {} 已保留过", docId);
             return false;
         }
         existMap.put(docId, true);

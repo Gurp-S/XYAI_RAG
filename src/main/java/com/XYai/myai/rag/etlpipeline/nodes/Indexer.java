@@ -1,5 +1,6 @@
 package com.XYai.myai.rag.etlpipeline.nodes;
 
+import com.XYai.myai.commonUtils.FloatArrayList;
 import com.XYai.myai.mapper.FileRecordMapper;
 import com.XYai.myai.rag.aop.annotation.RagTraceNode;
 import com.XYai.myai.rag.etlpipeline.pojo.IngestionContext;
@@ -19,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -58,14 +59,14 @@ public class Indexer implements Ingestion {
     private String databaseName;
 
     @Resource(name = "uploadExecutor")
-    private ThreadPoolTaskExecutor executor;
+    private TaskExecutor executor;
 
     @Override
     public String getNodeType() {
         return "indexer";
     }
 
-    @RagTraceNode(name = "执行入库", type = "上传管道")
+    @RagTraceNode(name = "执行入库", type = "上传管道",taskIdArg = "etlNode")
     public NodeResult execute(IngestionContext context, NodeConfig config) {
         List<Document> chunks = context.getChunks();
         if (chunks == null || chunks.isEmpty()) {
@@ -172,16 +173,10 @@ public class Indexer implements Ingestion {
 
                 float[] contextVector = (float[]) data.get("embedding_context");
                 float[] questionVector = (float[]) data.get("embedding_question");
-                List<Float> cVec = new ArrayList<>(contextVector.length);
-                List<Float> qVec = new ArrayList<>(contextVector.length);
-                for (float v : contextVector) {
-                    cVec.add(v);
-                }
-                for (float v : questionVector) {
-                    qVec.add(v);
-                }
-                contextEmbeddings.add(cVec);
-                questionEmbeddings.add(qVec);
+                
+                contextEmbeddings.add(new FloatArrayList(contextVector));
+                questionEmbeddings.add(new FloatArrayList(questionVector));
+                
                 metadataList.add((JsonObject) data.get("metadata"));
             }
 

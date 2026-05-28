@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserChatMessageDTO {
-    long id;
-    String conversationId;
+    Long id;
+    Long conversationId;
     String targetType;
     String targetId;
     String senderId;

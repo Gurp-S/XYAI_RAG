@@ -148,7 +148,7 @@ public class UserController {
 
 
     @GetMapping("/history/delete")
-    public Result<String> deleteHistory(String conversationId) {
+    public Result<String> deleteHistory(Long conversationId) {
         return userService.deleteHistory(requireLoginUser().getId(), conversationId);
     }
 
@@ -160,8 +160,8 @@ public class UserController {
 
     @GetMapping("/history/conversation")
     public Result<List<ChatConversation>> conversationHistory(
-            String conversationId,
-            @RequestParam(required = false) String cursor,
+            Long conversationId,
+            @RequestParam(required = false) Long cursor,
             @RequestParam(defaultValue = "20") int limit) {
         return userService.conversationHistory(conversationId, cursor, limit);
     }

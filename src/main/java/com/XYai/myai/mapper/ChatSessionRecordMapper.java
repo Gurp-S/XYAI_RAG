@@ -15,7 +15,7 @@ import org.apache.ibatis.annotations.Select;
 public interface ChatSessionRecordMapper extends BaseMapper<ChatSessionRecord> {
 
     @Select("SELECT COUNT(1) FROM chat_memory_interaction WHERE conversation_id = #{conversationId}")
-    long countByConversationId(@Param("conversationId") String conversationId);
+    long countByConversationId(@Param("conversationId") Long conversationId);
 
     @Delete("""
             DELETE FROM chat_memory_interaction
@@ -23,6 +23,6 @@ public interface ChatSessionRecordMapper extends BaseMapper<ChatSessionRecord> {
             ORDER BY created_at
             LIMIT #{deleteCount}
             """)
-    int deleteOldestByLimit(@Param("conversationId") String conversationId,
+    int deleteOldestByLimit(@Param("conversationId") Long conversationId,
                             @Param("deleteCount") int deleteCount);
 }

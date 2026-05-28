@@ -1,6 +1,5 @@
 package com.XYai.myai.rag;
 
-import com.XYai.myai.rag.aop.annotation.RagTraceContext;
 import com.XYai.myai.rag.aop.annotation.RagTraceNode;
 import com.XYai.myai.rag.channel.MultiChannelRetrievalEngine;
 import com.XYai.myai.rag.channel.pojo.RetrievedChunk;
@@ -16,7 +15,7 @@ import com.XYai.myai.rag.rewrite.pojo.RewriteResult;
 import com.XYai.myai.user.LoginUserInfoManager;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -61,10 +60,10 @@ public class RetrievalAugmentedGeneration {
     private ConversationMemorySummaryService conversationMemorySummaryService;
 
     @Resource(name = "mcpExecutor")
-    private ThreadPoolTaskExecutor mcpExecutor;
+    private TaskExecutor mcpExecutor;
 
     @Resource(name = "memeryExecutor")
-    private ThreadPoolTaskExecutor memoryExecutor;
+    private TaskExecutor memoryExecutor;
 
     // ==================== 步骤1：获取用户上下文 ====================
 
@@ -74,53 +73,51 @@ public class RetrievalAugmentedGeneration {
         return new UserContext(userId, securityCtx);
     }
 
-    // ==================== 步骤2：异步加载MCP工具结果 ====================
+    // ==================== 步骤2：异步加载MCP工具及其结果 ====================
 
-    @RagTraceNode(name = "加载MCP工具", type = "MCP工具")
-    public CompletableFuture<List<ToolProcessorResult>> loadMCPToolsAsync(String message,LoadSession memorySession,String conversationId,String chatMessageId) {
+    @RagTraceNode(name = "MCP工具", type = "MCP工具",taskIdArg = "root")
+    public CompletableFuture<List<ToolProcessorResult>> loadMCPToolsAsync(String message,LoadSession memorySession,Long conversationId,Long chatMessageId) {
         return CompletableFuture.supplyAsync(
-                () -> {
-                    return toolDecisionManager.toolProcessor(message, memorySession,conversationId,chatMessageId);
-                },
+                () -> toolDecisionManager.toolProcessor(message, memorySession,conversationId,chatMessageId),
                 mcpExecutor)
-                .orTimeout(35, TimeUnit.SECONDS)   // 整体超时35秒
+                .orTimeout(35, TimeUnit.SECONDS)
                 .exceptionally(ex -> {
                     log.error("MCP工具加载失败或超时", ex);
-                    return List.of();  // 降级空列表
+                    return List.of();
                 });
     }
 
     // ==================== 步骤3：异步加载会话记忆 ====================
-    @RagTraceNode(name = "加载会话记忆", type = "会话记忆")
-    public LoadSession loadMemoryAsync(String conversationId) {
+    @RagTraceNode(name = "加载会话记忆", type = "会话记忆",taskIdArg = "root")
+    public LoadSession loadMemoryAsync(Long conversationId) {
         return conversationMemorySummaryService.load(conversationId);
     }
 
     // ==================== 步骤4：同步执行查询重写 ====================
-    @RagTraceNode(name = "查询重写", type = "查询重写")
-    public RewriteResult rewriteQuery(String message,String conversationId,String chatMessageId) {
+    @RagTraceNode(name = "查询重写", type = "查询重写",taskIdArg = "root")
+    public RewriteResult rewriteQuery(String message,Long conversationId,Long chatMessageId) {
         return queryRewriter.rewrite(message,conversationId,chatMessageId);
     }
 
     // ==================== 步骤5：同步执行实体识别 ====================
-    @RagTraceNode(name = "实体识别", type = "实体识别")
+    @RagTraceNode(name = "实体识别", type = "实体识别",taskIdArg = "root")
     public Map<String, Integer> recognizeIntent(String rewrittenUserMessage) {
         return neo4jKnowledgeGraphService.getUserMessageFileChunkId(rewrittenUserMessage);
     }
 
     // ==================== 步骤6：同步执行多通道文档检索 ====================
-    @RagTraceNode(name = "多通道文档检索", type = "文档检索")
+    @RagTraceNode(name = "多通道文档检索", type = "文档检索",taskIdArg = "root")
     public List<RetrievedChunk> retrieveDocuments(
             Map<String, Integer> userMessageEntityFileChunkIds,
             RewriteResult rewritten,
-            String conversationId,
+            Long conversationId,
             String originalMessage) {
         return multiChannelRetrievalEngine.retrieve(userMessageEntityFileChunkIds, rewritten, conversationId,
                 originalMessage);
     }
 
     // ==================== 步骤7：等待异步结果并构建RAG结果 ====================
-    @RagTraceNode(name = "构建RAG结果", type = "构建RAG结果")
+    @RagTraceNode(name = "构建RAG结果", type = "构建RAG结果",taskIdArg = "root")
     public RAGResult buildRAGResult(
             CompletableFuture<List<ToolProcessorResult>> mcpFuture,
             LoadSession memorySession,
@@ -150,7 +147,7 @@ public class RetrievalAugmentedGeneration {
     }
 
     // ==================== 步骤8：格式化最终Prompt ====================
-    @RagTraceNode(name = "Prompt", type = "Prompt")
+    @RagTraceNode(name = "Prompt", type = "Prompt" ,taskIdArg = "root")
     public String formatFinalPrompt(RAGResult ragResult, String systemMessage,String fileContent) {
         String userMessage = String.format(USER_MESSAGE_TEMPLATE,
                 ragResult.getRetrieveText(),

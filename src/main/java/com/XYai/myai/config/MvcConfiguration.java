@@ -3,8 +3,8 @@ package com.XYai.myai.config;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskDecorator;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -25,14 +25,11 @@ public class MvcConfiguration implements WebMvcConfigurer {
      * 解决 'This executor is not suitable for production use under load' 的警告。
      */
     @Bean
-    public ThreadPoolTaskExecutor mvcTaskExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(10);
-        executor.setMaxPoolSize(100);
-        executor.setQueueCapacity(500);
+    public SimpleAsyncTaskExecutor mvcTaskExecutor() {
+        SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor();
+        executor.setVirtualThreads(true);
         executor.setThreadNamePrefix("MvcAsync-");
-        executor.setTaskDecorator(userContextDecorator);  // ★ 添加装饰器
-        executor.initialize();
+        executor.setTaskDecorator(userContextDecorator);
         return executor;
     }
 

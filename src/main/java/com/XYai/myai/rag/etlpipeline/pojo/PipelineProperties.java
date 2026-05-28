@@ -44,6 +44,9 @@ public class PipelineProperties {
     /** 默认分块重叠大小 */
     @Builder.Default
     private int defaultOverlapSize = 128;
+
+    @Builder.Default
+    private int titleSplitLevel = 6;
     /** PDF 分块大小 */
     @Builder.Default
     private int pdfChunkSize = 1200;

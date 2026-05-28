@@ -29,6 +29,24 @@ public final class RedisKeyConfig {
     private RedisKeyConfig() {
     }
 
+    private static String fileHashTag(String fileId) {
+        if (fileId == null || fileId.isBlank()) {
+            return "{unknown}";
+        }
+        if (fileId.startsWith("{") && fileId.endsWith("}")) {
+            return fileId;
+        }
+        return "{" + fileId + "}";
+    }
+
+    public static String stripHashTag(String value) {
+        if (value == null) return null;
+        if (value.startsWith("{") && value.endsWith("}") && value.length() > 2) {
+            return value.substring(1, value.length() - 1);
+        }
+        return value;
+    }
+
     /**
      * 意图树节点 Key
      * 用途：存储意图节点信息，用于意图识别快速判断
@@ -96,7 +114,7 @@ public final class RedisKeyConfig {
      * @return 拼接后的 Redis Key
      */
     public static String collectionFileChunkBitKey(String collectionName,String fileId) {
-        return PREFIX + String.format(Locale.ROOT, "collection:filebits:%s:%s", collectionName,fileId);
+        return PREFIX + String.format(Locale.ROOT, "collection:filebits:%s:%s", fileHashTag(fileId), collectionName);
     }
 
     /**
@@ -107,7 +125,15 @@ public final class RedisKeyConfig {
      * @return 拼接后的 Redis Key
      */
     public static String userFileBitKey(Long userId, String fileId) {
-        return PREFIX + String.format(Locale.ROOT, "user:filebits:%d:%s", userId, fileId);
+        return PREFIX + String.format(Locale.ROOT, "user:filebits:%s:%d", fileHashTag(fileId), userId);
+    }
+
+    public static String userFileBitKeyPatternByUser(Long userId) {
+        return PREFIX + String.format(Locale.ROOT, "user:filebits:*:%d", userId);
+    }
+
+    public static String userFileBitKeyPatternByFileId(String fileId) {
+        return PREFIX + String.format(Locale.ROOT, "user:filebits:%s:*", fileHashTag(fileId));
     }
 
     /**
@@ -117,7 +143,7 @@ public final class RedisKeyConfig {
      * @return 拼接后的 Redis Key
      */
     public static String fileHashKey(String sha256) {
-        return PREFIX + "file:hash:" + sha256;
+        return PREFIX + "file:hash:" + fileHashTag(sha256);
     }
 
     /**
@@ -134,11 +160,11 @@ public final class RedisKeyConfig {
      * 文件分片用户使用计数 Key
      * 用途：统计某个文件分片被多少用户使用
      * @param fileId 文件ID
-     * @param chunkId 分片ID
+    * @param chunkId 分片ID
      * @return 拼接后的 Redis Key
      */
-    public static String fileChunkUserCountKey(String fileId, Long chunkId) {
-        return PREFIX + "fileChunk:count:" + fileId + ":" + chunkId;
+    public static String fileChunkUserCountKey(String fileId, int chunkId) {
+        return PREFIX + "fileChunk:count:" + fileHashTag(fileId) + ":" + chunkId;
     }
 
     /**
@@ -148,11 +174,11 @@ public final class RedisKeyConfig {
      * @param conversationId 对话ID
      * @return 拼接后的 Redis Key
      */
-    public static String userConversationRecord(Long userId,String conversationId){
+    public static String userConversationRecord(Long userId,Long conversationId){
         return PREFIX + "chatMessage:" + userId + ":" + conversationId;
     }
 
-    public static String userConversationLock(Long userId,String conversationId){
+    public static String userConversationLock(Long userId,Long conversationId){
         return PREFIX + "chatMessage:" + userId + ":lock:" + conversationId;
     }
 
@@ -163,7 +189,7 @@ public final class RedisKeyConfig {
      * @param conversationId 对话ID
      * @return 拼接后的 Redis Key
      */
-    public static String userSummaryRecord(Long userId,String conversationId){
+    public static String userSummaryRecord(Long userId,Long conversationId){
         return PREFIX + "chatMessage:" + userId + ":summary:" + conversationId;
     }
 

@@ -13,5 +13,5 @@ import org.springframework.data.repository.query.Param;
 @Mapper
 public interface ChatConversationMapper extends BaseMapper<ChatConversation> {
     @Delete("DELETE FROM chat_conversation WHERE conversation_id = #{conversationId} ORDER BY created_at ASC LIMIT #{limit}")
-    void deleteOldestMessages(@Param("conversationId") String conversationId, @Param("limit") int limit);
+    void deleteOldestMessages(@Param("conversationId") Long conversationId, @Param("limit") int limit);
 }

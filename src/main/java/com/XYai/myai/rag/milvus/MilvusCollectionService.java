@@ -7,8 +7,8 @@ import com.github.benmanes.caffeine.cache.Cache;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,7 +26,9 @@ public class MilvusCollectionService {
     @Resource
     private MilvusAclManager milvusAclManager;
     @Resource
-    private RedissonClient redissonClient;
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Resource
     @Qualifier("defaultCache")
     private Cache<String, Object> localCache;
 
@@ -69,8 +71,8 @@ public class MilvusCollectionService {
     public void createCollectionIfAbsent(String collectionName) {
         // 添加集合权限给当前用户(创建同时加载给用户)
         Long userId = LoginUserInfoManager.getUserId();
-        redissonClient.getSet(RedisKeyConfig.userLoadCollectionsKey(userId)).add(collectionName);
-        redissonClient.getAtomicLong(RedisKeyConfig.collectionUserCountKey(collectionName)).incrementAndGet();
+        stringRedisTemplate.opsForSet().add(RedisKeyConfig.userLoadCollectionsKey(userId), collectionName);
+        stringRedisTemplate.opsForValue().increment(RedisKeyConfig.collectionUserCountKey(collectionName));
     }
 
     /**
@@ -130,4 +132,8 @@ public class MilvusCollectionService {
         return milvusAclManager.getCollectionAcl(collectionName);
     }
 
+    public Integer getCollectionsFileNumber(String collectionName) {
+        Long size = stringRedisTemplate.opsForSet().size(RedisKeyConfig.collectionFileIds(collectionName));
+        return size != null ? size.intValue() : 0;
+    }
 }

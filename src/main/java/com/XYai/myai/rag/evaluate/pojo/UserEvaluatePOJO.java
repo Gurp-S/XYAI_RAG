@@ -14,9 +14,9 @@ import java.time.LocalDateTime;
 @TableName("xy_user_evaluate")
 public class UserEvaluatePOJO {
     @TableId
-    private String messageId;   // 主键，对应数据库 message_id
+    private Long messageId;   // 主键，对应数据库 message_id
 
-    private String conversationId;
+    private Long conversationId;
 
     private Long userId;
 

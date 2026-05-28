@@ -38,7 +38,7 @@ public class TraceRecord {
     private String errorMessage;
 
     @TableField("cost_time")
-    private long coseTime;
+    private long costTime;
 
     private LocalDateTime endTime;
 }

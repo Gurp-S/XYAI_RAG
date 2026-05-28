@@ -14,8 +14,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatMessage {
-    long id;
-    String conversationId;
+    Long id;
+    Long conversationId;
     String targetType;
     String targetId;
     String senderId;

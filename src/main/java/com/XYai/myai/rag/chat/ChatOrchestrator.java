@@ -1,5 +1,6 @@
 package com.XYai.myai.rag.chat;
 
+import cn.hutool.core.util.IdUtil;
 import com.XYai.myai.rag.RetrievalAugmentedGeneration;
 import com.XYai.myai.rag.aop.annotation.RagTraceContext;
 import com.XYai.myai.rag.aop.annotation.RagTraceRoot;
@@ -14,9 +15,8 @@ import com.XYai.myai.rag.rewrite.pojo.RewriteResult;
 import com.XYai.myai.user.LoginUserInfoManager;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -24,11 +24,9 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -48,25 +46,22 @@ public class ChatOrchestrator {
     @Resource
     private SystemEvaluateService systemEvaluateService;
 
-    @Resource
-    private StringRedisTemplate stringRedisTemplate;
-
     @Resource(name = "chatExecutor")
-    private ThreadPoolTaskExecutor chatExecutor;
+    private TaskExecutor chatExecutor;
 
     // ==================== 主入口方法 ====================
 
-    @RagTraceRoot(name = "对话开始", conversationIdArg = "", taskIdArg = "chat")
-    public CompletableFuture<Void> chat(String message, String conversationId, String fileContent, SseEmitter emitter) {
+    @RagTraceRoot(name = "对话主流程", conversationIdArg = "", taskIdArg = "chat")
+    public CompletableFuture<Void> chat(String message, Long conversationId, String fileContent, SseEmitter emitter) {
         return doChat(message, conversationId, fileContent, emitter, false);
     }
 
-    @RagTraceRoot(name = "对话开始fast", conversationIdArg = "", taskIdArg = "chatFast")
-    public void chatFast(String message, String conversationId, String fileContent, SseEmitter emitter) {
+    @RagTraceRoot(name = "快速对话主流程", conversationIdArg = "", taskIdArg = "chatFast")
+    public void chatFast(String message, Long conversationId, String fileContent, SseEmitter emitter) {
         doChat(message, conversationId, fileContent, emitter, true);
     }
 
-    private CompletableFuture<Void> doChat(String message, String conversationId, String fileContent,
+    private CompletableFuture<Void> doChat(String message, Long conversationId, String fileContent,
                                             SseEmitter emitter, boolean fast) {
         // 步骤0：参数校验
         if (message == null || message.isBlank()) {
@@ -80,7 +75,7 @@ public class ChatOrchestrator {
         log.info("╔══════════════════════════════════════════════╗");
         log.info("║ [{}] 对话流程开始                        ║", mode);
         log.info("╚══════════════════════════════════════════════╝");
-        log.info("[{}] message='{}', conversationId='{}'",
+        log.info("[{}] message='{}', conversationId={}",
                 mode,
                 message.length() > 50 ? message.substring(0, 50) + "..." : message,
                 conversationId);
@@ -89,16 +84,31 @@ public class ChatOrchestrator {
         UserContext userCtx = rag.getUserContext();
         log.info("[{}] 用户上下文获取完成, userId={}", mode, userCtx != null ? userCtx.getUserId() : "null");
 
-        // 生成 chatMessageId
-        long seq = stringRedisTemplate.opsForValue().increment("xyai:chat:seq:" + conversationId);
-        String chatMessageId = conversationId + "::" + String.format("%04d", seq);
+        // 生成 chatMessageId（雪花算法 long 值，保证分布式唯一且有序）
+        Long chatMessageId = IdUtil.getSnowflakeNextId();
         log.info("[{}] 生成 chatMessageId={}", mode, chatMessageId);
+
+        // 如 conversationId 为空（首次对话），由后端生成雪花 ID
+        if (conversationId == null) {
+            conversationId = IdUtil.getSnowflakeNextId();
+            log.info("[{}] 首次对话，生成 conversationId={}", mode, conversationId);
+        }
+        final Long finalConvId = conversationId;
+
+        // 发送 start 事件，将 conversationId 和 chatMessageId 返回前端
+        try {
+            emitter.send(SseEmitter.event()
+                    .data("{\"type\":\"start\",\"conversationId\":\"" + finalConvId
+                            + "\",\"chatMessageId\":\"" + chatMessageId + "\"}"));
+        } catch (IOException e) {
+            log.warn("[{}] 发送 start 事件失败", mode, e);
+        }
 
         // 步骤2-3：启动异步任务（MCP工具 + 会话记忆）
         log.info("[{}] >>> 启动异步任务: MCP工具 + 会话记忆", mode);
-        LoadSession memorySession = rag.loadMemoryAsync(conversationId);
+        LoadSession memorySession = rag.loadMemoryAsync(finalConvId);
         CompletableFuture<List<ToolProcessorResult>> mcpFuture = rag.loadMCPToolsAsync(
-                message, memorySession, conversationId, chatMessageId);
+                message, memorySession, finalConvId, chatMessageId);
         log.info("[{}] >>> 异步任务已提交", mode);
 
         // 步骤4-10：在异步线程中执行完整流程
@@ -107,7 +117,7 @@ public class ChatOrchestrator {
             try {
                 // 步骤4-6：同步执行 RAG 流程
                 RAGIntermediate intermediate = executeRAGSync(
-                        message, conversationId, userCtx, chatMessageId, mode);
+                        message, finalConvId, userCtx, chatMessageId, mode);
 
                 // 步骤7：等待 MCP 结果并构建 RAGResult
                 List<ToolProcessorResult> mcpResults;
@@ -131,7 +141,7 @@ public class ChatOrchestrator {
                 log.info("[{}] 最终 Prompt 构建完成，长度={}", mode, finalPrompt.length());
 
                 // 步骤9-10：调用模型流式输出 + 后处理
-                executeModelCallStream(finalPrompt, conversationId, message, userCtx,
+                executeModelCallStream(finalPrompt, finalConvId, message, userCtx,
                         chatMessageId, fast, emitter, mode);
 
             } catch (Exception e) {
@@ -152,8 +162,8 @@ public class ChatOrchestrator {
     /**
      * 同步执行 RAG 核心流程（查询重写、意图识别、文档检索）
      */
-    private RAGIntermediate executeRAGSync(String message, String conversationId, UserContext userCtx,
-                                           String chatMessageId, String mode) {
+    private RAGIntermediate executeRAGSync(String message, Long conversationId, UserContext userCtx,
+                                           Long chatMessageId, String mode) {
         log.info("[RAG_SYNC] ==== 开始同步RAG流程(步骤4-6) ==== mode:{}", mode);
         try {
             if (userCtx != null) {
@@ -195,9 +205,9 @@ public class ChatOrchestrator {
     /**
      * 模型流式调用（同步阻塞，向 SseEmitter 发送流式数据）
      */
-    private void executeModelCallStream(String finalPrompt, String conversationId,
+    private void executeModelCallStream(String finalPrompt, Long conversationId,
                                         String originalMessage, UserContext userCtx,
-                                        String chatMessageId, boolean fast,
+                                        Long chatMessageId, boolean fast,
                                         SseEmitter emitter, String mode) {
         log.info("[MODEL_CALL_{}] ==== 开始模型调用 ====", mode);
         log.info("[MODEL_CALL_{}] finalPrompt长度={}, conversationId={}, chatMessageId={}",
@@ -217,22 +227,16 @@ public class ChatOrchestrator {
         };
 
         // onComplete: 流式结束，处理后续任务
+        String[] modelNameRef = new String[1];
         Runnable onComplete = () -> {
-            long durationMs = (System.nanoTime() - startTime) / 1_000_000;
             log.info("[MODEL_CALL_{}] <<< 模型流式响应完成，总字符数={}, 耗时={}ms",
-                    mode, fullAnswer.length(), durationMs);
+                    mode, fullAnswer.length(), (System.nanoTime() - startTime) / 1_000_000);
 
             String answer = fullAnswer.toString();
 
             // 异步保存对话记忆
             modelInvocation.saveMemoryAsync(
                     conversationId, chatMessageId, originalMessage, answer, userCtx.getUserId());
-
-            // 异步记录 Token 使用量
-            modelInvocation.saveTokenUseAsync(
-                    conversationId, chatMessageId,
-                    (long) finalPrompt.length(), (long) answer.length(),
-                    userCtx.getUserId(), durationMs, "chat_default", "chat");
 
             // 异步系统评估
             if (!answer.isBlank() && !answer.contains("服务繁忙")) {
@@ -245,7 +249,7 @@ public class ChatOrchestrator {
                                 .userId(userCtx.getUserId())
                                 .build(),
                         List.of(),
-                        durationMs,
+                        (System.nanoTime() - startTime) / 1_000_000,
                         originalMessage);
             }
 
@@ -263,14 +267,22 @@ public class ChatOrchestrator {
 
         // 执行流式调用（同步阻塞，返回模型名称）
         if (fast) {
-            modelInvocation.callModelFastStream(
+            modelNameRef[0] = modelInvocation.callModelFastStream(
                     finalPrompt, conversationId, onChunk, onError, onComplete);
         } else {
-            modelInvocation.callModelStream(
+            modelNameRef[0] = modelInvocation.callModelStream(
                     finalPrompt, conversationId, onChunk, onError, onComplete);
         }
 
-        log.info("[MODEL_CALL_{}] 模型调用结束", mode);
+        // 流式结束后保存 Token 消耗
+        long durationMs = (System.nanoTime() - startTime) / 1_000_000;
+        RagTraceContext.setPhase("模型路由");
+        modelInvocation.saveTokenUseAsync(
+                conversationId, chatMessageId,
+                (long) finalPrompt.length(), (long) fullAnswer.toString().length(),
+                userCtx.getUserId(), durationMs, modelNameRef[0], "chat");
+
+        log.info("[MODEL_CALL_{}] 模型调用结束, 模型: {}", mode, modelNameRef[0]);
     }
 
     // ==================== SseEmitter 辅助方法 ====================

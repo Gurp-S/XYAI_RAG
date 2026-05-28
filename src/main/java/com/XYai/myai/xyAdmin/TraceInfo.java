@@ -6,6 +6,7 @@ import com.XYai.myai.mapper.TraceRecordMapper;
 import com.XYai.myai.rag.aop.annotation.NodeRecord;
 import com.XYai.myai.rag.aop.annotation.TraceRecord;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -94,17 +95,14 @@ public class TraceInfo {
         String column = resolveTraceSortColumn(sortBy);
         wrapper.orderBy(true, isAsc, column);
 
-        long total = traceRecordMapper.selectCount(wrapper);
-
-        int offset = (page - 1) * size;
-        wrapper.last("LIMIT " + size + " OFFSET " + offset);
-        List<TraceRecord> records = traceRecordMapper.selectList(wrapper);
+        Page<TraceRecord> tracePage = traceRecordMapper.selectPage(
+                new Page<>(page, size), wrapper);
 
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("total", total);
-        result.put("page", page);
-        result.put("size", size);
-        result.put("records", records);
+        result.put("total", tracePage.getTotal());
+        result.put("page", tracePage.getCurrent());
+        result.put("size", tracePage.getSize());
+        result.put("records", tracePage.getRecords());
         return Result.success(result);
     }
 
@@ -147,17 +145,14 @@ public class TraceInfo {
         String column = resolveNodeSortColumn(sortBy);
         wrapper.orderBy(true, isAsc, column);
 
-        long total = nodeRecordMapper.selectCount(wrapper);
-
-        int offset = (page - 1) * size;
-        wrapper.last("LIMIT " + size + " OFFSET " + offset);
-        List<NodeRecord> records = nodeRecordMapper.selectList(wrapper);
+        Page<NodeRecord> nodePage = nodeRecordMapper.selectPage(
+                new Page<>(page, size), wrapper);
 
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("total", total);
-        result.put("page", page);
-        result.put("size", size);
-        result.put("records", records);
+        result.put("total", nodePage.getTotal());
+        result.put("page", nodePage.getCurrent());
+        result.put("size", nodePage.getSize());
+        result.put("records", nodePage.getRecords());
         return Result.success(result);
     }
 

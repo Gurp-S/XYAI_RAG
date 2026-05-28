@@ -11,7 +11,7 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 
 import java.util.concurrent.Executor;
 
@@ -25,7 +25,7 @@ public class CommonConfiguration implements AsyncConfigurer {
 
     @Resource
     @Qualifier("taskUserExecutor")
-    private ThreadPoolTaskExecutor taskUserExecutor;
+    private TaskExecutor taskUserExecutor;
 
     @Override
     public Executor getAsyncExecutor() {

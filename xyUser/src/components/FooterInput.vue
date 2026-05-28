@@ -1,7 +1,7 @@
 ﻿<template>
   <footer class="input-area">
     <div class="input-wrapper">
-        <button class="btn-attach" type="button" title="附加文件" @click="toggleAttachMenu">
+        <button class="btn-attach" type="button" @click="toggleAttachMenu">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -17,7 +17,7 @@ id="message" ref="textareaRef"
             @input="onInput"
             @keydown.enter="handleEnter"
             ></textarea>
-        <button id="send" class="btn-send" title="发送消息" :disabled="disabled" @click="handleClick">
+        <button id="send" class="btn-send" :disabled="disabled" @click="handleClick">
             <svg viewBox="0 0 24 24">
                 <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
             </svg>

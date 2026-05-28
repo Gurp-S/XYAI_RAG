@@ -12,24 +12,24 @@ public interface ModelRouterService {
     /**
      * 普通调用（自动降级）
      */
-    String route(String prompt, String sessionId);
+    String route(String prompt, Long sessionId);
 
     /**
      * 指定首选模型（失败自动降级）
      */
-    String routeWithPreferred(String prompt, String preferredModel, String sessionId);
+    String routeWithPreferred(String prompt, String preferredModel, Long sessionId);
 
     /**
      * 快速模式（并发调用，取最快响应）
      */
-    String routeFast(String prompt, String sessionId);
+    String routeFast(String prompt, Long sessionId);
 
     /**
      * 流式调用（自动降级）
      *
      * @return 实际使用的模型名称
      */
-    String routeStream(String prompt, String sessionId,
+    String routeStream(String prompt, Long sessionId,
                        Consumer<String> onChunk, Consumer<Throwable> onError, Runnable onComplete);
 
     /**
@@ -37,7 +37,7 @@ public interface ModelRouterService {
      *
      * @return 实际使用的模型名称
      */
-    String routeWithPreferredStream(String prompt, String preferredModel, String sessionId,
+    String routeWithPreferredStream(String prompt, String preferredModel, Long sessionId,
                                     Consumer<String> onChunk, Consumer<Throwable> onError, Runnable onComplete);
 
     /**
@@ -45,7 +45,7 @@ public interface ModelRouterService {
      *
      * @return 实际使用的模型名称
      */
-    String routeFastStream(String prompt, String sessionId,
+    String routeFastStream(String prompt, Long sessionId,
                            Consumer<String> onChunk, Consumer<Throwable> onError, Runnable onComplete);
 
     /**

@@ -54,7 +54,6 @@
                 class="password-toggle"
                 :aria-label="showPassword ? '隐藏密码' : '显示密码'"
                 :aria-pressed="showPassword"
-                title="切换密码可见"
                 @click="showPassword = !showPassword"
               >
                 <svg
@@ -117,7 +116,6 @@
                 class="password-toggle"
                 :aria-label="showPassword ? '隐藏密码' : '显示密码'"
                 :aria-pressed="showPassword"
-                title="切换密码可见"
                 @click="showPassword = !showPassword"
               >
                 <svg
@@ -178,7 +176,6 @@
                 class="password-toggle"
                 :aria-label="showPassword ? '隐藏密码' : '显示密码'"
                 :aria-pressed="showPassword"
-                title="切换密码可见"
                 @click="showPassword = !showPassword"
               >
                 <svg
@@ -322,7 +319,6 @@
                 class="password-toggle"
                 :aria-label="showPassword ? '隐藏密码' : '显示密码'"
                 :aria-pressed="showPassword"
-                title="切换密码可见"
                 @click="showPassword = !showPassword"
               >
                 <svg
@@ -383,7 +379,6 @@
                 class="password-toggle"
                 :aria-label="showPassword ? '隐藏密码' : '显示密码'"
                 :aria-pressed="showPassword"
-                title="切换密码可见"
                 @click="showPassword = !showPassword"
               >
                 <svg

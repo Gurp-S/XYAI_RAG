@@ -28,5 +28,5 @@ public class RetrievalProperties {
     @Builder.Default
     private int minContentLength = 10;
     @Builder.Default
-    private int maxContentLength = 2000;
+    private int maxContentLength = 3000;
 }

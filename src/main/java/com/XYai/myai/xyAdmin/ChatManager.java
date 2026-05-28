@@ -7,6 +7,7 @@ import com.XYai.myai.rag.memory.pojo.ChatConversation;
 import com.XYai.myai.xyAdmin.mapper.TokenRecordMapper;
 import com.XYai.myai.xyAdmin.pojo.TokenRecord;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -200,19 +201,14 @@ public class ChatManager {
         String column = resolveSortColumn(sortBy);
         wrapper.orderBy(true, isAsc, column);
 
-        // 总数
-        long total = tokenRecordMapper.selectCount(wrapper);
-
-        // 分页（使用 MyBatis-Plus Page 对象更佳，此处修正手动拼接方式）
-        int offset = (page - 1) * size;
-        wrapper.last("LIMIT " + size + " OFFSET " + offset);
-        List<TokenRecord> records = tokenRecordMapper.selectList(wrapper);
+        Page<TokenRecord> pageResult = tokenRecordMapper.selectPage(
+                new Page<>(page, size), wrapper);
 
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("total", total);
-        result.put("page", page);
-        result.put("size", size);
-        result.put("records", records);
+        result.put("total", pageResult.getTotal());
+        result.put("page", pageResult.getCurrent());
+        result.put("size", pageResult.getSize());
+        result.put("records", pageResult.getRecords());
         return Result.success(result);
     }
 

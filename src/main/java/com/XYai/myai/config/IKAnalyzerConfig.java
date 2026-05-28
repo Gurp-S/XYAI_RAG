@@ -5,7 +5,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 
 /**
  * IK分词器配置（备选方案）
@@ -17,12 +17,12 @@ public class IKAnalyzerConfig {
 
     @Resource
     @Qualifier("ioBoundExecutor")   // 复用已有线程池
-    private ThreadPoolTaskExecutor executor;
+    private TaskExecutor executor;
 
     @PostConstruct
     public void init() {
         // 使用 ioBoundExecutor 提交任务，自动传递上下文
-        executor.submit(() -> {
+        executor.execute(() -> {
             try {
                 Thread.sleep(1000);
                 Class.forName("org.wltea.analyzer.dic.Dictionary");

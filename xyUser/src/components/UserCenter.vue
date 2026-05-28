@@ -139,7 +139,6 @@
                   </div>
                   <button
                     class="uc-friend-chat-btn"
-                    title="聊天"
                     @click="startUserChat(friend)"
                   >
                     <svg
@@ -158,7 +157,6 @@
                   </button>
                   <button
                     class="uc-friend-del-btn"
-                    title="删除"
                     @click="confirmDeleteFriend(friend)"
                   >
                     <svg
@@ -246,7 +244,6 @@
                         </div>
                         <button
                           class="uc-drawer-chat-btn"
-                          title="私聊"
                           @click.stop="startUserChat(member)"
                         >
                           <svg

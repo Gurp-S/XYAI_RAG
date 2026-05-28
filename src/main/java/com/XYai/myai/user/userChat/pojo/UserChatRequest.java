@@ -5,7 +5,7 @@ package com.XYai.myai.user.userChat.pojo;
  */
 public record UserChatRequest(
         String message,
-        String conversationId,
+        Long conversationId,
         Long userId,
         String targetType,
         String targetId,

@@ -1,5 +1,6 @@
 package com.XYai.myai.xyAdmin;
 
+import com.XYai.myai.commonUtils.redis.RedisBitSetUtils;
 import com.XYai.myai.commonUtils.redis.RedisKeyConfig;
 import com.XYai.myai.config.Result;
 import com.XYai.myai.mapper.FileRecordMapper;
@@ -17,13 +18,13 @@ import io.milvus.param.dml.QueryParam;
 import io.milvus.response.QueryResultsWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RBitSet;
-import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -41,6 +42,8 @@ public class MilvusManager {
     private UserMapper userMapper;
     @Resource
     private RedissonClient redissonClient;
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
     @Resource
     private FileRecordMapper fileRecordMapper;
     @Value("${spring.ai.vectorstore.milvus.collectionName:my_ai}")
@@ -94,7 +97,8 @@ public class MilvusManager {
             int total = filtered.size();
             int fromIndex = (page - 1) * size;
             int toIndex = Math.min(fromIndex + size, total);
-            List<Map<String, Object>> pageData = fromIndex < total ? filtered.subList(fromIndex, toIndex) : new ArrayList<>();
+            List<Map<String, Object>> pageData = fromIndex < total ? filtered.subList(fromIndex, toIndex)
+                    : new ArrayList<>();
 
             Map<String, Object> result = new LinkedHashMap<>();
             result.put("total", total);
@@ -132,8 +136,10 @@ public class MilvusManager {
                     Object docId = record.get("doc_id");
                     if (docId instanceof String s && !s.isBlank()) {
                         int idx = s.lastIndexOf(':');
-                        if (idx > 0) allFileIds.add(s.substring(0, idx));
-                        else allFileIds.add(s);
+                        if (idx > 0)
+                            allFileIds.add(s.substring(0, idx));
+                        else
+                            allFileIds.add(s);
                     }
                 }
             }
@@ -156,7 +162,6 @@ public class MilvusManager {
         return resultList;
     }
 
-
     /**
      * 统计文件使用用户数
      */
@@ -164,10 +169,12 @@ public class MilvusManager {
         long count = 0;
         try {
             Iterable<String> keys = redissonClient.getKeys().getKeysByPattern(
-                    RedisKeyConfig.PREFIX + "user:filebits:*:" + fileId);
+                    RedisKeyConfig.userFileBitKeyPatternByFileId(fileId));
             for (String key : keys) {
-                RBitSet bitSet = redissonClient.getBitSet(key);
-                if (bitSet.cardinality() > 0) count++;
+                byte[] raw = stringRedisTemplate.execute((RedisCallback<byte[]>) conn -> conn.stringCommands()
+                        .get(key.getBytes(StandardCharsets.UTF_8)));
+                if (raw != null && RedisBitSetUtils.bitSetFromRedisBytes(raw).cardinality() > 0)
+                    count++;
             }
         } catch (Exception e) {
             log.warn("统计文件用户失败: {}", e.getMessage());
@@ -193,7 +200,8 @@ public class MilvusManager {
                 }
 
                 // 检查该集合的 SET 中是否包含该 fileId 的分块
-                RSet<String> set = redissonClient.getSet(RedisKeyConfig.collectionFileIds(collectionName));
+                Set<String> set = stringRedisTemplate.opsForSet()
+                        .members(RedisKeyConfig.collectionFileIds(collectionName));
                 for (String entry : set) {
                     if (entry != null && entry.startsWith(fileId + ":")) {
                         result.add(collectionName);
@@ -288,13 +296,12 @@ public class MilvusManager {
 
     private Integer countCollectionFiles(String collectionName) {
         try {
-            RSet<String> set = redissonClient.getSet(RedisKeyConfig.collectionFileIds(collectionName));
-            return set.size();
+            Long size = stringRedisTemplate.opsForSet().size(RedisKeyConfig.collectionFileIds(collectionName));
+            return size != null ? size.intValue() : 0;
         } catch (Exception e) {
             return 0;
         }
     }
-
 
     private Integer countCollectionUsers(String collectionName) {
         int count = 0;
@@ -302,9 +309,10 @@ public class MilvusManager {
             Iterable<String> userKeys = redissonClient.getKeys().getKeysByPattern(
                     RedisKeyConfig.PREFIX + "user:collections:*");
             for (String key : userKeys) {
-                if (key.contains(":unloaded:")) continue;
-                RSet<String> set = redissonClient.getSet(key);
-                if (set.contains(collectionName)) count++;
+                if (key.contains(":unloaded:"))
+                    continue;
+                if (Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(key, collectionName)))
+                    count++;
             }
         } catch (Exception e) {
             log.warn("统计知识库用户失败", e);
@@ -325,8 +333,8 @@ public class MilvusManager {
             List<User> allUsers = userMapper.selectList(null);
             for (User user : allUsers) {
                 if (user.getId() != null) {
-                    RSet<String> set = redissonClient.getSet(RedisKeyConfig.userLoadCollectionsKey(user.getId()));
-                    if (set.contains(collectionName)) {
+                    if (Boolean.TRUE.equals(stringRedisTemplate.opsForSet()
+                            .isMember(RedisKeyConfig.userLoadCollectionsKey(user.getId()), collectionName))) {
                         user.setPassword(null);
                         authorizedUsers.add(user);
                     }
@@ -357,32 +365,30 @@ public class MilvusManager {
         return Result.success("缓存已刷新");
     }
 
-
     @GetMapping("/file/users")
     public Result<Map<String, Object>> getFileUsersPaged(
             @RequestParam String fileId,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size) {
         try {
-            List<User> authorizedUsers = new ArrayList<>();
-            // 查找所有用户的 user:filebits:userId:fileId 键
+            // 查找所有用户的 user:filebits:userId:fileId 键，收集 userId
+            List<Long> userIds = new ArrayList<>();
             Iterable<String> keys = redissonClient.getKeys().getKeysByPattern(
-                    RedisKeyConfig.PREFIX + "user:filebits:*:" + fileId);
+                    RedisKeyConfig.userFileBitKeyPatternByFileId(fileId));
             for (String key : keys) {
                 String[] parts = key.split(":");
-                if (parts.length >= 4) {
-                    long userId = Long.parseLong(parts[3]);
-                    User user = userMapper.selectById(userId);
-                    if (user != null) {
-                        user.setPassword(null);
-                        authorizedUsers.add(user);
-                    }
+                if (parts.length >= 5) {
+                    userIds.add(Long.parseLong(parts[4]));
                 }
             }
 
-            int total = authorizedUsers.size();
+            // 批量查询用户
+            List<User> allUsers = userIds.isEmpty() ? List.of() : userMapper.selectBatchIds(userIds);
+            allUsers.forEach(u -> u.setPassword(null));
+
+            int total = allUsers.size();
             int from = (page - 1) * size, to = Math.min(from + size, total);
-            List<User> pageData = from < total ? authorizedUsers.subList(from, to) : new ArrayList<>();
+            List<User> pageData = from < total ? allUsers.subList(from, to) : new ArrayList<>();
 
             Map<String, Object> result = new LinkedHashMap<>();
             result.put("total", total);
@@ -412,7 +418,7 @@ public class MilvusManager {
                     RedisKeyConfig.PREFIX + "file:hash:*");
             for (String hashKey : hashKeys) {
                 // fileHashKey 存储的是 Set，包含关联的 collectionName，所以需要遍历成员
-                RSet<String> hashSet = redissonClient.getSet(hashKey);
+                Set<String> hashSet = stringRedisTemplate.opsForSet().members(hashKey);
                 boolean hasCollections = false;
                 for (String member : hashSet) {
                     // 成员就是 collectionName
@@ -423,10 +429,11 @@ public class MilvusManager {
                 }
                 if (!hasCollections) {
                     // 删除该哈希键
-                    redissonClient.getKeys().delete(hashKey);
+                    stringRedisTemplate.delete(hashKey);
                     cleanedRedis++;
                     // 可选：从 key 中提取 fileId 并删除 xy_file_record 记录
-                    String fileId = hashKey.substring(hashKey.lastIndexOf(":") + 1);
+                    String tagged = hashKey.substring(hashKey.lastIndexOf(":") + 1);
+                    String fileId = RedisKeyConfig.stripHashTag(tagged);
                     try {
                         fileRecordMapper.deleteById(fileId);
                         cleanedDb++;
@@ -463,7 +470,8 @@ public class MilvusManager {
                     String suffix = key.substring(RedisKeyConfig.PREFIX.length());
                     String[] parts = suffix.split(":");
                     String candidate = key.substring(key.lastIndexOf(":") + 1);
-                    if (!candidate.matches("^[a-zA-Z0-9_]{1,64}$")) continue;
+                    if (!candidate.matches("^[a-zA-Z0-9_]{1,64}$"))
+                        continue;
                     String coll = parts[2];
                     processSingleCollection(coll);
                     count++;
@@ -478,12 +486,12 @@ public class MilvusManager {
 
     private void processSingleCollection(String collectionName) {
         try {
-            RSet<String> fileSet = redissonClient.getSet(RedisKeyConfig.collectionFileIds(collectionName));
-            if (fileSet.isEmpty()) {
+            Long fileCount = stringRedisTemplate.opsForSet().size(RedisKeyConfig.collectionFileIds(collectionName));
+            if (fileCount == null || fileCount == 0) {
                 // 删除 Milvus 物理集合（如果存在）
                 milvusCollectionService.drop(collectionName);
                 // 删除 Redis 中的集合文件键
-                fileSet.delete();
+                stringRedisTemplate.delete(RedisKeyConfig.collectionFileIds(collectionName));
                 log.info("清理空集合: {}", collectionName);
             }
         } catch (Exception e) {
@@ -560,16 +568,20 @@ public class MilvusManager {
                     // 删除 Redis 中与该文件相关的键（如 file:hash:* 和集合中的条目）
                     // 先清理 file:hash: 键
                     Iterable<String> hashKeys = redissonClient.getKeys().getKeysByPattern(
-                            RedisKeyConfig.PREFIX + "file:hash:" + fid);
+                            RedisKeyConfig.fileHashKey(fid));
                     for (String hk : hashKeys) {
-                        redissonClient.getKeys().delete(hk);
+                        stringRedisTemplate.delete(hk);
                     }
                     // 清理 collection:files:* 中涉及该文件的条目
                     Iterable<String> collKeys = redissonClient.getKeys().getKeysByPattern(
                             RedisKeyConfig.PREFIX + "collection:files:*");
                     for (String ck : collKeys) {
-                        RSet<String> set = redissonClient.getSet(ck);
-                        set.removeIf(entry -> entry != null && entry.startsWith(fid + ":"));
+                        Set<String> set = stringRedisTemplate.opsForSet().members(ck);
+                        for (String entry : set) {
+                            if (entry != null && entry.startsWith(fid + ":")) {
+                                stringRedisTemplate.opsForSet().remove(ck, entry);
+                            }
+                        }
                     }
                     removed++;
                     log.info("清理无用户文件: {}", fid);
@@ -592,12 +604,13 @@ public class MilvusManager {
                     RedisKeyConfig.PREFIX + "collection:files:*");
             for (String key : keys) {
                 String candidate = key.substring(key.lastIndexOf(":") + 1);
-                if (!candidate.matches("^[a-zA-Z0-9_]{1,64}$")) continue;
+                if (!candidate.matches("^[a-zA-Z0-9_]{1,64}$"))
+                    continue;
             }
             for (String coll : allNames) {
                 if (countCollectionUsers(coll) == 0) {
                     // 删除 Redis 中的集合信息，并尝试删除 Milvus 物理集合
-                    redissonClient.getSet(RedisKeyConfig.collectionFileIds(coll)).delete();
+                    stringRedisTemplate.delete(RedisKeyConfig.collectionFileIds(coll));
                     milvusCollectionService.drop(coll);
                     removed++;
                     log.info("清理无用户集合: {}", coll);

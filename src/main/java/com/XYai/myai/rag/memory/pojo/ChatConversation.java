@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,13 +21,15 @@ import java.time.LocalDateTime;
 public class ChatConversation {
 
     @TableId(value = "chat_message_id", type = IdType.ASSIGN_ID)
-    private String chatMessageId;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long chatMessageId;
 
     @TableField("user_id")
     private Long userId;
 
     @TableField("conversation_id")
-    private String conversationId;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long conversationId;
 
     @TableField("user_message")
     private String userMessage;

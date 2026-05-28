@@ -69,8 +69,8 @@ public class TraceRecordServiceIml implements TraceRecordService {
     }
 
     @Override
-    public void finishRun(String traceId, long coseTime) {
-        traceRecordMapper.updateByTraceId(traceId, "SUCCESS", LocalDateTime.now(), coseTime, null);
+    public void finishRun(String traceId, long costTime) {
+        traceRecordMapper.updateByTraceId(traceId, "SUCCESS", LocalDateTime.now(), costTime, null);
     }
 
     @Override

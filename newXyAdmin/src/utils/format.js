@@ -15,7 +15,8 @@ export function formatNumber(n) {
  * Format duration display: >=1000ms -> X.Xs, <1000ms -> Xms
  */
 export function formatDuration(ms) {
-  if (ms === null || ms === undefined || ms === 0) return '-'
+  if (ms === null || ms === undefined) return '-'
+  if (ms === 0) return '0ms'
   if (ms >= 1000) return (ms / 1000).toFixed(1) + 's'
   return ms + 'ms'
 }

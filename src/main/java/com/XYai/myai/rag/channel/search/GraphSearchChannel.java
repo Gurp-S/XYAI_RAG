@@ -91,7 +91,7 @@ public class GraphSearchChannel implements SearchChannel {
     }
 
     @Override
-    @RagTraceNode(name = "实体社区图召回", type = "search")
+    @RagTraceNode(name = "实体社区图召回", type = "search", taskIdArg = "searchRoot")
     public SearchChannelResult search(SearchContext context) {
         String query = context.getOriginalQuery();
         List<String> entities = entityRecognizer.extractEntities(query);

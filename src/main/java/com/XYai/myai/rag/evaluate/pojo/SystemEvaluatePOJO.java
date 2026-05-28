@@ -15,9 +15,9 @@ import java.time.LocalDateTime;
 @TableName("xy_system_evaluate")
 public class SystemEvaluatePOJO {
     @TableId(type = IdType.INPUT)
-    private String chatMessageId;
+    private Long chatMessageId;
 
-    private String conversationId;
+    private Long conversationId;
     private Long userId;
 
     /** 综合 F1 */

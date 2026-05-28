@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.IntStream;
 
 /**
@@ -104,7 +103,7 @@ public class BM25PostProcessor implements SearchResultPostProcessor {
     // ======================== 核心处理 ========================
 
     @Override
-    @RagTraceNode(name = "bm25打分", type = "process")
+    @RagTraceNode(name = "bm25打分", type = "process",taskIdArg = "processRoot")
     public List<RetrievedChunk> process(List<RetrievedChunk> chunks, SearchContext context) {
         // 1. 快速失败：空列表或空查询
         if (chunks == null || chunks.isEmpty()) {
@@ -257,7 +256,7 @@ public class BM25PostProcessor implements SearchResultPostProcessor {
         // 8. 输出缓存统计
         if (log.isDebugEnabled()) {
             var stats = docTermFreqCache.stats();
-            log.debug("Cache stats: hitCount={}, missCount={}, hitRate={}",
+            log.debug("缓存命中: hitCount={}, missCount={}, hitRate={}",
                     stats.hitCount(), stats.missCount(), stats.hitRate());
         }
 

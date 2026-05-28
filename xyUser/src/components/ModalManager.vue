@@ -18,7 +18,7 @@
             </div>
             <div class="modal-body">
                 <div id="uploadZone" class="upload-zone" @dragover.prevent @drop.prevent="handleFileDrop">
-                    <input id="fileInput" ref="uploadFileInput" type="file" class="file-input" accept=".pdf,.doc,.docx,.txt" multiple title="" @click="resetUploadFileInput" @change="handleFileSelect" />
+                    <input id="fileInput" ref="uploadFileInput" type="file" class="file-input" accept=".pdf,.doc,.docx,.txt" multiple @click="resetUploadFileInput" @change="handleFileSelect" />
                     <svg
 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
                         stroke-linejoin="round">

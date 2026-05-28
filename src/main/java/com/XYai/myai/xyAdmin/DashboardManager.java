@@ -2,7 +2,6 @@ package com.XYai.myai.xyAdmin;
 
 import com.XYai.myai.commonUtils.redis.RedisKeyConfig;
 import com.XYai.myai.mapper.*;
-import com.XYai.myai.rag.aop.annotation.NodeRecord;
 import com.XYai.myai.rag.chat.pojo.ModelRouterProperties;
 import com.XYai.myai.user.pojo.User;
 import com.XYai.myai.xyAdmin.mapper.TokenRecordMapper;
@@ -11,12 +10,16 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -37,6 +40,10 @@ import java.util.concurrent.TimeUnit;
 public class DashboardManager {
 
     // 最小时间（早于任何业务时间）
+    private Map<String, Object> cachedStats;
+    private long lastStatsFetch = 0;
+    private static final long STATS_CACHE_TTL_MS = 5000;
+
     @Resource
     private StringRedisTemplate redis;
     @Resource
@@ -59,6 +66,12 @@ public class DashboardManager {
      */
     @GetMapping("/stats")
     public Map<String, Object> getStats() {
+        // 5s 缓存避免重复聚合查询
+        long now = System.currentTimeMillis();
+        if (cachedStats != null && (now - lastStatsFetch) < STATS_CACHE_TTL_MS) {
+            return cachedStats;
+        }
+
         Map<String, Object> stats = new LinkedHashMap<>();
 
         // 用户总数
@@ -95,37 +108,34 @@ public class DashboardManager {
         }
         stats.put("evaluateCount", evalCount);
 
-        // 平均链路耗时
+        // 平均链路耗时（SQL 聚合，避免全表加载）
         double avgCost = 0;
         try {
-            List<NodeRecord> nodes = nodeRecordMapper.selectList(null);
-            if (nodes != null && !nodes.isEmpty()) {
-                avgCost = nodes.stream()
-                        .filter(n -> n.getCostTime() != null)
-                        .mapToDouble(NodeRecord::getCostTime)
-                        .average()
-                        .orElse(0);
-            }
+            Long avgCostTime = nodeRecordMapper.selectAvgCostTime();
+            avgCost = avgCostTime != null ? avgCostTime : 0;
         } catch (Exception e) {
-            log.warn("avgCostTime 计算失败", e);
+            log.warn("avgCostTime 查询失败", e);
         }
         stats.put("avgCostTime", Math.round(avgCost));
 
         // Milvus 集合数
         try {
-            stats.put("milvusCollections", redis.keys("xyai:collection:files:*").size());
+            stats.put("milvusCollections", countKeysByPattern("xyai:collection:files:*"));
         } catch (Exception e) {
             log.warn("milvusCollections 获取失败", e);
             stats.put("milvusCollections", 0);
         }
 
         // 文件总数
-        stats.put("fileCount", redis.keys("xyai:file:hash:*").size());
+        stats.put("fileCount", countKeysByPattern("xyai:file:hash:*"));
 
         // 在线用户数
-        Long onlineCount = 0L;
+        long onlineCount = 0L;
         try {
-            onlineCount = userMapper.selectCount(new QueryWrapper<User>().eq("status", true));
+            Long countObj = userMapper.selectCount(new QueryWrapper<User>().eq("status", true));
+            if (countObj != null) {
+                onlineCount = countObj;
+            }
         } catch (Exception e) {
             log.warn("onlineUserCount 获取失败", e);
         }
@@ -154,6 +164,8 @@ public class DashboardManager {
         }
         stats.put("latestAnnouncement", announcement);
 
+        cachedStats = stats;
+        lastStatsFetch = now;
         return stats;
     }
 
@@ -258,5 +270,27 @@ public class DashboardManager {
         String key = RedisKeyConfig.dailyFileUseCountKey(today);
         redis.opsForValue().increment(key);
         redis.expire(key, 30, TimeUnit.DAYS);
+    }
+
+    /**
+     * 用 SCAN 替代 KEYS 命令统计匹配的 key 数量，避免 Redis 阻塞。
+     */
+    private int countKeysByPattern(String pattern) {
+        try {
+            Set<String> keys = redis.execute((RedisCallback<Set<String>>) conn -> {
+                Set<String> matched = new HashSet<>();
+                try (Cursor<byte[]> cursor = conn.keyCommands().scan(
+                        ScanOptions.scanOptions().match(pattern).count(500).build())) {
+                    while (cursor.hasNext()) {
+                        matched.add(new String(cursor.next(), StandardCharsets.UTF_8));
+                    }
+                }
+                return matched;
+            });
+            return keys != null ? keys.size() : 0;
+        } catch (Exception e) {
+            log.warn("SCAN failed for pattern {}", pattern, e);
+            return 0;
+        }
     }
 }

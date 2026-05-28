@@ -224,6 +224,8 @@ const menuItems = computed(() => [
   padding: 10px 20px;
   overflow: hidden;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Transition */

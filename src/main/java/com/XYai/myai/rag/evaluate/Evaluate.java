@@ -18,13 +18,13 @@ public class Evaluate {
     private EvaluateImpl evaluateImpl;
 
     @PostMapping("/user")
-    public Result<String> userEvaluate(@RequestParam String conversationId, @RequestParam String chatMessageId, @RequestParam Integer feedback){
+    public Result<String> userEvaluate(@RequestParam Long conversationId, @RequestParam Long chatMessageId, @RequestParam Integer feedback){
         log.info("userEvaluate conversationId={}, chatMessageId={}, feedback={}", conversationId, chatMessageId, feedback);
         return evaluateImpl.userEvaluate(conversationId,chatMessageId,feedback);
     }
 
     @PostMapping("/system")
-    public Result<String> systemEvaluate(@RequestParam String conversationId, @RequestParam Long userId, @RequestParam String chatMessageId){
+    public Result<String> systemEvaluate(@RequestParam Long conversationId, @RequestParam Long userId, @RequestParam Long chatMessageId){
         return evaluateImpl.systemEvaluate(conversationId,userId,chatMessageId);
     }
 }

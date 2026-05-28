@@ -17,6 +17,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class IngestionContext implements Serializable {
+
+    private PipelineProperties pipelineProperties;
     /*
         Document
                 text
@@ -60,7 +62,7 @@ public class IngestionContext implements Serializable {
      * 用 @Singular 在 builder 上提供单个元素的添加方法（chunk(...) / log(...)）
      */
     @Builder.Default
-    private List<Document> chunks = new ArrayList<>();
+    private List<Document> chunks = new ArrayList<>(64);
 
     // ChunkerNode分块后的文档块
     @Builder.Default

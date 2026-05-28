@@ -47,14 +47,17 @@ public class MilvusController {
     }
 
     /**
-     * 获取集合数据
+     * 获取集合数据（游标分页）
      *
      * @param collectionName 集合名称
-     * @return 元数据列表
+     * @param cursor         上一页最后一条记录的 doc_id，首次传空
+     * @param pageSize       每页大小，不传默认为 20
+     * @return 分页元数据
      */
     @PostMapping("/metadata")
-    public Result<List<Map<String, Object>>> getCollectionsFiles(String collectionName) {
-        //是否有权限（若没有权限则返回错误）
+    public Result<CursorPage<Map<String, Object>>> getCollectionsFiles(
+            String collectionName, String cursor, Integer pageSize) {
+        // 是否有权限（若没有权限则返回错误）
         if (!milvusAclManager.getCollectionAcl(collectionName)) {
             log.info("getCollectionsMetadataNoACl:{}", collectionName);
             return Result.error(1, "无权限访问");
@@ -62,12 +65,18 @@ public class MilvusController {
         if (!milvusAclManager.userCollectionLoadAcl(collectionName)) {
             return Result.error(1, "未加载");
         }
-        return Result.success(milvusFileManager.getUserCollectionFiles(collectionName));
+        int size = (pageSize != null && pageSize > 0) ? pageSize : 20;
+        return Result.success(milvusFileManager.getUserCollectionFiles(collectionName, cursor, size));
+    }
+
+    @GetMapping("/metadata/number")
+    public Result<Integer> getCollectionsFileNumber(String collectionName) {
+        return Result.success(milvusCollectionService.getCollectionsFileNumber(collectionName));
     }
 
     @GetMapping("/metadata/user")
     public Result<List<Map<String, Object>>> getUserFiles() {
-        //是否有权限（若没有权限则返回错误）
+        // 是否有权限（若没有权限则返回错误）
         return Result.success(milvusFileManager.getUserFiles());
     }
 
@@ -78,7 +87,7 @@ public class MilvusController {
      * @return 匹配的集合名称列表
      */
     @PostMapping("/search")
-    public Result<List<String>> search(String str) {//权限隔离
+    public Result<List<String>> search(String str) {// 权限隔离
         List<String> searchCollectionNames = milvusCollectionService.search(str);
         return Result.success(searchCollectionNames);
     }
@@ -90,7 +99,7 @@ public class MilvusController {
      * @return 结果
      */
     @PostMapping("/create")
-    public Result<String> createCollection(String collectionName) {//增加权限
+    public Result<String> createCollection(String collectionName) {// 增加权限
         milvusCollectionService.createCollectionIfAbsent(collectionName);
         return Result.success("集合创建成功");
     }
@@ -103,7 +112,7 @@ public class MilvusController {
      */
     @PostMapping("/status")
     public Result<Boolean> getStatus(String collectionName) {
-        //集合文件读取权力（若没有权限则返回错误）
+        // 集合文件读取权力（若没有权限则返回错误）
         if (!milvusAclManager.getCollectionAcl(collectionName)) {
             log.info("getStatusNoACl:{}", collectionName);
             return Result.error(1, "无权限访问");
@@ -120,8 +129,8 @@ public class MilvusController {
      * @throws Exception 错误
      */
     @PostMapping("/loadOrunload")
-    public Result<String> unloadOrLoadCollection(String collectionName) throws Exception {//权限隔离
-        //读取权开关（若没有权限则返回错误）
+    public Result<String> unloadOrLoadCollection(String collectionName) throws Exception {// 权限隔离
+        // 读取权开关（若没有权限则返回错误）
         if (!milvusAclManager.getCollectionAcl(collectionName)) {
             log.info("unloadOrLoadCollectionNoACl:{}", collectionName);
             return Result.error(1, "无权限访问");
@@ -153,15 +162,15 @@ public class MilvusController {
 
     @PostMapping("/delete/doc")
     public Result<String> dropFileChunk(
-            @RequestParam Long chunkId,
+            @RequestParam int chunkId,
             @RequestParam String fileId,
             @RequestParam String collectionName) {
         log.info("文件:{}集合:{}", fileId, collectionName);
-        if (!milvusAclManager.getCollectionAcl(collectionName) || !milvusAclManager.getFileChunkAcl(fileId, Math.toIntExact(chunkId))) {
+        if (!milvusAclManager.getCollectionAcl(collectionName) || !milvusAclManager.getFileChunkAcl(fileId, chunkId)) {
             log.info("dropDocumentNoACl:{}", collectionName);
             return Result.error(1, "无权限访问");
         }
-        milvusFileManager.deleteDocument(chunkId, fileId);
+        milvusFileManager.deleteDocument(collectionName, chunkId, fileId);
         return Result.success("删除成功");
     }
 
@@ -176,6 +185,7 @@ public class MilvusController {
 
     /**
      * 分享文件的消息
+     * 
      * @param collectionName
      * @param fileId
      * @param userId
@@ -203,7 +213,9 @@ public class MilvusController {
             return Result.error(404, "用户不存在");
         }
         Integer normalizedChunkId = chunkId != null && chunkId > 0 ? chunkId : null;
-        String safeFileName = (fileName != null && !fileName.isBlank()) ? fileName.replace("\"", "\\\"").replace("\\", "\\\\") : "";
+        String safeFileName = (fileName != null && !fileName.isBlank())
+                ? fileName.replace("\"", "\\\"").replace("\\", "\\\\")
+                : "";
         String payload = "{\"type\":\"file_share\",\"collectionName\":\"" + collectionName
                 + "\",\"fileId\":\"" + fileId + "\",\"chunkId\":"
                 + (normalizedChunkId == null ? "null" : normalizedChunkId)
@@ -217,8 +229,7 @@ public class MilvusController {
                 String.valueOf(userId),
                 null,
                 sender.getName(),
-                "pending"
-        );
+                "pending");
         UserChatService.UserChatSendResult sendResult = userChatService.send(request);
 
         FileMessage message = FileMessage.builder()
@@ -244,6 +255,7 @@ public class MilvusController {
 
     /**
      * 确认接受后进行权限的设定
+     * 
      * @param collectionName
      * @param fileId
      * @param userId
@@ -251,16 +263,17 @@ public class MilvusController {
      * @return
      */
     @PostMapping("/share")
-    public Result<String> shareFiles(String collectionName ,String fileId , Long userId , int chunkId){
-        return milvusFileManager.shareFiles(collectionName, fileId , userId , chunkId);
+    public Result<String> shareFiles(String collectionName, String fileId, Long userId, int chunkId) {
+        return milvusFileManager.shareFiles(collectionName, fileId, userId, chunkId);
     }
 
     /**
      * 接收方接受文件分享 — 由接收方调用，直接授予权限
+     * 
      * @param collectionName 集合名称
-     * @param fileId 完整 doc_id（格式 filePart:000042）或 fileId
-     * @param chunkId 分块 ID（可选）
-     * @param senderId 发送方用户 ID（用于验证）
+     * @param fileId         完整 doc_id（格式 filePart:000042）或 fileId
+     * @param chunkId        分块 ID（可选）
+     * @param senderId       发送方用户 ID（用于验证）
      * @return
      */
     @PostMapping("/share/accept")
@@ -282,7 +295,8 @@ public class MilvusController {
             if (actualChunkId == 0) {
                 try {
                     actualChunkId = Integer.parseInt(fileId.substring(colonIdx + 1));
-                } catch (NumberFormatException ignored) {}
+                } catch (NumberFormatException ignored) {
+                }
             }
         }
 
@@ -297,13 +311,14 @@ public class MilvusController {
 
     /**
      * 接收方拒绝文件分享 — 删除聊天消息
+     * 
      * @param conversationId 对话 ID
-     * @param messageId 消息 ID
+     * @param messageId      消息 ID
      * @return
      */
     @PostMapping("/share/reject")
     public Result<String> rejectShare(
-            @RequestParam String conversationId,
+            @RequestParam Long conversationId,
             @RequestParam Long messageId) {
         User recipient = LoginUserInfoManager.getUser();
         if (recipient == null || recipient.getId() == null) {

@@ -45,7 +45,7 @@ public class Parser implements Ingestion {
         return "parser";
     }
 
-    @RagTraceNode(name = "解析", type = "上传管道")
+    @RagTraceNode(name = "解析", type = "上传管道",taskIdArg = "etlNode")
     public NodeResult execute(IngestionContext context, NodeConfig config) {
         Document document = context.getDocument();
         if (document == null) {

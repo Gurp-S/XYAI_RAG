@@ -1,5 +1,7 @@
 package com.XYai.myai.rag.rewrite;
 
+import cn.hutool.core.util.IdUtil;
+import com.XYai.myai.rag.aop.annotation.RagTraceContext;
 import com.XYai.myai.rag.chat.ModelInvocationService;
 import com.XYai.myai.rag.rewrite.pojo.RewriteResult;
 import com.XYai.myai.rag.rewrite.pojo.RewriterProperties;
@@ -84,7 +86,7 @@ public class QueryRewriter {
      * @param userQuestion 原始查询
      * @return 重写后的查询
      */
-    public RewriteResult rewrite(String userQuestion, String conversationId, String chatMessageId) {
+    public RewriteResult rewrite(String userQuestion, Long conversationId, Long chatMessageId) {
         // 简单规则重写
         String cleanUserQuery = QueryCleaner(userQuestion);
         // 判断是否开启llm
@@ -100,7 +102,7 @@ public class QueryRewriter {
      * @param userMessage 初始的 RewriteResult（可仅包含原始 query）
      * @return 重写并拆分后的 RewriteResult，失败时返回输入的 userMessage
      */
-    public RewriteResult callLLMRewriteAndSplit(RewriteResult userMessage, String conversationId, String chatMessageId) {
+    public RewriteResult callLLMRewriteAndSplit(RewriteResult userMessage, Long conversationId, Long chatMessageId) {
         // 1. 空值安全判断（修复：原代码直接 return null 导致上游报错）
         if (userMessage == null || userMessage.getRewrittenQuery() == null) {
             log.warn("输入的查询内容为空，直接返回原始对象");
@@ -128,9 +130,10 @@ public class QueryRewriter {
                 return userMessage;
             }
             // 5.2 token消耗保存
+            RagTraceContext.setPhase("查询重写");
             modelInvocationService.saveTokenUseAsync(
                     conversationId,
-                    chatMessageId + ":rewrite",
+                    IdUtil.getSnowflakeNextId(),
                     (long) prompt.toString().length(),
                     (long) rewrittenMessage.length(),
                     LoginUserInfoManager.getUserId(),

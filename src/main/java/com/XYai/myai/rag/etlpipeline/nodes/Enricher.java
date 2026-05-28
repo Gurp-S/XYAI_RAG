@@ -1,6 +1,7 @@
 package com.XYai.myai.rag.etlpipeline.nodes;
 
 import cn.hutool.core.util.IdUtil;
+import com.XYai.myai.rag.aop.annotation.RagTraceContext;
 import com.XYai.myai.rag.aop.annotation.RagTraceNode;
 import com.XYai.myai.rag.chat.ModelInvocationService;
 import com.XYai.myai.rag.etlpipeline.pojo.IngestionContext;
@@ -13,10 +14,9 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.document.Document;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -42,14 +42,14 @@ public class Enricher implements Ingestion {
     @Resource
     private ModelInvocationService modelInvocation;
     @Resource(name = "uploadExecutor")
-    private ThreadPoolTaskExecutor executor;
+    private TaskExecutor executor;
 
     @Override
     public String getNodeType() {
         return "enricher";
     }
 
-    @RagTraceNode(name = "增强", type = "上传管道")
+    @RagTraceNode(name = "增强", type = "上传管道" ,taskIdArg = "etlNode")
     public NodeResult execute(IngestionContext context, NodeConfig config) {
         if(pipelineProperties.getEnricherEnable()){return NodeResult.ok("增强未开启，跳过增强");}
         List<Document> chunks = context.getChunks();
@@ -163,10 +163,10 @@ public class Enricher implements Ingestion {
             long t1 = System.currentTimeMillis();
             String resp = chatModel.call(prompt).trim();
             long cost = System.currentTimeMillis() - t1;
-            String chatMessageId = IdUtil.getSnowflakeNextIdStr() + "_" + "_questions";
+            RagTraceContext.setPhase("文档增强-问题");
             modelInvocation.saveTokenUseAsync(
-                    LocalDateTime.now().toString(),
-                    chatMessageId,
+                    IdUtil.getSnowflakeNextId(),
+                    IdUtil.getSnowflakeNextId(),
                     (long) prompt.length(),
                     (long) resp.length(),
                     LoginUserInfoManager.getUserId(),
@@ -189,10 +189,10 @@ public class Enricher implements Ingestion {
             long t1 = System.currentTimeMillis();
             String resp = chatModel.call(prompt).trim();
             long cost = System.currentTimeMillis() - t1;
-            String chatMessageId = IdUtil.getSnowflakeNextIdStr() + "_" + "_Triples";
+            RagTraceContext.setPhase("文档增强-三元组");
             modelInvocation.saveTokenUseAsync(
-                    LocalDateTime.now().toString(),
-                    chatMessageId,
+                    IdUtil.getSnowflakeNextId(),
+                    IdUtil.getSnowflakeNextId(),
                     (long) prompt.length(),
                     (long) resp.length(),
                     LoginUserInfoManager.getUserId(),

@@ -15,8 +15,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.redisson.api.RSet;
-import org.redisson.api.RedissonClient;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
@@ -24,7 +22,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -55,8 +53,6 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
     @Resource
     private IntentProperties intentProperties;
     @Resource
-    private RedissonClient redissonClient;
-    @Resource
     private MilvusVectorStoreConfig milvusVectorStoreConfig;
     @Resource
     private IKAnalyzerTokenize ikAnalyzerTokenize;
@@ -64,7 +60,7 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
     private List<Document> docs;
 
     @Resource(name = "intentExecutor")
-    private ThreadPoolTaskExecutor intentExecutor;
+    private TaskExecutor intentExecutor;
 
     /**
      * 识别一组查询（可能包含拆分后的子问题）并返回意图列表。
@@ -247,7 +243,7 @@ public class IntentRecognitionServiceIml implements IntentRecognitionService {
             List<IntentNode> leafNodes = subIntent == null ? List.of() : subIntent;
             // 1. 查叶子节点
             // 1.1先查redis失败查mysql
-            RSet<Object> set = redissonClient.getSet(RedisKeyConfig.intentNodeLeaveKey());
+            Set<String> set = stringRedisTemplate.opsForSet().members(RedisKeyConfig.intentNodeLeaveKey());
             if (leafNodes.isEmpty()) {
                 leafNodes = set.stream().map(o -> JSON.parseObject(o.toString(), IntentNode.class)).toList();
             }

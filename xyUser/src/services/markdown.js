@@ -246,7 +246,17 @@ function convertInlineCodeWithNewlines(md) {
     return placeholder(idx);
   });
 
-  const processed = withoutFences.replace(/`([^`]*\n[^`]*)`/g, (m, g1) => {
+  // Protect single-line inline codes first so the multi-line regex
+  // below cannot match from a closing backtick of one inline code
+  // to the opening backtick of another across newlines.
+  const inlineRegex = /`[^`\n]*`/g;
+  const inlineBlocks = [];
+  const withoutInline = withoutFences.replace(inlineRegex, (m) => {
+    inlineBlocks.push(m);
+    return `@@INLINE_CODE_${inlineBlocks.length - 1}@@`;
+  });
+
+  const processed = withoutInline.replace(/`([^`\n]*\n[^`]*)`/g, (m, g1) => {
     // If the captured content begins or ends with ```, it's likely a broken
     // code block marker, skip conversion to avoid doubling up.
     if (/^\s*```|```\s*$/.test(g1)) {
@@ -256,11 +266,131 @@ function convertInlineCodeWithNewlines(md) {
     return "```text\n" + inner + "\n```";
   });
 
-  return processed.replace(
+  const withInline = processed.replace(
+    /@@INLINE_CODE_(\d+)@@/g,
+    (_, idx) => inlineBlocks[Number(idx)] || "",
+  );
+  return withInline.replace(
     /@@CODE_BLOCK_(\d+)@@/g,
-    (m, idx) => codeBlocks[Number(idx)] || "",
+    (_, idx) => codeBlocks[Number(idx)] || "",
   );
 }
+
+
+// Auto-detect unfenced code blocks and wrap them in backtick fences.
+// Uses heuristics: indentation, comments, braces, and known code keywords.
+function autoFenceCodeBlocks(md) {
+  if (!md) return md;
+
+  const lines = md.split("\n");
+  const output = [];
+  const buf = [];
+  let inFence = false;
+
+  const codeKeywords = [
+    "public", "private", "protected", "class", "interface", "enum",
+    "extends", "implements", "import", "package", "return", "if", "else",
+    "for", "while", "do", "switch", "case", "break", "continue",
+    "try", "catch", "finally", "throw", "throws", "new", "this", "super",
+    "static", "final", "abstract", "synchronized", "volatile", "transient",
+    "def", "val", "var", "fun", "async", "await", "let", "const",
+    "function", "using", "namespace", "type", "record", "struct",
+    "int", "float", "double", "long", "boolean", "char", "byte", "short",
+    "void", "string", "when", "object", "trait", "sealed",
+    "data", "open", "inner", "override",
+  ];
+  const keywordPattern = new RegExp(
+    "^\\s{0,3}(" + codeKeywords.join("|") + ")\\b"
+  );
+
+  function isCodeLine(line) {
+    const trimmed = line.trim();
+    if (!trimmed) return false;
+
+    // --- Exclude common markdown patterns (checked before code patterns) ---
+
+    // Markdown unordered list:   * text, - text, + text (0-3 spaces indent)
+    if (/^\s{0,3}([-*+])\s/.test(trimmed)) return false;
+    // Markdown ordered list:   1. text, 1) text
+    if (/^\s{0,3}\d+[.)]\s/.test(trimmed)) return false;
+    // Markdown blockquotes
+    if (/^\s{0,3}>/.test(trimmed)) return false;
+    // Markdown ATX headings
+    if (/^\s{0,3}#{1,6}\s/.test(trimmed)) return false;
+    // Markdown horizontal rules
+    if (/^\s{0,3}[-*_]{3,}\s*$/.test(trimmed)) return false;
+    // Markdown table rows (pipe-delimited)
+    if (/^\s*\|/.test(trimmed) || /\|\s*$/.test(trimmed)) return false;
+
+    // --- Code detection patterns ---
+
+    // Comment lines
+    if (/^\/\//.test(trimmed) || /^\/\*/.test(trimmed)) return true;
+
+    // Block comment continuation lines (require leading indent to avoid bold/italic conflict)
+    if (/^\s+\*\s/.test(line)) return true;
+
+    // Single braces
+    if (/^[\{\}]$/.test(trimmed)) return true;
+
+    // Closing brace + keyword: } else if, } catch, } finally, } while
+    if (/^}\s*(else|catch|finally|do|while)\b/.test(trimmed)) return true;
+
+    // Lines ending in opening brace (Java/Kotlin style)
+    if (/\{\s*$/.test(trimmed)) return true;
+
+    // 4+ spaces indent (standard markdown code convention)
+    if (/^\s{4,}/.test(line)) return true;
+
+    // Code keyword at line start (allows 0-3 leading spaces)
+    if (keywordPattern.test(line)) return true;
+
+    // Type keyword + word chars + assignment: e.g., "intremaining = ..."
+    if (/^\s{0,3}(?:int|float|double|long|boolean|char|byte|short|void|string)\w*\s*=/.test(trimmed)) return true;
+
+    return false;
+  }
+
+  function flush() {
+    if (buf.length === 0) return;
+    // Single-line "brace-only" lines not worth fencing
+    if (buf.length === 1 && /^\s*[\{\}]$/.test(buf[0])) {
+      output.push(buf[0]);
+      buf.length = 0;
+      return;
+    }
+    const code = buf.join("\n");
+    output.push("```\n" + code + "\n```");
+    buf.length = 0;
+  }
+
+  for (const line of lines) {
+    // Track existing fenced blocks so we don't re-fence their content
+    if (/^```/.test(line.trim())) {
+      flush();
+      inFence = !inFence;
+      output.push(line);
+      continue;
+    }
+    if (inFence) {
+      output.push(line);
+      continue;
+    }
+
+    if (isCodeLine(line)) {
+      buf.push(line);
+    } else if (!line.trim() && buf.length > 0) {
+      buf.push(line); // empty line inside code
+    } else {
+      flush();
+      output.push(line);
+    }
+  }
+  flush();
+
+  return output.join("\n");
+}
+
 
 export function renderAssistantMarkdown(rawText) {
   let content = String(rawText || "").replace(/\r\n/g, "\n");
@@ -280,23 +410,37 @@ export function renderAssistantMarkdown(rawText) {
   // Remove zero-width characters
   content = content.replace(/\u200B|\u200C|\u200D|\uFEFF/g, "");
 
-  // Fix lines with 3+ opening backticks but a single (or no) closing backtick.
-  // These are likely broken inline code (triple-backtick typo), not fenced blocks.
-  // e.g.  ```O(1)...`  \u2192  `O(1)...`   (opening 3+, closing 1)
+  // Convert non-standard list symbols (\u00B7 \u2022 \u25CF \u25AA etc.) to standard markdown -
+  content = content.replace(/^(\s*)[\u00B7\uF0B7\u2022\u25CF\u25AA] /gm, "$1- ");
+
+  // Step A1: Insert a space between inline code and any immediately-following
+  // backtick sequence (1+ backticks). Without this space, marked cannot find
+  // a valid closing delimiter because the closing backtick would be part of a
+  // longer backtick string, violating GFM inline code rules.
+  // Must run BEFORE step B so the inline-code closer is not consumed as
+  // part of a 3+-backtick sequence.
+  // e.g.  `code```text  \u2192  `code` ``text
+  content = content.replace(/(?<=^|\s)(`[^`\n]+`)(`+)/g, '$1 $2');
+
+  // Step A2: Replace triple-backtick-after-inline-code with a placeholder
+  // to prevent fixBrokenInlineFence from breaking it (matching 2 backticks
+  // as empty inline code, then parity check adding more).
+  // e.g.  `code` ```text  \u2192  `code` @@XY_TRIPLE_BT@@text
+  content = content.replace(/(?<=^|\s)(`[^`\n]+`)\s*(```)(\w*)/g, '$1 @@XY_TRIPLE_BT@@$3');
+
+  // Step B: Fix lines with 3+ opening backticks but a single (or no) closing
+  // backtick. These are likely broken inline code (triple-backtick typo), not
+  // fenced blocks.  e.g.  ```O(1)...`  \u2192  `O(1)...`
   content = content.replace(/(`{3,})([^`\n]*)`/g, (m, open, inner) => {
     if (open.length >= 3) return "`" + inner + "`";
     return m;
   });
 
-  // Prevent inline-code-followed-by-triple-backtick from creating unintended
-  // fenced code blocks that consume the rest of the document.
-  // e.g.  `0x61c88647```text  \u2192  `0x61c88647` @@XY_TRIPLE_BT@@text
-  content = content.replace(/(`[^`\n]+`)(```)/g, '$1 @@XY_TRIPLE_BT@@');
-
   const fixedFence = fixBrokenInlineFence(content);
   const normalizedHeadings = ensureHeadingSpacing(fixedFence);
+  const autoFenced = autoFenceCodeBlocks(normalizedHeadings);
   const normalizedInlineCode =
-    convertInlineCodeWithNewlines(normalizedHeadings);
+    convertInlineCodeWithNewlines(autoFenced);
   const unescaped = unescapeMarkdownEscapes(normalizedInlineCode);
   const withToc = injectTocPlaceholders(unescaped);
   const withMath = renderWithMath(withToc);
@@ -316,6 +460,7 @@ export function renderAssistantMarkdown(rawText) {
         "class",
         "data-language",
         "title",
+        "id",
       ],
       ALLOW_DATA_ATTR: true,
     });

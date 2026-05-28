@@ -11,7 +11,7 @@ import com.XYai.myai.user.LoginUserInfoManager;
 import com.XYai.myai.user.pojo.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.crypto.Mac;
@@ -39,7 +39,7 @@ public class OssController {
     private ObjectMapper objectMapper; // for JSON (可注入，也可 new ObjectMapper())
 
     @Resource(name = "uploadExecutor")
-    private ThreadPoolTaskExecutor uploadExecutor;
+    private TaskExecutor uploadExecutor;
 
     @Resource
     private PipelineDefinitionFactory pipelineDefinitionFactory;

@@ -41,7 +41,7 @@ public class RerankPostProcessor implements SearchResultPostProcessor {
     }
 
     @Override
-    @RagTraceNode(name = "rerank", type = "process")
+    @RagTraceNode(name = "rerank", type = "process" ,taskIdArg = "processRoot")
     public List<RetrievedChunk> process(List<RetrievedChunk> chunks, SearchContext context) {
         if (chunks == null || chunks.isEmpty()) {
             return List.of();

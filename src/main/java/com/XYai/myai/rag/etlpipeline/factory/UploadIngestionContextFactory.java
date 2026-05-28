@@ -36,7 +36,8 @@ public class UploadIngestionContextFactory {
      * @return 封装完成的 IngestionContext 上下文对象
      * @throws IOException 文件读取IO异常
      */
-    public IngestionContext create(MultipartFile file, String collectionName, User user, String fileHashId, List<Long> copyChunks)
+    public IngestionContext create(MultipartFile file, String collectionName, User user, String fileHashId,
+            List<Integer> copyChunks)
             throws IOException {
         String fileName = safeFileName(file);
         String kbId = IdUtil.getSnowflakeNextIdStr();
@@ -60,10 +61,10 @@ public class UploadIngestionContextFactory {
      * 外部来源入口：URL、本地文件路径都可以统一走这里。
      */
     public IngestionContext createFromSource(String sourceUri,
-                                             String sourceType,
-                                             String collectionName,
-                                             String kbId,
-                                             User user) { // 加 user
+            String sourceType,
+            String collectionName,
+            String kbId,
+            User user) { // 加 user
         return createContext("1", sourceUri, sourceType, null, null, collectionName, kbId, null, null, List.of(), user);
     }
 
@@ -80,16 +81,16 @@ public class UploadIngestionContextFactory {
      * 核心：创建上下文（已加入权限）
      */
     private IngestionContext createContext(String fileHashId,
-                                           String sourceUri,
-                                           String sourceType,
-                                           byte[] rawBytes,
-                                           String mimeType,
-                                           String collectionName,
-                                           String kbId,
-                                           String fileName,
-                                           Long fileSize,
-                                           List<Long> copyChunks,
-                                           User user) {
+            String sourceUri,
+            String sourceType,
+            byte[] rawBytes,
+            String mimeType,
+            String collectionName,
+            String kbId,
+            String fileName,
+            Long fileSize,
+            List<Integer> copyChunks,
+            User user) {
         Map<String, Object> metadata = new HashMap<>();
         metadata.put(IngestionContext.META_FILE_ID, fileHashId);
         metadata.put(IngestionContext.META_SOURCE_URI, sourceUri);
@@ -106,8 +107,8 @@ public class UploadIngestionContextFactory {
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
         // ====================== 【自动注入权限字段】 ======================
-            // 默认私有
-            metadata.put(IngestionContext.META_VISIBILITY, "private");
+        // 默认私有
+        metadata.put(IngestionContext.META_VISIBILITY, "private");
         // 构建文档
         Document document = Document.builder()
                 .text("")

@@ -1,24 +1,43 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
 /**
- * Calculate table max-height for fixed-height layouts.
- * @param {number} extraOffset - Additional offset to subtract (filters, headers, etc.)
+ * Calculate table max-height so the table fills available viewport space.
+ * Measures the .card-table element's actual position for accuracy.
+ * @param {number} extraOffset - Additional offset to subtract
  */
 export function useTableHeight(extraOffset = 0) {
-  const tableHeight = ref(500)
+  const tableHeight = ref(400)
 
   function calc() {
-    const headerH = 56       // header bar
-    const padding = 20       // .content padding (10*2)
-    const viewHeader = 36    // .view__header area (reduced)
-    const cardHeader = 40    // el-card header (reduced)
-    const pagination = 44    // pagination area (reduced)
-    const cardPad = 24       // card body padding (12*2, reduced)
-    tableHeight.value = window.innerHeight - headerH - padding - viewHeader - cardHeader - pagination - cardPad - extraOffset
+    // Find the card-table element in the current page
+    const cardTable = document.querySelector('.card-table')
+    if (cardTable) {
+      const rect = cardTable.getBoundingClientRect()
+      // Available height: viewport bottom → card top, minus pagination area
+      const paginationArea = 56
+      tableHeight.value = window.innerHeight - rect.top - paginationArea - extraOffset
+    } else {
+      // Fallback: use hardcoded estimate
+      tableHeight.value = window.innerHeight - 200 - extraOffset
+    }
   }
 
-  onMounted(calc)
-  // Don't listen for resize to avoid flicker; recalc on demand
+  let observer = null
+  onMounted(() => {
+    // Wait a tick for DOM to fully render
+    requestAnimationFrame(() => {
+      calc()
+      // Watch for layout changes (sidebar toggle, filter wrap, etc.)
+      const cardTable = document.querySelector('.card-table')
+      if (cardTable) {
+        observer = new ResizeObserver(calc)
+        observer.observe(cardTable)
+      }
+    })
+  })
+  onUnmounted(() => {
+    if (observer) observer.disconnect()
+  })
 
   return { tableHeight, recalc: calc }
 }

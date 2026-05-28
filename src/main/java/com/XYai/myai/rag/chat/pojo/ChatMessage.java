@@ -15,9 +15,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChatMessage {
     /**
-     * 消息ID，格式 conversationId:seqNo
+     * 消息ID，雪花算法
      */
-    String chatMessageId;
+    Long chatMessageId;
 
     /**
      * 用户的原始输入消息

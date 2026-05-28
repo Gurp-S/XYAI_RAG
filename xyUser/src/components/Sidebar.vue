@@ -10,13 +10,13 @@
     </div>
     <div class="menu">
         <div class="history-label">工作区</div>
-        <div id="navChat" class="menu-item" title="聊天会话" :class="{ active: isChatHomeActive }" @click="switchToChat">
+        <div id="navChat" class="menu-item" :class="{ active: isChatHomeActive }" @click="switchToChat">
             <svg viewBox="0 0 24 24">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
             </svg>
             <span>聊天会话</span>
         </div>
-        <div id="navDB" class="menu-item" title="向量数据库" :class="{ active: isDbRoute }" @click="switchToDb">
+        <div id="navDB" class="menu-item" :class="{ active: isDbRoute }" @click="switchToDb">
             <svg viewBox="0 0 24 24">
                 <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
                 <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
@@ -39,7 +39,7 @@
         />
     </div>
 
-    <div class="user-profile" title="用户中心" @click.stop="toggleUserCenter()">
+    <div class="user-profile" @click.stop="toggleUserCenter()">
         <div class="user-profile-main">
                         <div class="user-avatar-inner" :class="{ offline: !store.currentUser }">
                                 <template v-if="store.currentUser && store.currentUser.avatar">
@@ -57,7 +57,7 @@
             </div>
         </div>
         
-        <button v-if="store.currentUser" class="logout-btn" title="退出登录" @click.stop="handleLogout">
+        <button v-if="store.currentUser" class="logout-btn" @click.stop="handleLogout">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                 <polyline points="16 17 21 12 16 7"></polyline>
