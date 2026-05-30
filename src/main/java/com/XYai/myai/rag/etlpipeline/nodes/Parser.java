@@ -11,8 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
-import org.apache.tika.sax.BodyContentHandler;
-import org.apache.tika.sax.WriteOutContentHandler;
+import org.apache.tika.sax.ToXMLContentHandler;
 import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -32,7 +31,7 @@ public class Parser implements Ingestion {
 
     @Resource
     private PipelineProperties pipelineProperties;
-    
+
     // 纯文本格式白名单
     private static final Set<String> TEXT_MIME_TYPES = Set.of(
             "text/plain", "text/html", "text/xml", "text/csv", "text/markdown",
@@ -119,21 +118,26 @@ public class Parser implements Ingestion {
         ParseContext parseContext = new ParseContext();
 
         try (ByteArrayInputStream input = new ByteArrayInputStream(rawBytes)) {
-            WriteOutContentHandler handler = new WriteOutContentHandler(10000000);
+            // 修改为 ToXMLContentHandler 以保留文档结构
+            ToXMLContentHandler handler = new ToXMLContentHandler();
             AutoDetectParser parser = new AutoDetectParser();
             parser.parse(input, handler, metadata, parseContext);
-            String text = handler.toString();
-            if (StringUtils.hasText(text)) {
+            String xhtml = handler.toString();
+
+            if (StringUtils.hasText(xhtml)) {
+                // 将 XHTML 转换为 Markdown 格式，保留标题、段落等结构
+                String markdown = convertXhtmlToMarkdown(xhtml);
+
                 // 直接将 Tika 提取的元数据写入文档
                 Map<String, Object> docMeta = context.getDocument().getMetadata();
                 for (String name : metadata.names()) {
                     docMeta.put(name, metadata.get(name));
                 }
-                // 如果之前没有 MIME 类型m使用 Tika 检测到的
+                // 如果之前没有 MIME 类型，使用 Tika 检测到的
                 if (!StringUtils.hasText(mimeType) && metadata.get(Metadata.CONTENT_TYPE) != null) {
                     docMeta.put(IngestionContext.META_MIME_TYPE, metadata.get(Metadata.CONTENT_TYPE));
                 }
-                return text;
+                return markdown;
             }
         } catch (Exception ex) {
             // Tika 解析失败直接解码
@@ -147,5 +151,45 @@ public class Parser implements Ingestion {
             RagTraceContext.setNodeWarn("Tika解析长度受限: " + ex.getMessage());
         }
         return null;
+    }
+
+    /**
+     * 将 Tika 输出的 XHTML 转换为 Markdown 格式，以便 Chunker 准确识别标题和段落。
+     */
+    private String convertXhtmlToMarkdown(String xhtml) {
+        // 移除 XML 声明和 HTML 外层标签，只取 body 内容
+        String body = xhtml.replaceAll("(?s)<\\?xml[^>]*\\?>", "");
+        body = body.replaceAll("(?s)<html[^>]*>|</html>", "");
+        body = body.replaceAll("(?s)<head[^>]*>.*?</head>", "");
+        body = body.replaceAll("(?s)<body[^>]*>|</body>", "");
+
+        // 标题标签转为 Markdown 标题 (h1-h6)
+        for (int i = 1; i <= 6; i++) {
+            String tag = "h" + i;
+            String prefix = "#".repeat(i) + " ";
+            body = body.replaceAll("(?s)<" + tag + "[^>]*>(.*?)</" + tag + ">",
+                    "\n\n" + prefix + "$1\n\n");
+        }
+
+        // 段落标签转为空行分隔的纯文本
+        body = body.replaceAll("(?s)<p[^>]*>(.*?)</p>", "\n\n$1\n\n");
+
+        // 换行标签转为换行符
+        body = body.replaceAll("<br\\s*/?>", "\n");
+
+        // 移除所有剩余 XML 标签，保留内部文本
+        body = body.replaceAll("<[^>]+>", "");
+
+        // 解码常见 HTML 实体
+        body = body.replace("&lt;", "<")
+                .replace("&gt;", ">")
+                .replace("&amp;", "&")
+                .replace("&quot;", "\"")
+                .replace("&apos;", "'")
+                .replace("&nbsp;", " ");
+
+        // 压缩多余空行为最多两个换行
+        body = body.replaceAll("\\n{3,}", "\n\n");
+        return body.trim();
     }
 }

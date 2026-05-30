@@ -70,6 +70,7 @@ export default defineConfig({
     // 监听 IPv6 未指定地址
     host: "::",
     port: 5173,
+    allowedHosts: ["www.xyoct21.cn", "xyoct21.cn"],
     proxy: {
       "/upload": { target: "http://localhost:8080", changeOrigin: true },
       "/ai": { target: "http://localhost:8080", changeOrigin: true },
@@ -78,7 +79,7 @@ export default defineConfig({
       "/oss": { target: "http://localhost:8080", changeOrigin: true },
       "/evaluate": { target: "http://localhost:8080", changeOrigin: true },
       "/metadata": { target: "http://localhost:8080", changeOrigin: true },
-      "/xyAdmin": { target: "http://localhost:8080", changeOrigin: true }
+      "/xyAdmin": { target: "http://localhost:8080", changeOrigin: true },
     },
   },
   build: {

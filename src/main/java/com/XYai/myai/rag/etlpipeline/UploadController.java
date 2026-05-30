@@ -7,27 +7,24 @@ import com.XYai.myai.rag.aop.annotation.RagTraceRoot;
 import com.XYai.myai.rag.aop.annotation.RateLimit;
 import com.XYai.myai.rag.etlpipeline.factory.PipelineDefinitionFactory;
 import com.XYai.myai.rag.etlpipeline.factory.UploadIngestionContextFactory;
+import com.XYai.myai.rag.etlpipeline.kafka.FileUploadEvent;
 import com.XYai.myai.rag.etlpipeline.oss.OssService;
 import com.XYai.myai.rag.etlpipeline.pojo.*;
 import com.XYai.myai.rag.milvus.MilvusFileManager;
 import com.XYai.myai.user.LoginUserInfoManager;
 import com.XYai.myai.user.pojo.User;
+import com.alibaba.fastjson2.JSON;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.MediaType;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.alibaba.fastjson2.JSON;
-import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.File;
@@ -38,11 +35,8 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.UUID;
+import java.util.concurrent.*;
 
 @Slf4j
 @RestController
@@ -65,6 +59,8 @@ public class UploadController {
     private UploadTaskStore uploadTaskStore;
     @Resource
     private MilvusFileManager milvusFileManager;
+    @Resource
+    private KafkaTemplate<String, Object> kafkaTemplate;
     @Resource(name = "uploadExecutor")
     private TaskExecutor uploadExecutor;
 
@@ -340,7 +336,17 @@ public class UploadController {
             return false;
         }
         String fileName = safeFileName(file);
+        try {
+            String taskId = IdUtil.getSnowflakeNextId() + "";
+            FileUploadEvent fileUploadEvent = new FileUploadEvent(
+                    taskId,file.getBytes(),fileName,collectionName,
+                    user.getId(), UUID.randomUUID().toString()
+            );
+            kafkaTemplate.send("etl-file",fileHashId,fileUploadEvent);
 
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         try {
             // OSS 上传（失败仅记录，不中断后续处理）
             if (uploadProperties.getOssEnabled()) {

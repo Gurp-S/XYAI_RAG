@@ -5,9 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.ollama.OllamaEmbeddingModel;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,19 +56,19 @@ public class MultiChatClientConfig {
 
     // ==================== Embedding ====================
 
-    @Bean
-    @Primary
-    public EmbeddingModel embeddingModel(OpenAiEmbeddingModel openAiEmbeddingModel) {
-        return openAiEmbeddingModel;
-    }
-
-
 //    @Bean
 //    @Primary
-//    public EmbeddingModel embeddingModel(OllamaEmbeddingModel ollamaEmbeddingModel) {
-//        return ollamaEmbeddingModel;
+//    public EmbeddingModel embeddingModel(OpenAiEmbeddingModel openAiEmbeddingModel) {
+//        return openAiEmbeddingModel;
 //    }
-//
+
+
+    @Bean
+    @Primary
+    public EmbeddingModel embeddingModel(OllamaEmbeddingModel ollamaEmbeddingModel) {
+        return ollamaEmbeddingModel;
+    }
+
 
     // ==================== 结构化输出专用 Bean（兼容旧引用） ====================
 

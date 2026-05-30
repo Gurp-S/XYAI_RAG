@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -40,7 +39,7 @@ public class PipelineProperties {
     @Builder.Default
     private int maxNumChunks = 1024;
     @Builder.Default
-    private int minChunkSizeChars = 384;
+    private int minChunkSizeChars = 256;
     /** 默认分块重叠大小 */
     @Builder.Default
     private int defaultOverlapSize = 128;

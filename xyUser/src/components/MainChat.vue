@@ -895,12 +895,10 @@ async function handleDownloadFile(file) {
 
 async function sendContactMessage(messageText) {
   try {
-    const convId =
-      store.activeConversationId ||
-      (store.activeConversationId =
-        typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-          ? crypto.randomUUID()
-          : `conv_${Date.now()}_${Math.random().toString(16).slice(2)}`);
+    // 用户对话用后端生成 conversationId，不传客户端自定义值
+    const convId = /^\d+$/.test(String(store.activeConversationId || ""))
+      ? store.activeConversationId
+      : undefined;
 
     const requestBody = {
       message: messageText,
@@ -977,7 +975,10 @@ async function performAiChat(message, userMsgIndex, options = {}) {
     messages.value[assistantIndex].ragData = null;
   }
 
-  let requestConversationId = store.activeConversationId;
+  // 确保 conversationId 为数字字符串，防止后端 Long 反序列化失败
+  let requestConversationId = /^\d+$/.test(String(store.activeConversationId || ""))
+    ? store.activeConversationId
+    : undefined;
   if (currentAbortController) {
     currentAbortController.abort();
   }

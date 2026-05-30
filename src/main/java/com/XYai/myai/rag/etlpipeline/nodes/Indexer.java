@@ -22,6 +22,7 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
@@ -66,6 +67,7 @@ public class Indexer implements Ingestion {
         return "indexer";
     }
 
+    @Transactional
     @RagTraceNode(name = "执行入库", type = "上传管道",taskIdArg = "etlNode")
     public NodeResult execute(IngestionContext context, NodeConfig config) {
         List<Document> chunks = context.getChunks();

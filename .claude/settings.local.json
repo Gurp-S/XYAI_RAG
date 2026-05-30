@@ -89,7 +89,8 @@
       "Bash(node /tmp/test_esc2.js)",
       "Bash(node d:/lea/xyai/xyUser/src/test_esc.js)",
       "Bash(del d:/lea/xyai/xyUser/src/test_esc.js)",
-      "Bash(/d/lea/maven/bin/mvn compile *)"
+      "Bash(/d/lea/maven/bin/mvn compile *)",
+      "Bash(curl -sL \"https://www.xyoct21.cn/src/main.js\")"
     ],
     "additionalDirectories": [
       "d:\\lea\\xyai\\frontend\\xyAdmin\\src"
