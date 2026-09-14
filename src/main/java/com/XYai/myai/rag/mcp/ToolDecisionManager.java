@@ -2,12 +2,12 @@ package com.XYai.myai.rag.mcp;
 
 import cn.hutool.core.util.IdUtil;
 import com.XYai.myai.rag.aop.annotation.RagTraceContext;
-import com.XYai.myai.rag.aop.annotation.RagTraceNode;
-import com.XYai.myai.rag.chat.ModelInvocationService;
+import com.XYai.myai.rag.kafka.event.AnalyticsEvent;
 import com.XYai.myai.rag.mcp.pojo.McpToolDecision;
 import com.XYai.myai.rag.mcp.pojo.ToolProcessorResult;
 import com.XYai.myai.rag.memory.pojo.LoadSession;
 import com.XYai.myai.user.LoginUserInfoManager;
+import com.XYai.myai.xyAdmin.pojo.TokenUse;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import jakarta.annotation.PostConstruct;
@@ -20,6 +20,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -82,7 +83,7 @@ public class ToolDecisionManager {
     @Resource
     private ArgumentExtractor argumentExtractor;
     @Resource
-    private ModelInvocationService modelInvocation;
+    private KafkaTemplate<String, Object> kafkaTemplate;
     @Resource
     private McpToolToggleRegistry toolToggleRegistry;
 
@@ -176,14 +177,18 @@ public class ToolDecisionManager {
         String cleaned = cleanJsonResponse(rawResponse);
         log.info("[MCP_DECISION] 清理后的JSON: {}", cleaned);
         RagTraceContext.setPhase("MCP决策");
-        modelInvocation.saveTokenUseAsync(
+        TokenUse tokenUse = new TokenUse(
                 conversationId,
                 IdUtil.getSnowflakeNextId(),
-                (long) prompt.toString().length(),
-                (long) rawResponse.length(),
+                prompt.toString().length(),
+                rawResponse.length(),
                 LoginUserInfoManager.getUserId(),
                 cost,
                 chatModel.getDefaultOptions().getModel(), "mcp");
+        kafkaTemplate.send("analytics-event", null, new AnalyticsEvent(
+                UUID.randomUUID().toString(),"evaluate",
+                null,tokenUse,null
+        ));
         try {
             List<McpToolDecision> decisions = JSON.parseObject(cleaned, new TypeReference<List<McpToolDecision>>() {
             });

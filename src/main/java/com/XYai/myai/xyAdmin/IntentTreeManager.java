@@ -1,5 +1,7 @@
 package com.XYai.myai.xyAdmin;
 
+import com.XYai.myai.security.annotation.AdminOnly;
+
 import com.XYai.myai.config.Result;
 import com.XYai.myai.mapper.IntentNodeMapper;
 import com.XYai.myai.rag.intent.pojo.IntentNode;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
+@AdminOnly
 @RestController
 @RequestMapping("/xyAdmin/intent")
 public class IntentTreeManager {

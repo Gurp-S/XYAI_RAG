@@ -1,8 +1,12 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/spring-io/spring-boot/main/spring-boot-project/spring-boot-configuration-processor/src/test/resources/schema.json
 spring:
   application:
     name: My-AI
   profiles:
     active: local
+  threads:
+    virtual:
+      enabled: true   # Tomcat 请求处理改用虚拟线程（Java21），万级并发连接不占平台线程
   server:
     address: "::"
     port: 8080
@@ -11,6 +15,11 @@ spring:
     username: ${SPRING_MYSQL_USERNAME:}
     password: ${SPRING_MYSQL_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 50      # 高并发 JDBC 池（阻塞型连接，须与虚拟线程解耦）
+      minimum-idle: 10
+      connection-timeout: 5000
+      max-lifetime: 1800000
   sql:
     init:
       mode: always
@@ -23,15 +32,18 @@ spring:
       timeout: 3s
       lettuce:
         pool:
-          max-active: 16
-          max-idle: 8
-          min-idle: 2
+          max-active: 64         # 高并发 Redis 连接池
+          max-idle: 32
+          min-idle: 8
   servlet:
     multipart:
       max-file-size: 100MB      # 单个文件最大大小
       max-request-size: 100MB
   neo4j:
     uri: bolt://localhost:7687
+    pool:
+      max-connection-pool-size: 300   # 高并发图查询池（默认100，压测中排队满）
+      connection-acquisition-timeout: 5s
     authentication:
       username: ${spring.neo4j.authentication.username}
       password: ${spring.neo4j.authentication.username:}
@@ -63,7 +75,7 @@ spring:
       embedding:
         enabled: false
         options:
-          model: qwen3-embedding
+          model: qwen3-embedding:0.6b
       rerank:
         options:
           model: qwen3-reranker-0.6b
@@ -75,7 +87,7 @@ spring:
           port: 19530
         database-name: my_xy
         collection-name: my_ai
-        embedding-dimension: 1024
+        embedding-dimension: 768
         metric-type: COSINE
         initialize-schema: true
         index-type: ivf_flat
@@ -88,6 +100,38 @@ spring:
           enabled: true
         name: mcp-client
         type: async
+    kafka:
+      bootstrap-servers: localhost:9092
+      producer:
+        key-serializer: org.apache.kafka.common.serialization.StringSerializer
+        value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+        properties:
+          spring.json.type.mapping: >
+            fileUploadEvent:com.XYai.myai.rag.kafka.event.FileUploadEvent,
+            chunkEvent:com.XYai.myai.rag.kafka.event.ChunkEvent,
+            aclCommandEvent:com.XYai.myai.rag.kafka.event.AclCommandEvent,
+            analyticsEvent:com.XYai.myai.rag.kafka.event.AnalyticsEvent,
+            memoryEvent:com.XYai.myai.rag.kafka.event.MemoryEvent,
+            neo4jEvent:com.XYai.myai.rag.kafka.event.Neo4jEvent,
+            traceLogEvent:com.XYai.myai.rag.kafka.event.TraceLogEvent
+      consumer:
+        group-id: xyai-default
+        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+        properties:
+          spring.json.type.mapping: >
+            com.XYai.myai.rag.kafka.event.FileUploadEvent:fileUploadEvent,
+            com.XYai.myai.rag.kafka.event.ChunkEvent:chunkEvent,
+            com.XYai.myai.rag.kafka.event.AclCommandEvent:aclCommandEvent,
+            com.XYai.myai.rag.kafka.event.AnalyticsEvent:analyticsEvent,
+            com.XYai.myai.rag.kafka.event.MemoryEvent:memoryEvent,
+            com.XYai.myai.rag.kafka.event.Neo4jEvent:neo4jEvent,
+            com.XYai.myai.rag.kafka.event.TraceLogEvent:traceLogEvent
+          spring.json.trusted.packages: "*"
+        enable-auto-commit: false
+        auto-offset-reset: earliest
+      listener:
+        ack-mode: manual
 
 
 # 模型路由配置（顶级配置）
@@ -242,10 +286,85 @@ jwt:
   refresh-token-exp-sec: 1209600
   refresh-cookie-name: refresh_token
   http-secure: true
-  rsa-private-key-path: classpath:keys/private_pkcs8.pem
-  rsa-public-key-path: classpath:keys/public_x509.pem
-retrieval:
-  rerank-l-lM: false
+  # Prefer PEM from env/secret store in production. File path is local-dev fallback only.
+  rsa-private-key: ${JWT_RSA_PRIVATE_KEY:}
+  rsa-public-key: ${JWT_RSA_PUBLIC_KEY:}
+  rsa-private-key-path: ${JWT_RSA_PRIVATE_KEY_PATH:file:./config/keys/private_pkcs8.pem}
+  rsa-public-key-path: ${JWT_RSA_PUBLIC_KEY_PATH:file:./config/keys/public_x509.pem}
 
+# ============ Web 容器高并发配置（虚拟线程 + 大连接数） ============
+server:
+  tomcat:
+    threads:
+      max: 400            # 平台线程兜底上限（开启虚拟线程后请求处理不占这些线程）
+      min-spare: 25
+    max-connections: 16384  # 最大并发连接数（SSE 长连接场景需远大于线程数）
+    accept-count: 2000      # TCP 排队上限
+    connection-timeout: 5s
+    keep-alive:
+      max-keep-alive-requests: 100000
+      timeout: 120s         # SSE 流式响应保活
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+rag:
+  retrieval:
+    # 分块粒度：512 token 子块 + 64 重叠（父子切片 small-to-big，生成用 parent_text 章节全文）
+    max-chunk-size: 512
+    chunk-overlap: 64
+    min-merge-size: 32
+    semantic-split-threshold: 0.6
+    # 召回深度与精排保留数
+    channel-top-k: 20
+    final-top-k: 8
+    # 召回后过滤阈值（BM25 为 max 归一分，阈值须低于向量阈值）
+    common-score-threshold: 0.5
+    high-score-threshold: 0.85
+    low-score-threshold: 0.2
+    vector-only-threshold: 0.5
+    bm25-score-threshold: 0.35
+    # 重排门槛（相对+绝对）：cutoff = max(min, top分数×relative)，过滤后至少保留 keep-top 条
+    # 2026-09-09 压测定稿：0.6/2 配合元数据加权在黄金集取得 P=0.840/R=1.0/Hit=1.0
+    min-rerank-score: 0.1
+    rerank-gate-relative: 0.6
+    rerank-gate-keep-top: 2
+    # 元数据加权：查询词命中 fileName/section_path 时按覆盖率加成分数（同主题多文档区分）
+    metadata-boost-enabled: true
+    metadata-boost-weight: 0.12
+    # 文档级整合：按来源文档分组，弱源文档候选分数 < 最优文档分×ratio 剔除（同主题多文档不互相稀释）
+    # 压测扫描：ratio 0.8→0.940, 0.9→0.947, 0.95→0.942，0.9 为最优
+    doc-consolidation-enabled: true
+    doc-keep-ratio: 0.9
+    # 分数落差自适应截断（elbow）：Top-K 窗口内相邻分差超过阈值提前截断，剔除长尾噪声
+    score-elbow-enabled: true
+    score-elbow-gap: 0.12
+    # 重排：dashscope（百炼 gte-rerank）| ollama | off
+    rerank-provider: dashscope
+    rerank-l-lm: true
+    # CRAG 质量门控：证据分 = top × 支撑度系数(0.7~1.0)，支撑块=融合分≥floor 的候选
+    quality-gate-retry-enabled: true
+    quality-gate-threshold: 0.45
+    quality-gate-support-floor: 0.3
+    quality-gate-support-target: 3
+  rerank:
+    dashscope:
+      model: gte-rerank-v2
+      base-url: https://dashscope.aliyuncs.com
 
 

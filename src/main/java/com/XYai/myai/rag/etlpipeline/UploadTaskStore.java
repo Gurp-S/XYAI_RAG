@@ -1,13 +1,8 @@
 package com.XYai.myai.rag.etlpipeline;
 
 import com.XYai.myai.rag.etlpipeline.pojo.TaskState;
-import com.XYai.myai.rag.milvus.MilvusCollectionService;
 import com.alibaba.fastjson2.JSON;
 import jakarta.annotation.Resource;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 

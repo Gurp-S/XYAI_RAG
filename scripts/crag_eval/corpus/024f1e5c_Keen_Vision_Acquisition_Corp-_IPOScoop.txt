@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<!--[if lte IE 9 ]><html class="ie lt-ie9" lang="en-US"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en-US"> <!--<![endif]-->
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<title>Keen Vision Acquisition Corp. | IPOScoop</title>
+
+	<link rel="profile" href="http://gmpg.org/xfn/11" />
+	<link rel="pingback" href="" />
+
+	<!-- Custom favicon-->
+	<link rel="shortcut icon" href="https://www.iposcoop.com/wp-content/uploads/2014/02/favicon.ico	" />
+
+	<!-- Retina/iOS favicon -->
+	<link rel="apple-touch-icon-precomposed" href="https://www.iposcoop.com/wp-content/themes/flatsome/apple-touch-icon-precomposed.png" />
+	    <script type="text/javascript">
+    /* <![CDATA[ */
+    var ajaxurl = "https://www.iposcoop.com/wp-admin/admin-ajax.php";
+    /* ]]> */
+    </script>
+    <link rel='dns-prefetch' href='//s.w.org' />
+<link rel="alternate" type="application/rss+xml" title="IPOScoop &raquo; Feed" href="https://www.iposcoop.com/feed/" />
+<link rel="alternate" type="application/rss+xml" title="IPOScoop &raquo; Comments Feed" href="https://www.iposcoop.com/comments/feed/" />
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.3\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.3\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/www.iposcoop.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.8.24"}};
+			!function(t,a,e){var r,i,n,o=a.createElement("canvas"),l=o.getContext&&o.getContext("2d");function c(t){var e=a.createElement("script");e.src=t,e.defer=e.type="text/javascript",a.getElementsByTagName("head")[0].appendChild(e)}for(n=Array("flag","emoji4"),e.supports={everything:!0,everythingExceptFlag:!0},i=0;i<n.length;i++)e.supports[n[i]]=function(t){var e,a=String.fromCharCode;if(!l||!l.fillText)return!1;switch(l.clearRect(0,0,o.width,o.height),l.textBaseline="top",l.font="600 32px Arial",t){case"flag":return(l.fillText(a(55356,56826,55356,56819),0,0),e=o.toDataURL(),l.clearRect(0,0,o.width,o.height),l.fillText(a(55356,56826,8203,55356,56819),0,0),e===o.toDataURL())?!1:(l.clearRect(0,0,o.width,o.height),l.fillText(a(55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447),0,0),e=o.toDataURL(),l.clearRect(0,0,o.width,o.height),l.fillText(a(55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447),0,0),e!==o.toDataURL());case"emoji4":return l.fillText(a(55358,56794,8205,9794,65039),0,0),e=o.toDataURL(),l.clearRect(0,0,o.width,o.height),l.fillText(a(55358,56794,8203,9794,65039),0,0),e!==o.toDataURL()}return!1}(n[i]),e.supports.everything=e.supports.everything&&e.supports[n[i]],"flag"!==n[i]&&(e.supports.everythingExceptFlag=e.supports.everythingExceptFlag&&e.supports[n[i]]);e.supports.everythingExceptFlag=e.supports.everythingExceptFlag&&!e.supports.flag,e.DOMReady=!1,e.readyCallback=function(){e.DOMReady=!0},e.supports.everything||(r=function(){e.readyCallback()},a.addEventListener?(a.addEventListener("DOMContentLoaded",r,!1),t.addEventListener("load",r,!1)):(t.attachEvent("onload",r),a.attachEvent("onreadystatechange",function(){"complete"===a.readyState&&e.readyCallback()})),(r=e.source||{}).concatemoji?c(r.concatemoji):r.wpemoji&&r.twemoji&&(c(r.twemoji),c(r.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<link rel='stylesheet' id='validate-engine-css-css'  href='https://www.iposcoop.com/wp-content/plugins/wysija-newsletters/css/validationEngine.jquery.css?ver=2.7.13' type='text/css' media='all' />
+<link rel='stylesheet' id='aqpb-view-css-css'  href='https://www.iposcoop.com/wp-content/plugins/aqua-page-builder/assets/css/aqpb-view.css?ver=1709134571' type='text/css' media='all' />
+<link rel='stylesheet' id='pmpro_frontend-css'  href='https://www.iposcoop.com/wp-content/plugins/paid-memberships-pro/css/frontend.css?ver=1.8.5.6' type='text/css' media='screen' />
+<link rel='stylesheet' id='pmpro_print-css'  href='https://www.iposcoop.com/wp-content/plugins/paid-memberships-pro/css/print.css?ver=1.8.5.6' type='text/css' media='print' />
+<link rel='stylesheet' id='purethemes-shortcodes-css'  href='https://www.iposcoop.com/wp-content/plugins/purethemes-shortcodes/css/shortcodes.css?ver=4.8.24' type='text/css' media='all' />
+<link rel='stylesheet' id='theme-my-login-css'  href='https://www.iposcoop.com/wp-content/themes/flatsome-child/theme-my-login.css?ver=6.4.16' type='text/css' media='all' />
+<link rel='stylesheet' id='dashicons-css'  href='https://www.iposcoop.com/wp-includes/css/dashicons.min.css?ver=4.8.24' type='text/css' media='all' />
+<link rel='stylesheet' id='contact-form-7-css'  href='https://www.iposcoop.com/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=4.3' type='text/css' media='all' />
+<link rel='stylesheet' id='wp-pagenavi-css'  href='https://www.iposcoop.com/wp-content/plugins/wp-pagenavi/pagenavi-css.css?ver=2.70' type='text/css' media='all' />
+<link rel='stylesheet' id='theme-my-login-ajax-css'  href='https://www.iposcoop.com/wp-content/plugins/theme-my-login/modules/ajax/css/ajax.css?ver=4.8.24' type='text/css' media='all' />
+<link rel='stylesheet' id='flatsome-icons-css'  href='https://www.iposcoop.com/wp-content/themes/flatsome/css/fonts.css?ver=4.8.24' type='text/css' media='all' />
+<link rel='stylesheet' id='flatsome-animations-css'  href='https://www.iposcoop.com/wp-content/themes/flatsome/css/animations.css?ver=4.8.24' type='text/css' media='all' />
+<link rel='stylesheet' id='flatsome-style-css'  href='https://www.iposcoop.com/wp-content/themes/flatsome-child/style.css?ver=1.7' type='text/css' media='all' />
+<link rel='stylesheet' id='print_style-css'  href='https://www.iposcoop.com/wp-content/themes/flatsome/../flatsome-child/print.css?ver=4.8.24' type='text/css' media='all' />
+<script type='text/javascript' src='https://www.iposcoop.com/wp-includes/js/jquery/jquery.js?ver=1.12.4'></script>
+<script type='text/javascript' src='https://www.iposcoop.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.1'></script>
+<script type='text/javascript' src='https://www.iposcoop.com/wp-content/plugins/paid-memberships-pro/js/paid-memberships-pro.js?ver=4.8.24'></script>
+<script type='text/javascript' src='https://www.iposcoop.com/wp-content/plugins/purethemes-shortcodes/js/shortcodes.js?ver=4.8.24'></script>
+<script type='text/javascript' src='https://www.iposcoop.com/wp-content/themes/flatsome/js/jquery.nicescroll.min.js?ver=4.8.24'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var wpAjax = {"noPerm":"Sorry, you are not allowed to do that.","broken":"An unidentified error has occurred."};
+/* ]]> */
+</script>
+<script type='text/javascript' src='https://www.iposcoop.com/wp-includes/js/wp-ajax-response.min.js?ver=4.8.24'></script>
+<script type='text/javascript' src='https://www.iposcoop.com/wp-content/plugins/theme-my-login/modules/ajax/js/ajax.js?ver=4.8.24'></script>
+<link rel='https://api.w.org/' href='https://www.iposcoop.com/wp-json/' />
+<link rel='prev' title='U.S. GoldMining Inc.' href='https://www.iposcoop.com/ipo/u-s-goldmining-inc/' />
+<link rel='next' title='EPWK Holdings Ltd.' href='https://www.iposcoop.com/ipo/epwk-holdings-ltd/' />
+<meta name="generator" content="WordPress 4.8.24" />
+<link rel="canonical" href="https://www.iposcoop.com/ipo/keen-vision-acquisition-corp/" />
+<link rel='shortlink' href='https://www.iposcoop.com/?p=30447' />
+<link rel="alternate" type="application/json+oembed" href="https://www.iposcoop.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.iposcoop.com%2Fipo%2Fkeen-vision-acquisition-corp%2F" />
+<link rel="alternate" type="text/xml+oembed" href="https://www.iposcoop.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.iposcoop.com%2Fipo%2Fkeen-vision-acquisition-corp%2F&#038;format=xml" />
+<!--[if lt IE 9]><link rel="stylesheet" type="text/css" href="https://www.iposcoop.com/wp-content/themes/flatsome/css/ie8.css"><script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script><script>var head = document.getElementsByTagName('head')[0],style = document.createElement('style');style.type = 'text/css';style.styleSheet.cssText = ':before,:after{content:none !important';head.appendChild(style);setTimeout(function(){head.removeChild(style);}, 0);</script><![endif]-->
+<!-- Custom CSS Codes -->
+<style type="text/css">
+	/* Set FONTS */
+
+	
+	/* CUSTOM LAYOUT */
+	 
+		  body{background-color:#29527c; background-image:url(""); }
+	
+	 
+			#masthead{ height:70px; }
+			#logo a img{ max-height:20px}
+	
+	 
+			#logo {width: 200px}
+	
+	 
+			#masthead.stuck.move_down{height:70px; }
+			#masthead.stuck.move_down #logo a img{ max-height:40px }
+	
+
+	/* CUSTOM COLORS */
+	 
+			#masthead{background-color: #fff; ;}
+			.dark-header .header-nav li.mini-cart .cart-icon strong{background-color: #fff}
+	
+	 
+			.sliderNav.small a,#main-content,h3.section-title.title_center span{background-color: #FFF!important}
+	
+	 
+			.wide-nav {background-color:#eee}
+	
+	 
+			#top-bar{background-color:#627f9a }
+	
+	
+
+	 
+		/* PRIMARY COLOR */
+		/* -- color -- */
+		.navigation-paging a, .navigation-image a ,ul.page-numbers a, ul.page-numbers li > span,#masthead .mobile-menu a,.alt-button, #logo a, li.mini-cart .cart-icon strong,.post-date,#masthead .mobile-menu a.mobile-menu a,.checkout-group h3,.order-review h3 {color: #627f9a;}
+		/* -- background -- */
+		.text-box-primary, .navigation-paging a:hover, .navigation-image a:hover ,.next-prev-nav .prod-dropdown > a:hover,ul.page-numbers a:hover,.widget_product_tag_cloud a:hover,.custom-cart-count,.iosSlider .sliderNav a:hover span,a.button.alt-button:hover,.loading i, li.mini-cart.active .cart-icon strong,.product-image .quick-view, .product-image .product-bg, #submit, button, #submit, button, .button, input[type="submit"],li.mini-cart.active .cart-icon strong,.post-item:hover .post-date,.blog_shortcode_item:hover .post-date,.product-category:hover .header-title,.column-slider .sliderNav a:hover,.ux_banner {background-color: #627f9a}
+		/* -- borders -- */
+		.navigation-paging a, .navigation-image a ,ul.page-numbers a, ul.page-numbers li > span,ul.page-numbers a:hover,.post.sticky,.widget_product_tag_cloud a,.next-prev-nav .prod-dropdown > a:hover,.iosSlider .sliderNav a:hover span,.column-slider .sliderNav a:hover,.woocommerce .order-review, .woocommerce-checkout form.login,.button, button, li.mini-cart .cart-icon strong,li.mini-cart .cart-icon .cart-icon-handle,.post-date{border-color: #627f9a;}
+		/* -- alt buttons-- */
+		a.primary.alt-button:hover{background-color:#627f9a!important};
+	
+	 
+		/* SECONDARY COLOR */
+		/* -- color -- */
+		.star-rating:before, .woocommerce-page .star-rating:before, .star-rating span:before{color: #d26e4b}
+		a.secondary.alt-button,li.menu-sale a{color: #d26e4b!important}
+		/* -- background -- */
+		ul.page-numbers li > span,.mini-cart:hover .custom-cart-count,.callout .inner,.button.secondary,.button.checkout,#submit.secondary, button.secondary, .button.secondary, input[type="submit"].secondary{background-color: #d26e4b}
+		/* -- borders -- */
+		ul.page-numbers li > span,a.button.secondary,.button.secondary{border-color:#d26e4b;}
+		/* -- alt buttons-- */
+		a.secondary.alt-button:hover{color:#FFF!important;background-color:#d26e4b!important}
+		ul.page-numbers li > span{color: #FFF;}
+	
+	 
+		/* Success COLOR */
+		/* -- color -- */
+		.woocommerce-message{color: #7a9c59!important}
+		.woocommerce-message:before,.woocommerce-message:after{color: #FFF!important; background-color:#7a9c59!important }
+	
+	
+	
+	
+
+	
+
+   	
+	
+	/* CUSTOM CSS */
+	div {}</style>
+
+</head>
+
+<body class="ipo-template-default single single-ipo postid-30447 antialiased group-blog sticky_header breadcrumb-normal boxed">
+	<div id="wrapper">
+		<div class="header-wrapper">
+		
+
+				<div id="top-bar">
+			<div class="row">
+				<div class="large-12 columns">
+					<!-- left text -->
+					<div class="left-text left">
+						<div class="html"></div><!-- .html -->
+					</div>
+					<!-- right text -->
+					<div class="right-text right hide-for-small">
+						 						<div class="menu-top-bar-container"><ul id="menu-top-bar" class="top-bar-nav"><li id="menu-item-15891" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home menu-item-15891"><a href="https://www.iposcoop.com/" class="nav-top-link">Home</a></li>
+<li id="menu-item-15678" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15678"><a href="https://www.iposcoop.com/scoop-ratings-definition/" class="nav-top-link">SCOOP Ratings Definition</a></li>
+<li id="menu-item-15679" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15679"><a href="https://www.iposcoop.com/scoop-track-record-from-2000-to-present/" class="nav-top-link">Track Record</a></li>
+<li id="menu-item-15680" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15680"><a href="https://www.iposcoop.com/our-services/" class="nav-top-link">Our Services</a></li>
+<li id="menu-item-15681" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15681"><a href="https://www.iposcoop.com/how-to-subscribe/" class="nav-top-link">How To Subscribe</a></li>
+<li id="menu-item-15682" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15682"><a href="https://www.iposcoop.com/about-us/" class="nav-top-link">About Us</a></li>
+<li id="menu-item-15683" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15683"><a href="https://www.iposcoop.com/contact-us/" class="nav-top-link">Contact Us</a></li>
+<li id="menu-item-15791" class="tml_ajax_link menu-item menu-item-type-post_type menu-item-object-page menu-item-15791"><a href="https://www.iposcoop.com/login/" class="nav-top-link">Log In</a></li>
+</ul></div>						 					</div><!-- .pos-text -->
+
+				</div><!-- .large-12 columns -->
+			</div><!-- .row -->
+		</div><!-- .#top-bar -->
+		
+
+		<div class="sticky-wrapper">
+		<header id="masthead" class="site-header" role="banner">
+			<div class="row"> 
+				<div class="large-12 columns header-container">
+					<div class="mobile-menu show-for-small"><a href="#open-menu"><span class="icon-menu"></span></a></div><!-- end mobile menu -->
+					
+					 
+					<div id="logo" class="logo-left">
+						<a href="https://www.iposcoop.com/" title="IPOScoop - " rel="home">
+							<img src="https://www.iposcoop.com/wp-content/uploads/2014/01/iposcoop-green.png" class="header_logo" alt="IPOScoop"/>						</a>
+					</div><!-- .logo -->
+					
+					<div class="left-links">
+													<ul id="site-navigation" class="header-nav">
+																
+																<li class="search-dropdown">
+									<a href="#" class="nav-top-link icon-search" onClick="return false;"></a>
+									<div class="nav-dropdown">
+										
+
+<div class="row collapse search-wrapper">
+<form method="get" id="searchform" class="searchform" action="https://www.iposcoop.com/" role="search">
+	  <div class="large-10 small-10 columns">
+	   		<input type="search" class="field" name="s" value="" id="s" placeholder="Search &hellip;" />
+	  </div><!-- input -->
+	  <div class="large-2 small-2 columns">
+	    <button class="button secondary postfix"><i class="icon-search"></i></button>
+	  </div><!-- button -->
+</form>
+</div><!-- row -->
+
+	
+									</div><!-- .nav-dropdown -->
+								</li><!-- .search-dropdown -->
+								
+									<li id="menu-item-15685" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-15685"><a href="https://www.iposcoop.com/category/ipo-buzz/" class="nav-top-link">IPO Buzz</a></li>
+<li id="menu-item-15686" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15686"><a href="https://www.iposcoop.com/ipo-calendar/" class="nav-top-link">IPO Calendar</a></li>
+<li id="menu-item-15754" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15754"><a href="https://www.iposcoop.com/ipo-index/" class="nav-top-link">IPO Index</a></li>
+<li id="menu-item-15697" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-parent-item menu-item-15697"><a class="nav-top-link">IPO Pipeline</a>
+<div class=nav-dropdown><ul>
+	<li id="menu-item-15698" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15698"><a href="https://www.iposcoop.com/scoop-rating/">SCOOP Ratings</a></li>
+	<li id="menu-item-15699" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15699"><a href="https://www.iposcoop.com/ipos-recently-filed/">IPOs Recently Filed</a></li>
+	<li id="menu-item-15700" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15700"><a href="https://www.iposcoop.com/ipos-by-managers-pipeline/">IPO&#8217;s by Managers</a></li>
+	<li id="menu-item-15701" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15701"><a href="https://www.iposcoop.com/by-industry-pipeline/">By Industry</a></li>
+	<li id="menu-item-15702" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-15702"><a href="https://www.nasdaq.com/market-activity/spos">Secondary Offerings</a></li>
+</ul></div>
+</li>
+<li id="menu-item-15703" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-parent-item menu-item-15703"><a class="nav-top-link">Pricings</a>
+<div class=nav-dropdown><ul>
+	<li id="menu-item-15704" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15704"><a href="https://www.iposcoop.com/current-year-pricings/">2024 Pricings</a></li>
+	<li id="menu-item-15707" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15707"><a href="https://www.iposcoop.com/last-100-ipos/">Last 100 IPOs</a></li>
+	<li id="menu-item-15708" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15708"><a href="https://www.iposcoop.com/last-12-months/">Last 12 Months</a></li>
+	<li id="menu-item-15706" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15706"><a href="https://www.iposcoop.com/ipos-by-managers/">IPO&#8217;s by Managers</a></li>
+	<li id="menu-item-15705" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15705"><a href="https://www.iposcoop.com/by-industry/">By Industry</a></li>
+	<li id="menu-item-15709" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-15709"><a href="https://www.nasdaq.com/market-activity/spos">Secondary Offerings</a></li>
+</ul></div>
+</li>
+<li id="menu-item-20488" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-parent-item menu-item-20488"><a class="nav-top-link">QUIET PERIOD/LOCK-UP PERIOD</a>
+<div class=nav-dropdown><ul>
+	<li id="menu-item-20490" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-20490"><a href="https://www.iposcoop.com/quiet-period-expiration/">Quiet Period Expiration</a></li>
+	<li id="menu-item-20489" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-20489"><a href="https://www.iposcoop.com/lock-up-period-expiration/">Lock-Up Period Expiration</a></li>
+</ul></div>
+</li>
+
+								
+		                        								
+							</ul>
+											</div><!-- .left-links -->
+
+					
+					<div class="right-links">
+						 
+						<ul class="header-nav">
+									
+
+					<!-- Show mini cart if Woocommerce is activated -->
+									</ul><!-- .header-nav -->
+				
+			</div><!-- .right-links -->
+		</div><!-- .large-12 -->
+	</div><!-- .row -->
+</header><!-- .header -->
+</div><!-- .sticky-wrapper -->
+
+</div><!-- .header-wrapper -->
+
+
+ 
+<!-- Custom banner-->
+<div id="header-banner">
+	<img src="https://www.iposcoop.com/wp-content/themes/flatsome/images/header-iposcoop.jpg" />
+</div>
+
+<div id="main-content" class="site-main light">
+<div class="row"><div class="large-12 columns"><div class="top-divider"></div></div></div>
+	
+<!-- Titlebar
+    ================================================== -->
+    <section id="titlebar">
+        <div class="large-12 columns">
+            <h3 class="section-title"><span>Keen Vision Acquisition Corp.</span></h3>
+            <div class="print-ipo"><a href="javascript:;" onClick="window.print();return false" class="button small primary">Print</a></div>
+        </div>
+    </section>
+
+<!-- Content
+    ================================================== -->
+
+    <!-- Container -->
+    <div class="container post-30447 ipo type-ipo status-publish hentry pmpro-has-access" >
+
+        <div class="row container" >
+            <div class="large-12 columns">
+                
+                    
+                    <table class="ipo-table">
+                        <tr class="heading"><td colspan="2">General Information</td></tr>
+                        <tr class="odd">
+                            <td class="first"><strong>Business:</strong></td>
+                            <td><h3 style="text-align: justify;"><span style="color: #000000;">We currently intend to focus on sourcing opportunities that are in biotechnology, consumer goods or agriculture, evaluated based on sustainability and environmental, social, and corporate governance (“ESG”) imperatives. (Incorporated in the British Virgin Islands) </span></h3>
+<h3 style="text-align: justify;"><span style="color: #000000;">We will primarily seek to acquire a target company with a total enterprise value not exceeding $1 billion.</span></h3>
+<h3 style="text-align: justify;"><span style="font-size: 14pt;"><strong><span style="color: #000000;">Kenneth K.C. Wong and Jason Wong are our founders. Our sponsor is KVC Sponsor LLC, founded by Keen Vision Capital (BVI) Limited (“KVC”) and Jason Wong. Keen Vision Capital (BVI) Limited is a single<span class="nobreak">-family </span>office firm founded by Kenneth Wong and solely involved in private equity investments. Jason Wong has been dealing in private equity for several decades..</span></strong></span></h3>
+<h3 style="text-align: justify;"><span style="font-size: 14pt; color: #000000;">Kenneth Wong began his career in corporate finance as an intern at Morgan Stanley from July 1994 to December 1994. From September 1995 to February 2000, he was a corporate finance associate and later an associate director in the corporate finance division of SBC Warburg (later renamed UBS Investment Bank). While he was with SBC Warburg, he was the buy-side financial advisor in a $38 billion acquisition, which was then the largest M&amp;A transaction in Asia. From September 2001 to September 2002, he was a direct investment associate at AIG Investment Corp., focusing on emerging markets and health care/pharmaceuticals.</span></h3>
+<h3 class="Text_flush" style="text-align: justify;"><span style="color: #000000;">Between October 2002 and August 2008, Kenneth Wong was the CFO of Shanghai<span class="nobreak">-listed</span> Topsun Science and Technology Company Limited (SH600771). He was one of the youngest CFOs of a listed company in China at the time. Kenneth Wong was later promoted to senior vice president of the Topsun Group, then one of the largest non<span class="nobreak">-state</span><span class="nobreak">-owned</span> pharmaceutical enterprises in China. In that role, he was responsible for its strategy and global alliances. He oversaw acquisitions of two national pharmaceutical companies, Yunnan Baiyao Group Company Limited and Shanxi Guangyuyuan Chinese Herbal Medicine Company Limited. In 2007, Kenneth Wong successfully packaged the group’s assets and disposed of Qidong Gaitianli Pharmaceutical Co., Ltd., which included national renowned brands such as White and Black, to the Bayer Group in Germany. With a total consideration of RMB1.3 billion, this transaction became the first major cross<span class="nobreak">-border</span> M&amp;A deal in the Chinese pharmaceutical industry. It was also then one of the largest transactions in China’s private sector. </span></h3>
+<h3 class="Text_flush" style="text-align: justify;"><span style="color: #000000;">With those accomplishments under his belt, Kenneth Wong went on to establish Keen Vision International Limited (“KVI”) in 2008, which specializes in operational management and private equity (“PE”) investments. Keen Vision Capital (KVC) was established as a wholly <span class="nobreak">owned</span> subsidiary of KVI in 2011, with the purpose of focusing on minority PE investments in companies with the potential to be listed within 24 to 30 months. </span></h3>
+<h3 class="Text_flush" style="text-align: justify;"><span style="color: #000000;">Kenneth Wong is the chairman and CEO of KVI and KVC. He is also the vice <span class="nobreak">chairman</span> of Medera Inc., a clinical biotechnology company focusing on the development of next<span class="nobreak">-generation</span> therapeutics for difficult<span class="nobreak">-to</span><span class="nobreak">-treat</span> and incurable diseases. Medera capitalizes on the world’s first human “mini<span class="nobreak">-Heart</span>” technology and further extends it to include other mini<span class="nobreak">-organs</span> to form a unique and comprehensive “mini<span class="nobreak">-Life</span>” platform for revolutionary disease modelling and drug discovery. Using this pioneering technology platform, Medera has developed one of the world’s largest gene and cell therapeutic pipelines for cardiovascular diseases with an extensive catalogue of therapeutic vectors.</span></h3>
+<h3 class="Text_flush" style="text-align: justify;"><span style="color: #000000;">We believe Kenneth Wong’s entrepreneurial vision, together with his extensive experience in business operations and expertise in corporate finance, will contribute tremendously to a timely and successful business combination of Keen Vision Acquisition Corp., thus optimizing returns for our investors.</span></h3>
+<h3 class="Text_flush" style="text-align: justify;"><span style="color: #000000;">Jason Wong is a pioneer of Asian SPAC listing in the United States, with over 25 years of experience in fund management and capital markets investment in the Asia Pacific. He is also a seasoned SPAC expert, having sponsored or been on the management team of multiple SPACs since 2014.</span></h3>
+<h3 class="Text_flush" style="text-align: justify;"><span style="color: #000000;">Jason Wong is the chairman and CEO of Norwich Investment Limited, the sponsor of a NASDAQ<span class="nobreak">-listed</span> SPAC, Tottenham Acquisition I Limited, which merged with Clene Nanomedicine, Inc. in December 2020. He is also the sole director and CEO of Ace Global Investment Limited, the sponsor of Ace Global Business Acquisition Limited, a SPAC listed on NASDAQ (ACBA), which announced its merger with LE Worldwide Limited in December 2022; and the sole manager of Soul Venture Partners, LLC, the sponsor of Inception Growth Acquisition Limited, a SPAC listed on NASDAQ ( IGTA). Jason Wong also served as an independent director of DT Asia Investment Limited, a SPAC previously listed on NASDAQ, which consummated its business combination in July 2016 with China Lending Group (subsequently renamed Roan Holdings Group Co., Ltd. and now trading on the OTCQB Market).</span></h3>
+<h3 class="Text_flush" style="text-align: justify;"><span style="color: #000000;">Jason Wong is a founding partner and an investment committee member of both Whiz Partners Asia Limited, a PE fund dedicated to investing in small to medium tech companies in Japan and other Asian countries, as well as Sony China Hero Fund, the first console game fund in China.</span></h3>
+<h3 class="Text_flush" style="text-align: justify;"><span style="color: #000000;">We believe Jason Wong will be invaluable to KVC Sponsor LLC with his strong SPAC track record and expertise in identifying, evaluating and executing targets. Jason Wong will not be a member of the board, nor will he have any voting capacity on our behalf and as such will not be subjected to the fiduciary requirements to which our board members are subjected.</span></h3>
+<h3 style="text-align: justify;"><span style="color: #000000;">**Note: In addition to the 3,737,500 insider shares issued to our sponsor, KVC Sponsor LLC, our sponsor has committed to purchase from us an aggregate of 647,700 units (or up to 715,950 units if the underwriter’s over<span class="nobreak">-allotment</span> option is exercised in full) or “private units”, at $10.00 per private unit for a total purchase price of $6,477,000 (or $7,159,500, if the underwriter’s over<span class="nobreak">-allotment</span> option is exercised in full). These purchases will take place on a private placement basis simultaneous with the consummation of this offering. Each private unit shall consist of one ordinary share and one private warrant exercisable to purchase one ordinary share at a price of $11.50 per full share.</span></h3>
+<h3 style="text-align: justify;"><span style="color: #000000;">(Note: Keen Vision Acquisition Corp. priced its SPAC IPO on July 24, 2023, in sync with the terms in its prospectus: 13.0 million units at $10.00 each to raise $130 million. At pricing, Keen Vision Acquisition Corp. became the 20th SPAC IPO priced so far this year.)</span></h3>
+<h3>(Note: This was the first SPAC IPO filing of 2023. Keen Vision Acquisition Corp. intends to offer 13.0 million units at $10.00 each to raise $130 million,  according to an S-1 filing dated Feb. 9, 2023. Each unit consists of one ordinary share and one redeemable warrant to buy one share. Keen Vision Acquisition Corp. filed an S-1/A dated March 20, 2023, in which it disclosed its proposed symbol &#8211; KVACU &#8211; for its SPAC IPO. This is a NASDAQ listing.)</h3>
+</td>
+                        </tr>
+                        <tr>
+                            <td class="first"><strong>Industry:</strong></td>
+                            <td>BLANK CHECKS</td>
+                        </tr>
+                        <tr class="odd">
+                            <td class="first"><strong>Employees:</strong></td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td class="first"><strong>Founded:</strong></td>
+                            <td>2021</td>
+                        </tr>
+                        <tr class="heading"><td colspan="2">Contact Information</td></tr>
+                        <tr class="odd">
+                            <td class="first"><strong>Address</strong></td>
+                            <td>37 Greenbriar Drive Summit, New Jersey 07901</td>
+                        </tr>
+                        <tr>
+                            <td class="first"><strong>Phone Number</strong></td>
+                            <td>(203) 609-1394</td>
+                        </tr>
+                        <tr class="odd">
+                            <td class="first"><strong>Web Address</strong></td>
+                            <td><a href="" target="_blank"></a></td>
+                        </tr>
+                        <tr>
+                            <td class="first"><strong>View Prospectus:</strong></td>
+                            <td><a href="https://www.sec.gov/edgar/browse/?CIK=1889983" target="_blank">Keen Vision Acquisition Corp.</a></td>
+                        </tr>
+                        <tr class="heading"><td colspan="2">Financial Information</td></tr>
+                        <tr class="odd">
+                            <td class="first"><strong>Market Cap</strong></td>
+                            <td>$168.98mil</td>
+                        </tr>
+                        <tr>
+                            <td class="first"><strong>Revenues</strong></td>
+                            <td>$0 mil (last 12 months)</td>
+                        </tr>
+                        <tr class="odd">
+                            <td class="first"><strong>Net Income</strong></td>
+                            <td>$0 mil (last 12 months)</td>
+                        </tr>
+                        <tr class="heading"><td colspan="2">IPO Profile</td></tr>
+                        <tr>
+                            <td class="first"><strong>Symbol</strong></td>
+                            <td><a href="http://finance.yahoo.com/q?s=KVACU" target="_blank">KVACU</a></td>
+                        </tr>
+                        <tr class="odd">
+                            <td class="first"><strong>Exchange</strong></td>
+                            <td>NASDAQ</td>
+                        </tr>
+                        <tr>
+                            <td class="first"><strong>Shares (millions):</strong></td>
+                            <td>13.0</td>
+                        </tr>
+                        <tr class="odd">
+                            <td class="first"><strong>Price range</strong></td>
+                            <td>$10.00 - $10.00</td>
+                        </tr>
+                        <tr>
+                            <td class="first"><strong>Est. $ Volume</strong></td>
+                            <td>$130.0 mil</td>
+                        </tr>
+                        <tr class="odd">
+                            <td class="first"><strong>Manager / Joint Managers</strong></td>
+                            <td>EF Hutton/ Brookline Capital Markets</td>
+                        </tr>
+                        <tr>
+                            <td class="first"><strong>CO-Managers</strong></td>
+                            <td></td>
+                        </tr>
+                        <tr class="odd">
+                            <td class="first"><strong>Expected To Trade:</strong></td>
+                            <td>
+                            7/25/2023                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="first">
+                                <strong>
+                                                                        Status:
+                                                                </strong>
+                            </td>
+                            <td>Priced</td>
+                        </tr>
+                        <tr class="odd">
+                            <td class="first"><strong>Quiet Period Expiration Date:</strong></td>
+                                                        <td><a class="simplemodal-login" href="/how-to-subscribe">Available only to Subscribers</a></td>
+                                                    </tr>
+                        <tr>
+                            <td class="first"><strong>Lock-Up Period Expiration Date:</strong></td>
+                                                        <td><a class="simplemodal-login" href="/how-to-subscribe">Available only to Subscribers</a></td>
+                                                    </tr>
+                        
+                        <tr class="odd">
+                            <td class="first"><strong>SCOOP Rating</strong></td>
+                                                        <td><a class="simplemodal-login" href="/how-to-subscribe">Available only to Subscribers</a></td>
+                                                    </tr>
+                        
+                        <tr>
+                            <td class="first"><strong>Rating Change</strong></td>
+                                                        <td><a class="simplemodal-login" href="/how-to-subscribe">Available only to Subscribers</a></td>
+                                                    </tr>
+                    </table>
+                            </div>
+        </div>
+    </div>
+        <!-- Page Content / End -->
+
+</div><!-- #main-content -->
+
+<footer class="footer-wrapper" role="contentinfo">
+
+<!-- FOOTER 1 -->
+<div class="footer footer-1 light"  style="background-color:#fff">
+	<div class="row">
+   		<div id="text-6" class="large-3 columns widget left widget_text">			<div class="textwidget"><div class="disclaimer notification warning">
+<p><b>Disclaimer:</b> A SCOOP Rating (Wall Street Consensus of Opening-day Premiums), is a general consensus taken, at press time, from Wall Street and investment professionals concerning how well an IPO might perform when it starts trading. The SCOOP Rating does not reflect the opinions of anyone associated with IPOScoop.com. The SCOOP ratings should not be taken as investment advice. The rating merely reflects the opinion of the professionals at the time of publication and is subject to last-minute changes due to market conditions, changes in a specific offering and other factors, such as changes in the proposed offering terms and the shifting of investor interest in the IPO. The information offered is taken from sources we believe to be reliable, but we cannot guarantee the accuracy.</p><br/>
+<p><b>Disclosure:</b> Nobody on the IPOScoop.com staff has a position in any stocks mentioned above, nor do they trade or invest in IPOs. The IPOScoop.com staff does not issue advice, recommendations or opinions. </p>
+</div></div>
+		</div>        
+	</div><!-- end row -->
+</div><!-- end footer 1 -->
+
+
+ 
+
+<!-- FOOTER 2 -->
+
+
+ 
+
+<div class="absolute-footer dark" style="background-color:#333">
+<div class="row">
+	<div class="large-12 columns">
+		<div class="left">
+		<div class="copyright-footer">Copyright 2006 - 2024 © IPOScoop.com</div>
+		</div><!-- .left -->
+		<div class="right">
+								<div class="menu-footer-container"><ul id="menu-footer" class="footer-nav"><li id="menu-item-15696" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-15696"><a href="https://www.iposcoop.com/category/ipo-traffic/">Archive</a></li>
+<li id="menu-item-15693" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15693"><a href="https://www.iposcoop.com/other-ipo-links/">Other IPO Links</a></li>
+<li id="menu-item-15694" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15694"><a href="https://www.iposcoop.com/about-us/">About Us</a></li>
+<li id="menu-item-15695" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15695"><a href="https://www.iposcoop.com/contact-us/">Contact Us</a></li>
+</ul></div>						
+									</div>
+	</div><!-- .large-12 -->
+</div><!-- .row-->
+</div><!-- .absolute-footer -->
+</footer><!-- .footer-wrapper -->
+</div><!-- #wrapper -->
+
+<!-- back to top -->
+<a href="#top" id="top-link"><span class="icon-angle-up"></span></a>
+
+ 
+
+		<!-- Memberships powered by Paid Memberships Pro v1.8.5.6.
+ -->
+		<script type='text/javascript' src='https://www.iposcoop.com/wp-content/plugins/aqua-page-builder/assets/js/aqpb-view.js?ver=1709134571'></script>
+<script type='text/javascript' src='https://www.iposcoop.com/wp-content/plugins/contact-form-7/includes/js/jquery.form.min.js?ver=3.51.0-2014.06.20'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var _wpcf7 = {"loaderUrl":"https:\/\/www.iposcoop.com\/wp-content\/plugins\/contact-form-7\/images\/ajax-loader.gif","sending":"Sending ..."};
+/* ]]> */
+</script>
+<script type='text/javascript' src='https://www.iposcoop.com/wp-content/plugins/contact-form-7/includes/js/scripts.js?ver=4.3'></script>
+<script type='text/javascript' src='https://www.iposcoop.com/wp-content/themes/flatsome/js/modernizr.js?ver=20120202'></script>
+<script type='text/javascript' src='https://www.iposcoop.com/wp-content/themes/flatsome/js/plugins.js?ver=20120202'></script>
+<script type='text/javascript' src='https://www.iposcoop.com/wp-content/themes/flatsome/js/jquery.iosslider.min.js?ver=20120202'></script>
+<script type='text/javascript' src='https://www.iposcoop.com/wp-content/themes/flatsome/js/jquery.magnific-popup.js?ver=20120202'></script>
+<script type='text/javascript' src='https://www.iposcoop.com/wp-content/themes/flatsome/js/theme.js?v=1.7&#038;ver=20120202'></script>
+<script type='text/javascript' src='https://www.iposcoop.com/wp-includes/js/wp-embed.min.js?ver=4.8.24'></script>
+
+</body>
+</html>

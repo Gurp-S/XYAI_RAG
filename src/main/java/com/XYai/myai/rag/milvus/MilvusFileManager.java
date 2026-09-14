@@ -12,6 +12,7 @@ import com.google.gson.JsonParser;
 import io.milvus.client.MilvusServiceClient;
 import io.milvus.grpc.QueryResults;
 import io.milvus.param.R;
+import io.milvus.param.dml.DeleteParam;
 import io.milvus.param.dml.QueryParam;
 import io.milvus.response.QueryResultsWrapper;
 import jakarta.annotation.Resource;
@@ -19,14 +20,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -38,9 +37,12 @@ import java.util.stream.Collectors;
 @Service
 public class MilvusFileManager {
 
+    // ======================== 常量定义 ========================
     private static final int MAX_METADATA_QUERY_LIMIT = 10000;
     private static final int MAX_OR_CLAUSES = 5000;
     private static final int MAX_CONCURRENT_COLLECTION_QUERIES = 3;
+
+    // ======================== 依赖注入 ========================
     @Resource
     private MilvusAclManager milvusAclManager;
     @Resource
@@ -52,7 +54,7 @@ public class MilvusFileManager {
     @Resource
     private MilvusServiceClient milvusClient;
     @Resource
-    private MilvusCollectionService milvusCollectionService;
+    private MilvusCollectionManager milvusCollectionManager;
     @Resource
     private MilvusMetadataFilter milvusMetadataFilter;
     @Resource(name = "milvusExecutor")
@@ -60,6 +62,7 @@ public class MilvusFileManager {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
+    // ======================== Milvus 查询结果解析 ========================
     /**
      * 解析 Milvus 查询结果为 Map 列表，过滤掉 Google Gson 对象。
      */
@@ -77,7 +80,7 @@ public class MilvusFileManager {
             Map<String, Object> clean = new HashMap<>(original.size());
             original.forEach((key, value) -> {
                 // 将 Google Gson 复杂对象转为字符串，其他类型直接保存
-                if (value instanceof com.google.gson.JsonElement) {
+                if (value instanceof JsonElement) {
                     clean.put(key, value.toString());
                 } else {
                     clean.put(key, value);
@@ -88,6 +91,7 @@ public class MilvusFileManager {
         return result;
     }
 
+    // ======================== 文件去重与上传状态判断 ========================
     /**
      * 文件去重判断入口（使用 Redis 原子操作避免并发问题）。
      * 无文件:
@@ -127,22 +131,26 @@ public class MilvusFileManager {
                 return result;
             }
             // 2. 获取文件块大小（从 Redis Set 中直接读取）
-            int chunkSize = getFileChunkSize(fileHash, stringRedisTemplate.opsForSet().randomMember(redisKey));
+            int chunkSize = milvusAclManager.getFileChunkSize(fileHash, redisKey);
             log.info("chunkSize:{}", chunkSize);
             // 3. 同一用户、同一集合、同一文件的情况
-            if (Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(redisKey, collectionName)) &&
+            if (Boolean.TRUE.equals(milvusAclManager.collectionExistFile(redisKey, collectionName)) &&
                     milvusAclManager.getCollectionAcl(collectionName) &&
                     milvusAclManager.getFileAcl(fileHash)) {
                 String userBitKey = RedisKeyConfig.userFileBitKey(userId, fileHash);
                 String collectionBitKey = RedisKeyConfig.collectionFileChunkBitKey(collectionName, fileHash);
-                byte[] userRaw = stringRedisTemplate.execute((RedisCallback<byte[]>) conn -> conn.stringCommands()
-                        .get(userBitKey.getBytes(StandardCharsets.UTF_8)));
-                byte[] collectionRaw = stringRedisTemplate.execute((RedisCallback<byte[]>) conn -> conn.stringCommands()
-                        .get(collectionBitKey.getBytes(StandardCharsets.UTF_8)));
+                byte[] userRaw = milvusAclManager.getFileChunkBitMapAcl(userBitKey);
+                byte[] collectionRaw = milvusAclManager.getFileChunkBitMapAcl(collectionBitKey);
+                log.info("userBitKey={}, rawBytes length={}, hex={}",
+                        userBitKey, userRaw != null ? userRaw.length : 0,
+                        userRaw != null ? bytesToHex(userRaw) : "null");
+                log.info("collectionBitKey={}, rawBytes length={}, hex={}",
+                        collectionBitKey, collectionRaw != null ? collectionRaw.length : 0,
+                        collectionRaw != null ? bytesToHex(collectionRaw) : "null");
                 BitSet localBits = (userRaw != null) ? RedisBitSetUtils.bitSetFromRedisBytes(userRaw) : new BitSet();
                 BitSet collectionLocalBits = (collectionRaw != null) ? RedisBitSetUtils.bitSetFromRedisBytes(collectionRaw) : new BitSet();
-                int existingCount = localBits.cardinality();
-                int collectionExistingCount = collectionLocalBits.cardinality();
+                int existingCount = localBits.get(1, chunkSize + 1).cardinality();
+                int collectionExistingCount = collectionLocalBits.get(1, chunkSize + 1).cardinality();
                 log.info("existingCount:{},collectionExistingCount:{}",existingCount,collectionExistingCount);
                 if (existingCount == chunkSize && collectionExistingCount == chunkSize) {
                     result.setSkipStatus(SkipFileInfo.SKIP_FILE);
@@ -156,13 +164,7 @@ public class MilvusFileManager {
                     }
                 }
                 // 批量检查缺失 chunk 在库中是否存在
-                List<Object> existsResults = stringRedisTemplate.executePipelined((RedisCallback<Object>) conn -> {
-                    for (Integer id : missing) {
-                        byte[] ck = RedisKeyConfig.fileChunkUserCountKey(fileHash, id).getBytes(StandardCharsets.UTF_8);
-                        conn.keyCommands().exists(ck);
-                    }
-                    return null;
-                });
+                List<Object> existsResults = milvusAclManager.fileChunksExist(missing,fileHash);
 
                 // 处理结果：库中存在的直接赋权，不存在的需上传
                 boolean changed = false;
@@ -179,16 +181,8 @@ public class MilvusFileManager {
                 }
                 // 有新增授权时写回 bitmap
                 if (changed) {
-                    final byte[] finalBytes = RedisBitSetUtils.bitSetToRedisBytes(localBits);
-                    stringRedisTemplate.execute((RedisCallback<Object>) conn -> {
-                        conn.stringCommands().set(userBitKey.getBytes(StandardCharsets.UTF_8), finalBytes);
-                        return null;
-                    });
-                    final byte[] collectionFinalBytes = RedisBitSetUtils.bitSetToRedisBytes(collectionLocalBits);
-                    stringRedisTemplate.execute((RedisCallback<Object>) conn -> {
-                        conn.stringCommands().set(collectionBitKey.getBytes(StandardCharsets.UTF_8), collectionFinalBytes);
-                        return null;
-                    });
+                    milvusAclManager.writeFileChunkBitMapAcl(userBitKey,localBits);
+                    milvusAclManager.writeFileChunkBitMapAcl(collectionBitKey,collectionLocalBits);
                 }
                 log.info("跳过文件:{}", result.getUpChunks());
                 result.setSkipStatus(result.getUpChunks().isEmpty() ? SkipFileInfo.SKIP_FILE : SkipFileInfo.UP_CHUNK);
@@ -197,8 +191,8 @@ public class MilvusFileManager {
 
             // 4. 不同集合或新用户：复制整个文件
             log.info("复制文件权限,文件分块大小:{}", chunkSize);
-            milvusAclManager.addFileUserACl(fileHash, collectionName, chunkSize);
-            stringRedisTemplate.opsForSet().add(redisKey, collectionName);
+            milvusAclManager.addFileUserACl(fileHash, collectionName, Collections.nCopies(chunkSize, 1));
+            milvusAclManager.addFileCollectionAcl(redisKey,collectionName);
             result.setSkipStatus(SkipFileInfo.COPY_FILE);
             return result;
 
@@ -207,47 +201,16 @@ public class MilvusFileManager {
         }
     }
 
-    /**
-     * 获取文件的总分块数，从 Redis Hash 中读取 fileId:chunkSize。
-     * 期望 Redis 中存储结构：fileHash -> field "chunkSize" -> value
-     */
-    private int getFileChunkSize(String fileHash, String collectionName) {
-        Set<String> fileIds = stringRedisTemplate.opsForSet().members(RedisKeyConfig.collectionFileIds(collectionName));
-        if (fileIds == null || fileIds.isEmpty()) {
-            return 0;
+    private String bytesToHex(byte[] bytes) {
+        if (bytes == null) return "null";
+        StringBuilder sb = new StringBuilder(bytes.length * 2);
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b & 0xff));
         }
-        // 遍历 Set，寻找 "fileHash:chunkSize" 格式的数据
-        for (String entry : fileIds) {
-            if (entry.startsWith(fileHash + ":")) {
-                try {
-                    return Integer.parseInt(entry.substring(entry.indexOf(":") + 1));
-                } catch (NumberFormatException e) {
-                    log.warn("chunkSize 解析失败: {}", entry);
-                    return 0;
-                }
-            }
-        }
-        return 0;
+        return sb.toString();
     }
-    //
-    // /**
-    // * 向 Milvus 集合添加文档（自动向量化），保证幂等性。
-    // */
-    // public Result<String> add(String collectionName, List<Document> documents) {
-    // if (documents == null || documents.isEmpty()) {
-    // return Result.error(400, "文档为空");
-    // }
-    //
-    // if (!milvusCollectionService.exists(collectionName)) {
-    // return Result.error(404, "集合不存在或无权限: " + collectionName);
-    // }
-    //
-    // // 记录 ACL 权限
-    // milvusAclManager.addFileUserACl(documents, collectionName);
-    //
-    // log.info("成功添加 {} 个文档到集合 {} ", documents.size(), collectionName);
-    // return Result.success("添加成功");
-    // }
+
+    // ======================== 文件分享与权限控制 ========================
 
     /**
      * 删除文件分块权限（实际向量数据保留，由 Milvus 生命周期管理）。
@@ -256,25 +219,59 @@ public class MilvusFileManager {
         milvusAclManager.deleteDocumentAcl(collectionName, chunkId, fileId);
     }
 
-    /**
-     * 流式计算文件 SHA-256 哈希。
-     */
-    public String calculateFileHash(MultipartFile file) throws IOException, NoSuchAlgorithmException {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        try (InputStream in = file.getInputStream()) {
-            byte[] buffer = new byte[8192];
-            int len;
-            while ((len = in.read(buffer)) != -1) {
-                digest.update(buffer, 0, len);
-            }
-        }
-        StringBuilder sb = new StringBuilder();
-        for (byte b : digest.digest()) {
-            sb.append(String.format("%02x", b));
-        }
-        return sb.toString();
+    public void deleteFileChunk(String fileChunkId){
+        String expr = String.format("doc_id == \"%s\"", fileChunkId);
+        milvusClient.delete(DeleteParam.newBuilder()
+                .withDatabaseName(databaseName)
+                .withCollectionName(defaultCollectionName)
+                .withExpr(expr)
+                .build());
     }
 
+    public Result<String> shareFiles(String collectionName, String fileId, Long userId, int chunkId) {
+        if (userId == null || userId <= 0) {
+            return Result.error(400, "userId 不能为空");
+        }
+        if (collectionName == null || collectionName.isBlank() || fileId == null || fileId.isBlank()) {
+            return Result.error(400, "collectionName/fileId 不能为空");
+        }
+        int chunkSize = milvusAclManager.resolveChunkSizeFromCollection(collectionName, fileId);
+        if (chunkSize <= 0) {
+            return Result.error(404, "文件不存在或未入库");
+        }
+        milvusAclManager.ensureUserCollectionAcl(userId, collectionName);
+        List<Integer> chunkIds;
+        if (chunkId > 0) {
+            if (chunkId > chunkSize) {
+                return Result.error(400, "chunkId 超出范围");
+            }
+            chunkIds = List.of(chunkId);
+        } else {
+            int cap = (int) Math.min(chunkSize, RedisKeyConfig.MAX_CHUNK_PER_FILE);
+            chunkIds = new ArrayList<>(cap);
+            for (int i = 1; i <= cap; i++) {
+                chunkIds.add(i);
+            }
+        }
+
+        milvusAclManager.grantFileChunksToUser(userId, fileId, collectionName, chunkIds, chunkSize);
+        return Result.success("分享成功");
+    }
+
+    // ======================== TODO 文档更新 ========================
+    public Result<String> updateFileChunk(String docId, String content) {
+        // 删除旧数据
+//        String[] split = docId.split(":");
+//        String fileId = split[0];
+//        int chunkId = Integer.parseInt(split[1]);
+//        String collectionName = stringRedisTemplate.opsForSet()
+//                .randomMember(RedisKeyConfig.fileHashKey(fileId));
+//        deleteDocument(collectionName, chunkId, fileId);
+        // 插入管道
+        return Result.success();
+    }
+
+    // ======================== 集合文件元数据查询（带权限与分页） ========================
     /**
      * 获取集合内用户可见的文件元数据（全量），带权限过滤与 Milvus 查询。
      *
@@ -288,11 +285,6 @@ public class MilvusFileManager {
 
     /**
      * 获取集合内用户可见的文件元数据（游标分页），带权限过滤与 Milvus 查询。
-     *
-     * @param collectionName 集合名称
-     * @param cursor         上一页最后一条记录的 doc_id，首次传 null
-     * @param pageSize       每页大小，<=0 时使用默认值 20
-     * @return 分页结果
      */
     public CursorPage<Map<String, Object>> getUserCollectionFiles(String collectionName, String cursor, int pageSize) {
         if (collectionName == null || collectionName.isBlank()) {
@@ -302,7 +294,7 @@ public class MilvusFileManager {
             pageSize = 20;
 
         // 从 Redis 获取 ACL 权限
-        List<String> fileChunkIds = milvusAclManager.getCollectionFiles(collectionName);
+        Set<String> fileChunkIds = milvusAclManager.getCollectionFiles(collectionName);
         if (fileChunkIds == null || fileChunkIds.isEmpty()) {
             return new CursorPage<>(Collections.emptyList(), null, false);
         }
@@ -344,6 +336,32 @@ public class MilvusFileManager {
         return new CursorPage<>(raw, nextCursor, hasMore);
     }
 
+    // ======================== TODO 全量查询所有集合文件 ========================
+    public List<Map<String, Object>> getUserFiles() {
+        Set<String> allCollectionNames = milvusCollectionManager.getAllCollectionNames();
+        Semaphore semaphore = new Semaphore(MAX_CONCURRENT_COLLECTION_QUERIES);
+        List<CompletableFuture<List<Map<String, Object>>>> futures = allCollectionNames.stream()
+                .map(collectionName -> CompletableFuture.<List<Map<String, Object>>>supplyAsync(() -> {
+                    try {
+                        semaphore.acquire();
+                        List<Map<String, Object>> files = queryAllCollectionFiles(collectionName);
+                        return files.stream()
+                                .map(original -> {
+                                    Map<String, Object> newMap = new HashMap<>(original);
+                                    newMap.put("collectionName", collectionName);
+                                    return newMap;
+                                }).collect(Collectors.toList());
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        return new ArrayList<>();
+                    } finally {
+                        semaphore.release();
+                    }
+                }, milvusExecutor)).toList();
+        return futures.stream().map(CompletableFuture::join).flatMap(List::stream).collect(Collectors.toList());
+    }
+
+    // ======================== 核心查询与排序 ========================
     /**
      * 核心查询逻辑：查询 + 排序 + 过滤，返回全量列表。
      */
@@ -352,7 +370,7 @@ public class MilvusFileManager {
             return Collections.emptyList();
         }
 
-        List<String> fileChunkIds = milvusAclManager.getCollectionFiles(collectionName);
+        Set<String> fileChunkIds = milvusAclManager.getCollectionFiles(collectionName);
         if (fileChunkIds == null || fileChunkIds.isEmpty()) {
             return Collections.emptyList();
         }
@@ -416,6 +434,26 @@ public class MilvusFileManager {
                 .collect(Collectors.toList());
     }
 
+    // ======================== 工具方法：文件哈希、字段提取、表达式构建 ========================
+    /**
+     * 流式计算文件 SHA-256 哈希。
+     */
+    public String calculateFileHash(MultipartFile file) throws IOException, NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        try (InputStream in = file.getInputStream()) {
+            byte[] buffer = new byte[8192];
+            int len;
+            while ((len = in.read(buffer)) != -1) {
+                digest.update(buffer, 0, len);
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        for (byte b : digest.digest()) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
+    }
+
     // 从 doc_id 中提取 fileId（例如 "abc-000001" → "abc"）
     private String extractFileIdFromDocId(Map<String, Object> m) {
         String docId = (String) m.get("doc_id");
@@ -461,7 +499,7 @@ public class MilvusFileManager {
      * 根据 fileId:chunkId 列表生成 Milvus 查询表达式。
      * 转义单引号防止注入（Milvus 字符串用单引号包围时会加倍单引号转义）。
      */
-    private String buildFileChunkExpr(List<String> fileChunkIds) {
+    private String buildFileChunkExpr(Set<String> fileChunkIds) {
         List<String> clauses = new ArrayList<>();
         for (String fc : fileChunkIds) {
             if (fc == null || !fc.contains(":"))
@@ -487,116 +525,5 @@ public class MilvusFileManager {
                 log.debug("上报任务节点失败 taskId={}, nodeType=fetcher", taskId, e);
             }
         }
-    }
-
-    public Result<String> shareFiles(String collectionName, String fileId, Long userId, int chunkId) {
-        if (userId == null || userId <= 0) {
-            return Result.error(400, "userId 不能为空");
-        }
-        if (collectionName == null || collectionName.isBlank() || fileId == null || fileId.isBlank()) {
-            return Result.error(400, "collectionName/fileId 不能为空");
-        }
-        int chunkSize = resolveChunkSizeFromCollection(collectionName, fileId);
-        if (chunkSize <= 0) {
-            return Result.error(404, "文件不存在或未入库");
-        }
-        ensureUserCollectionAcl(userId, collectionName);
-        List<Integer> chunkIds;
-        if (chunkId > 0) {
-            if (chunkId > chunkSize) {
-                return Result.error(400, "chunkId 超出范围");
-            }
-            chunkIds = List.of(chunkId);
-        } else {
-            int cap = (int) Math.min(chunkSize, RedisKeyConfig.MAX_CHUNK_PER_FILE);
-            chunkIds = new ArrayList<>(cap);
-            for (int i = 1; i <= cap; i++) {
-                chunkIds.add(i);
-            }
-        }
-
-        grantFileChunksToUser(userId, fileId, collectionName, chunkIds, chunkSize);
-        return Result.success("分享成功");
-    }
-
-    private int resolveChunkSizeFromCollection(String collectionName, String fileId) {
-        try {
-            for (String entryObj : stringRedisTemplate.opsForSet()
-                    .members(RedisKeyConfig.collectionFileIds(collectionName))) {
-                if (entryObj == null || !entryObj.startsWith(fileId + ":"))
-                    continue;
-                String[] parts = entryObj.split(":", 2);
-                if (parts.length == 2) {
-                    return Integer.parseInt(parts[1]);
-                }
-            }
-        } catch (Exception e) {
-            log.warn("解析 chunkSize 失败 collection={} fileId={}", collectionName, fileId, e);
-        }
-        return 0;
-    }
-
-    private void ensureUserCollectionAcl(Long userId, String collectionName) {
-        String loadKey = RedisKeyConfig.userLoadCollectionsKey(userId);
-        String unloadKey = RedisKeyConfig.userUnloadCollectionsKey(userId);
-        boolean hasAcl = false;
-        try {
-            hasAcl = Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(loadKey, collectionName))
-                    || Boolean.TRUE.equals(stringRedisTemplate.opsForSet().isMember(unloadKey, collectionName));
-        } catch (Exception e) {
-            log.warn("检查用户集合权限失败 userId={} collection={}", userId, collectionName, e);
-        }
-        if (!hasAcl) {
-            stringRedisTemplate.opsForSet().add(unloadKey, collectionName);
-            stringRedisTemplate.opsForValue().increment(RedisKeyConfig.collectionUserCountKey(collectionName));
-        }
-    }
-
-    private void grantFileChunksToUser(Long userId, String fileId, String collectionName, List<Integer> chunkIds,
-                                       int chunkSize) {
-        int cap = (int) Math.min(chunkSize, RedisKeyConfig.MAX_CHUNK_PER_FILE);
-        if (cap <= 0 || chunkIds == null || chunkIds.isEmpty()) {
-            return;
-        }
-        String entry = fileId + ":" + chunkSize;
-        stringRedisTemplate.opsForSet().add(RedisKeyConfig.collectionFileIds(collectionName), entry);
-        stringRedisTemplate.opsForSet().add(RedisKeyConfig.fileHashKey(fileId), collectionName);
-        milvusAclManager.grantFileChunksToUser(userId, fileId, collectionName, chunkIds, chunkSize);
-    }
-
-    public Result<String> updateFileChunk(String docId, String content) {
-        // 删除旧数据
-        String[] split = docId.split(":");
-        String fileId = split[0];
-        int chunkId = Integer.parseInt(split[1]);
-        String collectionName = stringRedisTemplate.opsForSet()
-                .randomMember(RedisKeyConfig.fileHashKey(fileId));
-        deleteDocument(collectionName, chunkId, fileId);
-        // 插入管道
-        return Result.success();
-    }
-
-    public List<Map<String, Object>> getUserFiles() {
-        List<String> allCollectionNames = milvusCollectionService.getAllCollectionNames();
-        Semaphore semaphore = new Semaphore(MAX_CONCURRENT_COLLECTION_QUERIES);
-        List<CompletableFuture<List<Map<String, Object>>>> futures = allCollectionNames.stream()
-                .map(collectionName -> CompletableFuture.<List<Map<String, Object>>>supplyAsync(() -> {
-                    try {
-                        semaphore.acquire();
-                        List<Map<String, Object>> files = queryAllCollectionFiles(collectionName);
-                        return files.stream()
-                                .map(original -> {
-                                    Map<String, Object> newMap = new HashMap<>(original);
-                                    newMap.put("collectionName", collectionName);
-                                    return newMap;
-                                }).collect(Collectors.toList());
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        return new ArrayList<>();
-                    } finally {
-                        semaphore.release();
-                    }
-                }, milvusExecutor)).collect(Collectors.toList());
-        return futures.stream().map(CompletableFuture::join).flatMap(List::stream).collect(Collectors.toList());
     }
 }

@@ -38,6 +38,11 @@ public class RetrievedChunk {
     private Double bm25Score;
 
     /**
+     * 重排得分（gte-rerank relevance_score，0~1；未重排时为 null）
+     */
+    private Double rerankScore;
+
+    /**
      * 元数据（权限、版本、时间戳、来源标识等；过滤阶段通常基于该字段做规则判断）。
      */
     private Map<String, Object> metadata;

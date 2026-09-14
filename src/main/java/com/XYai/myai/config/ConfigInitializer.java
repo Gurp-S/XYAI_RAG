@@ -1,8 +1,6 @@
 package com.XYai.myai.config;
 
-import com.XYai.myai.config.CacheConfig;
 import com.XYai.myai.rag.channel.pojo.RetrievalProperties;
-import com.XYai.myai.rag.etlpipeline.pojo.PipelineProperties;
 import com.XYai.myai.rag.etlpipeline.pojo.UploadProperties;
 import com.XYai.myai.rag.evaluate.service.SystemEvaluateService;
 import com.XYai.myai.rag.intent.pojo.IntentProperties;
@@ -24,8 +22,8 @@ public class ConfigInitializer {
     @Resource
     private ConfigPersistence configPersistence;
 
-    @Resource
-    private PipelineProperties pipelineProperties;
+//    @Resource
+//    private PipelineProperties pipelineProperties;
     @Resource
     private UploadProperties uploadProperties;
     @Resource
@@ -44,7 +42,7 @@ public class ConfigInitializer {
     @PostConstruct
     public void init() {
         log.info("====== 开始加载持久化配置 ======");
-        configPersistence.load("pipeline", pipelineProperties);
+        //configPersistence.load("pipeline", pipelineProperties);
         configPersistence.load("upload", uploadProperties);
         configPersistence.load("intent", intentProperties);
         configPersistence.load("memory", memoryProperties);

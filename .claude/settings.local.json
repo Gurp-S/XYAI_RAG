@@ -90,7 +90,11 @@
       "Bash(node d:/lea/xyai/xyUser/src/test_esc.js)",
       "Bash(del d:/lea/xyai/xyUser/src/test_esc.js)",
       "Bash(/d/lea/maven/bin/mvn compile *)",
-      "Bash(curl -sL \"https://www.xyoct21.cn/src/main.js\")"
+      "Bash(curl -sL \"https://www.xyoct21.cn/src/main.js\")",
+      "Bash(docker exec *)",
+      "Bash(docker stop *)",
+      "Bash(docker rm *)",
+      "Bash(docker run *)"
     ],
     "additionalDirectories": [
       "d:\\lea\\xyai\\frontend\\xyAdmin\\src"

@@ -2,10 +2,11 @@ package com.XYai.myai.rag.rewrite;
 
 import cn.hutool.core.util.IdUtil;
 import com.XYai.myai.rag.aop.annotation.RagTraceContext;
-import com.XYai.myai.rag.chat.ModelInvocationService;
+import com.XYai.myai.rag.kafka.event.AnalyticsEvent;
 import com.XYai.myai.rag.rewrite.pojo.RewriteResult;
 import com.XYai.myai.rag.rewrite.pojo.RewriterProperties;
 import com.XYai.myai.user.LoginUserInfoManager;
+import com.XYai.myai.xyAdmin.pojo.TokenUse;
 import com.alibaba.fastjson2.JSON;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -13,9 +14,11 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 /**
@@ -45,7 +48,7 @@ public class QueryRewriter {
     @Resource
     private RewriterProperties rewriterProperties;
     @Resource
-    private ModelInvocationService modelInvocationService;
+    private KafkaTemplate<String, Object> kafkaTemplate;
 
     public static String QueryCleaner(String query) {
         if (query == null || query.isBlank()) return null;
@@ -131,16 +134,20 @@ public class QueryRewriter {
             }
             // 5.2 token消耗保存
             RagTraceContext.setPhase("查询重写");
-            modelInvocationService.saveTokenUseAsync(
+            TokenUse tokenUse = new TokenUse(
                     conversationId,
                     IdUtil.getSnowflakeNextId(),
-                    (long) prompt.toString().length(),
-                    (long) rewrittenMessage.length(),
+                    prompt.toString().length(),
+                    rewrittenMessage.length(),
                     LoginUserInfoManager.getUserId(),
                     durationMs,
                     chatModel.getDefaultOptions().getModel(),
                     "queryRewrite"
             );
+            kafkaTemplate.send("analytics-event", null, new AnalyticsEvent(
+                    UUID.randomUUID().toString(),"evaluate",
+                    null,tokenUse,null
+            ));
             // 6. JSON解析
             return JSON.parseObject(rewrittenMessage, RewriteResult.class);
 

@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html xml:lang="en-US" lang="en-US" role="document">
+
+<head>
+    <base href="/snl24" />
+    <link rel="shortcut icon" href="/images/tenants/snl24/favicon.ico?v=yGy_KUbn-40ygY47CeRsp5Owq6NmNO4dKkkDD8hE4Nw">
+
+    <link rel="alternative" href="https://feeds.24.com/articles/errorpages/404/rss" type="application/rss&#x2B;xml" />
+    <link rel="stylesheet" href="/css/tenants/snl24/style.min.css?v=T_omliULXGnL9Z4WxvGYTsA_bR1xuyTEdPvTEXSXn9c" />
+    
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta name="apple-mobile-web-app-title" content="SNL24">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+<meta name="msapplication-navbutton-color" content="red">
+<meta name="msapplication-TileColor" content="red">
+<meta name="msapplication-TileImage" content="~/images/pwa/snl24/mstile-150x150.png">
+
+<!-- Pinned Sites  -->
+<meta name="application-name" content="SNL24">
+<meta name="msapplication-tooltip" content="SNL24">
+<meta name="msapplication-starturl" content="/">
+<!-- Tap highlighting  -->
+<meta name="msapplication-tap-highlight" content="no">
+
+<!-- iOS  -->
+<link rel="apple-touch-icon" sizes="120x120" href="/images/pwa/snl24/apple-touch-icon-120x120.png?v=T2o-6g2jlSN-Bbo8Unbzu5Eo2Nv7tzSqUdFtCLXzziM">
+<link rel="apple-touch-icon" sizes="152x152" href="/images/pwa/snl24/apple-touch-icon-152x152.png?v=qyhH-dkZBPGhWWH7383jUlF1f5RapBxYp0QYRRHhg3E">
+<link rel="apple-touch-icon" sizes="167x167" href="/images/pwa/snl24/apple-touch-icon-167x167.png?v=emdFVBQBJ-Sm9ZUYbED_6iUHhVxUgL5VAMqkR1sgaj0">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/pwa/snl24/apple-touch-icon-180x180.png?v=uwHy65kC5hvAp9y6C100rZxMgFFg-h7i-Kb2LqmnPR0">
+<link rel="apple-touch-icon" href="/images/pwa/snl24/apple-touch-icon-180x180.png?v=uwHy65kC5hvAp9y6C100rZxMgFFg-h7i-Kb2LqmnPR0">
+
+<link rel="apple-touch-startup-image" href="/images/pwa/snl24/640x1136.png?v=x-eO3hj3Au8sqq_sAIB7jL7d1iHZaGZoZUGKgPiaR5w" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="/images/pwa/snl24/750x1294.png?v=eNombVnLC2v73Q6Utdn-qAgOszJLPhC7X3d96xDP59I" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="/images/pwa/snl24/1242x2148.png?v=4KRPb80wTGfgPXJirCJ4zkeJbb6qkcF39NwATaXbETk" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="/images/pwa/snl24/1125x2436.png?v=bVFABtx6JAEraAQKUel2ULYEJ728JtRpYdCn4SpFfUQ" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="/images/pwa/snl24/1536x2048.png?v=7Z5uVQxoPe0yHuPvN32w2GcAY0scFtzkhrBwwcY7axw" media="(min-device-width: 768px) and (max-device-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="/images/pwa/snl24/1668x2224.png?v=3sKYoHYJpbSs0syQJwgRqc32vXqdyQkfFWgOxDqr4-o" media="(min-device-width: 834px) and (max-device-width: 834px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="/images/pwa/snl24/2048x2732.png?v=xLEaeFbDa723ltSrRSEelf5zYfxiici-9J4TpWX7SNc" media="(min-device-width: 1024px) and (max-device-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: portrait)">
+
+
+<meta name="theme-color" content="#ffffff" />
+<link rel="manifest" href="/manifests/snl24.json?v=Ma4dBDSIiLYHlVpHi93C0j5yuQs40ywjhSP_AYXqLX0" />
+    
+
+<!--SEO Meta-->
+<title>SNL24 | Not Found</title>
+<meta name="articleid" content="00000000-0000-0000-0000-000000000000" />
+    <meta name="ad:name" content="/8900/24.com/web/" />
+    <meta name="ad:zone" content="errorpages/404" />
+    <meta name="breadcrumb" content="errorpages/404" />
+    <meta name="pageviewtype" content="error_view" />
+    <meta name="pagetype" content="error" />
+    <meta name="usertype" content="Anonymous" />
+    <meta name="isloggedin" content="false" />
+    <meta name="sitename" content="SNL24" />
+    <meta name="version" content="3.0.24072.4" />
+    <meta property="og:site_name" content="SNL24" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="SNL24" />
+
+<link rel="canonical" href="https://www.snl24.com/errorpages/404" />
+
+<meta name="twitter:widgets:csp" content="on">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="snl24">
+
+<script type="text/javascript">
+    za24_AdZone = 'errorpages/404';
+</script>
+        <script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
+
+    <meta name="platform" content="web">
+    <script type="text/javascript">
+        za24_AdSite = '/8900/24.com/web/';
+    </script>
+    <script>window.oovvuuReplacementAdServerURL = "https://pubads.g.doubleclick.net/gampad/ads?iu=/8900/24.com/web/errorpages/404&sz=640x480&ciu_szs=300x250%2C728x90&gdfp_req=1&output=vast&unviewed_position_start=1&env=vp&impl=s&correlator=";</script>
+
+
+    
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=5">
+
+        
+    <link rel="preload" as="font" href="/fonts/medium/montserrat-v24-latin-500.woff2" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" as="font" href="/fonts/bold/montserrat-v24-latin-700.woff2" type="font/woff2" crossorigin="anonymous" />
+<link rel="preconnect" href="https://log.outbrainimg.com" crossorigin="anonymous" />
+<link rel="preconnect" href="https://collector.brandmetrics.com" crossorigin="anonymous" />
+<link rel="preconnect" href="https://adservice.google.co.za" crossorigin="anonymous" />
+<link rel="preconnect" href="https://securepubads.g.doubleclick.net" crossorigin="anonymous" />
+<link rel="preconnect" href="https://tpc.googlesyndication.com" crossorigin="anonymous" />
+<link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin="anonymous" />
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin="anonymous" />
+<link rel="preconnect" href="https://www.google-analytics.com" crossorigin="anonymous" />
+<link rel="preconnect" href="https://csi.gstatic.com" crossorigin="anonymous" />
+<link rel="preconnect" href="https://www.googletagservices.com" crossorigin="anonymous" />
+<link rel="preconnect" href="https://tags.crwdcntrl.net" crossorigin="anonymous"/>
+<link rel="preconnect" href="https://bcp.crwdcntrl.net" crossorigin="anonymous"/>
+<link rel="dns-prefetch" href="https://tags.crwdcntrl.net" crossorigin="anonymous"/>
+<link rel="dns-prefetch" href="https://bcp.crwdcntrl.net" crossorigin="anonymous"/>
+<script src="/js/htmx.min.js"></script>
+
+
+
+
+    
+
+    
+        <script>
+            // attach it to the window
+            firebaseConfig = {
+                apiKey: 'AIzaSyA7XMn9LG7jMVoSVMuz-oGz-prQl1yq81U',
+                authDomain: 'auth.snl24.com',
+                projectId: 'snl24-prod'
+            };
+        </script>
+        
+
+<!--Scripts: head-->
+
+    
+    <script type="module">
+        import yaid from './js/modules/tracking/yaid.min.js?v=3.0.24072.4';
+        new yaid();
+    </script>
+    <!-- Google Tag Manager -->  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);  })(window,document,'script','dataLayer','GTM-5FF4NNT');</script>  <!-- End Google Tag Manager -->
+      <script type="module">
+        import setreturnurl from './js/modules/setreturnurl.min.js?v=3.0.24072.4';
+	    new setreturnurl();
+    </script>
+    
+
+    <script type='application/ld+json'>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":{"@type":"WebPage","@id":"https://www.snl24.com/\nerrorpages\n/\n","name":"errorpages"},"position":1},{"@type":"ListItem","item":{"@type":"WebPage","@id":"https://www.snl24.com/\nerrorpages\n/\n404\n/\n","name":"404"},"position":2}]}</script>
+
+    
+    
+    <script>
+  !(function () {
+    window.googletag = window.googletag || {};
+    window.googletag.cmd = window.googletag.cmd || [];
+    var targetingKey = 'lotame';
+    var lotameClientId = '15647';
+    var audLocalStorageKey = 'lotame_' + lotameClientId + '_auds';
+
+    // Immediately get audiences from local storage and get them loaded
+    try {
+      var storedAuds = window.localStorage.getItem(audLocalStorageKey) || '';
+
+      if (storedAuds) {
+        googletag.cmd.push(function () {
+          window.googletag
+            .pubads()
+            .setTargeting(targetingKey, storedAuds.split(','));
+        });
+      }
+    } catch (e) {}
+
+    // Callback when targeting audience is ready to push latest audience data
+    var audienceReadyCallback = function (profile) {
+      // Get audiences as an array
+      var lotameAudiences = profile.getAudiences() || [];
+
+      // Set the new target audiences for call to Google
+      googletag.cmd.push(function () {
+        window.googletag.pubads().setTargeting(targetingKey, lotameAudiences);
+      });
+    };
+
+    // Lotame Config
+    var lotameTagInput = {
+      data: {},
+      config: {
+        clientId: Number(lotameClientId),
+        audienceLocalStorage: audLocalStorageKey,
+        onProfileReady: audienceReadyCallback,
+      },
+    };
+
+    // Lotame initialization
+    var lotameConfig = lotameTagInput.config || {};
+    var namespace = (window['lotame_' + lotameConfig.clientId] = {});
+    namespace.config = lotameConfig;
+    namespace.data = lotameTagInput.data || {};
+    namespace.cmd = namespace.cmd || [];
+  })();
+</script>
+
+<script async src="https://tags.crwdcntrl.net/lt/c/15647/lt.min.js"></script>
+
+</head>
+
+<body>
+        <div data-ad="true" data-adname="Interstitial" data-adzone="/8900/24.com/web/snl24/web-interstitial" data-sizes="[[320,480],[480,320]]" style="" data-isfluid="false" data-outofpage="true" data-interstitial="true" data-targets="{&quot;pagetype&quot;:&quot;error&quot;,&quot;breadcrumb&quot;:&quot;errorpages/404&quot;,&quot;template_type&quot;:&quot;Error404&quot;,&quot;adname&quot;:&quot;Interstitial&quot;,&quot;posno&quot;:&quot;1&quot;,&quot;pos&quot;:&quot;1&quot;,&quot;Subscribed&quot;:&quot;n&quot;,&quot;Registered&quot;:&quot;n&quot;,&quot;Suspended&quot;:&quot;n&quot;,&quot;user_type&quot;:&quot;Anonymous&quot;,&quot;is-lifestyle&quot;:&quot;false&quot;,&quot;section&quot;:&quot;errorpages/404&quot;,&quot;live&quot;:&quot;false&quot;,&quot;platform&quot;:&quot;desktop&quot;,&quot;pagename&quot;:&quot;https://www.snl24.com/errorpages/404&quot;,&quot;t_ref&quot;:&quot;m24&quot;}" data-isrefreshenabled="true" id="Interstitial" class="transitional-ad pos-fixed adblock"></div>
+    
+            <script type="text/javascript">
+                (function () {
+                    if (!location.hostname.toLowerCase().includes('snl24.com'))
+                        window.location.href = 'http://snl24.com/';
+                })();
+            </script>
+    
+
+    <div data-ad="true" data-adname="retailbar" data-adzone="/8900/24.com/web/snl24/errorpages/404" data-sizes="[[200,400]]" style="" data-isfluid="false" data-outofpage="false" data-interstitial="false" data-targets="{&quot;pagetype&quot;:&quot;error&quot;,&quot;breadcrumb&quot;:&quot;errorpages/404&quot;,&quot;template_type&quot;:&quot;Error404&quot;,&quot;adname&quot;:&quot;retailbar&quot;,&quot;posno&quot;:&quot;1&quot;,&quot;pos&quot;:&quot;1&quot;,&quot;Subscribed&quot;:&quot;n&quot;,&quot;Registered&quot;:&quot;n&quot;,&quot;Suspended&quot;:&quot;n&quot;,&quot;user_type&quot;:&quot;Anonymous&quot;,&quot;is-lifestyle&quot;:&quot;false&quot;,&quot;section&quot;:&quot;errorpages/404&quot;,&quot;live&quot;:&quot;false&quot;,&quot;platform&quot;:&quot;desktop&quot;,&quot;pagename&quot;:&quot;https://www.snl24.com/errorpages/404&quot;,&quot;t_ref&quot;:&quot;m24&quot;}" data-isrefreshenabled="true" id="retailbar" class="retail-ad pos-fixed adblock"></div>
+    <div data-ad="true" data-adname="wallpaper" data-adzone="/8900/24.com/web/snl24/errorpages/404" data-sizes="[[2,1]]" style="" data-isfluid="false" data-outofpage="false" data-interstitial="false" data-targets="{&quot;pagetype&quot;:&quot;error&quot;,&quot;breadcrumb&quot;:&quot;errorpages/404&quot;,&quot;template_type&quot;:&quot;Error404&quot;,&quot;adname&quot;:&quot;wallpaper&quot;,&quot;posno&quot;:&quot;1&quot;,&quot;pos&quot;:&quot;1&quot;,&quot;Subscribed&quot;:&quot;n&quot;,&quot;Registered&quot;:&quot;n&quot;,&quot;Suspended&quot;:&quot;n&quot;,&quot;user_type&quot;:&quot;Anonymous&quot;,&quot;is-lifestyle&quot;:&quot;false&quot;,&quot;section&quot;:&quot;errorpages/404&quot;,&quot;live&quot;:&quot;false&quot;,&quot;platform&quot;:&quot;desktop&quot;,&quot;pagename&quot;:&quot;https://www.snl24.com/errorpages/404&quot;,&quot;t_ref&quot;:&quot;m24&quot;}" data-isrefreshenabled="true" id="wallpaper" class="pos-fixed adblock fullwidth neg-pos"></div>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5FF4NNT" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+    
+        
+
+<!--Scripts: body-->
+
+        
+
+
+    <div class="brandbar">
+        <div class="wrapper">
+            <ul class="brandbar__links">
+                            <li class="links--image ">
+                                <a data-event-name="site_link" data-event-container="brandbar" href="/" target="_self">
+                                    <img src="https://cdn.24.co.za/files/Cms/General/d/3942/1f9a57cc26794550b4ecff2672380e99.svg" alt="SNL24" />
+                                </a>
+                            </li>
+                            <li class="links--image ">
+                                <a data-event-name="site_link" data-event-container="brandbar" href="soccerladuma" target="_self">
+                                    <img src="https://cdn.24.co.za/files/Cms/General/d/3942/890223287c4d449489a3f056e47acbab.png" alt="Soccer Laduma" />
+                                </a>
+                            </li>
+                            <li class="links--image ">
+                                <a data-event-name="site_link" data-event-container="brandbar" href="dailysun" target="_self">
+                                    <img src="https://cdn.24.co.za/files/Cms/General/d/3942/10d3dea4fcec4450994c424364fc1e0b.svg" alt="Daily Sun" />
+                                </a>
+                            </li>
+                            <li class="links--image ">
+                                <a data-event-name="site_link" data-event-container="brandbar" href="kickoff" target="_self">
+                                    <img src="https://cdn.24.co.za/files/Cms/General/d/3942/fcbc0f83936a469aba715b67cb0118ea.png" alt="KickOff" />
+                                </a>
+                            </li>
+                            <li class="links--image ">
+                                <a data-event-name="site_link" data-event-container="brandbar" href="drum" target="_self">
+                                    <img src="https://cdn.24.co.za/files/Cms/General/d/3942/d6a2981a80d74a5ba5eea3ff5740d6a0.svg" alt="" />
+                                </a>
+                            </li>
+                            <li class="links--image ">
+                                <a data-event-name="site_link" data-event-container="brandbar" href="truelove" target="_self">
+                                    <img src="https://cdn.24.co.za/files/Cms/General/d/3942/2328a5d6789f4ac99ec69f09a447e685.svg" alt="" />
+                                </a>
+                            </li>
+                            <li class="links--image links--image-notice">
+                                <a data-event-name="partner_link" data-event-container="brandbar" href="https://www.snl24.com/notices" target="_self">
+                                    <img src="https://cdn.24.co.za/files/Cms/General/d/9542/d9d9a1b5e932449da6a099d98fec8837.svg" alt="Public Notices" />
+                                </a>
+                            </li>
+            </ul>
+
+            <div id="auth-section">
+                <ul class="auth profile--container">
+                    
+                    
+                        <li class="auth__subscribe">
+                            <a return-url id="subscribe-button" data-event-name="subscribe_link" data-event-container="brandbar" href="/subscription">
+                                <span>Subscribe</span>
+                            </a>
+                        </li>
+                    
+                    
+                        <li class="auth__login">
+                            <a return-url data-event-name="login_link" data-event-container="brandbar" href="/auth/signin">
+                                <span>Sign in</span>
+                            </a>
+                        </li>
+                    
+                    
+
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="module">
+        import indicator from './js/modules/profile/indicator.min.js?v=3.0.24072.4';
+        new indicator('.auth__profile');
+    </script>
+
+    
+
+    <div data-ad="true" data-adname="transitional" data-adzone="/8900/24.com/web/snl24/errorpages/404" data-sizes="[[10,10]]" style="" data-isfluid="false" data-outofpage="false" data-interstitial="false" data-targets="{&quot;pagetype&quot;:&quot;error&quot;,&quot;breadcrumb&quot;:&quot;errorpages/404&quot;,&quot;template_type&quot;:&quot;Error404&quot;,&quot;adname&quot;:&quot;transitional&quot;,&quot;posno&quot;:&quot;1&quot;,&quot;pos&quot;:&quot;1&quot;,&quot;Subscribed&quot;:&quot;n&quot;,&quot;Registered&quot;:&quot;n&quot;,&quot;Suspended&quot;:&quot;n&quot;,&quot;user_type&quot;:&quot;Anonymous&quot;,&quot;is-lifestyle&quot;:&quot;false&quot;,&quot;section&quot;:&quot;errorpages/404&quot;,&quot;live&quot;:&quot;false&quot;,&quot;platform&quot;:&quot;desktop&quot;,&quot;pagename&quot;:&quot;https://www.snl24.com/errorpages/404&quot;,&quot;t_ref&quot;:&quot;m24&quot;}" data-isrefreshenabled="true" id="transitional" class="transitional-ad pos-fixed adblock"></div>
+    <div data-ad="true" data-adname="LB_sponsorship" data-adzone="/8900/24.com/web/snl24/errorpages/404" data-sizes="[[728,90],[970,90],[980,90],[970,250]]" style="" data-isfluid="false" data-outofpage="false" data-interstitial="false" data-targets="{&quot;pagetype&quot;:&quot;error&quot;,&quot;breadcrumb&quot;:&quot;errorpages/404&quot;,&quot;template_type&quot;:&quot;Error404&quot;,&quot;adname&quot;:&quot;LB_sponsorship&quot;,&quot;posno&quot;:&quot;1&quot;,&quot;pos&quot;:&quot;1&quot;,&quot;Subscribed&quot;:&quot;n&quot;,&quot;Registered&quot;:&quot;n&quot;,&quot;Suspended&quot;:&quot;n&quot;,&quot;user_type&quot;:&quot;Anonymous&quot;,&quot;is-lifestyle&quot;:&quot;false&quot;,&quot;section&quot;:&quot;errorpages/404&quot;,&quot;live&quot;:&quot;false&quot;,&quot;platform&quot;:&quot;desktop&quot;,&quot;pagename&quot;:&quot;https://www.snl24.com/errorpages/404&quot;,&quot;t_ref&quot;:&quot;m24&quot;}" data-isrefreshenabled="true" data-isrefreshable="True" id="LB_sponsorship" class="ad-expand adblock"></div>
+
+    <div id="main-content" class="wrapper" role="main">
+        
+
+<!-- Header -->
+<header class="header" role="banner">
+<div class="header-container">        
+    <a href="/snl24" class="header__logo snl24" aria-label="Site Logo" data-event-name="home_link" data-event-container="header">
+        <img src="/images/tenants/snl24/Logo.svg?v=v3G__kZN6vPQ6mcgQxSWdvhNi6aTNeIDpH0r8USJF1k" alt="Site Logo" class="tf-img" width="280" height="68" />
+    </a>        
+    <div class="header-container--content">
+            <form method="get" class="header__search" role="search" action="/snl24/search">
+                <input type="text" name="query" class="tf-search-box" placeholder="Search" id="search" aria-label="Search" title="Please fill out this field." oninvalid="this.setCustomValidity('Please fill out this field.')" oninput="this.setCustomValidity('')" required />
+                <input type="submit" value="" id="searchBtn" aria-label="Search button" role="button" data-event-name="search_query" />
+            </form>
+
+        
+
+
+
+            <!-- Weather Widget -->
+<link defer rel="stylesheet" href="/css/tenants/snl24/widgets/weather/index.min.css?v=2yDrbxUMf0RN0lHXzpRiKu9O4E9AAxHswaOXKKY2IFU" />
+<a data-event-name="weather_link" href="/profile/weather">
+    <div class="weather-widget weather-widget--locked">
+        <div class="weather-widget__image">
+        </div>
+        <div class="weather-widget__data">
+            <p class="weather-widget__data--date">Monday, 18 March</p>
+            <span class="weather-widget__data--city">Add location</span>
+        </div>
+    </div>
+</a>
+
+
+    </div>
+</div>
+
+
+<!-- Nav Header -->
+        <nav class="header__nav" role="navigation">
+            <ul>
+                    <li class=" is-active   ">
+                        <a href="/" aria-label="Home" data-event-container="menu" data-event-name="category_link" data-event-breadcrumb="/" data-url="/" class="is-active nav-item" target="_self">Home</a>
+                    </li>
+                    <li class="    ">
+                        <a href="snl24/snl24-plus" aria-label="SNL24 Plus" data-event-container="menu" data-event-name="category_link" data-event-breadcrumb="snl24/snl24-plus" data-url="snl24/snl24-plus" class=" nav-item" target="_self">SNL24 Plus</a>
+                    </li>
+                    <li class="    ">
+                        <a href="soccerladuma" aria-label="Soccer Laduma" data-event-container="menu" data-event-name="category_link" data-event-breadcrumb="soccerladuma" data-url="soccerladuma" class=" nav-item" target="_self">Soccer Laduma</a>
+                    </li>
+                    <li class="    ">
+                        <a href="dailysun" aria-label="Daily Sun" data-event-container="menu" data-event-name="category_link" data-event-breadcrumb="dailysun" data-url="dailysun" class=" nav-item" target="_self">Daily Sun</a>
+                    </li>
+                    <li class="    ">
+                        <a href="kickoff" aria-label="KickOff" data-event-container="menu" data-event-name="category_link" data-event-breadcrumb="kickoff" data-url="kickoff" class=" nav-item" target="_self">KickOff</a>
+                    </li>
+                    <li class="    ">
+                        <a href="drum" aria-label="Drum" data-event-container="menu" data-event-name="category_link" data-event-breadcrumb="drum" data-url="drum" class=" nav-item" target="_self">Drum</a>
+                    </li>
+                    <li class="    ">
+                        <a href="truelove" aria-label="TrueLove" data-event-container="menu" data-event-name="category_link" data-event-breadcrumb="truelove" data-url="truelove" class=" nav-item" target="_self">TrueLove</a>
+                    </li>
+                    <li class="  has-children  ">
+                        <a href="snl24/watchandlisten" aria-label="Watch &amp; Listen " data-event-container="menu" data-event-name="category_link" data-event-breadcrumb="snl24/watchandlisten" data-url="snl24/watchandlisten" class=" nav-item" target="_self">Watch &amp; Listen </a>
+                                <ul class="sub-nav">
+                                        <li class=""> 
+                                            <a href="snl24/watchandlisten/podcast" aria-label="Podcast" data-event-container="submenu" data-event-name="category_link" data-event-breadcrumb="snl24/watchandlisten/podcast" target="_blank" rel="noopener noreferrer">Podcast</a>
+                                        </li>
+                                </ul>
+                    </li>
+                    <li class="    ">
+                        <a href="snl24/matchcentre" aria-label="Match Centre" data-event-container="menu" data-event-name="category_link" data-event-breadcrumb="snl24/matchcentre" data-url="snl24/matchcentre" class=" nav-item" target="_self">Match Centre</a>
+                    </li>
+                    <li class="  has-children  ">
+                        <a href="#" aria-label="More" data-event-container="menu" data-event-name="category_link" data-event-breadcrumb="#" data-url="#" class=" nav-item" target="_self">More</a>
+                                <ul class="sub-nav">
+                                        <li class=""> 
+                                            <a href="https://www.snl24.com/snl24/snl24competitions" aria-label="Competitions  " data-event-container="submenu" data-event-name="category_link" data-event-breadcrumb="https://www.snl24.com/snl24/snl24competitions" target="_self">Competitions  </a>
+                                        </li>
+                                        <li class=""> 
+                                            <a href="snl24/epublications" aria-label="E-editions" data-event-container="submenu" data-event-name="category_link" data-event-breadcrumb="snl24/epublications" target="_blank" rel="noopener noreferrer">E-editions</a>
+                                        </li>
+                                </ul>
+                    </li>
+            </ul>
+        </nav>
+
+
+</header>
+
+<script type="module">
+    import searchupdate from './js/modules/searchupdate.min.js?v=3.0.24072.4';
+    new searchupdate('#search', '#searchBtn');
+</script>
+        <div data-ad="true" data-adname="LB1" data-adzone="/8900/24.com/web/snl24/errorpages/404" data-sizes="[[728,90],[970,90],[980,90],[970,250]]" style="height: 90px;width: 728px;" data-isfluid="false" data-outofpage="false" data-interstitial="false" data-targets="{&quot;pagetype&quot;:&quot;error&quot;,&quot;breadcrumb&quot;:&quot;errorpages/404&quot;,&quot;template_type&quot;:&quot;Error404&quot;,&quot;adname&quot;:&quot;LB1&quot;,&quot;posno&quot;:&quot;1&quot;,&quot;pos&quot;:&quot;1&quot;,&quot;Subscribed&quot;:&quot;n&quot;,&quot;Registered&quot;:&quot;n&quot;,&quot;Suspended&quot;:&quot;n&quot;,&quot;user_type&quot;:&quot;Anonymous&quot;,&quot;is-lifestyle&quot;:&quot;false&quot;,&quot;section&quot;:&quot;errorpages/404&quot;,&quot;live&quot;:&quot;false&quot;,&quot;platform&quot;:&quot;desktop&quot;,&quot;pagename&quot;:&quot;https://www.snl24.com/errorpages/404&quot;,&quot;t_ref&quot;:&quot;m24&quot;}" data-isrefreshenabled="true" data-isrefreshable="True" id="LB1" class="ad-expand adblock"></div>
+        
+        
+        <vc:hot-topics></vc:hot-topics>
+        <div class="container">
+            <link rel="stylesheet" href="/css/tenants/snl24/pages/error/index.min.css?v=bf2AcSpjgzC562U9zFiNPKLkOlrmbAR9FHGGmpg7irU" />
+
+
+<div class="error">
+    <div class="error-img"></div>
+    <h1>
+        We’re sorry, the page you have requested does not exist.
+    </h1>
+    <p>Code Error <span>404</span></p>
+</div>
+
+            <script type="module">
+                import articleposition from './js/modules/articles/articleposition.min.js?v=3.0.24072.4'
+                articleposition.setArticlePosition();
+            </script>
+        </div>
+    </div>
+
+    
+
+    
+        <script src="/js/modules/pwa.min.js?v=ajSNoKPO1iFZHsREi3FmD-EeK5Js1G3uM6i6R9GI0DU" type="module"></script>
+        <script async src="/js/modules/naas.min.js?v=9Z3fJEawRwLCTp5omRpGcw710Q87xH6jw-FHQTDZODs" type="module"></script>
+        <script async src="https://pub.doubleverify.com/signals/pub.js#ctx=21638714&cmp=DV1023945" referrerpolicy="no-referrer-when-downgrade">
+
+        </script>
+        
+
+<!--Scripts: footer-->
+
+    
+
+    <vc:legacy-pay-u />
+    <!--Scripts: PagePing-->
+<script>
+  window.addEventListener('load', (event) => {
+      console.log(event);
+    const isoStr = new Date().toISOString();
+    var appname =
+      document.querySelector('meta[name="application-name"]')?.content || '';
+
+    var evt = new URL('https://evt.24.com/v1/collect');
+    if (appname.toLowerCase().endsWith('dev'))
+    {
+        evt = new URL('https://dev-evt.24.com/v1/collect');
+    }
+
+    evt.searchParams.append('eventType', 'events');
+    evt.searchParams.append('eventName', 'page_ping');
+    evt.searchParams.append('eventDate', isoStr);
+    evt.searchParams.append('pagetitle', document.title);
+    var isbrave =
+      (navigator.brave && navigator.brave.isBrave() != undefined) || false;
+    var tfuid = ('; ' + document.cookie).split(`; 24uid=`).pop().split(';')[0];
+    var platform = document.querySelector('meta[name="platform"]')?.content || '';
+    var breadcrumb = document.querySelector('meta[name="breadcrumb"]')?.content || '';
+    var usertype = document.querySelector('meta[name="usertype"]')?.content || '';
+    var permatitle = document.querySelector('meta[name="permatitle"]')?.content || '';
+    var access = document.querySelector('meta[name="access"]')?.content || '';
+    var articleState = document.querySelector('meta[name="locked"]')?.content || '';
+    var articleid = document.querySelector('meta[name="articleid"]')?.content || '';
+    var pageviewtype = document.querySelector('meta[name="pageviewtype"]')?.content || '';
+    var isbreakingnews = document.querySelector('meta[name="isbreakingnews"]')?.content || '';
+    var isexclusive = document.querySelector('meta[name="isexclusive"]')?.content || '';
+    var url = window.location.href;
+
+    var userAgent = navigator.userAgent;
+    articleState = articleState == 'true' ? 'locked' : 'unlocked';
+    articleid =
+      articleid == '00000000-0000-0000-0000-000000000000' ? '' : articleid;
+    articleState = articleid === '' ? '' : articleState;
+    var tfuat = ('; ' + document.cookie).split(`; 24uat=`).pop().split(';')[0];
+    if (tfuat !== '') {
+      var base64Url = tfuat.split('.')[1];
+      var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      var jsonPayload = decodeURIComponent(
+        window
+          .atob(base64)
+          .split('')
+          .map(function (c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+          })
+          .join('')
+      );
+      var model = JSON.parse(jsonPayload);
+      tfuat = model.user_id;
+    }
+    if (isbrave !== '') {
+      evt.searchParams.append('isBrave', isbrave);
+    }
+    if (platform !== '') {
+      evt.searchParams.append('platform', platform);
+    }
+    if (tfuid !== '') {
+      evt.searchParams.append('24uid', tfuid);
+    }
+    if (tfuat !== '') {
+      evt.searchParams.append('firebaseId', tfuat);
+    }
+    if (appname !== '') {
+      evt.searchParams.append('appName', appname);
+    }
+    if (breadcrumb !== '') {
+      evt.searchParams.append('breadcrumb', breadcrumb);
+    }
+    if (usertype !== '') {
+      evt.searchParams.append('userState', usertype.toLowerCase());
+    }
+    if (articleState !== '') {
+      evt.searchParams.append('articleState', articleState);
+    }
+    if (permatitle !== '') {
+      evt.searchParams.append('permatitle', permatitle);
+    }
+    if (access !== '') {
+      evt.searchParams.append('access', access);
+    }
+    if (articleid !== '') {
+      evt.searchParams.append('articleid', articleid);
+    }
+    if (url !== '') {
+      evt.searchParams.append('url', url);
+    }
+    if (pageviewtype !== '') {
+      evt.searchParams.append('source', pageviewtype);
+    }
+    if (userAgent !== '') {
+      evt.searchParams.append('userAgent', userAgent);
+    }
+    if (isbreakingnews !== '') {
+        evt.searchParams.append('IsBreakingNews', isbreakingnews);
+    }
+    if (isexclusive !== '') {
+        evt.searchParams.append('IsExclusive', isexclusive);
+    }
+
+    setTimeout(function () {
+      fetch('https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js', {
+        method: 'HEAD',
+        mode: 'no-cors',
+        cache: 'no-store',
+      })
+        .then(() => {
+          evt.searchParams.append('adblock', false);
+          var googleId = typeof ga != "undefined" ? ga.getAll()[0].get('clientId') : '';
+          var googleId = ('; ' + document.cookie).split(`; _ga=`).pop().split(';')[0];
+            if (googleId !== '') {
+                googleId=googleId.substring(6)
+            }
+          if (googleId !== '') {
+            evt.searchParams.append('googleId', googleId);
+          }
+          var downloadingImage = new Image();
+          downloadingImage.src = evt.href;
+        })
+        .catch(() => {
+          evt.searchParams.append('adblock', true);
+          var downloadingImage = new Image();
+          downloadingImage.src = evt.href;
+        });
+    }, 2000);
+  });
+</script>
+    
+
+    <input id="EnableOTP" type="hidden" />
+
+
+
+    <input id="EnableEmailVerification" type="hidden" />
+
+
+	<script nws-csp-add-nonce='true'>'serviceWorker'in navigator&&navigator.serviceWorker.register('/serviceworker', { scope: '/' })</script></body>
+</html>

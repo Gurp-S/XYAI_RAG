@@ -4,19 +4,26 @@ import cn.hutool.core.util.IdUtil;
 import com.XYai.myai.rag.RetrievalAugmentedGeneration;
 import com.XYai.myai.rag.aop.annotation.RagTraceContext;
 import com.XYai.myai.rag.aop.annotation.RagTraceRoot;
+import com.XYai.myai.rag.channel.cache.RetrievalCacheService;
 import com.XYai.myai.rag.channel.pojo.RetrievedChunk;
+import com.XYai.myai.rag.channel.processor.RetrievalQualityGate;
 import com.XYai.myai.rag.chat.pojo.ChatMessage;
+import com.XYai.myai.rag.evaluate.pojo.SystemEvaluate;
 import com.XYai.myai.rag.evaluate.service.SystemEvaluateService;
+import com.XYai.myai.rag.kafka.event.AnalyticsEvent;
 import com.XYai.myai.rag.mcp.pojo.ToolProcessorResult;
+import com.XYai.myai.rag.memory.LongTermMemoryService;
 import com.XYai.myai.rag.memory.pojo.LoadSession;
 import com.XYai.myai.rag.ragPojo.RAGResult;
 import com.XYai.myai.rag.ragPojo.UserContext;
 import com.XYai.myai.rag.rewrite.pojo.RewriteResult;
 import com.XYai.myai.user.LoginUserInfoManager;
+import com.XYai.myai.xyAdmin.pojo.TokenUse;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.http.HttpStatus;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -26,6 +33,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -46,8 +54,23 @@ public class ChatOrchestrator {
     @Resource
     private SystemEvaluateService systemEvaluateService;
 
+    @Resource
+    private RetrievalQualityGate retrievalQualityGate;
+
+    @Resource
+    private RetrievalCacheService retrievalCacheService;
+
+    @Resource
+    private LongTermMemoryService longTermMemoryService;
+
     @Resource(name = "chatExecutor")
     private TaskExecutor chatExecutor;
+    @Resource
+    private KafkaTemplate<String,Object> kafkaTemplate;
+
+    /** 尽力而为观测事件（token 统计/评估）专用轻量 producer：acks=1 + 微批 + lz4 */
+    @Resource(name = "fastKafkaTemplate")
+    private KafkaTemplate<String,Object> fastKafkaTemplate;
 
     // ==================== 主入口方法 ====================
 
@@ -62,7 +85,7 @@ public class ChatOrchestrator {
     }
 
     private CompletableFuture<Void> doChat(String message, Long conversationId, String fileContent,
-                                            SseEmitter emitter, boolean fast) {
+                                           SseEmitter emitter, boolean fast) {
         // 步骤0：参数校验
         if (message == null || message.isBlank()) {
             String modeTag = fast ? "[CHAT_FAST]" : "[CHAT]";
@@ -115,6 +138,12 @@ public class ChatOrchestrator {
         return CompletableFuture.runAsync(() -> {
 
             try {
+                // Agent 步骤 A：记忆形成——从本轮用户消息抽取长期记忆（LLM 无关，确定性规则）
+                Long uid = userCtx != null ? userCtx.getUserId() : null;
+                if (uid != null) {
+                    longTermMemoryService.remember(uid, message, finalConvId);
+                }
+
                 // 步骤4-6：同步执行 RAG 流程
                 RAGIntermediate intermediate = executeRAGSync(
                         message, finalConvId, userCtx, chatMessageId, mode);
@@ -135,14 +164,41 @@ public class ChatOrchestrator {
                         intermediate.rewritten(),
                         intermediate.retrieved(),
                         message);
+                ragResult.setInsufficientEvidence(intermediate.insufficientEvidence());
 
-                // 步骤8：构建最终 Prompt
+                // Agent 步骤 B：长期记忆召回 → 注入 Prompt 上下文（MemGPT 式 memory retrieval）
+                LongTermMemoryService.RecallResult memoryRecall = uid == null
+                        ? LongTermMemoryService.RecallResult.empty()
+                        : longTermMemoryService.recall(uid, message, 5);
+                if (memoryRecall.text() != null && !memoryRecall.text().isBlank()) {
+                    ragResult.setLongTermMemoryText(memoryRecall.text());
+                }
+
+                // 步骤8：构建最终 Prompt（证据不足时进入决策分支）
                 String finalPrompt = rag.formatFinalPrompt(ragResult, modelInvocation.getSystemMessage(), fileContent);
+                if (intermediate.insufficientEvidence()) {
+                    // Agent 决策：知识库证据不足 → 若长期记忆与问题相关，允许基于记忆作个性化答复；
+                    // 否则要求模型明示"知识库无资料"，禁止编造（Agentic 澄清/拒答策略）
+                    if (memoryRecall.relevant()) {
+                        finalPrompt = finalPrompt + "\n\n(系统提示: 知识库未检索到直接资料，但用户长期记忆与问题相关。"
+                                + "可以基于长期记忆作答并标注'这是根据你的过往信息整理的答案'，若记忆不足以回答请向用户澄清，不要编造。)" ;
+                        log.info("[{}] 证据不足→走记忆个性化分支 (topScore={})", mode,
+                                String.format("%.3f", memoryRecall.topScore()));
+                    } else {
+                        finalPrompt = finalPrompt + "\n\n(系统提示: 本轮检索证据不足，若无法回答请明确告知用户知识库中暂无相关资料，不要编造。)";
+                    }
+                }
                 log.info("[{}] 最终 Prompt 构建完成，长度={}", mode, finalPrompt.length());
+
+                // 答案缓存 key：归一化问题 + 用户 + 检索指纹（检索结果不变才可复用答案）
+                String answerCacheKey = retrievalCacheService.buildAnswerKey(
+                        RetrievalCacheService.normalizeQuery(message),
+                        userCtx.getUserId(),
+                        intermediate.retrieved());
 
                 // 步骤9-10：调用模型流式输出 + 后处理
                 executeModelCallStream(finalPrompt, finalConvId, message, userCtx,
-                        chatMessageId, fast, emitter, mode);
+                        chatMessageId, fast, emitter, mode, answerCacheKey);
 
             } catch (Exception e) {
                 log.error("[{}] 对话处理异常", mode, e);
@@ -195,7 +251,15 @@ public class ChatOrchestrator {
                     retrieved != null ? retrieved.size() : 0,
                     System.currentTimeMillis() - t3);
 
-            return new RAGIntermediate(rewritten, retrieved);
+            // 步骤6.5：检索质量门控（CRAG 式）——证据不足时改写重检索一次
+            RetrievalQualityGate.GateOutcome outcome = retrievalQualityGate.gate(
+                    retrieved, userMessageEntityFileChunkIds, rewritten, conversationId, message);
+            if (outcome.isRetried()) {
+                log.info("[RAG_SYNC] 门控重检索完成: bestScore={}, insufficient={}",
+                        outcome.getBestScore(), outcome.isInsufficientEvidence());
+            }
+
+            return new RAGIntermediate(rewritten, outcome.getChunks(), outcome.isInsufficientEvidence());
         } finally {
             LoginUserInfoManager.remove();
             SecurityContextHolder.clearContext();
@@ -208,10 +272,26 @@ public class ChatOrchestrator {
     private void executeModelCallStream(String finalPrompt, Long conversationId,
                                         String originalMessage, UserContext userCtx,
                                         Long chatMessageId, boolean fast,
-                                        SseEmitter emitter, String mode) {
+                                        SseEmitter emitter, String mode, String answerCacheKey) {
         log.info("[MODEL_CALL_{}] ==== 开始模型调用 ====", mode);
         log.info("[MODEL_CALL_{}] finalPrompt长度={}, conversationId={}, chatMessageId={}",
                 mode, finalPrompt.length(), conversationId, chatMessageId);
+
+        // L4 答案缓存：命中直接回放，跳过 LLM（P99 优化主路径）
+        String cachedAnswer = retrievalCacheService.getAnswer(answerCacheKey);
+        if (cachedAnswer != null) {
+            log.info("[MODEL_CALL_{}] 答案缓存命中，回放缓存回答，长度={}", mode, cachedAnswer.length());
+            try {
+                for (int i = 0; i < cachedAnswer.length(); i += 100) {
+                    String piece = cachedAnswer.substring(i, Math.min(i + 100, cachedAnswer.length()));
+                    emitter.send(SseEmitter.event().data(piece));
+                }
+            } catch (IOException e) {
+                log.warn("[MODEL_CALL_{}] 缓存回放 SSE 发送中断", mode, e);
+            }
+            completeEmitterDone(emitter);
+            return;
+        }
 
         StringBuilder fullAnswer = new StringBuilder();
         long startTime = System.nanoTime();
@@ -234,25 +314,29 @@ public class ChatOrchestrator {
 
             String answer = fullAnswer.toString();
 
+            // 写入答案缓存（检索结果不变时后续同样问题直接回放）
+            retrievalCacheService.putAnswer(answerCacheKey, answer);
+
             // 异步保存对话记忆
-            modelInvocation.saveMemoryAsync(
+            modelInvocation.saveMemory(
                     conversationId, chatMessageId, originalMessage, answer, userCtx.getUserId());
 
             // 异步系统评估
-            if (!answer.isBlank() && !answer.contains("服务繁忙")) {
-                systemEvaluateService.submitEvaluate(
-                        conversationId,
-                        ChatMessage.builder()
-                                .chatMessageId(chatMessageId)
-                                .userMessage(originalMessage)
-                                .assistantMessage(answer)
-                                .userId(userCtx.getUserId())
-                                .build(),
-                        List.of(),
-                        (System.nanoTime() - startTime) / 1_000_000,
-                        originalMessage);
-            }
-
+            SystemEvaluate systemEvaluate = new SystemEvaluate(
+                    conversationId,
+                    ChatMessage.builder()
+                            .chatMessageId(chatMessageId)
+                            .userMessage(originalMessage)
+                            .assistantMessage(answer)
+                            .userId(userCtx.getUserId())
+                            .build(),
+                    List.of(),
+                    (System.nanoTime() - startTime) / 1_000_000,
+                    originalMessage);
+            fastKafkaTemplate.send("analytics-event", null, new AnalyticsEvent(
+                    UUID.randomUUID().toString(),"evaluate",
+                    null,null,systemEvaluate
+            ));
             // 完成 SSE
             completeEmitterDone(emitter);
         };
@@ -277,11 +361,14 @@ public class ChatOrchestrator {
         // 流式结束后保存 Token 消耗
         long durationMs = (System.nanoTime() - startTime) / 1_000_000;
         RagTraceContext.setPhase("模型路由");
-        modelInvocation.saveTokenUseAsync(
+        TokenUse tokenUse = new TokenUse(
                 conversationId, chatMessageId,
-                (long) finalPrompt.length(), (long) fullAnswer.toString().length(),
+                finalPrompt.length(), fullAnswer.toString().length(),
                 userCtx.getUserId(), durationMs, modelNameRef[0], "chat");
-
+        fastKafkaTemplate.send("analytics-event", null, new AnalyticsEvent(
+                UUID.randomUUID().toString(),"save_token",
+                null,tokenUse,null
+        ));
         log.info("[MODEL_CALL_{}] 模型调用结束, 模型: {}", mode, modelNameRef[0]);
     }
 
@@ -312,6 +399,6 @@ public class ChatOrchestrator {
 
     // ==================== 内部类 ====================
 
-    private record RAGIntermediate(RewriteResult rewritten, List<RetrievedChunk> retrieved) {
+    private record RAGIntermediate(RewriteResult rewritten, List<RetrievedChunk> retrieved, boolean insufficientEvidence) {
     }
 }

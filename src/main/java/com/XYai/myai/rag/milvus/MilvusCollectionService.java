@@ -125,7 +125,7 @@ public class MilvusCollectionService {
      */
     public List<String> getAllCollectionNames() {
         // 先读取当前用户权限集合
-        return milvusAclManager.getUserCollectionsAcl();
+        return new java.util.ArrayList<>(milvusAclManager.getUserCollectionsAcl());
     }
 
     public Boolean exists(String collectionName) {

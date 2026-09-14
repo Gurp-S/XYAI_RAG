@@ -7,14 +7,13 @@ import com.XYai.myai.user.pojo.User;
 import com.XYai.myai.user.userChat.UserChatService;
 import com.XYai.myai.user.userChat.pojo.FileMessage;
 import com.XYai.myai.user.userChat.pojo.UserChatRequest;
-import com.github.benmanes.caffeine.cache.Cache;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Milvus 向量数据库管理控制器。
@@ -30,7 +29,7 @@ public class MilvusController {
     @Resource
     private MilvusFileManager milvusFileManager;
     @Resource
-    private MilvusCollectionService milvusCollectionService;
+    private MilvusCollectionManager milvusCollectionManager;
     @Resource
     private UserChatService userChatService;
     @Resource
@@ -42,8 +41,8 @@ public class MilvusController {
      * @return 返回数据库集合列表
      */
     @GetMapping("/list")
-    public Result<List<String>> listCollections() {
-        return Result.success(milvusCollectionService.getAllCollectionNames());
+    public Result<Set<String>> listCollections() {
+        return Result.success(milvusCollectionManager.getAllCollectionNames());
     }
 
     /**
@@ -71,7 +70,7 @@ public class MilvusController {
 
     @GetMapping("/metadata/number")
     public Result<Integer> getCollectionsFileNumber(String collectionName) {
-        return Result.success(milvusCollectionService.getCollectionsFileNumber(collectionName));
+        return Result.success(milvusCollectionManager.getCollectionsFileNumber(collectionName));
     }
 
     @GetMapping("/metadata/user")
@@ -88,7 +87,7 @@ public class MilvusController {
      */
     @PostMapping("/search")
     public Result<List<String>> search(String str) {// 权限隔离
-        List<String> searchCollectionNames = milvusCollectionService.search(str);
+        List<String> searchCollectionNames = milvusCollectionManager.search(str);
         return Result.success(searchCollectionNames);
     }
 
@@ -100,7 +99,7 @@ public class MilvusController {
      */
     @PostMapping("/create")
     public Result<String> createCollection(String collectionName) {// 增加权限
-        milvusCollectionService.createCollectionIfAbsent(collectionName);
+        milvusCollectionManager.createCollectionIfAbsent(collectionName);
         return Result.success("集合创建成功");
     }
 
@@ -117,7 +116,7 @@ public class MilvusController {
             log.info("getStatusNoACl:{}", collectionName);
             return Result.error(1, "无权限访问");
         }
-        boolean isLoad = milvusCollectionService.isLoaded(collectionName);
+        boolean isLoad = milvusCollectionManager.isLoaded(collectionName);
         return Result.success(isLoad);
     }
 
@@ -135,11 +134,11 @@ public class MilvusController {
             log.info("unloadOrLoadCollectionNoACl:{}", collectionName);
             return Result.error(1, "无权限访问");
         }
-        if (!milvusCollectionService.isLoaded(collectionName)) {
-            milvusCollectionService.loadCollection(collectionName);
+        if (!milvusCollectionManager.isLoaded(collectionName)) {
+            milvusCollectionManager.loadCollection(collectionName);
             log.info("loadCollectionName:{}", collectionName);
         } else {
-            milvusCollectionService.unloadCollection(collectionName);
+            milvusCollectionManager.unloadCollection(collectionName);
             log.info("unLoadCollectionName:{}", collectionName);
         }
         return Result.success();
@@ -157,7 +156,7 @@ public class MilvusController {
             log.info("dropCollectionNoACl:{}", collectionName);
             return Result.error(1, "无权限访问");
         }
-        return milvusCollectionService.drop(collectionName);
+        return milvusCollectionManager.drop(collectionName);
     }
 
     @PostMapping("/delete/doc")
@@ -180,7 +179,7 @@ public class MilvusController {
             log.info("rebuildCollectionNoACl:{}", collectionName);
             return Result.error(1, "无权限访问");
         }
-        return milvusCollectionService.rebuild(collectionName);
+        return milvusCollectionManager.rebuild(collectionName);
     }
 
     /**

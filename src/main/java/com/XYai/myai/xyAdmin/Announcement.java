@@ -1,5 +1,7 @@
 package com.XYai.myai.xyAdmin;
 
+import com.XYai.myai.security.annotation.AdminOnly;
+
 import com.XYai.myai.config.Result;
 import com.alibaba.fastjson2.JSON;
 import jakarta.annotation.Resource;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
  * 使用 Redis List 存储公告消息
  */
 @Slf4j
+@AdminOnly
 @RestController
 @RequestMapping("/xyAdmin/announcement")
 public class Announcement {

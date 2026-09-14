@@ -3,19 +3,25 @@ package com.XYai.myai.rag.aop;
 
 import com.XYai.myai.exception.RateLimitException;
 import com.XYai.myai.rag.aop.annotation.RateLimit;
+import com.XYai.myai.user.LoginUserInfoManager;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Collections;
 import java.util.UUID;
 
 /**
  * 限流切面：在方法执行前通过 Redis + Lua 完成固定窗口限流判断。
+ * 限流 key 默认按「资源名 + 用户/IP」隔离，避免全局一刀切。
  */
 @Aspect
 @Component
@@ -29,7 +35,7 @@ public class RateLimitAspect {
     /**
      * 匹配所有使用 {@link RateLimit} 注解的方法。
      */
-    @Pointcut("@annotation(com.XYai.myai.rag.aop.Annotation.rateLimit)")
+    @Pointcut("@annotation(com.XYai.myai.rag.aop.annotation.RateLimit)")
     public void pointCut() {
     }
 
@@ -40,23 +46,41 @@ public class RateLimitAspect {
      */
     @Before("pointCut() && @annotation(rateLimit)")
     public void before(RateLimit rateLimit) {
-        // 从注解中读取限流参数。
         int limit = rateLimit.limit();
         String name = rateLimit.rateName();
+        if (!StringUtils.hasText(name)) {
+            name = "default";
+        }
         long windowMs = rateLimit.windowMs();
+        String bucketKey = "rate:" + name + ":" + resolveCallerKey();
 
-        // 执行 Lua 脚本进行原子限流判断。
         Boolean isAccess = stringRedisTemplate.execute(
                 redisScript,
-                Collections.singletonList(name),
+                Collections.singletonList(bucketKey),
                 String.valueOf(limit),
-                // 仅传窗口大小，让Redis自己查权威时间
                 String.valueOf(windowMs),
-                // Zset member 唯一值，避免同值覆盖。
                 UUID.randomUUID().toString()
         );
-        if (!isAccess) {
+        if (Boolean.FALSE.equals(isAccess)) {
             throw new RateLimitException();
         }
+    }
+
+    private String resolveCallerKey() {
+        Long userId = LoginUserInfoManager.getUserId();
+        if (userId != null) {
+            return "u:" + userId;
+        }
+        ServletRequestAttributes attrs =
+                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attrs != null) {
+            HttpServletRequest request = attrs.getRequest();
+            String forwarded = request.getHeader("X-Forwarded-For");
+            if (StringUtils.hasText(forwarded)) {
+                return "ip:" + forwarded.split(",")[0].trim();
+            }
+            return "ip:" + request.getRemoteAddr();
+        }
+        return "anon";
     }
 }

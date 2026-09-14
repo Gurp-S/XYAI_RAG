@@ -24,6 +24,11 @@ public class TraceRecordServiceIml implements TraceRecordService {
     private NodeRecordMapper nodeRecordMapper;
 
     @Override
+    public void updateRun(String traceId, String status, String message, Long costTimeMs) {
+        traceRecordMapper.updateByTraceId(traceId, status, LocalDateTime.now(), costTimeMs, message);
+    }
+
+    @Override
     public void startRun(String traceId, String name) {
         TraceRecord record = TraceRecord.builder()
                 .traceId(traceId)
@@ -49,8 +54,8 @@ public class TraceRecordServiceIml implements TraceRecordService {
 
 
     @Override
-    public void updateNode(String traceId, String nodeId, Object name, Object type, long costTime) {
-        nodeRecordMapper.updateNodeStatus(nodeId, "SUCCESS", LocalDateTime.now(), costTime, null);
+    public void updateNode(String traceId,String status, String nodeId, Object name, Object type, long costTime, String message) {
+        nodeRecordMapper.updateNodeStatus(nodeId, status, LocalDateTime.now(), costTime, message);
     }
 
     @Override
@@ -60,7 +65,7 @@ public class TraceRecordServiceIml implements TraceRecordService {
 
     @Override
     public void recordRunWarn(String traceId, String warnMessage, long costTime) {
-        traceRecordMapper.updateByTraceId(traceId, "WARN", LocalDateTime.now(), costTime, warnMessage);
+        updateRun(traceId, "WARN", warnMessage, costTime);
     }
 
     @Override
@@ -70,11 +75,11 @@ public class TraceRecordServiceIml implements TraceRecordService {
 
     @Override
     public void finishRun(String traceId, long costTime) {
-        traceRecordMapper.updateByTraceId(traceId, "SUCCESS", LocalDateTime.now(), costTime, null);
+        updateRun(traceId, "SUCCESS", null, costTime);
     }
 
     @Override
     public void recordError(String traceId, String message) {
-        traceRecordMapper.updateByTraceId(traceId, "ERROR", LocalDateTime.now(), null, message);
+        updateRun(traceId, "ERROR", message, null);
     }
 }

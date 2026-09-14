@@ -1,5 +1,7 @@
 package com.XYai.myai.xyAdmin;
 
+import com.XYai.myai.security.annotation.AdminOnly;
+
 import com.XYai.myai.config.CacheConfig;
 import com.XYai.myai.config.ConfigPersistence;
 import com.XYai.myai.config.Result;
@@ -25,6 +27,7 @@ import java.util.HashMap;
  * 提供运行时查看和更新各模块配置的能力
  */
 @Slf4j
+@AdminOnly
 @RestController
 @RequestMapping("/xyAdmin/rag/properties")
 public class RagPropertiesManager {

@@ -1,10 +1,10 @@
 package com.XYai.myai.rag.chat;
 
 import com.XYai.myai.config.Result;
+import com.XYai.myai.exception.DocumentParseException;
+import com.XYai.myai.rag.aop.annotation.RateLimit;
 import com.XYai.myai.rag.chat.pojo.ChatRequest;
-import com.XYai.myai.rag.etlpipeline.nodes.Parser;
-import com.XYai.myai.rag.etlpipeline.pojo.IngestionContext;
-import com.XYai.myai.rag.etlpipeline.pojo.NodeResult;
+import com.XYai.myai.rag.etlpipeline.consumers.Parser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,9 +18,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * AI 对话控制器
@@ -63,6 +63,7 @@ public class ChatController {
     // ==================== 普通对话接口（SSE 流式） ====================
 
     @GetMapping(value = "/chat", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @RateLimit(limit = 30, rateName = "ai_chat", windowMs = 60_000)
     @Operation(summary = "流式对话(GET)", description = "GET方式的流式对话接口")
     public SseEmitter chat(
             @Parameter(description = "用户消息", example = "你好")
@@ -76,6 +77,7 @@ public class ChatController {
     }
 
     @PostMapping(value = "/chat", consumes = "application/json", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @RateLimit(limit = 30, rateName = "ai_chat", windowMs = 60_000)
     @Operation(summary = "流式对话(POST)", description = "POST方式的流式对话接口")
     public SseEmitter chatPost(@Valid @RequestBody ChatRequest request) {
         SseEmitter emitter = new SseEmitter(0L);
@@ -87,6 +89,7 @@ public class ChatController {
     // ==================== 快速模式接口 ====================
 
     @GetMapping(value = "/chat/fast", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @RateLimit(limit = 20, rateName = "ai_chat_fast", windowMs = 60_000)
     @Operation(summary = "快速模式(GET)", description = "并发调用多个模型，取最快响应")
     public SseEmitter chatFast(
             @Parameter(description = "用户消息", example = "你好")
@@ -101,6 +104,7 @@ public class ChatController {
     }
 
     @PostMapping(value = "/chat/fast", consumes = "application/json", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @RateLimit(limit = 20, rateName = "ai_chat_fast", windowMs = 60_000)
     @Operation(summary = "快速模式(POST)", description = "POST方式的快速模式接口")
     public SseEmitter chatFastPost(@Valid @RequestBody ChatRequest request) {
         log.info("快速模式(POST) - conversationId: {}", request.getConversationId());
@@ -111,36 +115,24 @@ public class ChatController {
     }
 
     @PostMapping("/chat/files")
+    @RateLimit(limit = 10, rateName = "ai_chat_files", windowMs = 60_000)
     public Result<Map<String, String>> chatFiles(
             @RequestParam(value = "chatFile", required = false) MultipartFile file) {
         log.info("chatFiles 文件解析开始");
         if (file == null || file.isEmpty()) {
             return Result.error(1, "文件不能为空");
         }
-        byte[] rawBytes;
+
+        String tempHash = UUID.randomUUID().toString();
+        Document parsedDoc;
         try {
-            rawBytes = file.getBytes();
-        } catch (IOException e) {
-            log.error("文件读取失败", e);
-            return Result.error(2, "文件读取失败，请检查文件是否损坏");
+            parsedDoc = parser.execute(file, tempHash);
+        } catch (DocumentParseException e) {
+            log.error("文件解析失败: {}", e.getMessage());
+            return Result.error(3, "文件解析失败：" + e.getMessage());
         }
-        Document document = Document.builder()
-                .text("")
-                .metadata(new HashMap<>())
-                .build();
-        document.getMetadata().put(IngestionContext.META_RAW_BYTES, rawBytes);
-        if (file.getContentType() != null) {
-            document.getMetadata().put(IngestionContext.META_MIME_TYPE, file.getContentType());
-        }
-        IngestionContext context = IngestionContext.builder()
-                .document(document)
-                .build();
-        NodeResult nodeResult = parser.execute(context, null);
-        if (!nodeResult.isSuccess()) {
-            log.error("文件解析失败: {}", nodeResult.getMessage());
-            return Result.error(3, "文件解析失败：" + nodeResult.getMessage());
-        }
-        String content = context.getDocument().getText();
+
+        String content = parsedDoc.getText();
         if (!StringUtils.hasText(content)) {
             return Result.error(1, "未提取出文字");
         }

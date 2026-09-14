@@ -1,0 +1,2203 @@
+<!DOCTYPE html>
+
+
+    <html itemscope itemtype="https://schema.org/QAPage" class="html__responsive " lang="en">
+
+    <head>
+
+        <title>What was the first movie to feature a person seated on a toilet? - Movies & TV Stack Exchange</title>
+        <link rel="shortcut icon" href="https://cdn.sstatic.net/Sites/movies/Img/favicon.ico?v=74d8f37ba4ec">
+        <link rel="apple-touch-icon" href="https://cdn.sstatic.net/Sites/movies/Img/apple-touch-icon.png?v=628999b87fc2">
+        <link rel="image_src" href="https://cdn.sstatic.net/Sites/movies/Img/apple-touch-icon.png?v=628999b87fc2"> 
+        <link rel="search" type="application/opensearchdescription+xml" title="Movies &amp; TV Stack Exchange" href="/opensearch.xml">
+        <link rel="canonical" href="https://movies.stackexchange.com/questions/31321/what-was-the-first-movie-to-feature-a-person-seated-on-a-toilet" />
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0">
+        <meta property="og:type" content= "website" />
+        <meta property="og:url" content="https://movies.stackexchange.com/questions/31321/what-was-the-first-movie-to-feature-a-person-seated-on-a-toilet"/>
+        <meta property="og:site_name" content="Movies &amp; TV Stack Exchange" />
+        <meta property="og:image" itemprop="image primaryImageOfPage" content="https://cdn.sstatic.net/Sites/movies/Img/apple-touch-icon@2.png?v=b89c1b553576" />
+        <meta name="twitter:card" content="summary"/>
+        <meta name="twitter:domain" content="movies.stackexchange.com"/>
+        <meta name="twitter:title" property="og:title" itemprop="name" content="What was the first movie to feature a person seated on a toilet?" />
+        <meta name="twitter:description" property="og:description" itemprop="description" content="Psycho directed by Alfred Hitchcock has a scene where a person is flushing a toilet. This fact provided some shock effect, since toilets were virtually never seen in American cinema in the 1960s.&#xA;&#xA;..." />
+    <script id="webpack-public-path" type="text/uri-list">https://cdn.sstatic.net/</script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.js"></script>
+    <script defer src="https://cdn.sstatic.net/Js/third-party/npm/@stackoverflow/stacks/dist/js/stacks.min.js?v=d5f780ae3281"></script>
+    <script src="https://cdn.sstatic.net/Js/stub.en.js?v=30dc0e2fbcff"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.sstatic.net/Shared/stacks.css?v=dbee492db9b7">
+    <link rel="stylesheet" type="text/css" href="https://cdn.sstatic.net/Sites/movies/primary.css?v=6ab24a0cc080">
+
+
+    
+            <link rel="alternate" type="application/atom+xml" title="Feed for question &#x27;What was the first movie to feature a person seated on a toilet?&#x27;" href="/feeds/question/31321">
+        <script>
+            StackExchange.ready(function () {
+
+                StackExchange.using("postValidation", function () {
+                    StackExchange.postValidation.initOnBlurAndSubmit($('#post-form'), 2, 'answer');
+                });
+
+
+                StackExchange.question.init({showAnswerHelp:true,totalCommentCount:5,shownCommentCount:5,enableTables:true,questionId:31321});
+
+                styleCode();
+
+                    StackExchange.realtime.subscribeToQuestion('367', '31321');
+                    StackExchange.using("gps", function () { StackExchange.gps.trackOutboundClicks('#content', '.js-post-body'); });
+
+
+            });
+        </script>
+
+        
+        
+        
+        <link rel="stylesheet" type="text/css" href="https://cdn.sstatic.net/Shared/Channels/channels.css?v=db82e15fc6d3">
+
+        
+        
+
+
+    <script>
+        StackExchange.ready(function () {
+            StackExchange.realtime.init('wss://qa.sockets.stackexchange.com');
+                StackExchange.realtime.subscribeToReputationNotifications('367');
+        StackExchange.realtime.subscribeToTopBarNotifications('367');
+        });
+    </script>
+    <script type="application/json" data-role="module-args" data-module-name="Shared/options.mod">{"options":{"locale":"en","serverTime":1710350251,"routeName":"Questions/Show","stackAuthUrl":"https://stackauth.com","networkMetaHostname":"meta.stackexchange.com","site":{"name":"Movies \u0026 TV Stack Exchange","description":"Q\u0026A for movie and TV enthusiasts","isNoticesTabEnabled":true,"enableNewTagCreationWarning":false,"insertSpaceAfterNameTabCompletion":false,"id":367,"cookieDomain":".stackexchange.com","childUrl":"https://movies.meta.stackexchange.com","negativeVoteScoreFloor":null,"enableSocialMediaInSharePopup":true,"protocol":"https"},"user":{"fkey":"d8334f8aab6b3bbb49bf12c218209bc1d5d0cc6025d8ce0ebad8f6a364fb2203","tid":"6b03fbc3-3aeb-4650-998f-adb79c44c60a","rep":0,"isAnonymous":true,"isAnonymousNetworkWide":true,"ab":{"collectives_survey":{"v":"coso_survey","g":1}}},"realtime":{"newest":true,"active":true,"tagged":true,"staleDisconnectIntervalInHours":0},"events":{"postType":{"question":1},"postEditionSection":{"title":1,"body":2,"tags":3}}}}</script>
+<script type="application/json" data-role="module-args" data-module-name="Shared/settings.mod">{"settings":{"markdown":{"enableTables":true},"intercom":{"appId":"inf0secd"},"flags":{"allowRetractingFlags":true,"allowRetractingCommentFlags":true},"subscriptions":{"defaultBasicMaxTrueUpSeats":250,"defaultFreemiumMaxTrueUpSeats":50,"defaultMaxTrueUpSeats":1000},"userMessaging":{},"tags":{},"elections":{"opaVoteResultsBaseUrl":"https://www.opavote.com/results/"},"paths":{"jQueryUIJSPath":"https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js","jQueryUICSSPath":"https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/themes/smoothness/jquery-ui.css"},"accounts":{"currentPasswordRequiredForChangingStackIdPassword":true},"search":{},"comments":{},"legal":{"oneTrustTCFConfigId":"cb0f3c87-b769-4e66-bbaa-377f9194216d","useCustomConsent":false},"questions":{"questionTitleLengthStartLiveWarningChars":50,"enableSavesFeature":true,"maxTitleSize":150,"enableQuestionTitleLengthLiveWarning":true},"site":{"allowImageUploads":true,"forceHttpsImages":true,"stacksEditorPreviewEnabled":true,"enableImgurHttps":true,"enableUserHovercards":true},"mentions":{"maxNumUsersInDropdown":50},"snippets":{"renderDomain":"stacksnippets.net"},"auth":{}}}</script>
+<script>StackExchange.init();</script>
+
+    <script>
+        StackExchange.using.setCacheBreakers({"Js/adops.en.js":"6da43f5e0a84","Js/ask.en.js":"","Js/begin-edit-event.en.js":"20edbaccceae","Js/copy-transpiled.en.js":"e0eb0f70fc72","Js/events.en.js":"","Js/explore-qlist.en.js":"2b1f34938b8b","Js/full-anon.en.js":"9cd1bae63ffc","Js/full.en.js":"84a2440b4e83","Js/highlightjs-loader.en.js":"510e2f94c2bf","Js/inline-tag-editing.en.js":"3e8cc64ee9d6","Js/keyboard-shortcuts.en.js":"107c2ac31497","Js/markdown-it-loader.en.js":"5818ef89ff9d","Js/mentions-transpiled.en.js":"d398f7c1afbf","Js/moderator.en.js":"b47aa4009d9d","Js/postCollections-transpiled.en.js":"11a255fe9394","Js/post-validation.en.js":"243bf7d290a3","Js/question-editor.en.js":"","Js/review-v2-transpiled.en.js":"d8246fd945d5","Js/revisions.en.js":"47b4d5ac24c9","Js/stacks-editor.en.js":"38fc04774f41","Js/tageditor.en.js":"dc13482a67f8","Js/tageditornew.en.js":"b3d2f0187c1a","Js/tagsuggestions.en.js":"bd6ec908f2a7","Js/unlimited-transpiled.en.js":"f26a1d5f3365","Js/wmd.en.js":"fe1f36bd295a"});
+        StackExchange.using("gps", function() {
+             StackExchange.gps.init(false);
+        });
+    </script>
+    <noscript id="noscript-css"><style>body,.s-topbar{margin-top:1.9em}</style></noscript>
+    </head>
+    <body class="question-page unified-theme">
+    
+    <div id="notify-container"></div>
+    <div id="custom-header"></div>
+        
+
+<header class="s-topbar ps-fixed t0 l0 js-top-bar">
+	<div class="s-topbar--container">
+			<a href="#" class="s-topbar--menu-btn js-left-sidebar-toggle" role="menuitem" aria-haspopup="true" aria-controls="left-sidebar" aria-expanded="false"><span></span></a>
+			<div class="topbar-dialog leftnav-dialog js-leftnav-dialog dno">
+				<div class="left-sidebar js-unpinned-left-sidebar" data-can-be="left-sidebar" data-is-here-when="sm"></div>
+			</div>
+			<a href="#" class="s-topbar--logo network-logo js-gps-track js-network-logo"
+		   data-gps-track="stack_exchange_popup.show" role="menuitem" aria-haspopup="true" aria-controls="topbar-network-logo-dialog" aria-expanded="false">
+				<svg aria-hidden="true" class="native mtn1 svg-icon iconLogoSEAlternativeSm" width="107" height="15" viewBox="0 0 107 15"><path d="m48.41 11.93-1.96-3.2-1.04 1.16v2.04h-1.42V2.18h1.42v6.01L48.14 5h1.72l-2.44 2.7 2.74 4.22h-1.75Zm-7.06.08c-1.59 0-3.14-.96-3.14-3.56s1.55-3.54 3.14-3.54c.97 0 1.65.27 2.31.97l-.97.93c-.44-.48-.79-.66-1.34-.66s-1 .22-1.3.62c-.31.38-.42.87-.42 1.68 0 .81.1 1.32.41 1.7.3.4.76.62 1.3.62.56 0 .9-.18 1.35-.66l.97.92c-.66.7-1.34.98-2.31.98Zm-5.66-3.15h-1.65c-.83 0-1.26.37-1.26 1s.4.99 1.3.99c.53 0 .93-.04 1.3-.4.22-.2.31-.53.31-1.03v-.56Zm.03 3.07v-.63c-.51.5-1 .71-1.87.71-.87 0-1.46-.2-1.89-.63a2.1 2.1 0 0 1-.55-1.49c0-1.16.82-2 2.42-2h1.86v-.5c0-.87-.44-1.3-1.54-1.3-.77 0-1.15.18-1.54.68l-.92-.86c.66-.77 1.35-1 2.52-1 1.93 0 2.9.8 2.9 2.38v4.64h-1.39Zm-5.9 0c-1.32 0-1.93-.93-1.93-1.93V6.18h-.8V5.1h.8V3h1.41v2.1h1.36v1.07H29.3v3.75c0 .5.25.81.78.81h.58v1.2h-.85Zm-6.33.08c-1.48 0-2.55-.34-3.49-1.28l1-.98c.72.72 1.51.94 2.52.94 1.3 0 2.04-.55 2.04-1.5 0-.42-.13-.78-.39-1.01-.25-.23-.5-.33-1.08-.41l-1.16-.17a3.4 3.4 0 0 1-1.88-.78 2.41 2.41 0 0 1-.72-1.86c0-1.7 1.25-2.86 3.3-2.86 1.3 0 2.22.33 3.07 1.1l-.96.94a2.92 2.92 0 0 0-2.15-.75c-1.16 0-1.8.65-1.8 1.52 0 .35.1.67.37.9.25.22.65.38 1.11.45l1.13.17c.91.13 1.42.35 1.84.72.54.47.8 1.17.8 2 0 1.8-1.48 2.86-3.55 2.86Z" fill="#FEFEFE"/><path d="M104.16 7.09c-.2-.42-.6-.74-1.2-.74s-.99.32-1.18.74c-.1.25-.15.44-.16.75h2.7a2 2 0 0 0-.16-.75Zm-2.54 1.96c0 .9.56 1.57 1.55 1.57.78 0 1.16-.21 1.61-.66l1.08 1.04a3.4 3.4 0 0 1-2.7 1.11c-1.68 0-3.29-.76-3.29-3.62 0-2.3 1.26-3.6 3.1-3.6 1.97 0 3.1 1.44 3.1 3.37v.79h-4.45Zm-5.48-2.57C95.1 6.48 95 7.37 95 8.3c0 .94.1 1.85 1.15 1.85 1.05 0 1.18-.91 1.18-1.85 0-.93-.13-1.82-1.18-1.82Zm-.17 8.22c-1.1 0-1.84-.21-2.58-.92l1.1-1.11c.4.38.8.54 1.4.54 1.06 0 1.43-.74 1.43-1.46v-.72c-.47.51-1 .7-1.7.7-.69 0-1.29-.23-1.68-.62-.67-.66-.73-1.57-.73-2.8 0-1.24.06-2.13.73-2.8.4-.39 1-.62 1.7-.62.75 0 1.24.2 1.73.75v-.67h1.72v6.8c0 1.7-1.21 2.93-3.12 2.93Zm-5.76-2.67V7.76c0-.96-.61-1.28-1.17-1.28-.56 0-1.18.32-1.18 1.28v4.27h-1.78V4.97h1.73v.65a2.44 2.44 0 0 1 1.78-.73c.7 0 1.28.23 1.67.62.58.57.73 1.24.73 2v4.52H90.2Zm-7.1-2.98h-1.4c-.64 0-1 .3-1 .8 0 .49.33.81 1.02.81.5 0 .8-.04 1.12-.34.2-.17.26-.46.26-.89v-.38Zm.04 2.98v-.6c-.48.47-.93.67-1.74.67-.8 0-1.4-.2-1.82-.62-.38-.4-.58-.97-.58-1.59 0-1.12.77-2.05 2.42-2.05h1.68V7.5c0-.77-.38-1.11-1.32-1.11-.68 0-1 .16-1.37.58l-1.13-1.1c.7-.75 1.38-.97 2.57-.97 1.99 0 3.02.84 3.02 2.5v4.64h-1.73Zm-6.93 0v-4.3c0-.94-.6-1.25-1.15-1.25-.56 0-1.15.32-1.15 1.24v4.31h-1.77V2.38h1.77v3.24a2.35 2.35 0 0 1 1.7-.73c1.56 0 2.38 1.08 2.38 2.57v4.57h-1.78Zm-6.96.08c-1.42 0-3.18-.76-3.18-3.62 0-2.85 1.76-3.6 3.18-3.6.98 0 1.72.3 2.34.95l-1.2 1.2c-.36-.4-.68-.56-1.14-.56-.42 0-.75.14-1.01.46-.27.33-.4.8-.4 1.55s.13 1.24.4 1.58c.26.3.59.46 1 .46.47 0 .79-.16 1.15-.56l1.2 1.18c-.62.65-1.36.96-2.34.96Zm-5.53-.08-1.3-2.11-1.3 2.11H59l2.45-3.6-2.35-3.46h2.12L62.42 7l1.21-2.02h2.13L63.4 8.43l2.46 3.6h-2.13Zm-11.75 0V2.06h6.6V3.8h-4.65v2.33h3.96v1.74h-3.96v2.42h4.65v1.74h-6.6Z" fill="#2F96E8"/><path d="M0 3c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2H0Z" fill="#8FD8F7"/><path d="M12 10H0c0 1.1.9 2 2 2h5v3l3-3a2 2 0 0 0 2-2Z" fill="#155397"/><path fill="#46A2D9" d="M0 4h12v2H0z"/><path fill="#2D6DB5" d="M0 7h12v2H0z"/></svg>
+			</a>
+			<div class="topbar-dialog network-logo-dialog js-network-logo-dialog dno" id="topbar-network-logo-dialog" role="dialog" aria-labelledby="topbar-network-logo-dialog-title" aria-describedby="topbar-network-logo-dialog-body">
+				<div class="dialog-content">
+					<h4 class="bold" id="topbar-network-logo-dialog-title">Stack Exchange Network</h4>
+					<p id="topbar-network-logo-dialog-body">
+						Stack Exchange network consists of 183 Q&amp;A communities including <a href="https://stackoverflow.com">Stack Overflow</a>, the largest, most trusted online community for developers to learn, share their knowledge, and build their careers.
+					</p>
+					<a class="s-btn s-btn__filled" href="https://stackexchange.com"
+				   data-gps-track="stack_exchange_popup.click">Visit Stack Exchange</a>
+					<button class="s-btn s-btn__muted p0 ps-absolute t16 r16 js-close-button" aria-label="Close"><svg aria-hidden="true" class="svg-icon iconClear" width="18" height="18"  viewBox="0 0 18 18"><path  d="M15 4.41 13.59 3 9 7.59 4.41 3 3 4.41 7.59 9 3 13.59 4.41 15 9 10.41 13.59 15 15 13.59 10.41 9 15 4.41Z"/></svg></button>
+				</div>
+			</div>
+
+
+
+
+
+		        <form id="search" role="search" action=/search class="s-topbar--searchbar js-searchbar " autocomplete="off">
+                        <div class="s-topbar--searchbar--input-group">
+                            <input name="q"
+                                   type="text"
+                                   role="combobox"
+                                   placeholder="Search on Movies &amp; TV&#x2026;"
+                                   value=""
+                                   autocomplete="off"
+                                   maxlength="240"
+                                   class="s-input s-input__search js-search-field "
+                                   aria-label="Search"
+                                   aria-controls="top-search" 
+                                   data-controller="s-popover"
+                                   data-action="focus->s-popover#show"
+                                   data-s-popover-placement="bottom-start" />
+                            <svg aria-hidden="true" class="s-input-icon s-input-icon__search svg-icon iconSearch" width="18" height="18"  viewBox="0 0 18 18"><path  d="m18 16.5-5.14-5.18h-.35a7 7 0 1 0-1.19 1.19v.35L16.5 18l1.5-1.5ZM12 7A5 5 0 1 1 2 7a5 5 0 0 1 10 0Z"/></svg>
+                            <div class="s-popover p0 wmx100 wmn4 sm:wmn-initial js-top-search-popover" id="top-search" role="menu">
+    <div class="s-popover--arrow"></div>
+    <div class="js-spinner p24 d-flex ai-center jc-center d-none">
+        <div class="s-spinner s-spinner__sm fc-orange-400">
+            <div class="v-visible-sr">Loading&#x2026;</div>
+        </div>
+    </div>
+
+    <span class="v-visible-sr js-screen-reader-info"></span>
+    <div class="js-ac-results overflow-y-auto hmx3 d-none"></div>
+
+    <div class="js-search-hints" aria-describedby="Tips for searching"></div>
+</div>
+                        </div>
+                </form>
+		
+
+<nav class="h100 ml-auto overflow-x-auto pr12">
+    <ol class="s-topbar--content" role="menubar">
+    
+        <li role="none">
+            <a href="/help" class="s-topbar--item js-help-button" role="menuitem" title="Help Center and other resources" aria-haspopup="true" aria-controls="topbar-help-dialog"
+           data-ga="[&quot;top navigation&quot;,&quot;help menu click&quot;,null,null,null]"><svg aria-hidden="true" class="svg-icon iconHelp" width="18" height="18"  viewBox="0 0 18 18"><path  d="M9 1C4.64 1 1 4.64 1 9c0 4.36 3.64 8 8 8 4.36 0 8-3.64 8-8 0-4.36-3.64-8-8-8Zm.81 12.13c-.02.71-.55 1.15-1.24 1.13-.66-.02-1.17-.49-1.15-1.2.02-.72.56-1.18 1.22-1.16.7.03 1.2.51 1.17 1.23ZM11.77 8c-.59.66-1.78 1.09-2.05 1.97a4 4 0 0 0-.09.75c0 .05-.03.16-.18.16H7.88c-.16 0-.18-.1-.18-.15.06-1.35.66-2.2 1.83-2.88.39-.29.7-.75.7-1.24.01-1.24-1.64-1.82-2.35-.72-.21.33-.18.73-.18 1.1H5.75c0-1.97 1.03-3.26 3.03-3.26 1.75 0 3.47.87 3.47 2.83 0 .57-.2 1.05-.48 1.44Z"/></svg></a>
+        </li>
+        <div class="topbar-dialog help-dialog js-help-dialog dno" id="topbar-help-dialog" role="menu">
+            <div class="modal-content">
+                <ul>
+                        <li>
+                            <a href="/tour" class="js-gps-track s-block-link" data-gps-track="help_popup.click({ item_type:1 })"
+                       data-ga="[&quot;top navigation&quot;,&quot;tour submenu click&quot;,null,null,null]">
+                                Tour
+                                <span class="item-summary">
+                                    Start here for a quick overview of the site
+                                </span>
+                            </a>
+                        </li>
+                    <li>
+                        <a href="/help" class="js-gps-track s-block-link"
+                       data-gps-track="help_popup.click({ item_type:4 })"
+                       data-ga="[&quot;top navigation&quot;,&quot;help center&quot;,null,null,null]">
+                            Help Center
+                            <span class="item-summary">
+                                Detailed answers to any questions you might have
+                            </span>
+                        </a>
+                    </li>
+                                <li>
+                                    <a href="https://movies.meta.stackexchange.com" class="js-gps-track s-block-link" data-gps-track="help_popup.click({ item_type:2 })"
+                       data-ga="[&quot;top navigation&quot;,&quot;meta submenu click&quot;,null,null,null]">
+                                        Meta
+                                        <span class="item-summary">
+                                            Discuss the workings and policies of this site
+                                        </span>
+                                    </a>
+                                </li>
+                            <li>
+                                <a href="https://stackoverflow.co/" class="js-gps-track s-block-link" data-gps-track="help_popup.click({ item_type:6 })"
+                       data-ga="[&quot;top navigation&quot;,&quot;about us submenu click&quot;,null,null,null]">
+                                    About Us
+                                    <span class="item-summary">
+                                        Learn more about Stack Overflow the company, and our products
+                                    </span>
+                                </a>
+                            </li>
+                </ul>
+            </div>
+        </div>
+        <li role="none">
+            <a href="https://stackexchange.com" class="s-topbar--item js-site-switcher-button js-gps-track" data-gps-track="site_switcher.show"
+           aria-label="Site switcher"
+           role="menuitem"
+           title="A list of all 183 Stack Exchange sites"
+           aria-haspopup="true" aria-expanded="false"
+           data-ga="[&quot;top navigation&quot;,&quot;stack exchange click&quot;,null,null,null]">
+                <svg aria-hidden="true" class="svg-icon iconStackExchange" width="18" height="18"  viewBox="0 0 18 18"><path  d="M15 1H3a2 2 0 0 0-2 2v2h16V3a2 2 0 0 0-2-2ZM1 13c0 1.1.9 2 2 2h8v3l3-3h1a2 2 0 0 0 2-2v-2H1v2Zm16-7H1v4h16V6Z"/></svg>
+            </a>
+        </li>
+    
+    
+        <li class="js-topbar-dialog-corral" role="presentation">
+                
+
+    <div class="topbar-dialog siteSwitcher-dialog dno" role="menu">
+        <div class="header fw-wrap">
+            <h3 class="flex--item">
+                <a href="https://movies.stackexchange.com">current community</a>
+            </h3>
+            <div class="flex--item fl1">
+                <div class="ai-center d-flex jc-end">
+                    <button
+                        class="js-close-button s-btn s-btn__muted p0 ml8 d-none sm:d-block"
+                        type="button"
+                        aria-label="Close"
+                    >
+                        <svg aria-hidden="true" class="svg-icon iconClear" width="18" height="18"  viewBox="0 0 18 18"><path  d="M15 4.41 13.59 3 9 7.59 4.41 3 3 4.41 7.59 9 3 13.59 4.41 15 9 10.41 13.59 15 15 13.59 10.41 9 15 4.41Z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-content bg-blue-200 current-site-container">
+            <ul class="current-site">
+                    <li class="d-flex">
+                            <div class="fl1">
+                <a href="https://movies.stackexchange.com"  
+       class="current-site-link d-flex gx8 site-link js-gps-track"
+       data-id="367"
+       data-gps-track="site_switcher.click({ item_type:3 })">
+        <div class="favicon favicon-movies site-icon flex--item" title="Movies &amp; TV"></div>
+        <span class="flex--item fl1">
+            Movies &amp; TV
+        </span>
+    </a>
+
+    </div>
+    <div class="related-links">
+            <a href="https://movies.stackexchange.com/help" class="js-gps-track" data-gps-track="site_switcher.click({ item_type:14 })">help</a>
+            <a href="https://chat.stackexchange.com?tab=site&amp;host=movies.stackexchange.com" class="js-gps-track" data-gps-track="site_switcher.click({ item_type:6 })">chat</a>
+    </div>
+
+                    </li>
+                    <li class="related-site d-flex">
+                            <div class="L-shaped-icon-container">
+        <span class="L-shaped-icon"></span>
+    </div>
+
+                            <a href="https://movies.meta.stackexchange.com"  
+       class="s-block-link px16 d-flex gx8 site-link js-gps-track"
+       data-id="369"
+       data-gps-track="site.switch({ target_site:369, item_type:3 }),site_switcher.click({ item_type:4 })">
+        <div class="favicon favicon-moviesmeta site-icon flex--item" title="Movies &amp; TV Meta"></div>
+        <span class="flex--item fl1">
+            Movies &amp; TV Meta
+        </span>
+    </a>
+
+                    </li>
+            </ul>
+        </div>
+
+        <div class="header" id="your-communities-header">
+            <h3>
+your communities            </h3>
+
+        </div>
+        <div class="modal-content" id="your-communities-section">
+
+                <div class="call-to-login">
+<a href="https://movies.stackexchange.com/users/signup?ssrc=site_switcher&amp;returnurl=https%3a%2f%2fmovies.stackexchange.com%2fquestions%2f31321%2fwhat-was-the-first-movie-to-feature-a-person-seated-on-a-toilet" class="login-link js-gps-track" data-gps-track="site_switcher.click({ item_type:10 })">Sign up</a> or <a href="https://movies.stackexchange.com/users/login?ssrc=site_switcher&amp;returnurl=https%3a%2f%2fmovies.stackexchange.com%2fquestions%2f31321%2fwhat-was-the-first-movie-to-feature-a-person-seated-on-a-toilet" class="login-link js-gps-track" data-gps-track="site_switcher.click({ item_type:11 })">log in</a> to customize your list.                </div>
+        </div>
+
+        <div class="header">
+            <h3><a href="https://stackexchange.com/sites">more stack exchange communities</a>
+            </h3>
+            <a href="https://stackoverflow.blog" class="float-right">company blog</a>
+        </div>
+        <div class="modal-content">
+                <div class="child-content"></div>
+        </div>        
+    </div>
+
+        </li>
+    
+            <li role="none"><button class="s-topbar--item s-btn s-btn__icon s-btn__muted d-none sm:d-inline-flex js-searchbar-trigger" role="menuitem" aria-label="Search" aria-haspopup="true" aria-controls="search" title="Click to show search"><svg aria-hidden="true" class="svg-icon iconSearch" width="18" height="18"  viewBox="0 0 18 18"><path  d="m18 16.5-5.14-5.18h-.35a7 7 0 1 0-1.19 1.19v.35L16.5 18l1.5-1.5ZM12 7A5 5 0 1 1 2 7a5 5 0 0 1 10 0Z"/></svg></button></li>
+                        <li role="none">
+                            <a href="https://movies.stackexchange.com/users/login?ssrc=head&returnurl=https%3a%2f%2fmovies.stackexchange.com%2fquestions%2f31321%2fwhat-was-the-first-movie-to-feature-a-person-seated-on-a-toilet" class="s-topbar--item s-topbar--item__unset s-btn s-btn__outlined ws-nowrap js-gps-track" role="menuitem" rel="nofollow"
+               data-gps-track="login.click" data-ga="[&quot;top navigation&quot;,&quot;login button click&quot;,null,null,null]">Log in</a>
+                        </li>
+                            <li role="none"><a href="https://movies.stackexchange.com/users/signup?ssrc=head&returnurl=https%3a%2f%2fmovies.stackexchange.com%2fquestions%2f31321%2fwhat-was-the-first-movie-to-feature-a-person-seated-on-a-toilet" class="s-topbar--item s-topbar--item__unset ml4 s-btn s-btn__filled ws-nowrap js-gps-track" role="menuitem" rel="nofollow" data-gps-track="signup.topbar.click" data-ga="[&quot;sign up&quot;,&quot;Sign Up Navigation&quot;,&quot;Header&quot;,null,null]">Sign up</a></li>
+    </ol>
+</nav>
+
+
+
+	</div>
+</header>
+
+	<script>
+		StackExchange.ready(function () { StackExchange.topbar.init(); });
+		StackExchange.scrollPadding.setPaddingTop(50, 10); 
+	</script>
+
+
+
+            <div id="top-hero-div" class="">
+                    
+
+
+            </div>
+
+        <header class="site-header">
+            <div class="site-header--container">
+            <a class="site-header--link d-flex ai-center fs-headline1 fw-bold" href="https://movies.stackexchange.com">
+                <img class="h-auto wmx100" src="https://cdn.sstatic.net/Sites/movies/Img/logo.svg?v=d1e3edb04666" alt="Movies &amp; TV">
+            </a>
+
+            </div>
+        </header>
+
+    <div class="container">
+                
+
+<div id="left-sidebar" data-is-here-when="md lg" class="left-sidebar js-pinned-left-sidebar ps-relative">
+    <div class="left-sidebar--sticky-container js-sticky-leftnav">
+        <nav role="navigation">
+            <ol class="nav-links">
+                <li>
+                    <ol class="nav-links">
+                        
+
+<li class="ps-relative"  aria-current="false">
+
+
+    <a
+       href="/"
+       class="s-block-link pl8 js-gps-track nav-links--link -link__with-icon"
+       
+       data-gps-track="top_nav.click({is_current: false, location:2, destination:8,  has_activity_notification:False})"
+       aria-controls="" data-controller="" data-s-popover-placement="right"
+       aria-current="false"
+       data-s-popover-auto-show="true" data-s-popover-hide-on-outside-click="never"
+    >
+        <div class="d-flex ai-center">
+<svg aria-hidden="true" class="svg-icon iconHome" width="18" height="18"  viewBox="0 0 18 18"><path  d="M15 10v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5H0l9-9 9 9h-3Zm-8 1v6h4v-6H7Z"/></svg>                <span class="-link--channel-name pl6">Home</span>
+
+        </div>
+    </a>
+</li>
+
+
+                        
+
+<li class="ps-relative  youarehere"  aria-current="true">
+
+
+    <a id="nav-questions"
+       href="/questions"
+       class="s-block-link pl8 js-gps-track nav-links--link -link__with-icon"
+       
+       data-gps-track="top_nav.click({is_current: true, location:2, destination:1,  has_activity_notification:False})"
+       aria-controls="" data-controller="" data-s-popover-placement="right"
+       aria-current="false"
+       data-s-popover-auto-show="true" data-s-popover-hide-on-outside-click="never"
+    >
+        <div class="d-flex ai-center">
+<svg aria-hidden="true" class="svg-icon iconQuestion" width="18" height="18"  viewBox="0 0 18 18"><path  d="m4 15-3 3V4c0-1.1.9-2 2-2h12c1.09 0 2 .91 2 2v9c0 1.09-.91 2-2 2H4Zm7.75-3.97c.72-.83.98-1.86.98-2.94 0-1.65-.7-3.22-2.3-3.83a4.41 4.41 0 0 0-3.02 0 3.8 3.8 0 0 0-2.32 3.83c0 1.29.35 2.29 1.03 3a3.8 3.8 0 0 0 2.85 1.07c.62 0 1.2-.11 1.71-.34.65.44 1 .68 1.06.7.23.13.46.23.7.3l.59-1.13a5.2 5.2 0 0 1-1.28-.66Zm-1.27-.9a5.4 5.4 0 0 0-1.5-.8l-.45.9c.33.12.66.29.98.5-.2.07-.42.11-.65.11-.61 0-1.12-.23-1.52-.68-.86-1-.86-3.12 0-4.11.8-.9 2.35-.9 3.15 0 .9 1.01.86 3.03-.01 4.08Z"/></svg>                <span class="-link--channel-name pl6">Questions</span>
+
+        </div>
+    </a>
+</li>
+
+
+
+
+
+                        
+
+<li class="ps-relative"  aria-current="false">
+
+
+    <a
+       href="/tags"
+       class="s-block-link pl8 js-gps-track nav-links--link -link__with-icon"
+       
+       data-gps-track="top_nav.click({is_current: false, location:2, destination:2,  has_activity_notification:False})"
+       aria-controls="" data-controller="" data-s-popover-placement="right"
+       aria-current="false"
+       data-s-popover-auto-show="true" data-s-popover-hide-on-outside-click="never"
+    >
+        <div class="d-flex ai-center">
+<svg aria-hidden="true" class="svg-icon iconTags" width="18" height="18"  viewBox="0 0 18 18"><path  d="M9.24 1a3 3 0 0 0-2.12.88l-5.7 5.7a2 2 0 0 0-.38 2.31 3 3 0 0 1 .67-1.01l6-6A3 3 0 0 1 9.83 2H14a3 3 0 0 1 .79.1A2 2 0 0 0 13 1H9.24Z" opacity=".4"/><path  d="M9.83 3a2 2 0 0 0-1.42.59l-6 6a2 2 0 0 0 0 2.82L6.6 16.6a2 2 0 0 0 2.82 0l6-6A2 2 0 0 0 16 9.17V5a2 2 0 0 0-2-2H9.83ZM12 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4Z"/></svg>                <span class="-link--channel-name pl6">Tags</span>
+
+        </div>
+    </a>
+</li>
+
+                        
+                        <li class="pb24"></li>
+
+
+                        
+
+<li class="ps-relative"  aria-current="false">
+
+
+    <a id="nav-users"
+       href="/users"
+       class="s-block-link pl8 js-gps-track nav-links--link -link__with-icon"
+       
+       data-gps-track="top_nav.click({is_current: false, location:2, destination:3,  has_activity_notification:False})"
+       aria-controls="" data-controller="" data-s-popover-placement="right"
+       aria-current="false"
+       data-s-popover-auto-show="true" data-s-popover-hide-on-outside-click="never"
+    >
+        <div class="d-flex ai-center">
+<svg aria-hidden="true" class="svg-icon iconPeople" width="18" height="18"  viewBox="0 0 18 18"><path  d="M17 14c0 .44-.45 1-1 1H9a1 1 0 0 1-1-1H2c-.54 0-1-.56-1-1 0-2.63 3-4 3-4s.23-.4 0-1c-.84-.62-1.06-.59-1-3 .06-2.42 1.37-3 2.5-3s2.44.58 2.5 3c.06 2.41-.16 2.38-1 3-.23.59 0 1 0 1s1.55.71 2.42 2.09c.78-.72 1.58-1.1 1.58-1.1s.23-.4 0-1c-.84-.61-1.06-.58-1-3 .06-2.41 1.37-3 2.5-3s2.44.59 2.5 3c.05 2.42-.16 2.39-1 3-.23.6 0 1 0 1s3 1.38 3 4Z"/></svg>                <span class="-link--channel-name pl6">Users</span>
+
+        </div>
+    </a>
+</li>
+
+
+
+                            
+
+<li class="ps-relative"  aria-current="false">
+
+
+    <a id="nav-unanswered"
+       href="/unanswered"
+       class="s-block-link pl8 js-gps-track nav-links--link -link__with-icon"
+       
+       data-gps-track="top_nav.click({is_current: false, location:2, destination:5,  has_activity_notification:False})"
+       aria-controls="" data-controller="" data-s-popover-placement="right"
+       aria-current="false"
+       data-s-popover-auto-show="true" data-s-popover-hide-on-outside-click="never"
+    >
+        <div class="d-flex ai-center">
+<svg aria-hidden="true" class="svg-icon iconAnswer" width="18" height="18"  viewBox="0 0 18 18"><path  d="M14 15H3c-1.09 0-2-.91-2-2V4c0-1.1.9-2 2-2h12c1.09 0 2 .91 2 2v14l-3-3Zm-1.02-3L9.82 4H8.14l-3.06 8h1.68l.65-1.79h3.15l.69 1.79h1.73Zm-2.93-3.12H7.9l1.06-2.92 1.09 2.92Z"/></svg>                <span class="-link--channel-name pl6">Unanswered</span>
+
+        </div>
+    </a>
+</li>
+
+
+
+
+                    </ol>
+                </li>
+                
+                
+
+        
+
+<li class="js-freemium-cta ps-relative">
+
+    <div class="fs-fine tt-uppercase fc-black-600 fw-bold ml8 mt16 mb8">Teams</div>
+
+    <div class="bt bl bb bc-black-200 p12 pb6 fc-black-500 blr-sm overflow-hidden">
+        <strong class="fc-black-600 mb6">Stack Overflow for Teams</strong>
+        – Start collaborating and sharing organizational knowledge.
+        
+        <img class="wmx100 mx-auto my8 h-auto d-block" width="139" height="114" src="https://cdn.sstatic.net/Img/teams/teams-illo-free-sidebar-promo.svg?v=47faa659a05e" alt="">
+
+        <a href="https://try.stackoverflow.co/why-teams/?utm_source=so-owned&amp;utm_medium=side-bar&amp;utm_campaign=campaign-38&amp;utm_content=cta" 
+           class="w100 s-btn s-btn__filled s-btn__xs bg-orange-400 js-gps-track"
+           data-gps-track="teams.create.left-sidenav.click({ Action: 6 })"
+           data-ga="[&quot;teams left navigation - anonymous&quot;,&quot;left nav free cta&quot;,&quot;stackoverflow.com/teams/create/free&quot;,null,null]">Create a free Team</a>
+        <a href="https://stackoverflow.co/teams/" 
+           class="w100 s-btn s-btn__muted s-btn__xs js-gps-track"
+           data-gps-track="teams.create.left-sidenav.click({ Action: 5 })"
+           data-ga="[&quot;teams left navigation - anonymous&quot;,&quot;left nav free cta&quot;,&quot;stackoverflow.com/teams&quot;,null,null]">Why Teams?</a>
+
+    </div>
+</li>
+
+
+    <li class="d-flex ai-center jc-space-between ml8 mt32 mb8 js-create-team-cta d-none">
+        <a href="javascript:void(0)"
+            class="s-link d-flex fl-grow1 fc-black-400 h:fc-black-600 fs-fine js-gps-track"
+            role="button"
+            aria-controls="popover-teams-create-cta"
+            data-controller="s-popover"
+            data-action="s-popover#toggle"
+            data-s-popover-placement="bottom-start"
+            data-s-popover-toggle-class="is-selected"
+            data-gps-track="teams.create.left-sidenav.click({ Action: ShowInfo })"
+            data-ga="[&quot;teams left navigation - anonymous&quot;,&quot;left nav show teams info&quot;,null,null,null]"
+        >
+            <div class="flex--item fl-grow1 fc-black-600 fw-bold tt-uppercase">Teams</div>
+            <div class="flex--item px12">
+                <svg aria-hidden="true" class="svg-icon iconPlusSm" width="14" height="14"  viewBox="0 0 14 14"><path  d="M8 2H6v4H2v2h4v4h2V8h4V6H8V2Z"/></svg>
+            </div>
+        </a>
+    </li>
+    <li class="ps-relative js-create-team-cta d-none">
+        <a href="https://stackoverflowteams.com/teams/create/free/?utm_source=so-owned&amp;utm_medium=side-bar&amp;utm_campaign=campaign-38&amp;utm_content=cta"
+        class="s-block-link pl8 js-gps-track nav-links--link"
+        title="Stack Overflow for Teams is a private, secure spot for your organization's questions and answers."
+        data-gps-track="teams.create.left-sidenav.click({ Action: FreemiumTeamsCreateClick })"
+        data-ga="[&quot;teams left navigation - anonymous&quot;,&quot;left nav team click&quot;,&quot;stackoverflow.com/teams/create/free&quot;,null,null]">
+            <div class="d-flex ai-center">
+                <div class="flex--item s-avatar va-middle bg-orange-400">
+                    <div class="s-avatar--letter mtn1">
+                        <svg aria-hidden="true" class="svg-icon iconBriefcaseSm" width="14" height="14"  viewBox="0 0 14 14"><path  d="M4 3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1h.5c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5h-7A1.5 1.5 0 0 1 2 10.5v-5C2 4.67 2.67 4 3.5 4H4V3Zm5 1V3H5v1h4Z"/></svg>
+                    </div>
+                    <svg aria-hidden="true" class="native s-avatar--badge svg-icon iconShieldXSm" width="9" height="10"  viewBox="0 0 9 10"><path fill="var(--white)" d="M0 1.84 4.5 0 9 1.84v3.17C9 7.53 6.3 10 4.5 10 2.7 10 0 7.53 0 5.01V1.84Z"/><path fill="var(--black-400)" d="M1 2.5 4.5 1 8 2.5v2.51C8 7.34 5.34 9 4.5 9 3.65 9 1 7.34 1 5.01V2.5Zm2.98 3.02L3.2 7h2.6l-.78-1.48a.4.4 0 0 1 .15-.38c.34-.24.73-.7.73-1.14 0-.71-.5-1.23-1.41-1.23-.92 0-1.39.52-1.39 1.23 0 .44.4.9.73 1.14.12.08.18.23.15.38Z"/></svg>
+                </div>
+                <div class="flex--item pl6">
+                    Create free Team
+                </div>
+            </div>
+        </a>
+    </li>
+
+            </ol>
+        </nav>
+    </div>
+
+
+
+        <div class="s-popover ws2"
+        id="popover-teams-create-cta"
+        role="menu"
+        aria-hidden="true">
+            <div class="s-popover--arrow"></div>
+
+            <div class="ps-relative overflow-hidden">
+                <p class="mb2"><strong>Teams</strong></p>
+                <p class="mb12 fs-caption fc-black-400">Q&amp;A for work</p>
+                <p class="mb12 fs-caption fc-black-500">Connect and share knowledge within a single location that is structured and easy to search.</p>
+                <a href="https://stackoverflow.co/teams/"
+            class="js-gps-track s-btn s-btn__filled s-btn__xs"
+            data-gps-track="teams.create.left-sidenav.click({ Action: CtaClick })"
+            data-ga="[&quot;teams left navigation - anonymous&quot;,&quot;left nav cta&quot;,&quot;stackoverflow.com/teams&quot;,null,null]">
+                    Learn more about Teams
+                </a>
+            </div>
+
+            <div class="ps-absolute t8 r8">
+                <svg aria-hidden="true" class="fc-orange-400 svg-spot spotPeople" width="48" height="48"  viewBox="0 0 48 48"><path  d="M13.5 28a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM7 30a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v5h11v-5a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v10a2 2 0 0 1-2 2H33v5a1 1 0 0 1-1 1H20a1 1 0 0 1-1-1v-5H8a1 1 0 0 1-1-1V30Zm25-6.5a4.5 4.5 0 1 0 9 0 4.5 4.5 0 0 0-9 0ZM24.5 34a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Z" opacity=".2"/><path  d="M16.4 26.08A6 6 0 1 0 7.53 26C5.64 26.06 4 27.52 4 29.45V40a1 1 0 0 0 1 1h9a1 1 0 1 0 0-2h-4v-7a1 1 0 1 0-2 0v7H6v-9.55c0-.73.67-1.45 1.64-1.45H16a1 1 0 0 0 .4-1.92ZM12 18a4 4 0 1 1 0 8 4 4 0 0 1 0-8Zm16.47 14a6 6 0 1 0-8.94 0A3.6 3.6 0 0 0 16 35.5V46a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V35.5c0-1.94-1.64-3.42-3.53-3.5ZM20 28a4 4 0 1 1 8 0 4 4 0 0 1-8 0Zm-.3 6h8.6c1 0 1.7.75 1.7 1.5V45h-2v-7a1 1 0 1 0-2 0v7h-4v-7a1 1 0 1 0-2 0v7h-2v-9.5c0-.75.7-1.5 1.7-1.5ZM42 22c0 1.54-.58 2.94-1.53 4A3.5 3.5 0 0 1 44 29.45V40a1 1 0 0 1-1 1h-9a1 1 0 1 1 0-2h4v-7a1 1 0 1 1 2 0v7h2v-9.55A1.5 1.5 0 0 0 40.48 28H32a1 1 0 0 1-.4-1.92A6 6 0 1 1 42 22Zm-2 0a4 4 0 1 0-8 0 4 4 0 0 0 8 0Z"/><g  opacity=".35"><path d="M17 10a1 1 0 011-1h12a1 1 0 110 2H18a1 1 0 01-1-1Zm1-5a1 1 0 100 2h12a1 1 0 100-2H18ZM14 1a1 1 0 00-1 1v12a1 1 0 001 1h5.09l4.2 4.2a1 1 0 001.46-.04l3.7-4.16H34a1 1 0 001-1V2a1 1 0 00-1-1H14Zm1 12V3h18v10h-5a1 1 0 00-.75.34l-3.3 3.7-3.74-3.75a1 1 0 00-.71-.29H15Z"/></g></svg>
+            </div>
+        </div>
+
+
+
+</div>
+
+
+
+        <div id="content" class="">
+
+            
+
+<div itemprop="mainEntity" itemscope itemtype="https://schema.org/Question">
+    <link itemprop="image" href="https://cdn.sstatic.net/Sites/movies/Img/apple-touch-icon.png?v=628999b87fc2">
+
+    <div class="inner-content clearfix">
+        
+
+            <div id="question-header" class="d-flex sm:fd-column">
+                        <h1 itemprop="name" class="fs-headline1 ow-break-word mb8 flex--item fl1"><a href="/questions/31321/what-was-the-first-movie-to-feature-a-person-seated-on-a-toilet" class="question-hyperlink">What was the first movie to feature a person seated on a toilet?</a></h1>
+
+
+                    <div class="ml12 aside-cta flex--item print:d-none sm:ml0 sm:mb12 sm:order-first sm:as-end">
+                            <a href="/questions/ask" class="ws-nowrap s-btn s-btn__filled">
+        Ask Question
+    </a>
+
+                    </div>
+            </div>
+            <div class="d-flex fw-wrap pb8 mb16 bb bc-black-200">
+                    <div class="flex--item ws-nowrap mr16 mb8" title="2015-02-20 11:21:04Z">
+                        <span class="fc-black-400 mr2">Asked</span>
+                        <time itemprop="dateCreated" datetime="2015-02-20T11:21:04">9 years ago</time>
+                    </div>
+                    <div class="flex--item ws-nowrap mr16 mb8">
+                        <span class="fc-black-400 mr2">Modified</span>
+                        <a href="?lastactivity" class="s-link s-link__inherit" title="2017-06-28 01:59:42Z">6 years, 8 months ago</a>
+                    </div>
+                    <div class="flex--item ws-nowrap mb8" title="Viewed 5,306 times">
+                        <span class="fc-black-400 mr2">Viewed</span>
+                        5k times
+                    </div>
+            </div>
+
+            <div id="mainbar" role="main" aria-label="question and answers">
+                
+<div class="question js-question" data-questionid="31321" data-position-on-page="0" data-score="17"  id="question">
+    <style>
+    </style>
+<div class="js-zone-container zone-container-main">
+    <div id="dfp-tlb" class="everyonelovesstackoverflow everyoneloves__top-leaderboard everyoneloves__leaderboard"></div>
+		<div class="js-report-ad-button-container " style="width: 728px"></div>
+</div>
+
+
+    <div class="post-layout ">
+        <div class="votecell post-layout--left">
+            <div class="js-voting-container d-flex jc-center fd-column ai-stretch gs4 fc-black-300" data-post-id="31321" data-referrer="None">
+        <button class="js-vote-up-btn flex--item s-btn ba bar-pill c-pointer as-center bc-black-225 fc-black-500 h:bg-theme-primary-200 h:fc-black-500 f:fc-black-050"
+                data-controller="s-tooltip"
+                data-s-tooltip-placement="right"
+                title="This question shows research effort; it is useful and clear"
+                aria-pressed="false"
+                aria-label="Up vote"
+                data-selected-classes="fc-theme-primary-100 bc-theme-primary-500 bg-theme-primary-500"
+                data-unselected-classes="bc-black-225 fc-black-500 h:bg-theme-primary-200 h:fc-black-500 f:fc-black-050">
+            <svg aria-hidden="true" class="svg-icon iconArrowUp" width="18" height="18"  viewBox="0 0 18 18"><path  d="M1 12h16L9 4l-8 8Z"/></svg>
+        </button>
+        <div class="js-vote-count flex--item d-flex fd-column ai-center fc-theme-body-font fw-bold fs-subheading py4"
+             itemprop="upvoteCount"
+             data-value="17">
+            17
+        </div>
+        <button class="js-vote-down-btn flex--item mb8 s-btn ba bar-pill c-pointer as-center bc-black-225 fc-black-500 h:bg-theme-primary-200 h:fc-black-500 f:fc-black-050"
+                data-controller="s-tooltip"
+                data-s-tooltip-placement="right"
+                title="This question does not show any research effort; it is unclear or not useful"
+                aria-pressed="false"
+                aria-label="Down vote"
+                data-selected-classes="fc-theme-primary-100 bc-theme-primary-500 bg-theme-primary-500"
+                data-unselected-classes="bc-black-225 fc-black-500 h:bg-theme-primary-200 h:fc-black-500 f:fc-black-050">
+            <svg aria-hidden="true" class="svg-icon iconArrowDown" width="18" height="18"  viewBox="0 0 18 18"><path  d="M1 6h16l-8 8-8-8Z"/></svg>
+        </button>
+
+
+        
+<button class="js-saves-btn s-btn s-btn__unset c-pointer py4"
+        type="button"
+        id="saves-btn-31321"
+        data-controller="s-tooltip"
+        data-s-tooltip-placement="right"
+        data-s-popover-placement=""
+        title="Save this question."
+        aria-pressed="false"
+        data-post-id="31321"
+        data-post-type-id="1"
+        data-user-privilege-for-post-click="0"
+        aria-controls=""
+        data-s-popover-auto-show="false"
+>
+    <svg aria-hidden="true" class="fc-theme-primary-400 js-saves-btn-selected d-none svg-icon iconBookmark" width="18" height="18"  viewBox="0 0 18 18"><path  d="M3 17V3c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v14l-6-4-6 4Z"/></svg>
+    <svg aria-hidden="true" class="js-saves-btn-unselected svg-icon iconBookmarkAlt" width="18" height="18"  viewBox="0 0 18 18"><path  d="m9 10.6 4 2.66V3H5v10.26l4-2.66ZM3 17V3c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v14l-6-4-6 4Z"/></svg>
+</button>
+
+
+
+
+
+
+
+
+    
+    <a class="js-post-issue flex--item s-btn s-btn__unset c-pointer py6 mx-auto" href="/posts/31321/timeline" data-shortcut="T" data-ks-title="timeline" data-controller="s-tooltip" data-s-tooltip-placement="right" title="Show activity on this post." aria-label="Timeline"><svg aria-hidden="true" class="mln2 mr0 svg-icon iconHistory" width="19" height="18"  viewBox="0 0 19 18"><path  d="M3 9a8 8 0 1 1 3.73 6.77L8.2 14.3A6 6 0 1 0 5 9l3.01-.01-4 4-4-4h3L3 9Zm7-4h1.01L11 9.36l3.22 2.1-.6.93L10 10V5Z"/></svg></a>
+
+</div>
+
+        </div>
+
+        
+
+<div class="postcell post-layout--right">
+    
+    <div class="s-prose js-post-body" itemprop="text">
+                
+<p><a href="http://en.wikipedia.org/wiki/Psycho_(1960_film)">Psycho</a> directed by Alfred Hitchcock has a scene where a person is flushing a toilet. This fact provided some shock effect, since toilets were virtually never seen in American cinema in the 1960s.</p>
+
+<p>Like the title of this question says, I want to know: <strong>which was the first movie to feature a person sitting on a toilet?</strong></p>
+
+<p>Why I'm asking this? I think it's an interesting and funny fact.</p>
+    </div>
+
+        <div class="mt24 mb12">
+            <div class="post-taglist d-flex gs4 gsy fd-column">
+                <div class="d-flex ps-relative fw-wrap">
+                    
+                    <ul class='ml0 list-ls-none js-post-tag-list-wrapper d-inline'><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/first-appearance" class="post-tag" title="show questions tagged &#39;first-appearance&#39;" aria-label="show questions tagged &#39;first-appearance&#39;" rel="tag" aria-labelledby="tag-first-appearance-tooltip-container">first-appearance</a></li></ul>
+                </div>
+            </div>
+        </div>
+
+    <div class="mb0 ">
+        <div class="mt16 d-flex gs8 gsy fw-wrap jc-end ai-start pt4 mb16">
+            <div class="flex--item mr16 fl1 w96">
+                
+
+
+<div class="js-post-menu pt2" data-post-id="31321" data-post-type-id="1">
+
+    <div class="d-flex gs8 s-anchors s-anchors__muted fw-wrap">
+
+        <div class="flex--item">
+            <a href="/q/31321"
+               rel="nofollow"
+               itemprop="url"
+               class="js-share-link js-gps-track"
+               title="Short permalink to this question"
+               data-gps-track="post.click({ item: 2, priv: 0, post_type: 1 })"
+               data-controller="se-share-sheet"
+               data-se-share-sheet-title="Share a link to this question"
+               data-se-share-sheet-subtitle=""
+               data-se-share-sheet-post-type="question"
+               data-se-share-sheet-social="facebook twitter "
+               data-se-share-sheet-location="1"
+               data-se-share-sheet-license-url="https%3a%2f%2fcreativecommons.org%2flicenses%2fby-sa%2f3.0%2f"
+               data-se-share-sheet-license-name="CC BY-SA 3.0"
+               data-s-popover-placement="bottom-start">Share</a>
+        </div>
+
+
+                    <div class="flex--item">
+                        <a href="/posts/31321/edit" class="js-suggest-edit-post js-gps-track" data-gps-track="post.click({ item: 6, priv: 0, post_type: 1 })" title="">Improve this question</a>
+                    </div>
+
+                <div class="flex--item">
+                    <button type="button"
+                            id="btnFollowPost-31321" class="s-btn s-btn__link js-follow-post js-follow-question js-gps-track"
+                            data-gps-track="post.click({ item: 14, priv: 0, post_type: 1 })"
+                            data-controller="s-tooltip " data-s-tooltip-placement="bottom"
+                            data-s-popover-placement="bottom" aria-controls=""
+                            title="Follow this question to receive notifications">
+                        Follow
+                    </button>
+                </div>
+
+
+
+
+
+
+    </div>
+    <div class="js-menu-popup-container"></div>
+</div>
+            </div>
+
+                <div class="post-signature flex--item">
+<div class="user-info user-hover ">
+    <div class="d-flex ">
+        <div class="user-action-time fl-grow1">
+            <a href="/posts/31321/revisions" title="show all edits to this post"
+                         class="js-gps-track"
+                         data-gps-track="post.click({ item: 4, priv: 0, post_type: 1 })">edited <span title='2015-12-29 15:36:50Z' class='relativetime'>Dec 29, 2015 at 15:36</span></a>
+        </div>
+        
+    </div>
+    <div class="user-gravatar32">
+        <a href="/users/28789/kshitij-bhandari"><div class="gravatar-wrapper-32"><img src="https://lh4.googleusercontent.com/-a0MjXVanVSI/AAAAAAAAAAI/AAAAAAAAAGw/wklNbsGDQ3Y/photo.jpg?sz=64" alt="Kshitij Bhandari&#39;s user avatar" width="32" height="32" class="bar-sm"></div></a>
+    </div>
+    <div class="user-details">
+        <a href="/users/28789/kshitij-bhandari">Kshitij Bhandari</a>
+        <div class="-flair">
+            <span class="reputation-score" title="reputation score " dir="ltr">1,251</span><span title="4 gold badges" aria-hidden="true"><span class="badge1"></span><span class="badgecount">4</span></span><span class="v-visible-sr">4 gold badges</span><span title="13 silver badges" aria-hidden="true"><span class="badge2"></span><span class="badgecount">13</span></span><span class="v-visible-sr">13 silver badges</span><span title="21 bronze badges" aria-hidden="true"><span class="badge3"></span><span class="badgecount">21</span></span><span class="v-visible-sr">21 bronze badges</span>
+        </div>
+    </div>
+</div>
+                </div>
+            <div class="post-signature owner flex--item">
+                <div class="user-info ">
+    <div class="d-flex ">
+        <div class="user-action-time fl-grow1">
+            asked <span title='2015-02-20 11:21:04Z' class='relativetime'>Feb 20, 2015 at 11:21</span>
+        </div>
+        
+    </div>
+    <div class="user-gravatar32">
+        <a href="/users/8737/charmin"><div class="gravatar-wrapper-32"><img src="https://i.stack.imgur.com/683L9.png?s=64&amp;g=1" alt="Charmin&#39;s user avatar" width="32" height="32" class="bar-sm"></div></a>
+    </div>
+    <div class="user-details" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <a href="/users/8737/charmin">Charmin</a><span class="d-none" itemprop="name">Charmin</span>
+        <div class="-flair">
+            <span class="reputation-score" title="reputation score " dir="ltr">1,533</span><span title="2 gold badges" aria-hidden="true"><span class="badge1"></span><span class="badgecount">2</span></span><span class="v-visible-sr">2 gold badges</span><span title="23 silver badges" aria-hidden="true"><span class="badge2"></span><span class="badgecount">23</span></span><span class="v-visible-sr">23 silver badges</span><span title="36 bronze badges" aria-hidden="true"><span class="badge3"></span><span class="badgecount">36</span></span><span class="v-visible-sr">36 bronze badges</span>
+        </div>
+    </div>
+</div>
+
+
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+
+
+
+            <span class="d-none" itemprop="commentCount">5</span> 
+    <div class="post-layout--right js-post-comments-component">
+        <div id="comments-31321" class="comments js-comments-container bt bc-black-200 mt12 " data-post-id="31321" data-min-length="15">
+            <ul class="comments-list js-comments-list"
+                    data-remaining-comments-count="0"
+                    data-canpost="false"
+                    data-cansee="true"
+                    data-comments-unavailable="false"
+                    data-addlink-disabled="true">
+
+                        <li id="comment-46570" class="comment js-comment " data-comment-id="46570" data-comment-owner-id="4386" data-comment-score="2">
+        <div class="js-comment-actions comment-actions">
+            <div class="comment-score js-comment-score js-comment-edit-hide">
+                    <span title="number of &#x27;useful comment&#x27; votes received"
+                            class="cool">2</span>
+            </div>
+        </div>
+        <div class="comment-text  js-comment-text-and-form">
+            <div class="comment-body js-comment-edit-hide">
+                
+                <span class="comment-copy">An odd one. :) Would an outhouse suffice?</span>
+                
+                <div class="d-inline-flex ai-center">
+&ndash;&nbsp;<a href="/users/4386/walt"
+                                title="99,873 reputation"
+                                class="comment-user">Walt</a>
+                </div>
+                <span class="comment-date" dir="ltr"><span title='2015-02-20 11:53:09Z, License: CC BY-SA 3.0' class='relativetime-clean'>Feb 20, 2015 at 11:53</span></span>
+            </div>
+        </div>
+    </li>
+    <li id="comment-46575" class="comment js-comment " data-comment-id="46575" data-comment-owner-id="5029" data-comment-score="1">
+        <div class="js-comment-actions comment-actions">
+            <div class="comment-score js-comment-score js-comment-edit-hide">
+                    <span title="number of &#x27;useful comment&#x27; votes received"
+                            class="cool">1</span>
+            </div>
+        </div>
+        <div class="comment-text  js-comment-text-and-form">
+            <div class="comment-body js-comment-edit-hide">
+                
+                <span class="comment-copy">Probably not the first, but there&#39;s a great scene in Bu&#241;uel&#39;s <i>The Phantom of Liberty</i>. <a href="https://www.youtube.com/watch?v=h1Mptgi23YE" rel="nofollow noreferrer">link</a>.</span>
+                
+                <div class="d-inline-flex ai-center">
+&ndash;&nbsp;<a href="/users/5029/fruitbat"
+                                title="1,380 reputation"
+                                class="comment-user">Fruitbat</a>
+                </div>
+                <span class="comment-date" dir="ltr"><span title='2015-02-20 14:05:01Z, License: CC BY-SA 3.0' class='relativetime-clean'>Feb 20, 2015 at 14:05</span></span>
+            </div>
+        </div>
+    </li>
+    <li id="comment-46607" class="comment js-comment " data-comment-id="46607" data-comment-owner-id="132" data-comment-score="0">
+        <div class="js-comment-actions comment-actions">
+            <div class="comment-score js-comment-score js-comment-edit-hide">
+            </div>
+        </div>
+        <div class="comment-text  js-comment-text-and-form">
+            <div class="comment-body js-comment-edit-hide">
+                
+                <span class="comment-copy">@Fruitbat The scene is available at <a href="http://movies.stackexchange.com/questions/633/eating-and-toilet-taboos-are-reversed/637#637" title="eating and toilet taboos are reversed">movies.stackexchange.com/questions/633/&hellip;</a></span>
+                
+                <div class="d-inline-flex ai-center">
+&ndash;&nbsp;<a href="/users/132/knut"
+                                title="2,295 reputation"
+                                class="comment-user">knut</a>
+                </div>
+                <span class="comment-date" dir="ltr"><span title='2015-02-20 19:33:57Z, License: CC BY-SA 3.0' class='relativetime-clean'>Feb 20, 2015 at 19:33</span></span>
+                        <span title="this comment was edited 1 time">
+                            <svg aria-hidden="true" class="va-text-bottom o50 svg-icon iconPencilSm" width="14" height="14"  viewBox="0 0 14 14"><path fill="#F1B600" d="m2 10.12 6.37-6.43 1.88 1.88L3.88 12H2v-1.88Z"/><path fill="#E87C87" d="m11.1 1.71 1.13 1.12c.2.2.2.51 0 .71L11.1 4.7 9.21 2.86l1.17-1.15c.2-.2.51-.2.71 0Z"/></svg>
+                        </span>
+            </div>
+        </div>
+    </li>
+    <li id="comment-46800" class="comment js-comment " data-comment-id="46800" data-comment-owner-id="8737" data-comment-score="1">
+        <div class="js-comment-actions comment-actions">
+            <div class="comment-score js-comment-score js-comment-edit-hide">
+                    <span title="number of &#x27;useful comment&#x27; votes received"
+                            class="cool">1</span>
+            </div>
+        </div>
+        <div class="comment-text  js-comment-text-and-form">
+            <div class="comment-body js-comment-edit-hide">
+                
+                <span class="comment-copy">I don&#39;t understand the close votes :-/ It would help if you leave a comment</span>
+                
+                <div class="d-inline-flex ai-center">
+&ndash;&nbsp;<a href="/users/8737/charmin"
+                                title="1,533 reputation"
+                                class="comment-user owner">Charmin</a>
+                </div>
+                <span class="comment-date" dir="ltr"><span title='2015-02-23 16:58:58Z, License: CC BY-SA 3.0' class='relativetime-clean'>Feb 23, 2015 at 16:58</span></span>
+            </div>
+        </div>
+    </li>
+    <li id="comment-71223" class="comment js-comment " data-comment-id="71223" data-comment-owner-id="27759" data-comment-score="1">
+        <div class="js-comment-actions comment-actions">
+            <div class="comment-score js-comment-score js-comment-edit-hide">
+                    <span title="number of &#x27;useful comment&#x27; votes received"
+                            class="cool">1</span>
+            </div>
+        </div>
+        <div class="comment-text  js-comment-text-and-form">
+            <div class="comment-body js-comment-edit-hide">
+                
+                <span class="comment-copy">Obligatory Tywin Lannister reference here.</span>
+                
+                <div class="d-inline-flex ai-center">
+&ndash;&nbsp;<a href="/users/27759/rand-althor"
+                                title="8,440 reputation"
+                                class="comment-user">Rand al&#x27;Thor</a>
+                </div>
+                <span class="comment-date" dir="ltr"><span title='2015-12-29 00:31:35Z, License: CC BY-SA 3.0' class='relativetime-clean'>Dec 29, 2015 at 0:31</span></span>
+            </div>
+        </div>
+    </li>
+
+            </ul>
+	    </div>
+
+        <div id="comments-link-31321" data-rep=50 data-anon=true>
+                    <a class="js-add-link comments-link disabled-link" title="Use comments to ask for more information or suggest improvements. Avoid answering questions in comments."  href="#" role="button">Add a comment</a>
+                <span class="js-link-separator dno">&nbsp;|&nbsp;</span>
+            <a class="js-show-link comments-link dno" title="Expand to show all comments on this post" href=# onclick="" role="button"></a>
+        </div>         
+    </div>
+    </div>
+
+</div>
+
+
+
+                
+                
+                <div id="answers">
+                    <a name="tab-top"></a>
+                    <div id="answers-header">
+                        <div class="answers-subheader d-flex ai-center mb8">
+                            <div class="flex--item fl1">
+                                <h2 class="mb0" data-answercount="3">
+                                        3 Answers
+                                    <span style="display:none;" itemprop="answerCount">3</span>
+                                </h2>
+                            </div>
+                            <div class="flex--item">
+                                
+
+<div class="d-flex g4 gsx ai-center sm:fd-column sm:ai-start">
+    <div class="d-flex fd-column ai-end sm:ai-start">
+        <label class="flex--item fs-caption" for="answer-sort-dropdown-select-menu">
+            Sorted by:
+        </label>
+        <a 
+            class="js-sort-preference-change s-link flex--item fs-fine d-none"
+            data-value="ScoreDesc"
+            href="/questions/31321/what-was-the-first-movie-to-feature-a-person-seated-on-a-toilet?answertab=scoredesc#tab-top"
+        >
+            Reset to default
+        </a>
+    </div>
+    <div class="flex--item s-select">
+        <select id="answer-sort-dropdown-select-menu">
+                    <option
+                        value=scoredesc
+                        selected=selected
+                    >
+                        Highest score (default)
+                    </option>
+                    <option
+                        value=modifieddesc
+                    >
+                        Date modified (newest first)
+                    </option>
+                    <option
+                        value=createdasc
+                    >
+                        Date created (oldest first)
+                    </option>
+        </select>
+    </div>
+</div>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                                    
+<a name="45890"></a>
+<div id="answer-45890" class="answer js-answer" data-answerid="45890" data-parentid="31321" data-score="15" data-position-on-page="1" data-highest-scored="1" data-question-has-accepted-highest-score="0"  itemprop="suggestedAnswer" itemscope itemtype="https://schema.org/Answer">
+    <div class="post-layout">
+        <div class="votecell post-layout--left">
+            <div class="js-voting-container d-flex jc-center fd-column ai-stretch gs4 fc-black-300" data-post-id="45890" data-referrer="None">
+        <button class="js-vote-up-btn flex--item s-btn ba bar-pill c-pointer as-center bc-black-225 fc-black-500 h:bg-theme-primary-200 h:fc-black-500 f:fc-black-050"
+                data-controller="s-tooltip"
+                data-s-tooltip-placement="right"
+                title="This answer is useful"
+                aria-pressed="false"
+                aria-label="Up vote"
+                data-selected-classes="fc-theme-primary-100 bc-theme-primary-500 bg-theme-primary-500"
+                data-unselected-classes="bc-black-225 fc-black-500 h:bg-theme-primary-200 h:fc-black-500 f:fc-black-050">
+            <svg aria-hidden="true" class="svg-icon iconArrowUp" width="18" height="18"  viewBox="0 0 18 18"><path  d="M1 12h16L9 4l-8 8Z"/></svg>
+        </button>
+        <div class="js-vote-count flex--item d-flex fd-column ai-center fc-theme-body-font fw-bold fs-subheading py4"
+             itemprop="upvoteCount"
+             data-value="15">
+            15
+        </div>
+        <button class="js-vote-down-btn flex--item mb8 s-btn ba bar-pill c-pointer as-center bc-black-225 fc-black-500 h:bg-theme-primary-200 h:fc-black-500 f:fc-black-050"
+                data-controller="s-tooltip"
+                data-s-tooltip-placement="right"
+                title="This answer is not useful"
+                aria-pressed="false"
+                aria-label="Down vote"
+                data-selected-classes="fc-theme-primary-100 bc-theme-primary-500 bg-theme-primary-500"
+                data-unselected-classes="bc-black-225 fc-black-500 h:bg-theme-primary-200 h:fc-black-500 f:fc-black-050">
+            <svg aria-hidden="true" class="svg-icon iconArrowDown" width="18" height="18"  viewBox="0 0 18 18"><path  d="M1 6h16l-8 8-8-8Z"/></svg>
+        </button>
+
+
+        
+<button class="js-saves-btn s-btn s-btn__unset c-pointer py4"
+        type="button"
+        id="saves-btn-45890"
+        data-controller="s-tooltip"
+        data-s-tooltip-placement="right"
+        data-s-popover-placement=""
+        title="Save this answer."
+        aria-pressed="false"
+        data-post-id="45890"
+        data-post-type-id="2"
+        data-user-privilege-for-post-click="0"
+        aria-controls=""
+        data-s-popover-auto-show="false"
+>
+    <svg aria-hidden="true" class="fc-theme-primary-400 js-saves-btn-selected d-none svg-icon iconBookmark" width="18" height="18"  viewBox="0 0 18 18"><path  d="M3 17V3c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v14l-6-4-6 4Z"/></svg>
+    <svg aria-hidden="true" class="js-saves-btn-unselected svg-icon iconBookmarkAlt" width="18" height="18"  viewBox="0 0 18 18"><path  d="m9 10.6 4 2.66V3H5v10.26l4-2.66ZM3 17V3c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v14l-6-4-6 4Z"/></svg>
+</button>
+
+
+
+
+
+
+
+            <div class="js-accepted-answer-indicator flex--item fc-green-400 py6 mtn8 d-none" data-s-tooltip-placement="right" title="Loading when this answer was accepted&#x2026;" tabindex="0" role="note" aria-label="Accepted">
+                <div class="ta-center">
+                    <svg aria-hidden="true" class="svg-icon iconCheckmarkLg" width="36" height="36"  viewBox="0 0 36 36"><path  d="m6 14 8 8L30 6v8L14 30l-8-8v-8Z"/></svg>
+                </div>
+            </div>
+            
+<div class="js-bounty-award-container flex--item py4">
+
+    <div class="d-flex fd-column gs4 ai-center">
+
+            <div class="js-bounty-award flex--item s-badge s-badge__bounty s-badge__sm as-center"
+                 title="This answer has been awarded bounties worth 50 reputation by Rand al&#x27;Thor" data-controller="s-tooltip" data-s-tooltip-placement="right">
+                +50
+            </div>
+
+    </div>
+</div>
+
+
+    
+    <a class="js-post-issue flex--item s-btn s-btn__unset c-pointer py6 mx-auto" href="/posts/45890/timeline" data-shortcut="T" data-ks-title="timeline" data-controller="s-tooltip" data-s-tooltip-placement="right" title="Show activity on this post." aria-label="Timeline"><svg aria-hidden="true" class="mln2 mr0 svg-icon iconHistory" width="19" height="18"  viewBox="0 0 19 18"><path  d="M3 9a8 8 0 1 1 3.73 6.77L8.2 14.3A6 6 0 1 0 5 9l3.01-.01-4 4-4-4h3L3 9Zm7-4h1.01L11 9.36l3.22 2.1-.6.93L10 10V5Z"/></svg></a>
+
+</div>
+
+        </div>
+
+        
+
+<div class="answercell post-layout--right">
+    
+    <div class="s-prose js-post-body" itemprop="text">
+<p>As a starting point, IMDB has a rather marvelous feature called "keywords" where users create tags for possible features of a film then tag films that contain such scenes or elements. It's a fun way to explore questions like this.</p>
+
+<p><a href="http://www.imdb.com/search/keyword?keywords=sitting-on-a-toilet">Sitting on a toilet</a> (126 titles) is indeed such a tag. If we sort that list by date, the earliest "sitting on toilet" film is, apparently, a <strong>1968</strong> French comedy about cannibals who run a vegetarian restaurant (no, really!), called <a href="http://m.imdb.com/title/tt0057827/?ref_=kw_li_tt">A Taste For Women</a>. </p>
+
+<hr>
+
+<p>If we take <a href="http://www.imdb.com/search/keyword?keywords=toilet&amp;sort=release_date,asc&amp;mode=detail&amp;page=1">the list simply tagged "toilet"</a> and sort it by date, IMDB believes the earliest film containing a toilet-related scene or plot was a German drama from <strong>1924</strong> called <a href="http://www.imdb.com/search/keyword?keywords=toilet&amp;sort=release_date,asc&amp;mode=detail&amp;page=1">The Last Laugh</a>, about a hotel doorman trying to deal with the indignity of being demoted to washroom attendant.</p>
+
+<p>The earliest American "toilet" film does actually appear to be Psycho, 1960.</p>
+
+<hr>
+
+<p>Here's a list of the dizzying, worrying variety of <a href="http://www.imdb.com/find?s=kw&amp;ref_=kw_fnd&amp;q=Toilet">IMDB keywords that contain the word "toilet"</a>, which range from <a href="http://www.imdb.com/keyword/head-in-a-toilet/?ref_=fn_kw_kw_43">Head in a toilet</a> (32 titles) to <a href="http://www.imdb.com/keyword/toilet-twerking/?ref_=fn_kw_kw_88">Toilet twerking</a> (just one title...).</p>
+
+<p>If you ever wanted to know the most popular film where toilet paper makes a notable appearance, according to IMDB, it's V For Vendetta. No, I don't remember the toilet paper scene, either, but some diligent IMDB user has tagged <a href="http://www.imdb.com/search/keyword?keywords=toilet-paper">148 films that include toilet paper</a>. The internet is a wonderful and terrifying thing.</p>
+
+<hr>
+
+<p>Researching this question has given me a very strange recent internet browsing history... Fun fact: I found out about this feature after a talk by director Edgar Wright, who described reading his own films' IMDB profiles and cracking up in baffled hysterics on discovering which elements the people of IMDB felt worth tagging. For example, <a href="http://www.imdb.com/title/tt0365748/keywords?ref_=tt_stry_kw">Shaun Of The Dead has among its "plot keywords"</a> "Cricket bat", "Arab grocer" and "Hip hop montage".</p>
+    </div>
+    <div class="mt24">
+        <div class="d-flex fw-wrap ai-start jc-end gs8 gsy">
+            <time itemprop="dateCreated" datetime="2016-01-05T23:46:09"></time>
+            <div class="flex--item mr16" style="flex: 1 1 100px;">
+                
+
+
+<div class="js-post-menu pt2" data-post-id="45890" data-post-type-id="2">
+
+    <div class="d-flex gs8 s-anchors s-anchors__muted fw-wrap">
+
+        <div class="flex--item">
+            <a href="/a/45890"
+               rel="nofollow"
+               itemprop="url"
+               class="js-share-link js-gps-track"
+               title="Short permalink to this answer"
+               data-gps-track="post.click({ item: 2, priv: 0, post_type: 2 })"
+               data-controller="se-share-sheet"
+               data-se-share-sheet-title="Share a link to this answer"
+               data-se-share-sheet-subtitle=""
+               data-se-share-sheet-post-type="answer"
+               data-se-share-sheet-social="facebook twitter "
+               data-se-share-sheet-location="2"
+               data-se-share-sheet-license-url="https%3a%2f%2fcreativecommons.org%2flicenses%2fby-sa%2f3.0%2f"
+               data-se-share-sheet-license-name="CC BY-SA 3.0"
+               data-s-popover-placement="bottom-start">Share</a>
+        </div>
+
+
+                    <div class="flex--item">
+                        <a href="/posts/45890/edit" class="js-suggest-edit-post js-gps-track" data-gps-track="post.click({ item: 6, priv: 0, post_type: 2 })" title="">Improve this answer</a>
+                    </div>
+
+                <div class="flex--item">
+                    <button type="button"
+                            id="btnFollowPost-45890" class="s-btn s-btn__link js-follow-post js-follow-answer js-gps-track"
+                            data-gps-track="post.click({ item: 14, priv: 0, post_type: 2 })"
+                            data-controller="s-tooltip " data-s-tooltip-placement="bottom"
+                            data-s-popover-placement="bottom" aria-controls=""
+                            title="Follow this answer to receive notifications">
+                        Follow
+                    </button>
+                </div>
+
+
+
+
+
+
+    </div>
+    <div class="js-menu-popup-container"></div>
+</div>
+            </div>
+            <div class="post-signature flex--item fl0">
+<div class="user-info ">
+    <div class="d-flex ">
+        <div class="user-action-time fl-grow1">
+            <a href="/posts/45890/revisions" title="show all edits to this post"
+                         class="js-gps-track"
+                         data-gps-track="post.click({ item: 4, priv: 0, post_type: 2 })">edited <span title='2016-01-06 00:26:48Z' class='relativetime'>Jan 6, 2016 at 0:26</span></a>
+        </div>
+        
+    </div>
+    <div class="user-gravatar32">
+        
+    </div>
+    <div class="user-details">
+        
+        <div class="-flair">
+            
+        </div>
+    </div>
+</div>
+            </div>
+
+
+            <div class="post-signature flex--item fl0">
+                <div class="user-info user-hover ">
+    <div class="d-flex ">
+        <div class="user-action-time fl-grow1">
+            answered <span title='2016-01-05 23:46:09Z' class='relativetime'>Jan 5, 2016 at 23:46</span>
+        </div>
+        
+    </div>
+    <div class="user-gravatar32">
+        <a href="/users/9718/user56reinstatemonica8"><div class="gravatar-wrapper-32"><img src="https://i.stack.imgur.com/67j9J.png?s=64&amp;g=1" alt="user56reinstatemonica8&#39;s user avatar" width="32" height="32" class="bar-sm"></div></a>
+    </div>
+    <div class="user-details" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <a href="/users/9718/user56reinstatemonica8">user56reinstatemonica8</a><span class="d-none" itemprop="name">user56reinstatemonica8</span>
+        <div class="-flair">
+            <span class="reputation-score" title="reputation score 10,897" dir="ltr">10.9k</span><span title="1 gold badge" aria-hidden="true"><span class="badge1"></span><span class="badgecount">1</span></span><span class="v-visible-sr">1 gold badge</span><span title="39 silver badges" aria-hidden="true"><span class="badge2"></span><span class="badgecount">39</span></span><span class="v-visible-sr">39 silver badges</span><span title="72 bronze badges" aria-hidden="true"><span class="badge3"></span><span class="badgecount">72</span></span><span class="v-visible-sr">72 bronze badges</span>
+        </div>
+    </div>
+</div>
+
+
+            </div>
+        </div>
+        
+    
+    </div>
+    
+</div>
+
+
+
+
+            <span class="d-none" itemprop="commentCount">2</span> 
+    <div class="post-layout--right js-post-comments-component">
+        <div id="comments-45890" class="comments js-comments-container bt bc-black-200 mt12 " data-post-id="45890" data-min-length="15">
+            <ul class="comments-list js-comments-list"
+                    data-remaining-comments-count="0"
+                    data-canpost="false"
+                    data-cansee="true"
+                    data-comments-unavailable="false"
+                    data-addlink-disabled="true">
+
+                        <li id="comment-88138" class="comment js-comment " data-comment-id="88138" data-comment-owner-id="6815" data-comment-score="1">
+        <div class="js-comment-actions comment-actions">
+            <div class="comment-score js-comment-score js-comment-edit-hide">
+                    <span title="number of &#x27;useful comment&#x27; votes received"
+                            class="cool">1</span>
+            </div>
+        </div>
+        <div class="comment-text  js-comment-text-and-form">
+            <div class="comment-body js-comment-edit-hide">
+                
+                <span class="comment-copy">You sound very similarly to Randall, author of xkcd. See : <a href="https://what-if.xkcd.com/100/" rel="nofollow noreferrer">what-if.xkcd.com/100</a></span>
+                
+                <div class="d-inline-flex ai-center">
+&ndash;&nbsp;<a href="/users/6815/olivier-dulac"
+                                title="139 reputation"
+                                class="comment-user">Olivier Dulac</a>
+                </div>
+                <span class="comment-date" dir="ltr"><span title='2016-06-23 20:22:25Z, License: CC BY-SA 3.0' class='relativetime-clean'>Jun 23, 2016 at 20:22</span></span>
+            </div>
+        </div>
+    </li>
+    <li id="comment-88663" class="comment js-comment " data-comment-id="88663" data-comment-owner-id="27759" data-comment-score="0">
+        <div class="js-comment-actions comment-actions">
+            <div class="comment-score js-comment-score js-comment-edit-hide">
+            </div>
+        </div>
+        <div class="comment-text  js-comment-text-and-form">
+            <div class="comment-body js-comment-edit-hide">
+                
+                <span class="comment-copy">Nice answer. Have a bounty.</span>
+                
+                <div class="d-inline-flex ai-center">
+&ndash;&nbsp;<a href="/users/27759/rand-althor"
+                                title="8,440 reputation"
+                                class="comment-user">Rand al&#x27;Thor</a>
+                </div>
+                <span class="comment-date" dir="ltr"><span title='2016-06-29 23:21:58Z, License: CC BY-SA 3.0' class='relativetime-clean'>Jun 29, 2016 at 23:21</span></span>
+            </div>
+        </div>
+    </li>
+
+            </ul>
+	    </div>
+
+        <div id="comments-link-45890" data-rep=50 data-anon=true>
+                    <a class="js-add-link comments-link disabled-link" title="Use comments to ask for more information or suggest improvements. Avoid comments like &#x201C;&#x2B;1&#x201D; or &#x201C;thanks&#x201D;."  href="#" role="button">Add a comment</a>
+                <span class="js-link-separator dno">&nbsp;|&nbsp;</span>
+            <a class="js-show-link comments-link dno" title="Expand to show all comments on this post" href=# onclick="" role="button"></a>
+        </div>         
+    </div>
+    </div>
+</div>
+
+<div class="js-zone-container zone-container-main">
+    <div id="dfp-mlb" class="everyonelovesstackoverflow everyoneloves__mid-leaderboard everyoneloves__leaderboard"></div>
+		<div class="js-report-ad-button-container " style="width: 728px"></div>
+</div>
+                                    
+<a name="45887"></a>
+<div id="answer-45887" class="answer js-answer" data-answerid="45887" data-parentid="31321" data-score="6" data-position-on-page="2" data-highest-scored="0" data-question-has-accepted-highest-score="0"  itemprop="suggestedAnswer" itemscope itemtype="https://schema.org/Answer">
+    <div class="post-layout">
+        <div class="votecell post-layout--left">
+            <div class="js-voting-container d-flex jc-center fd-column ai-stretch gs4 fc-black-300" data-post-id="45887" data-referrer="None">
+        <button class="js-vote-up-btn flex--item s-btn ba bar-pill c-pointer as-center bc-black-225 fc-black-500 h:bg-theme-primary-200 h:fc-black-500 f:fc-black-050"
+                data-controller="s-tooltip"
+                data-s-tooltip-placement="right"
+                title="This answer is useful"
+                aria-pressed="false"
+                aria-label="Up vote"
+                data-selected-classes="fc-theme-primary-100 bc-theme-primary-500 bg-theme-primary-500"
+                data-unselected-classes="bc-black-225 fc-black-500 h:bg-theme-primary-200 h:fc-black-500 f:fc-black-050">
+            <svg aria-hidden="true" class="svg-icon iconArrowUp" width="18" height="18"  viewBox="0 0 18 18"><path  d="M1 12h16L9 4l-8 8Z"/></svg>
+        </button>
+        <div class="js-vote-count flex--item d-flex fd-column ai-center fc-theme-body-font fw-bold fs-subheading py4"
+             itemprop="upvoteCount"
+             data-value="6">
+            6
+        </div>
+        <button class="js-vote-down-btn flex--item mb8 s-btn ba bar-pill c-pointer as-center bc-black-225 fc-black-500 h:bg-theme-primary-200 h:fc-black-500 f:fc-black-050"
+                data-controller="s-tooltip"
+                data-s-tooltip-placement="right"
+                title="This answer is not useful"
+                aria-pressed="false"
+                aria-label="Down vote"
+                data-selected-classes="fc-theme-primary-100 bc-theme-primary-500 bg-theme-primary-500"
+                data-unselected-classes="bc-black-225 fc-black-500 h:bg-theme-primary-200 h:fc-black-500 f:fc-black-050">
+            <svg aria-hidden="true" class="svg-icon iconArrowDown" width="18" height="18"  viewBox="0 0 18 18"><path  d="M1 6h16l-8 8-8-8Z"/></svg>
+        </button>
+
+
+        
+<button class="js-saves-btn s-btn s-btn__unset c-pointer py4"
+        type="button"
+        id="saves-btn-45887"
+        data-controller="s-tooltip"
+        data-s-tooltip-placement="right"
+        data-s-popover-placement=""
+        title="Save this answer."
+        aria-pressed="false"
+        data-post-id="45887"
+        data-post-type-id="2"
+        data-user-privilege-for-post-click="0"
+        aria-controls=""
+        data-s-popover-auto-show="false"
+>
+    <svg aria-hidden="true" class="fc-theme-primary-400 js-saves-btn-selected d-none svg-icon iconBookmark" width="18" height="18"  viewBox="0 0 18 18"><path  d="M3 17V3c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v14l-6-4-6 4Z"/></svg>
+    <svg aria-hidden="true" class="js-saves-btn-unselected svg-icon iconBookmarkAlt" width="18" height="18"  viewBox="0 0 18 18"><path  d="m9 10.6 4 2.66V3H5v10.26l4-2.66ZM3 17V3c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v14l-6-4-6 4Z"/></svg>
+</button>
+
+
+
+
+
+
+
+            <div class="js-accepted-answer-indicator flex--item fc-green-400 py6 mtn8 d-none" data-s-tooltip-placement="right" title="Loading when this answer was accepted&#x2026;" tabindex="0" role="note" aria-label="Accepted">
+                <div class="ta-center">
+                    <svg aria-hidden="true" class="svg-icon iconCheckmarkLg" width="36" height="36"  viewBox="0 0 36 36"><path  d="m6 14 8 8L30 6v8L14 30l-8-8v-8Z"/></svg>
+                </div>
+            </div>
+
+    
+    <a class="js-post-issue flex--item s-btn s-btn__unset c-pointer py6 mx-auto" href="/posts/45887/timeline" data-shortcut="T" data-ks-title="timeline" data-controller="s-tooltip" data-s-tooltip-placement="right" title="Show activity on this post." aria-label="Timeline"><svg aria-hidden="true" class="mln2 mr0 svg-icon iconHistory" width="19" height="18"  viewBox="0 0 19 18"><path  d="M3 9a8 8 0 1 1 3.73 6.77L8.2 14.3A6 6 0 1 0 5 9l3.01-.01-4 4-4-4h3L3 9Zm7-4h1.01L11 9.36l3.22 2.1-.6.93L10 10V5Z"/></svg></a>
+
+</div>
+
+        </div>
+
+        
+
+<div class="answercell post-layout--right">
+    
+    <div class="s-prose js-post-body" itemprop="text">
+<p>In the movie 'Fun with Dick and Jane' 1977, Jane Fonda sits down on a toilet whilst Dick is in the bathroom with her and the conversation is accompanied by the sound of pee hitting the water. I'm not sure that this was the first toilet but it's the first time I have heard a woman pee on a movie soundtrack.</p>
+    </div>
+    <div class="mt24">
+        <div class="d-flex fw-wrap ai-start jc-end gs8 gsy">
+            <time itemprop="dateCreated" datetime="2016-01-05T23:19:22"></time>
+            <div class="flex--item mr16" style="flex: 1 1 100px;">
+                
+
+
+<div class="js-post-menu pt2" data-post-id="45887" data-post-type-id="2">
+
+    <div class="d-flex gs8 s-anchors s-anchors__muted fw-wrap">
+
+        <div class="flex--item">
+            <a href="/a/45887"
+               rel="nofollow"
+               itemprop="url"
+               class="js-share-link js-gps-track"
+               title="Short permalink to this answer"
+               data-gps-track="post.click({ item: 2, priv: 0, post_type: 2 })"
+               data-controller="se-share-sheet"
+               data-se-share-sheet-title="Share a link to this answer"
+               data-se-share-sheet-subtitle=""
+               data-se-share-sheet-post-type="answer"
+               data-se-share-sheet-social="facebook twitter "
+               data-se-share-sheet-location="2"
+               data-se-share-sheet-license-url="https%3a%2f%2fcreativecommons.org%2flicenses%2fby-sa%2f3.0%2f"
+               data-se-share-sheet-license-name="CC BY-SA 3.0"
+               data-s-popover-placement="bottom-start">Share</a>
+        </div>
+
+
+                    <div class="flex--item">
+                        <a href="/posts/45887/edit" class="js-suggest-edit-post js-gps-track" data-gps-track="post.click({ item: 6, priv: 0, post_type: 2 })" title="">Improve this answer</a>
+                    </div>
+
+                <div class="flex--item">
+                    <button type="button"
+                            id="btnFollowPost-45887" class="s-btn s-btn__link js-follow-post js-follow-answer js-gps-track"
+                            data-gps-track="post.click({ item: 14, priv: 0, post_type: 2 })"
+                            data-controller="s-tooltip " data-s-tooltip-placement="bottom"
+                            data-s-popover-placement="bottom" aria-controls=""
+                            title="Follow this answer to receive notifications">
+                        Follow
+                    </button>
+                </div>
+
+
+
+
+
+
+    </div>
+    <div class="js-menu-popup-container"></div>
+</div>
+            </div>
+
+
+            <div class="post-signature flex--item fl0">
+                <div class="user-info ">
+    <div class="d-flex ">
+        <div class="user-action-time fl-grow1">
+            answered <span title='2016-01-05 23:19:22Z' class='relativetime'>Jan 5, 2016 at 23:19</span>
+        </div>
+        
+    </div>
+    <div class="user-gravatar32">
+        <a href="/users/29367/gesso"><div class="gravatar-wrapper-32"><img src="https://www.gravatar.com/avatar/7ec0b3a08d9f6c0efd92e503de025dde?s=64&amp;d=identicon&amp;r=PG&amp;f=y&amp;so-version=2" alt="Gesso&#39;s user avatar" width="32" height="32" class="bar-sm"></div></a>
+    </div>
+    <div class="user-details" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <a href="/users/29367/gesso">Gesso</a><span class="d-none" itemprop="name">Gesso</span>
+        <div class="-flair">
+            <span class="reputation-score" title="reputation score " dir="ltr">121</span><span title="1 silver badge" aria-hidden="true"><span class="badge2"></span><span class="badgecount">1</span></span><span class="v-visible-sr">1 silver badge</span><span title="5 bronze badges" aria-hidden="true"><span class="badge3"></span><span class="badgecount">5</span></span><span class="v-visible-sr">5 bronze badges</span>
+        </div>
+    </div>
+</div>
+
+
+            </div>
+        </div>
+        
+    
+    </div>
+    
+</div>
+
+
+
+
+            <span class="d-none" itemprop="commentCount"></span> 
+    <div class="post-layout--right js-post-comments-component">
+        <div id="comments-45887" class="comments js-comments-container bt bc-black-200 mt12  dno" data-post-id="45887" data-min-length="15">
+            <ul class="comments-list js-comments-list"
+                    data-remaining-comments-count="0"
+                    data-canpost="false"
+                    data-cansee="true"
+                    data-comments-unavailable="false"
+                    data-addlink-disabled="true">
+
+            </ul>
+	    </div>
+
+        <div id="comments-link-45887" data-rep=50 data-anon=true>
+                    <a class="js-add-link comments-link disabled-link" title="Use comments to ask for more information or suggest improvements. Avoid comments like &#x201C;&#x2B;1&#x201D; or &#x201C;thanks&#x201D;."  href="#" role="button">Add a comment</a>
+                <span class="js-link-separator dno">&nbsp;|&nbsp;</span>
+            <a class="js-show-link comments-link dno" title="Expand to show all comments on this post" href=# onclick="" role="button"></a>
+        </div>         
+    </div>
+    </div>
+</div>
+
+                                    
+<a name="75418"></a>
+<div id="answer-75418" class="answer js-answer" data-answerid="75418" data-parentid="31321" data-score="1" data-position-on-page="3" data-highest-scored="0" data-question-has-accepted-highest-score="0"  itemprop="suggestedAnswer" itemscope itemtype="https://schema.org/Answer">
+    <div class="post-layout">
+        <div class="votecell post-layout--left">
+            <div class="js-voting-container d-flex jc-center fd-column ai-stretch gs4 fc-black-300" data-post-id="75418" data-referrer="None">
+        <button class="js-vote-up-btn flex--item s-btn ba bar-pill c-pointer as-center bc-black-225 fc-black-500 h:bg-theme-primary-200 h:fc-black-500 f:fc-black-050"
+                data-controller="s-tooltip"
+                data-s-tooltip-placement="right"
+                title="This answer is useful"
+                aria-pressed="false"
+                aria-label="Up vote"
+                data-selected-classes="fc-theme-primary-100 bc-theme-primary-500 bg-theme-primary-500"
+                data-unselected-classes="bc-black-225 fc-black-500 h:bg-theme-primary-200 h:fc-black-500 f:fc-black-050">
+            <svg aria-hidden="true" class="svg-icon iconArrowUp" width="18" height="18"  viewBox="0 0 18 18"><path  d="M1 12h16L9 4l-8 8Z"/></svg>
+        </button>
+        <div class="js-vote-count flex--item d-flex fd-column ai-center fc-theme-body-font fw-bold fs-subheading py4"
+             itemprop="upvoteCount"
+             data-value="1">
+            1
+        </div>
+        <button class="js-vote-down-btn flex--item mb8 s-btn ba bar-pill c-pointer as-center bc-black-225 fc-black-500 h:bg-theme-primary-200 h:fc-black-500 f:fc-black-050"
+                data-controller="s-tooltip"
+                data-s-tooltip-placement="right"
+                title="This answer is not useful"
+                aria-pressed="false"
+                aria-label="Down vote"
+                data-selected-classes="fc-theme-primary-100 bc-theme-primary-500 bg-theme-primary-500"
+                data-unselected-classes="bc-black-225 fc-black-500 h:bg-theme-primary-200 h:fc-black-500 f:fc-black-050">
+            <svg aria-hidden="true" class="svg-icon iconArrowDown" width="18" height="18"  viewBox="0 0 18 18"><path  d="M1 6h16l-8 8-8-8Z"/></svg>
+        </button>
+
+
+        
+<button class="js-saves-btn s-btn s-btn__unset c-pointer py4"
+        type="button"
+        id="saves-btn-75418"
+        data-controller="s-tooltip"
+        data-s-tooltip-placement="right"
+        data-s-popover-placement=""
+        title="Save this answer."
+        aria-pressed="false"
+        data-post-id="75418"
+        data-post-type-id="2"
+        data-user-privilege-for-post-click="0"
+        aria-controls=""
+        data-s-popover-auto-show="false"
+>
+    <svg aria-hidden="true" class="fc-theme-primary-400 js-saves-btn-selected d-none svg-icon iconBookmark" width="18" height="18"  viewBox="0 0 18 18"><path  d="M3 17V3c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v14l-6-4-6 4Z"/></svg>
+    <svg aria-hidden="true" class="js-saves-btn-unselected svg-icon iconBookmarkAlt" width="18" height="18"  viewBox="0 0 18 18"><path  d="m9 10.6 4 2.66V3H5v10.26l4-2.66ZM3 17V3c0-1.1.9-2 2-2h8a2 2 0 0 1 2 2v14l-6-4-6 4Z"/></svg>
+</button>
+
+
+
+
+
+
+
+            <div class="js-accepted-answer-indicator flex--item fc-green-400 py6 mtn8 d-none" data-s-tooltip-placement="right" title="Loading when this answer was accepted&#x2026;" tabindex="0" role="note" aria-label="Accepted">
+                <div class="ta-center">
+                    <svg aria-hidden="true" class="svg-icon iconCheckmarkLg" width="36" height="36"  viewBox="0 0 36 36"><path  d="m6 14 8 8L30 6v8L14 30l-8-8v-8Z"/></svg>
+                </div>
+            </div>
+
+    
+    <a class="js-post-issue flex--item s-btn s-btn__unset c-pointer py6 mx-auto" href="/posts/75418/timeline" data-shortcut="T" data-ks-title="timeline" data-controller="s-tooltip" data-s-tooltip-placement="right" title="Show activity on this post." aria-label="Timeline"><svg aria-hidden="true" class="mln2 mr0 svg-icon iconHistory" width="19" height="18"  viewBox="0 0 19 18"><path  d="M3 9a8 8 0 1 1 3.73 6.77L8.2 14.3A6 6 0 1 0 5 9l3.01-.01-4 4-4-4h3L3 9Zm7-4h1.01L11 9.36l3.22 2.1-.6.93L10 10V5Z"/></svg></a>
+
+</div>
+
+        </div>
+
+        
+
+<div class="answercell post-layout--right">
+    
+    <div class="s-prose js-post-body" itemprop="text">
+<p>1958 "In the middle of the night" with Frederick March and Kim Novak. There is even toilet paper in the shot too! </p>
+    </div>
+    <div class="mt24">
+        <div class="d-flex fw-wrap ai-start jc-end gs8 gsy">
+            <time itemprop="dateCreated" datetime="2017-06-28T01:59:42"></time>
+            <div class="flex--item mr16" style="flex: 1 1 100px;">
+                
+
+
+<div class="js-post-menu pt2" data-post-id="75418" data-post-type-id="2">
+
+    <div class="d-flex gs8 s-anchors s-anchors__muted fw-wrap">
+
+        <div class="flex--item">
+            <a href="/a/75418"
+               rel="nofollow"
+               itemprop="url"
+               class="js-share-link js-gps-track"
+               title="Short permalink to this answer"
+               data-gps-track="post.click({ item: 2, priv: 0, post_type: 2 })"
+               data-controller="se-share-sheet"
+               data-se-share-sheet-title="Share a link to this answer"
+               data-se-share-sheet-subtitle=""
+               data-se-share-sheet-post-type="answer"
+               data-se-share-sheet-social="facebook twitter "
+               data-se-share-sheet-location="2"
+               data-se-share-sheet-license-url="https%3a%2f%2fcreativecommons.org%2flicenses%2fby-sa%2f3.0%2f"
+               data-se-share-sheet-license-name="CC BY-SA 3.0"
+               data-s-popover-placement="bottom-start">Share</a>
+        </div>
+
+
+                    <div class="flex--item">
+                        <a href="/posts/75418/edit" class="js-suggest-edit-post js-gps-track" data-gps-track="post.click({ item: 6, priv: 0, post_type: 2 })" title="">Improve this answer</a>
+                    </div>
+
+                <div class="flex--item">
+                    <button type="button"
+                            id="btnFollowPost-75418" class="s-btn s-btn__link js-follow-post js-follow-answer js-gps-track"
+                            data-gps-track="post.click({ item: 14, priv: 0, post_type: 2 })"
+                            data-controller="s-tooltip " data-s-tooltip-placement="bottom"
+                            data-s-popover-placement="bottom" aria-controls=""
+                            title="Follow this answer to receive notifications">
+                        Follow
+                    </button>
+                </div>
+
+
+
+
+
+
+    </div>
+    <div class="js-menu-popup-container"></div>
+</div>
+            </div>
+
+
+            <div class="post-signature flex--item fl0">
+                <div class="user-info ">
+    <div class="d-flex ">
+        <div class="user-action-time fl-grow1">
+            answered <span title='2017-06-28 01:59:42Z' class='relativetime'>Jun 28, 2017 at 1:59</span>
+        </div>
+        
+    </div>
+    <div class="user-gravatar32">
+        <a href="/users/53106/dave"><div class="gravatar-wrapper-32"><img src="https://www.gravatar.com/avatar/6f7143b3dce2e967d2e7da359fbaf2e2?s=64&amp;d=identicon&amp;r=PG" alt="Dave&#39;s user avatar" width="32" height="32" class="bar-sm"></div></a>
+    </div>
+    <div class="user-details" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <a href="/users/53106/dave">Dave</a><span class="d-none" itemprop="name">Dave</span>
+        <div class="-flair">
+            <span class="reputation-score" title="reputation score " dir="ltr">11</span><span title="1 bronze badge" aria-hidden="true"><span class="badge3"></span><span class="badgecount">1</span></span><span class="v-visible-sr">1 bronze badge</span>
+        </div>
+    </div>
+</div>
+
+
+            </div>
+        </div>
+        
+    
+    </div>
+    
+</div>
+
+
+
+
+            <span class="d-none" itemprop="commentCount"></span> 
+    <div class="post-layout--right js-post-comments-component">
+        <div id="comments-75418" class="comments js-comments-container bt bc-black-200 mt12  dno" data-post-id="75418" data-min-length="15">
+            <ul class="comments-list js-comments-list"
+                    data-remaining-comments-count="0"
+                    data-canpost="false"
+                    data-cansee="true"
+                    data-comments-unavailable="false"
+                    data-addlink-disabled="true">
+
+            </ul>
+	    </div>
+
+        <div id="comments-link-75418" data-rep=50 data-anon=true>
+                    <a class="js-add-link comments-link disabled-link" title="Use comments to ask for more information or suggest improvements. Avoid comments like &#x201C;&#x2B;1&#x201D; or &#x201C;thanks&#x201D;."  href="#" role="button">Add a comment</a>
+                <span class="js-link-separator dno">&nbsp;|&nbsp;</span>
+            <a class="js-show-link comments-link dno" title="Expand to show all comments on this post" href=# onclick="" role="button"></a>
+        </div>         
+    </div>
+    </div>
+</div>
+
+                                <h2 class="bottom-notice">
+                                    You must <a href="/users/login?ssrc=question_page&amp;returnurl=https%3a%2f%2fmovies.stackexchange.com%2fquestions%2f31321">log in</a> to answer this question.
+                                </h2>
+
+
+
+                            <h2 class="bottom-notice" data-loc="1">
+                                <div>
+Not the answer you&#x27;re looking for? Browse other questions tagged <ul class='ml0 list-ls-none js-post-tag-list-wrapper d-inline'><li class='d-inline mr4 js-post-tag-list-item'><a href="/questions/tagged/first-appearance" class="post-tag" title="show questions tagged &#39;first-appearance&#39;" aria-label="show questions tagged &#39;first-appearance&#39;" rel="tag" aria-labelledby="tag-first-appearance-tooltip-container">first-appearance</a></li></ul>.                                </div>
+                            </h2>
+                </div>
+            </div>
+
+            
+<div id="sidebar" class="show-votes" role="complementary" aria-label="sidebar">
+        
+
+    
+    <div class="s-sidebarwidget s-sidebarwidget__yellow s-anchors s-anchors__grayscale mb16" data-tracker="cb=1">
+        <ul class="d-block p0 m0">
+                        <li class="s-sidebarwidget--header s-sidebarwidget__small-bold-text d-flex fc-black-500 d:fc-black-600 bb bbw1">
+                            Featured on Meta
+                        </li>
+        <li class="s-sidebarwidget--item d-flex px16">
+            <div class="flex--item1 fl-shrink0">
+<div class="favicon favicon-stackexchangemeta" title="Meta Stack Exchange"></div>            </div>
+            <div class="flex--item wmn0 ow-break-word">
+                <a href="https://meta.stackexchange.com/questions/398127/our-partnership-with-google-and-commitment-to-socially-responsible-ai" class="js-gps-track" data-ga="[&quot;community bulletin board&quot;,&quot;Featured on Meta&quot;,&quot;https://meta.stackexchange.com/questions/398127/our-partnership-with-google-and-commitment-to-socially-responsible-ai&quot;,null,null]" data-gps-track="communitybulletin.click({ priority: 3, position: 0 })">Our partnership with Google and commitment to socially responsible AI</a>
+            </div>
+        </li>
+        <li class="s-sidebarwidget--item d-flex px16">
+            <div class="flex--item1 fl-shrink0">
+<div class="favicon favicon-stackexchangemeta" title="Meta Stack Exchange"></div>            </div>
+            <div class="flex--item wmn0 ow-break-word">
+                <a href="https://meta.stackexchange.com/questions/398279/shifting-the-data-dump-schedule-a-proposal" class="js-gps-track" data-ga="[&quot;community bulletin board&quot;,&quot;Featured on Meta&quot;,&quot;https://meta.stackexchange.com/questions/398279/shifting-the-data-dump-schedule-a-proposal&quot;,null,null]" data-gps-track="communitybulletin.click({ priority: 3, position: 1 })">Shifting the data dump schedule: A proposal</a>
+            </div>
+        </li>
+        </ul>
+    </div>
+
+
+<div class="js-zone-container zone-container-sidebar">
+    <div id="dfp-tsb" class="everyonelovesstackoverflow everyoneloves__top-sidebar"></div>
+		<div class="js-report-ad-button-container " style="width: 300px"></div>
+</div>
+        <div class="module sidebar-linked">
+	<h4 id="h-linked">Linked</h4>
+	    <div class="linked" data-tracker="lq=1">
+            <div class="spacer js-gps-track" data-gps-track="linkedquestion.click({ source_post_id: 31321, target_question_id: 633, position: 0 })">
+				<a href="/q/633" title="Question score (upvotes - downvotes)">
+					<div class="answer-votes answered-accepted default">40</div>
+				</a>
+				<a href="/questions/633/what-is-the-name-of-the-movie-in-which-eating-and-toilet-taboos-are-reversed?noredirect=1" class="question-hyperlink">What is the name of the movie in which eating and toilet taboos are reversed</a>
+			</div>
+            <div class="spacer js-gps-track" data-gps-track="linkedquestion.click({ source_post_id: 31321, target_question_id: 110388, position: 1 })">
+				<a href="/q/110388" title="Question score (upvotes - downvotes)">
+					<div class="answer-votes answered-accepted default">5</div>
+				</a>
+				<a href="/questions/110388/what-was-the-first-tv-series-to-show-a-toilet?noredirect=1" class="question-hyperlink">What was the first TV series to show a toilet?</a>
+			</div>
+	</div>
+</div>
+
+
+    
+
+
+        <div class="module sidebar-related">
+            <h4 id="h-related">Related</h4>
+            <div class="related js-gps-related-questions" data-tracker="rq=1">
+                    <div class="spacer" data-question-id="315">
+                        <a href="/q/315" title="Question score (upvotes - downvotes)" >
+                            <div class="answer-votes default">23</div>
+                        </a>
+                        <a href="/questions/315/what-was-the-first-live-action-movie-to-feature-a-talking-animal" class="question-hyperlink">What was the first live-action movie to feature a talking animal?</a>
+                    </div>
+                    <div class="spacer" data-question-id="4421">
+                        <a href="/q/4421" title="Question score (upvotes - downvotes)" >
+                            <div class="answer-votes answered-accepted default">5</div>
+                        </a>
+                        <a href="/questions/4421/what-was-the-first-tv-show-or-movie-to-feature-a-character-who-travelled-through" class="question-hyperlink">What was the first tv show or movie to feature a character who travelled through time?</a>
+                    </div>
+                    <div class="spacer" data-question-id="10202">
+                        <a href="/q/10202" title="Question score (upvotes - downvotes)" >
+                            <div class="answer-votes answered-accepted default">24</div>
+                        </a>
+                        <a href="/questions/10202/what-disney-animated-film-was-the-first-to-feature-blood" class="question-hyperlink">What Disney animated film was the first to feature blood?</a>
+                    </div>
+                    <div class="spacer" data-question-id="51377">
+                        <a href="/q/51377" title="Question score (upvotes - downvotes)" >
+                            <div class="answer-votes answered-accepted default">8</div>
+                        </a>
+                        <a href="/questions/51377/what-was-the-first-movie-entirely-shot-from-a-first-person-pov" class="question-hyperlink">What was the first movie entirely shot from a first person POV?</a>
+                    </div>
+                    <div class="spacer" data-question-id="67520">
+                        <a href="/q/67520" title="Question score (upvotes - downvotes)" >
+                            <div class="answer-votes default">3</div>
+                        </a>
+                        <a href="/questions/67520/what-was-the-first-revenge-movie" class="question-hyperlink">What was the first &quot;revenge&quot; movie?</a>
+                    </div>
+                    <div class="spacer" data-question-id="69551">
+                        <a href="/q/69551" title="Question score (upvotes - downvotes)" >
+                            <div class="answer-votes default">9</div>
+                        </a>
+                        <a href="/questions/69551/what-was-the-first-movie-to-feature-fast-moving-zombies" class="question-hyperlink">What was the first movie to feature fast moving zombies?</a>
+                    </div>
+                    <div class="spacer" data-question-id="106579">
+                        <a href="/q/106579" title="Question score (upvotes - downvotes)" >
+                            <div class="answer-votes answered-accepted default">5</div>
+                        </a>
+                        <a href="/questions/106579/what-was-the-first-zombie-movie" class="question-hyperlink">What was the first Zombie movie?</a>
+                    </div>
+                    <div class="spacer" data-question-id="110388">
+                        <a href="/q/110388" title="Question score (upvotes - downvotes)" >
+                            <div class="answer-votes answered-accepted default">5</div>
+                        </a>
+                        <a href="/questions/110388/what-was-the-first-tv-series-to-show-a-toilet" class="question-hyperlink">What was the first TV series to show a toilet?</a>
+                    </div>
+                    <div class="spacer" data-question-id="119934">
+                        <a href="/q/119934" title="Question score (upvotes - downvotes)" >
+                            <div class="answer-votes answered-accepted default">3</div>
+                        </a>
+                        <a href="/questions/119934/what-movie-or-show-was-the-first-to-feature-an-evidence-board" class="question-hyperlink">What movie or show was the first to feature an &quot;evidence board&quot;?</a>
+                    </div>
+                    <div class="spacer" data-question-id="120613">
+                        <a href="/q/120613" title="Question score (upvotes - downvotes)" >
+                            <div class="answer-votes answered-accepted default">15</div>
+                        </a>
+                        <a href="/questions/120613/what-was-the-first-movie-to-feature-both-black-and-white-as-well-as-color-scenes" class="question-hyperlink">What was the first movie to feature both black and white as well as color scenes?</a>
+                    </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+                 $(document).ready(function() {
+                     $(".js-gps-related-questions .spacer").click(function () {
+                        fireRelatedEvent($(this).index() + 1, $(this).data('question-id'));
+                     });
+
+                 function fireRelatedEvent(position, questionId) {
+                     StackExchange.using("gps", function() {
+                         StackExchange.gps.track('related_questions.click',
+                         {
+                             position: position,
+                             originQuestionId: 31321,
+                             relatedQuestionId: +questionId,
+                             location: 'sidebar',
+                             source: 'Baseline'
+                         });    
+                     });
+                 }
+             });
+         </script>
+
+
+
+    <div id="hot-network-questions" class="module tex2jax_ignore">
+    <h4>
+        <a href="https://stackexchange.com/questions?tab=hot"
+           class="js-gps-track s-link s-link__inherit" 
+           data-gps-track="posts_hot_network.click({ item_type:1, location:11 })">
+            Hot Network Questions
+        </a>
+    </h4>
+    <ul>
+            <li >
+                <div class="favicon favicon-tex" title="TeX - LaTeX Stack Exchange"></div><a href="https://tex.stackexchange.com/questions/712991/savesymbol-shows-completely-wrong-symbol" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:11, target_site:85 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    savesymbol shows completely wrong symbol
+                </a>
+
+            </li>
+            <li >
+                <div class="favicon favicon-politics" title="Politics Stack Exchange"></div><a href="https://politics.stackexchange.com/questions/86297/have-any-western-analysts-explained-how-the-crimes-for-which-the-icc-recently-in" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:11, target_site:475 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Have any Western analysts explained how the crimes for which the ICC recently indicted two Russian commanders, differ from the bombing of Serbia?
+                </a>
+
+            </li>
+            <li >
+                <div class="favicon favicon-worldbuilding" title="Worldbuilding Stack Exchange"></div><a href="https://worldbuilding.stackexchange.com/questions/256096/how-can-i-make-so-that-not-much-useful-scientific-knowledge-or-artifacts-remain" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:11, target_site:579 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    How can I make so that not much useful scientific knowledge or artifacts remain of an ancient, advanced civilization?
+                </a>
+
+            </li>
+            <li >
+                <div class="favicon favicon-money" title="Personal Finance &amp; Money Stack Exchange"></div><a href="https://money.stackexchange.com/questions/161836/how-much-do-we-need-to-understand-about-finances-in-order-to-trust-our-fiduciary" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:11, target_site:93 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    How much do we need to understand about finances in order to trust our fiduciary advisor&#x27;s recommendations?
+                </a>
+
+            </li>
+            <li >
+                <div class="favicon favicon-gardening" title="Gardening &amp; Landscaping Stack Exchange"></div><a href="https://gardening.stackexchange.com/questions/66124/think-this-rooted" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:11, target_site:269 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Think this rooted?
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-mathematica" title="Mathematica Stack Exchange"></div><a href="https://mathematica.stackexchange.com/questions/300404/why-is-mathematica-showing-a-root-twice-from-reduce-or-solve" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:11, target_site:387 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Why is Mathematica showing a root twice from Reduce or Solve?
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-bitcoin" title="Bitcoin Stack Exchange"></div><a href="https://bitcoin.stackexchange.com/questions/122256/question-about-nextblockhash-in-bitcoin-block-struct" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:11, target_site:308 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Question about nextblockhash in bitcoin block struct
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-academia" title="Academia Stack Exchange"></div><a href="https://academia.stackexchange.com/questions/208385/msc-paper-accepted-in-highest-impact-journal-in-my-field-what-next" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:11, target_site:415 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    MSc paper accepted in highest impact journal in my field - what next?
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-cs" title="Computer Science Stack Exchange"></div><a href="https://cs.stackexchange.com/questions/167032/are-there-languages-l1-%e2%8a%86-l2-%e2%8a%86-l3-when-l1-and-l3-are-np-complete-languages-and-l2" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:11, target_site:419 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Are there languages L1 &#x2286; L2 &#x2286; L3 when L1 and L3 are NP-Complete languages and L2 &#x2208; P?
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-codegolf" title="Code Golf Stack Exchange"></div><a href="https://codegolf.stackexchange.com/questions/271675/pretty-palintiples" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:11, target_site:200 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Pretty Palintiples
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-scifi" title="Science Fiction &amp; Fantasy Stack Exchange"></div><a href="https://scifi.stackexchange.com/questions/286141/comedy-sf-radio-show-radio-4-or-radio-4-extra-uk-aliens-base-their-society-on" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:11, target_site:186 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Comedy SF radio show. Radio 4 or Radio 4 extra (UK) Aliens base their society on a book of Noel Coward&#x27;s plays
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-softwareengineering" title="Software Engineering Stack Exchange"></div><a href="https://softwareengineering.stackexchange.com/questions/452414/is-utilizing-a-singleton-for-a-cache-an-antipattern" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:11, target_site:131 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Is utilizing a singleton for a cache an antipattern?
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-philosophy" title="Philosophy Stack Exchange"></div><a href="https://philosophy.stackexchange.com/questions/110510/should-the-evidence-of-obes-and-ndes-increase-our-epistemic-probability-of-non-p" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:11, target_site:265 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Should the evidence of OBEs and NDEs increase our epistemic probability of non-physicalist views of consciousness?
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-worldbuilding" title="Worldbuilding Stack Exchange"></div><a href="https://worldbuilding.stackexchange.com/questions/256092/how-long-will-global-internet-connectivity-remain-if-all-people-are-incapacitate" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:11, target_site:579 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    How long will global internet connectivity remain if all people are incapacitated?
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-gaming" title="Arqade"></div><a href="https://gaming.stackexchange.com/questions/407496/what-game-is-this-featured-on-the-msi-claw" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:11, target_site:41 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    What game is this featured on the MSI Claw?
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-electronics" title="Electrical Engineering Stack Exchange"></div><a href="https://electronics.stackexchange.com/questions/705791/tvs-diode-current-flow-at-breakdown" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:11, target_site:135 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    TVS Diode current flow at breakdown
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-tex" title="TeX - LaTeX Stack Exchange"></div><a href="https://tex.stackexchange.com/questions/713013/erroneous-width-of-widetilde-scrartcl-amsmath-lmodern" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:11, target_site:85 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Erroneous width of widetilde, scrartcl, amsmath, lmodern
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-worldbuilding" title="Worldbuilding Stack Exchange"></div><a href="https://worldbuilding.stackexchange.com/questions/256167/would-the-diet-described-below-sustain-a-human" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:11, target_site:579 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Would the diet described below sustain a human?
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-security" title="Information Security Stack Exchange"></div><a href="https://security.stackexchange.com/questions/275966/is-it-possible-to-sign-git-commits-on-a-different-computer" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:11, target_site:162 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Is it possible to sign Git commits on a different computer?
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-academia" title="Academia Stack Exchange"></div><a href="https://academia.stackexchange.com/questions/208392/how-many-hours-spending-learning-a-day" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:11, target_site:415 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    How many hours spending learning a day
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-matheducators" title="Mathematics Educators Stack Exchange"></div><a href="https://matheducators.stackexchange.com/questions/27594/why-or-when-do-we-use-the-general-form-of-conic-sections" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:11, target_site:548 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    why or when do we use the general form of conic sections?
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-ell" title="English Language Learners Stack Exchange"></div><a href="https://ell.stackexchange.com/questions/349696/is-there-a-word-to-describe-that-somebody-changed-their-mind-like-doch-nicht" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:11, target_site:481 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Is there a word to describe that somebody changed their mind (like &quot;doch nicht&quot;)?
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-puzzling" title="Puzzling Stack Exchange"></div><a href="https://puzzling.stackexchange.com/questions/125942/infiltrate-the-imposter-ring" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:11, target_site:559 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Infiltrate the Imposter Ring
+                </a>
+
+            </li>
+            <li class="dno js-hidden">
+                <div class="favicon favicon-bicycles" title="Bicycles Stack Exchange"></div><a href="https://bicycles.stackexchange.com/questions/93572/riding-with-clipless-pedals-around-the-city" class="js-gps-track question-hyperlink mb0" data-gps-track="site.switch({ item_type:11, target_site:126 }); posts_hot_network.click({ item_type:2, location:11 })">
+                    Riding with clipless pedals around the city
+                </a>
+
+            </li>
+    </ul>
+
+        <a href="#" 
+           class="show-more js-show-more js-gps-track" 
+           data-gps-track="posts_hot_network.click({ item_type:3, location:11 })">
+            more hot questions
+        </a>
+</div>
+
+                <div id="feed-link" class="js-feed-link">
+        <a href="/feeds/question/31321" title="Feed of this question and its answers">
+            <svg aria-hidden="true" class="fc-orange-400 svg-icon iconRss" width="18" height="18"  viewBox="0 0 18 18"><path  d="M3 1a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H3Zm0 1.5c6.9 0 12.5 5.6 12.5 12.5H13C13 9.55 8.45 5 3 5V2.5Zm0 5c4.08 0 7.5 3.41 7.5 7.5H8c0-2.72-2.28-5-5-5V7.5Zm0 5c1.36 0 2.5 1.14 2.5 2.5H3v-2.5Z"/></svg>
+            Question feed
+        </a>
+    </div>
+    <aside class="s-modal js-feed-link-modal" tabindex="-1" role="dialog" aria-labelledby="feed-modal-title" aria-describedby="feed-modal-description" aria-hidden="true">
+        <div class="s-modal--dialog js-modal-dialog wmx4" role="document"  data-controller="se-draggable">
+            <h1 class="s-modal--header fw-bold js-first-tabbable" id="feed-modal-title" data-se-draggable-target="handle" tabindex="0">
+                Subscribe to RSS
+            </h1>
+            <div class="d-flex gs4 gsy fd-column">
+                <div class="flex--item">
+                    <label class="d-block s-label c-default" for="feed-url">
+                        Question feed
+                        <p class="s-description mt2" id="feed-modal-description">To subscribe to this RSS feed, copy and paste this URL into your RSS reader.</p>
+                    </label>
+                </div>
+                <div class="d-flex ps-relative">
+                    <input class="s-input" type="text" name="feed-url" id="feed-url" readonly="readonly" value="https://movies.stackexchange.com/feeds/question/31321" />
+                    <svg aria-hidden="true" class="s-input-icon fc-orange-400 svg-icon iconRss" width="18" height="18"  viewBox="0 0 18 18"><path  d="M3 1a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H3Zm0 1.5c6.9 0 12.5 5.6 12.5 12.5H13C13 9.55 8.45 5 3 5V2.5Zm0 5c4.08 0 7.5 3.41 7.5 7.5H8c0-2.72-2.28-5-5-5V7.5Zm0 5c1.36 0 2.5 1.14 2.5 2.5H3v-2.5Z"/></svg>
+                </div>
+            </div>
+            <a class="s-modal--close s-btn s-btn__muted js-modal-close js-last-tabbable" href="#" aria-label="Close">
+                <svg aria-hidden="true" class="svg-icon iconClearSm" width="14" height="14"  viewBox="0 0 14 14"><path  d="M12 3.41 10.59 2 7 5.59 3.41 2 2 3.41 5.59 7 2 10.59 3.41 12 7 8.41 10.59 12 12 10.59 8.41 7 12 3.41Z"/></svg>
+            </a>
+        </div>
+    </aside>
+
+</div>
+
+    </div>
+<script>StackExchange.ready(function(){$.get('/posts/31321/ivc/9ff4?prg=10b3495d-13d8-4ed7-bc1f-dcd3c2f17cd7');});</script>
+<noscript><div><img src="/posts/31321/ivc/9ff4?prg=10b3495d-13d8-4ed7-bc1f-dcd3c2f17cd7" class="dno" alt="" width="0" height="0"></div></noscript></div>
+
+                        
+
+        </div>
+    </div>
+
+        
+    <script type="text/javascript">
+    var cam = cam || { opt: {} };
+    var clcGamLoaderOptions = cam || { opt: {} };
+    var opt = clcGamLoaderOptions.opt;
+
+    opt.refresh = !1;
+    opt.refreshInterval = 0;
+    opt.sf = !1;
+    opt.hb = !1;
+    opt.ll = !0;
+    opt.tlb_position = 0;
+    opt.personalization_consent = !1;
+    opt.targeting_consent = !1;
+    opt.performance_consent = !1;
+
+    opt.targeting = {Registered:['false'],NumberOfAnswers:['3']};
+    opt.adReportEnabled = !1;
+    opt.adReportUrl = '/ads/report-ad';
+    opt.adReportText = 'Report this ad';
+	opt.adReportFileTypeErrorMessage = 'Please select a PNG or JPG file.';
+    opt.adReportFileSizeErrorMessage = 'The file must be under 2 MiB.';
+	opt.adReportErrorText = 'Error uploading ad report.';
+	opt.adReportThanksText = 'Thanks for your feedback. We’ll review this against our code of conduct and take action if necessary.';
+    opt.adReportLoginExpiredMessage = 'Your login session has expired, please login and try again.';
+    opt.adReportLoginErrorMessage = 'An error occurred when loading the report form - please try again';
+	opt.adReportModalClass = 'js-ad-report';
+    opt.perRequestGuid = '10b3495d-13d8-4ed7-bc1f-dcd3c2f17cd7';
+    opt.responseHash = 'ZMNbpJ99EiLVvXZpUUH/WkfY9hO0tPbFctbEw31XnmM=';
+
+
+    opt.targeting.TargetingConsent = ['False_Passive'];
+    opt.allowAccountTargetingForThisRequest = !0;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('dfptestads')) {
+        const dfptestads = urlParams.get('dfptestads');
+        opt.targeting.DfpTestAds = dfptestads;
+    }
+</script>
+<script>;(()=>{"use strict";var __webpack_modules__={23:(e,t,s)=>{s.d(t,{Z7:()=>l,eq:()=>d,kG:()=>i});const n=(r=location.pathname,/^\/tags\//.test(r)||/^\/questions\/tagged\//.test(r)?"tag-pages":/^\/discussions\//.test(r)||/^\/beta\/discussions/.test(r)?"discussions":/^\/$/.test(r)||/^\/home/.test(r)?"home-page":"question-pages");var r;let a=location.hostname;const o={slots:{lb:[[728,90]],mlb:[[728,90]],smlb:[[728,90]],bmlb:[[728,90]],sb:e=>"dfp-tsb"===e?[[300,250],[300,600]]:[[300,250]],"tag-sponsorship":[[730,135]],"mobile-below-question":[[320,50],[300,250]],msb:[[300,250],[300,600]],"talent-conversion-tracking":[[1,1]],"site-sponsorship":[[230,60]]},ids:{"dfp-tlb":"lb","dfp-mlb":"mlb","dfp-smlb":"smlb","dfp-bmlb":"bmlb","dfp-tsb":"sb","dfp-isb":"sb","dfp-tag":"tag-sponsorship","dfp-msb":"msb","dfp-sspon":"site-sponsorship","dfp-m-aq":"mobile-below-question"},idsToExcludeFromAdReports:["dfp-sspon"]};function i(){return Object.keys(o.ids)}function d(e){return o.idsToExcludeFromAdReports.indexOf(e)<0}function l(e){var t=e.split("_")[0];const s=o.ids[t];let r=o.slots[s];return"function"==typeof r&&(r=r(t)),{path:`/248424177/${a}/${s}/${n}`,sizes:r,zone:s}}},865:(e,t,s)=>{function n(e){return"string"==typeof e?document.getElementById(e):e}function r(e){return!!(e=n(e))&&"none"===getComputedStyle(e).display}function a(e){return!r(e)}function o(e){return!!e}function i(e){return/^\s*$/.test(n(e).innerHTML)}function d(e){const{style:t}=e;t.height=t.maxHeight=t.minHeight="auto",t.display="none"}function l(e){const{style:t}=e;t.height=t.maxHeight=t.minHeight="auto",t.display="none",[].forEach.call(e.children,l)}function c(e){const{style:t}=e;t.height=t.maxHeight=t.minHeight="auto",t.removeProperty("display")}function g(e){const t=document.createElement("script");t.src=e,document.body.appendChild(t)}function p(e){return s=e,(t=[]).push=function(e){return s(),delete this.push,this.push(e)},t;var t,s}function h(e){let t="function"==typeof HTMLTemplateElement;var s=document.createElement(t?"template":"div");return e=e.trim(),s.innerHTML=e,t?s.content.firstChild:s.firstChild}s.d(t,{$Z:()=>c,Bv:()=>h,Gx:()=>g,Nj:()=>n,QZ:()=>p,cf:()=>d,pn:()=>a,wo:()=>l,xb:()=>i,xj:()=>r,yb:()=>o})},763:(__unused_webpack_module,__webpack_exports__,__webpack_require__)=>{__webpack_require__.d(__webpack_exports__,{t:()=>AdReports});var _common_helper__WEBPACK_IMPORTED_MODULE_2__=__webpack_require__(865),_console__WEBPACK_IMPORTED_MODULE_1__=__webpack_require__(276),_ad_units__WEBPACK_IMPORTED_MODULE_0__=__webpack_require__(23);class AdReports{constructor(e,t){if(this.googletag=e,this.cam=t,this.allowedFileTypes=["image/png","image/jpg","image/jpeg"],this.ignoreValidation=!1,_console__WEBPACK_IMPORTED_MODULE_1__.cM("Ad reporting init"),this.cam=t,this.callOnButtonClick=e=>this.onButtonClick(e),this.googletag.pubads().addEventListener("slotRenderEnded",e=>this.handleSlotRendered(e)),Array.isArray(t.slotsRenderedEvents)){_console__WEBPACK_IMPORTED_MODULE_1__.cM("Adding report button to "+t.slotsRenderedEvents.length+" events that have transpired");for(var s=0;s<t.slotsRenderedEvents.length;s++)this.handleSlotRendered(t.slotsRenderedEvents[s])}}handleSlotRendered(e){if(e&&e.slot&&!e.isEmpty&&(e.creativeId||e.lineItemId||!e.isEmpty)){var t=e.slot.getSlotElementId();if(t){var s=document.getElementById(t);if(s)if((0,_ad_units__WEBPACK_IMPORTED_MODULE_0__.eq)(t)){var n=s?.closest(".js-zone-container")?.querySelector(".js-report-ad-button-container");n.innerHTML="",n.append(this.createButton(e)),n.style.height="24px",_console__WEBPACK_IMPORTED_MODULE_1__.cM("Added report button to the bottom of "+t)}else _console__WEBPACK_IMPORTED_MODULE_1__.cM("Not adding report button to the bottom of "+t+": shouldHaveReportButton = false");else _console__WEBPACK_IMPORTED_MODULE_1__.cM("Not adding report button to the bottom of "+t+": resolved invalid adUnit element")}else _console__WEBPACK_IMPORTED_MODULE_1__.cM("Not adding report button to the bottom of element: invalid adUnitElementId")}else _console__WEBPACK_IMPORTED_MODULE_1__.cM("Not adding report button to the bottom of element: invalid SlotRenderEndedEvent")}async onButtonClick(e){e.preventDefault();let t=e.target;const s=t.dataset.modalUrl,n=t.dataset.googleEventData;return await this.loadModal(s,t,n),!1}createButton(e){let t=document.createElement("button");var s=JSON.stringify(e);return t.dataset.googleEventData=s,t.dataset.modalUrl=this.cam.opt.adReportUrl,t.dataset.adUnit=e.slot.getSlotElementId(),t.classList.add("js-report-ad","s-btn","s-btn__link","fs-fine","mt2","float-right"),t.append(document.createTextNode(this.cam.opt.adReportText)),t.removeEventListener("click",this.callOnButtonClick),t.addEventListener("click",this.callOnButtonClick),t}async loadModal(url,$link,googleEventData){try{await window.StackExchange.helpers.loadModal(url,{returnElements:window.$($link)}),this.initForm(googleEventData)}catch(e){var message="",response=e.responseText?eval(`(${e.responseText})`):null;message=response&&response.isLoggedOut?this.cam.opt.adReportLoginExpiredMessage:this.cam.opt.adReportLoginErrorMessage,window.StackExchange.helpers.showToast(message,{type:"danger"})}}removeModal(){window.StackExchange.helpers.closePopups(document.querySelectorAll("."+this.cam.opt.adReportModalClass),"dismiss")}initForm(e,t=!1){this.ignoreValidation=t,this.$form=document.querySelector(".js-ad-report-form"),this.$googleEventData=this.$form.querySelector(".js-json-data"),this.$adReportReasons=this.$form.querySelectorAll(".js-ad-report-reason"),this.$adReportReasonOther=this.$form.querySelector(".js-ad-report-reason-other"),this.$fileUploaderInput=this.$form.querySelector(".js-file-uploader-input"),this.$imageUploader=this.$form.querySelector(".js-image-uploader"),this.$clearImageUpload=this.$form.querySelector(".js-clear-image-upload"),this.$imageUploaderText=this.$form.querySelector(".js-image-uploader-text"),this.$imageUploaderPreview=this.$form.querySelector(".js-image-uploader-preview"),this.$fileErrorMessage=this.$form.querySelector(".js-file-error");const s=this.$form.querySelector(".js-drag-drop-enabled"),n=this.$form.querySelector(".js-drag-drop-disabled");this.$googleEventData.value=e,this.$adReportReasons.forEach((e,t)=>e.addEventListener("change",e=>{this.$adReportReasonOther.classList.toggle("d-none","3"!==e.target.value)})),this.$fileUploaderInput.addEventListener("change",()=>{this.validateFileInput()&&this.updateImagePreview(this.$fileUploaderInput.files)}),this.$clearImageUpload.addEventListener("click",e=>{e.preventDefault(),this.clearImageUpload()});try{this.$fileUploaderInput[0].value="",this.$imageUploader.addEventListener("dragenter dragover dragleave drop",this.preventDefaults),this.$imageUploader.addEventListener("dragenter dragover",this.handleDragStart),this.$imageUploader.addEventListener("dragleave drop",this.handleDragEnd),this.$imageUploader.addEventListener("drop",this.handleDrop)}catch(e){s.classList.add("d-none"),n.classList.remove("d-none")}this.$form.removeEventListener("",this.handleDragEnd),this.$form.addEventListener("submit",async e=>(e.preventDefault(),this.submitForm(),!1))}clearImageUpload(){this.$fileUploaderInput.value="",this.$imageUploaderPreview.setAttribute("src",""),this.$imageUploaderPreview.classList.add("d-none"),this.$clearImageUpload.classList.add("d-none"),this.$imageUploaderText.classList.remove("d-none"),this.$imageUploader.classList.add("p16","ba","bas-dashed","bc-black-100")}preventDefaults(e){e.preventDefault(),e.stopPropagation()}handleDragStart(e){this.$imageUploader.classList.remove("bas-dashed"),this.$imageUploader.classList.add("bas-solid","bc-black-100")}handleDragEnd(e){this.$imageUploader.classList.remove("bas-solid","bc-black-100"),this.$imageUploader.classList.add("bas-dashed")}handleDrop(e){var t=e.originalEvent.dataTransfer.files;FileReader&&t&&1===t.length&&(this.$fileUploaderInput.files=t,this.validateFileInput()&&this.updateImagePreview(t))}setError(e){this.$fileErrorMessage.parentElement.classList.toggle("has-error",e)}updateImagePreview(e){this.$imageUploader.classList.remove("p16","ba","bas-dashed","bc-black-100"),this.$clearImageUpload.classList.remove("d-none"),this.$imageUploaderText.classList.add("d-none");var t=new FileReader;t.onload=e=>{null!=e.target&&(this.$imageUploaderPreview.setAttribute("src",e.target.result),this.$imageUploaderPreview.classList.remove("d-none"))},t.readAsDataURL(e[0])}validateFileInput(){if(this.ignoreValidation)return!0;const e=this.cam.opt.adReportFileTypeErrorMessage,t=this.cam.opt.adReportFileSizeErrorMessage;if(null==this.$fileUploaderInput.files)return!1;var s=this.$fileUploaderInput.files[0];return null==s?(this.setError(!0),!1):this.allowedFileTypes.indexOf(s.type)<0?(this.$fileErrorMessage.textContent=e,this.$fileErrorMessage.classList.remove("d-none"),this.setError(!0),!1):s.size>2097152?(this.$fileErrorMessage.textContent=t,this.$fileErrorMessage.classList.remove("d-none"),this.setError(!0),!1):(this.$fileErrorMessage.classList.add("d-none"),this.setError(!1),!0)}async gatherDiagnosticInfo(){return{BrowserVersion:await this.getBrowserVersion()}}getElementSource(e){return e.outerHTML}getNestedIFrameElement(e){var t=e.querySelector("iframe");return t.contentDocument?t.contentDocument.documentElement:t.contentWindow.document.documentElement}async getBrowserVersion(){return await navigator.userAgentData.getHighEntropyValues(["fullVersionList"]).then(e=>JSON.stringify(e.fullVersionList))}async submitForm(){if(!this.validateFileInput())return!1;this.$form.querySelector("[type=submit]").setAttribute("disabled","true");var e=JSON.parse(this.$googleEventData.value||"{}");e.Reason=parseInt(this.$form.querySelector(".js-ad-report-reason:checked").value,10),e.Description=this.$adReportReasonOther.value,this.$googleEventData.value=JSON.stringify(e);var t=new FormData(this.$form);if("1"===t.get("shareDiagnosticInfo")){var s=await this.gatherDiagnosticInfo();Object.keys(s).forEach(e=>t.append(e,s[e]))}try{const e=await window.fetch(this.$form.getAttribute("action"),{method:this.$form.getAttribute("method"),body:t,cache:"no-cache"}),s=e.headers.get("content-type")||"",r=await e.text();if(!e.ok)throw new Error("response not valid");if(0===s.indexOf("text/html")){var n=(0,_common_helper__WEBPACK_IMPORTED_MODULE_2__.Bv)(r);const e=n?n.querySelector(".js-modal-content"):null;if(_console__WEBPACK_IMPORTED_MODULE_1__.cM("$popupContent"),_console__WEBPACK_IMPORTED_MODULE_1__.cM(e),!e)throw new Error(`Could not find .js-modal-content in response from ${this.$form.getAttribute("action")}`);document.querySelector(".js-modal-content").replaceWith(e)}else window.StackExchange.helpers.showToast(this.cam.opt.adReportThanksText,{type:"success"}),this.removeModal()}catch(e){window.StackExchange.helpers.showToast(this.cam.opt.adReportErrorText,{type:"danger"})}finally{let e=this.$form.querySelector("[type=submit]");e&&e.removeAttribute("disabled")}}}},276:(e,t,s)=>{function n(...e){}function r(...e){}s.d(t,{cM:()=>n,vU:()=>r})}},__webpack_module_cache__={};function __webpack_require__(e){var t=__webpack_module_cache__[e];if(void 0!==t)return t.exports;var s=__webpack_module_cache__[e]={exports:{}};return __webpack_modules__[e](s,s.exports,__webpack_require__),s.exports}__webpack_require__.d=(e,t)=>{for(var s in t)__webpack_require__.o(t,s)&&!__webpack_require__.o(e,s)&&Object.defineProperty(e,s,{enumerable:!0,get:t[s]})},__webpack_require__.o=(e,t)=>Object.prototype.hasOwnProperty.call(e,t);var __webpack_exports__={};(()=>{var e=__webpack_require__(276),t=(e=>(e[e.Above=0]="Above",e[e.Below=1]="Below",e))(t||{});const s=Object.assign({},{"lib":"https://cdn.sstatic.net/clc/js/bundles/gam_loader_script/gam_loader_script.bundle.741.e6ce4ee02b887d174e72.min.js","style":null,"u":null,"wa":true,"kt":2000,"tto":true,"h":"clc.stackoverflow.com","allowed":"^(((talent\\.)?stackoverflow)|(blog\\.codinghorror)|(.*\\.googlesyndication)|(serverfault|askubuntu|superuser)|([^\\.]+\\.stackexchange))\\.com$","wv":true,"al":false,"abd":true,"cpa_liid":[5882654614],"cpa_cid":[138377597667],"dp":false,"tgt_to":1000,"tgt_u":"https://clc.stackoverflow.com/get-user-acct-tgt","tgt_e":true,"tgt_p":100});var n=__webpack_require__(23),r=__webpack_require__(865),a=__webpack_require__(763);class o{constructor(t,s){this.googletag=t,this.interval=s,e.cM("Ad refresh init. interval: "+s),this.googletag.pubads().addEventListener("impressionViewable",e=>this.onImpressionViewable(e)),e.cM("done enabling ad refresh")}onImpressionViewable(t){var s=t.slot;e.cM("ad refresh - slot "+s.getSlotElementId()+" is viewable, initializing refresh"),this.scheduleRefresh(s)}scheduleRefresh(e){setTimeout(()=>this.refreshAdSlot(e),1e3*this.interval)}static refreshMyAd(t,s){let n=t.pubads().getSlots().find(e=>e.getSlotElementId()===s);n&&(e.cM("refreshMyAd - refreshing ad slot "+s),t.pubads().refresh([n]))}refreshAdSlot(t){var s=t.getSlotElementId();this.isElementVisibleInBrowser(s)?(e.cM("refreshing ad slot "+s),googletag.pubads().refresh([t])):(e.cM("refresh skipped this time; ad slot not viewable:"+s),this.scheduleRefresh(t))}isElementVisibleInBrowser(e){var t=document.getElementById(e);if(null!==t){var s=t.getBoundingClientRect();if(s.top>=0&&s.left>=0&&s.bottom<=(window.innerHeight||document.documentElement.clientHeight)&&s.right<=(window.innerWidth||document.documentElement.clientWidth))return!0}return!1}}var i=(e=>(e.Off="Off",e.PreSurvey="PreSurvey",e.Collect="Collect",e.PostSurvey="PostSurvey",e))(i||{});class d{constructor(e,t){this.lineItemImpressions=[],this.surveysIdsCompleted=[],this.lineItemImpressions=e,this.surveysIdsCompleted=t}addImpression(e,t){let s={brandId:e,lineItemId:t,timestamp:new Date};this.lineItemImpressions.push(s)}addBrandSurveyCompleted(e){-1===this.surveysIdsCompleted.indexOf(e)&&this.surveysIdsCompleted.push(e)}getTotalBrandImpressions(){let e=new Map;for(let t of this.lineItemImpressions)if(e.has(t.brandId)){let s=e.get(t.brandId);e.set(t.brandId,s+1)}else e.set(t.brandId,1);return e}getBrandLineItemImpressions(e){let t={};for(let s of this.lineItemImpressions)if(s.brandId==e)if(void 0!==t[s.lineItemId]){let e=t[s.lineItemId];t[s.lineItemId]=e+1}else t[s.lineItemId]=1;return t}}class l{constructor(){this.surveyEngagementLocalStorageKey="clc-survey-engagement"}getBrandSurveyEngagement(){let e=localStorage.getItem(this.surveyEngagementLocalStorageKey);if(null===e)return new d([],[]);let t=JSON.parse(e);return new d(t.lineItemImpressions,t.surveysIdsCompleted)}saveBrandSurveyEngagement(e){let t=JSON.stringify(e);localStorage.setItem(this.surveyEngagementLocalStorageKey,t)}}class c{constructor(){this.surveyRepository=new l}getBrandSurveyEngagement(){return this.surveyRepository.getBrandSurveyEngagement()}recordImpression(e,t){let s=this.getBrandSurveyEngagement();s.addImpression(e,t),this.surveyRepository.saveBrandSurveyEngagement(s)}recordBrandSurveyCompleted(e){let t=this.getBrandSurveyEngagement();t.addBrandSurveyCompleted(e),this.surveyRepository.saveBrandSurveyEngagement(t)}}class g{constructor(t,s){this.googletag=t,this.brandSettings=s,this.brandSlotMap=new Map,this.brandSurveyEngagementService=new c,e.cM("Brand Survey init: "+JSON.stringify(s)),void 0!==s?(this.googletag.pubads().addEventListener("slotRenderEnded",e=>this.handleSlotRendered(e)),this.googletag.pubads().addEventListener("impressionViewable",e=>this.onImpressionViewable(e)),e.cM("done enabling Brand Survey")):e.cM("Brand Survey init: brandSettings is undefined, not initializing")}handleSlotRendered(t){e.cM("Brand Survey - slot rendered - slot:"+JSON.stringify(t.slot.getSlotElementId())+" lineItem: "+t.lineItemId);let s=this.findItemWithId(t.lineItemId);if(null===s||s.mode!==i.Collect)this.brandSlotMap.delete(t.slot.getSlotElementId());else{let e={brandId:s.brandId,lineItemId:t.lineItemId};this.brandSlotMap.set(t.slot.getSlotElementId(),e)}}onImpressionViewable(t){let s=t.slot;if(e.cM("ad - Brand Survey - impression viewable.  Details: "+JSON.stringify(s.getSlotElementId())),e.cM("ad - Brand Survey - slot "+s.getSlotElementId()+" is viewable"),this.brandSlotMap.has(s.getSlotElementId())){let t=this.brandSlotMap.get(s.getSlotElementId());e.cM("Brand Survey - brand "+t.brandId+" is viewable"),this.recordImpression(this.brandSlotMap.get(s.getSlotElementId()))}}recordImpression(t){e.cM("ad - Brand Survey - recording impression for brand "+t.brandId),this.brandSurveyEngagementService.recordImpression(t.brandId,t.lineItemId)}findItemWithId(t){return e.cM("brand settings: "+JSON.stringify(this.brandSettings)),this.brandSettings.find(e=>e.lineItemIds.includes(t))||null}}const p="response-brand-survey-submit|",h="request-brand-survey-metadata|",m="record-metric-on-server|",u="request-dsp-tags",f="response-dsp-tags|";class _{static refreshAdIfBrandSurveyIsDuplicated(e,t,s){this.alreadyCompletedThisBrandSurvey(t)&&o.refreshMyAd(e,s)}static alreadyCompletedThisBrandSurvey(e){return(new c).getBrandSurveyEngagement().surveysIdsCompleted.includes(e)}}window.cam=new class{constructor(t=null){if(this.gptImported=!1,this.slotsRenderedEvents=[],this.collapsed={},e.cM("constructor"),this.clc_options=s,window.clcGamLoaderOptions)Object.assign(this,window.clcGamLoaderOptions);else if(void 0===this.opt){let e=window.opt;e&&(this.opt=e)}}init(){if(e.cM("init"),void 0===this.opt)throw new Error("opt not set, required by GAM Loader");e.cM("init brand survey service"),this.getUserMetaPromise=this.getUserMeta(),e.cM("setup message handler"),window.addEventListener("message",e=>{this.onmessage(e)})}handleSlotRenderedNoAdReport(){if(googletag.pubads().addEventListener("slotRenderEnded",e=>this.applyExtraMarginBottom(e)),Array.isArray(this.slotsRenderedEvents))for(var e=0;e<this.slotsRenderedEvents.length;e++)this.applyExtraMarginBottom(this.slotsRenderedEvents[e])}onmessage(t){let s="omni";if(t.data&&("string"==typeof t.data||t.data instanceof String))if(0===t.data.indexOf("get-omni-")){e.cM("Recevied get-omni message, sending back omni");var n=t.source,a=this.opt.omni,o="string"==typeof a?a:"";n.postMessage([s,o,this.opt.perRequestGuid].join("|"),"*")}else if(0===t.data.indexOf("collapse-")){e.cM("Recevied collapse message, collapse ad iframe"),e.cM(t);for(var i=t.source.window,d=document.getElementsByTagName("IFRAME"),l=0;l<d.length;l++){var g=d[l];if(g.contentWindow==i)return void(0,r.wo)(g.parentElement.parentElement.parentElement)}}else if(0===t.data.indexOf("resize|")){e.cM("Recevied resize message, resize ad iframe"),e.cM(t);let s=this._getFrameByEvent(t),n=t.data.indexOf("|")+1,r=t.data.slice(n),a=parseFloat(r)+.5;e.cM("New iframe height "+a),s.height=a.toString(),s.parentElement.style.height=a.toString()+"px"}else if(0===t.data.indexOf("getmarkup|")){let s=t.data.indexOf("|")+1,n=t.data.slice(s);e.cM("Recevied get markup message: "+n);let r=this._getFrameByEvent(t).closest(".everyonelovesstackoverflow");const a=document.createElement("script");a.dataset.adZoneId=r.id,a.src=n,document.body.appendChild(a)}else if(0===t.data.indexOf("window-location|")){let s=t.data.indexOf("|")+1,n=t.data.slice(s);e.cM("Recevied window location message: "+n),n.startsWith("/")||(n="/"+n),window.open(window.location.protocol+"//"+window.location.host+n,"_blank")}else if(0===t.data.indexOf("request-brand-survey-submit|")){let s=t.data.split("|"),n=s[1],r=s[2],a=s[3],o=JSON.parse(a);e.cM(n),e.cM(r),e.cM(a),e.cM("Received brand survey "+n+" response message: "+r);var v=new FormData;for(var b in o)v.append(b,o[b]);let i=this._getFrameByEvent(t);if(_.alreadyCompletedThisBrandSurvey(+n))return e.cM("Already completed this brand survey.  Not submitting duplicate to server."),void i.contentWindow.postMessage("response-brand-survey-submit-duplicate|","*");e.cM("Send the brand survey to the server"),fetch(r,{method:"POST",body:v}).then(e=>e.json()).then(e=>i.contentWindow.postMessage(p,"*")).catch(e=>i.contentWindow.postMessage(p,"*"))}else if(0===t.data.indexOf("brand-survey-completed-store|")){let s=t.data.split("|"),n=(s[1],s[2]);if(e.cM("Received brand survey completed store message for survey ID "+n),_.alreadyCompletedThisBrandSurvey(+n))return void e.cM("Already completed this brand survey.  Not recording duplicate locally.");e.cM("Record brand survey completion locally"),(new c).recordBrandSurveyCompleted(+n)}else if(0===t.data.indexOf(h)){let s=t.data.split("|"),n=s[1],r=s[2];e.cM("Received message: request-brand-survey-metadata| with Brand Survey ID "+r);let a=(new c).getBrandSurveyEngagement().getBrandLineItemImpressions(+n),o=JSON.stringify(a),i=this._getFrameByEvent(t);e.cM("sending impression data: "+o),i.contentWindow.postMessage("response-brand-survey-metadata|"+this.opt.responseHash+"|"+this.opt.perRequestGuid+"|"+o,"*")}else if(0===t.data.indexOf("refresh-if-duplicate-brand-survey|")){let e=t.data.split("|")[1],s=this.getSlotElementIdByEvent(t);_.refreshAdIfBrandSurveyIsDuplicated(googletag,+e,s)}else if(0===t.data.indexOf(m)){e.cM("Received message: record-metric-on-server| with args: "+t.data);let s=t.data.split("|"),n=s[1],r=s[2],a=s[3],o=s[4],i=new FormData;i.append("brandSurveyId",a.toString()),i.append("responseHash",this.opt.responseHash),i.append("perRequestGuid",this.opt.perRequestGuid),i.append("questionNumber",n.toString()),i.append("metricType",o.toString()),fetch(r,{method:"POST",body:i}).then(e=>e.ok).catch(t=>{e.cM("SendMetricToServer: Error sending metric to server: "+t)})}else if(0===t.data.indexOf(u)){e.cM("Received message: request-dsp-tags with args: "+t.data);let s=this._getFrameByEvent(t);if(!this.opt.targeting["so-tag"])return void s.contentWindow.postMessage(f,"*");const n=this.opt.targeting["so-tag"].join(",");e.cM("sending targeting tags: "+n),s.contentWindow.postMessage(f+n,"*")}else e.cM("Received unhandled message")}getSlotElementIdByEvent(e){let t=this._getFrameByEvent(e).parentElement?.parentElement?.id;return t||""}_getFrameByEvent(e){return Array.from(document.getElementsByTagName("iframe")).filter(t=>t.contentWindow===e.source)[0]}classifyZoneIds(e){const t=e.map(r.Nj).filter(r.yb);return{eligible:t.filter(r.xb).filter(r.pn),ineligible:t.filter(r.xj)}}applyExtraMarginBottom(t){if(t&&t.slot&&!t.isEmpty&&(t.creativeId||t.lineItemId||!t.isEmpty)){var s=t.slot.getSlotElementId();if(s){var r=document.getElementById(s);if(r)if((0,n.eq)(s)){var a=r?.closest(".js-zone-container");a.style.marginBottom="24px",e.cM("Applied extra margin to the bottom of "+s)}else e.cM("Not applying extra margin to the bottom of "+s+": shouldHaveReportButton = false");else e.cM("Not applying extra margin to the bottom of "+s+": resolved invalid adUnit element")}else e.cM("Not applying extra margin to the bottom of element: invalid adUnitElementId")}else e.cM("Not applying extra margin to the bottom of element: invalid SlotRenderEndedEvent")}async load(s=(0,n.kG)()){const i=this.opt.tlb_position===t.Above?["dfp-mlb","dfp-smlb"]:["dfp-mlb","dfp-smlb","dfp-tlb"];if(!this.isGptReady())return e.cM("Initializing..."),this.initGpt(),void googletag.cmd.push(()=>this.load(s));this.opt.adReportEnabled?(e.cM("Ad reporting enabled"),this.adReports=new a.t(googletag,this)):(e.cM("Ad reporting not enabled"),this.handleSlotRenderedNoAdReport()),this.opt.refresh?(e.cM("Ad refresh enabled"),this.adRefresh=new o(googletag,this.opt.refreshInterval)):e.cM("Ad refresh not enabled"),this.opt.brandSurveyEnabled&&(e.cM("Brand Survey enabled"),this.brandSurvey=new g(googletag,this.opt.brandSurveySettings)),e.cM("Attempting to load ads into ids: ",s);const{eligible:d,ineligible:l}=this.classifyZoneIds(s);if(this.initDebugPanel(googletag,d.concat(l)),d.forEach(e=>(0,r.cf)(e)),l.forEach(r.wo),0===d.length)return void e.cM("Found no ad ids on page");e.cM("Eligible ids:",d),this.opt.abd&&this.appendAdblockDetector();var c=googletag.pubads().getSlots();if(c){var p=c.filter(e=>s.indexOf(e.getSlotElementId())>=0);googletag.destroySlots(p)}this.opt.sf&&(googletag.pubads().setForceSafeFrame(!0),googletag.pubads().setSafeFrameConfig({allowOverlayExpansion:!0,allowPushExpansion:!0,sandbox:!0})),e.cM("Targeting consent: Checking...");let h=!1,m=!1;void 0!==this.opt.targeting_consent&&(m=!0,e.cM("Targeting consent: Parameter set"),e.cM("Targeting consent: Consent given? ",this.opt.targeting_consent),h=this.opt.targeting_consent),void 0!==this.opt.personalization_consent&&(e.cM("Personalization consent: Parameter set"),e.cM("Personalization consent: Consent given? ",this.opt.personalization_consent),h=h&&this.opt.personalization_consent),h=h&&m,this.setPrivacySettings(h),this.opt.ll||googletag.pubads().enableSingleRequest(),cam.sreEvent||(googletag.pubads().addEventListener("slotRenderEnded",e=>this.onSlotRendered(e)),cam.sreEvent=!0),await this.setTargeting();var u=d.filter(e=>!this.opt.ll||i.indexOf(e.id)<0),f=d.filter(e=>!!this.opt.ll&&i.indexOf(e.id)>=0);e.cM("Up front ids:",u),e.cM("Lazy loaded ids:",f),u.forEach(t=>{e.cM(`Defining ad for element ${t.id}`),this.defineSlot(t.id,googletag),t.setAttribute("data-dfp-zone","true")}),googletag.enableServices(),u.forEach(t=>{e.cM(`Displaying ad for element ${t.id}`),googletag.cmd.push(()=>googletag.display(t.id))}),this.opt.ll&&(e.cM("Enabling lazy loading for GAM"),googletag.pubads().enableLazyLoad({fetchMarginPercent:0,renderMarginPercent:0}),e.cM("Setting up lazy loaded ad units"),f.forEach(t=>{e.cM(`Lazy loading - Defining Slot ${t.id}`),this.defineSlot(t.id,googletag)}),f.forEach(t=>{e.cM(`Lazy loading - Displaying ad for element ${t.id}`),googletag.cmd.push(()=>googletag.display(t.id))}))}setPrivacySettings(e){e||googletag.pubads().setPrivacySettings({nonPersonalizedAds:!0})}async setTargeting(){if(!googletag)throw new Error("googletag not defined");let t=this.opt.targeting;if(!t)throw new Error("Targeting not defined (is "+typeof t+")");Object.keys(t).forEach(s=>{e.cM(`-> targeting - ${s}: ${t[s]}`),googletag.pubads().setTargeting(s,t[s])});let s=!1;if(void 0!==this.opt.targeting_consent&&(s=this.opt.targeting_consent),s){let t=(new c).getBrandSurveyEngagement();if(t.getTotalBrandImpressions().forEach((t,s)=>{e.cM(`-> targeting - BrandImpressions: ${s}: ${t}`),googletag.pubads().setTargeting("brand_"+s.toString()+"_impressions",t.toString())}),t.surveysIdsCompleted.forEach(t=>{e.cM(`-> targeting - SurveysTaken: ${t}`),googletag.pubads().setTargeting("survey_"+t+"_taken","true")}),this.clc_options.tgt_e&&this.getUserMetaPromise){let t=await this.getUserMetaPromise;t&&t.tgt_acct?(e.cM("-> targeting - User Account: "+t.tgt_acct),googletag.pubads().setTargeting("user-acct",t.tgt_acct.company_name),googletag.pubads().setTargeting("user_acct_top",t.tgt_acct.company_name),googletag.pubads().setTargeting("user_industry",t.tgt_acct.industry),googletag.pubads().setTargeting("user_employee_count",t.tgt_acct.employee_range)):e.cM("-> targeting - User Account: Not Found"),t&&Object.prototype.hasOwnProperty.call(t,"is_high_rep_earner")?(e.cM("-> targeting - High Rep Earner: "+t.is_high_rep_earner),googletag.pubads().setTargeting("IsHighRepEarner",t.is_high_rep_earner?"true":"false")):e.cM("-> targeting - High Rep Earner: not found")}}}appendAdblockDetector(){const e=document.createElement("div");e.className="adsbox",e.id="clc-abd",e.style.position="absolute",e.style.pointerEvents="none",e.innerHTML="&nbsp;",document.body.appendChild(e)}onSlotRendered(s){try{const o=s.slot.getSlotElementId();let i=[];o||i.push("id=0");const d=document.getElementById(o);if(o&&!d&&i.push("el=0"),0!==i.length)return void this.stalled(i.join("&"));const{path:l,sizes:c,zone:g}=(0,n.Z7)(o);if(this.collapsed[g]&&s.isEmpty)return e.cM(`No line item for the element #${d.id}... collapsing.`),void(0,r.wo)(d);if(this.slotsRenderedEvents.push(s),s.lineItemId||s.creativeId||!s.isEmpty){e.cM(`Rendered ad for element #${d.id} [line item #${s.lineItemId}]`),e.cM(s);var a=d.parentElement;if(a.classList.contains("js-zone-container")){switch((0,r.cf)(a),o){case"dfp-tlb":this.opt.tlb_position===t.Above?a.classList.add("mb8"):a.classList.add("mt16");break;case"dfp-tag":a.classList.add("mb8");break;case"dfp-msb":a.classList.add("mt16");break;case"dfp-mlb":case"dfp-smlb":case"dfp-bmlb":a.classList.add("my8");break;case"dfp-isb":a.classList.add("mt24");break;case"dfp-m-aq":a.classList.add("my12"),a.classList.add("mx-auto")}(0,r.$Z)(a),(0,r.$Z)(d)}else e.cM(`No ad for element #${d.id}, collapsing`),e.cM(s),(0,r.wo)(d)}}catch(t){e.cM("Exception thrown onSlotRendered"),e.cM(t),this.stalled("e=1")}}stalled(e){(new Image).src=`https://${this.clc_options.h}/stalled.gif?${e}`}defineSlot(t,s){"dfp-isb"===t&&(e.cM("-> targeting - Sidebar: Inline"),s.pubads().setTargeting("Sidebar",["Inline"])),"dfp-tsb"===t&&(e.cM("-> targeting - Sidebar: Right"),s.pubads().setTargeting("Sidebar",["Right"]));const{path:r,sizes:a,zone:o}=(0,n.Z7)(t);e.cM(`Defining slot for ${t}: ${r}, sizes: ${JSON.stringify(a)}`),s.defineSlot(r,a,t).addService(s.pubads())}importGptLibrary(){this.gptImported||(this.gptImported=!0,void 0===this.opt.targeting_consent||this.opt.targeting_consent?(0,r.Gx)("https://securepubads.g.doubleclick.net/tag/js/gpt.js"):(0,r.Gx)("https://pagead2.googlesyndication.com/tag/js/gpt.js"))}isGptReady(){return"undefined"!=typeof googletag&&!!googletag.apiReady}initGpt(){"undefined"==typeof googletag&&(window.googletag={cmd:(0,r.QZ)(()=>this.importGptLibrary())})}getUserMeta(){if(this.opt.allowAccountTargetingForThisRequest&&this.clc_options.tgt_e&&this.clc_options.tgt_p>0){if(e.cM("Targeting enabled."),this.clc_options.tgt_p<100){e.cM("Targeting rate limit enabled.  Rolling the dice...");const t=Math.floor(100*Math.random())+1;if(e.cM("Rolled "+t+" and the max is "+this.clc_options.tgt_p),t>this.clc_options.tgt_p)return void e.cM("Will not request targeting.")}return e.cM("Will request targeting."),function(e,t,s,n){if(t){const t=new Headers;return t.append("Accept","application/json"),async function(e,t={},s=5e3){if("number"!=typeof s&&null!=s&&!1!==s){if("string"!=typeof s)throw new Error("fetchWithTimeout: timeout must be a number");if(s=parseInt(s),isNaN(s))throw new Error("fetchWithTimeout: timeout must be a number (or string that can be parsed to a number)")}const n=new AbortController,{signal:r}=n,a=fetch(e,{...t,signal:r}),o=setTimeout(()=>n.abort(),s);try{const e=await a;return clearTimeout(o),e}catch(e){throw clearTimeout(o),e}}(s+"?"+new URLSearchParams({omni:e}),{method:"GET",mode:"cors",headers:t},n).then(e=>e.json())}return Promise.reject("No consent")}(this.opt.omni,this.opt.targeting_consent,this.clc_options.tgt_u,this.clc_options.tgt_to).catch(t=>{e.vU("Error fetching user account targeting"),e.vU(t)})}e.cM("Targeting disabled.  Will not request account targeting data.")}initDebugPanel(t,s){e.cM("initDebugPanel"),e.cM("Not showing debug panel.")}},window.clcGamLoaderOptions&&(cam.init(),cam.load())})()})();</script>
+        
+    <footer id="footer" class="site-footer js-footer" role="contentinfo">
+        <div class="site-footer--container">
+            <nav class="site-footer--nav">
+                    <div class="site-footer--col">
+                        <h5 class="-title"><a href="/">Movies &amp; TV</a></h5>
+                        <ul class="-list js-primary-footer-links">
+                                    <li><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 2 })" href="/tour">Tour</a></li>
+                                <li><a href="/help" class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 3 })">Help</a></li>
+                                    <li><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 5 })" href="https://chat.stackexchange.com?tab=site&host=movies.stackexchange.com">Chat</a></li>
+                            <li><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 13 })" href="/contact">Contact</a></li>
+                                <li><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 14 })" href="https://movies.meta.stackexchange.com">Feedback</a></li>
+                        </ul>
+                    </div>
+                <div class="site-footer--col">
+                    <h5 class="-title"><a class="js-gps-track" data-gps-track="footer.click({ location: 2, link: 1 })" href="https://stackoverflow.co/">Company</a></h5>
+                    <ul class="-list">
+                            <li><a href="https://stackoverflow.com" class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 15})">Stack Overflow</a></li>
+                            <li><a href="https://stackoverflow.co/teams/" class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 29 })">Teams</a></li>
+                            <li><a href="https://stackoverflow.co/advertising/" class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 21 })">Advertising</a></li>
+                            <li><a href="https://stackoverflow.co/collectives/" class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 40 })">Collectives</a></li>
+                            <li><a href="https://stackoverflow.co/talent/" class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 20 })">Talent</a></li>
+                                <li><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 1 })" href="https://stackoverflow.co/">About</a></li>
+                        <li><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 27 })" href="https://stackoverflow.co/company/press/">Press</a></li>
+                        <li><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 7 })" href="https://stackoverflow.com/legal">Legal</a></li>
+                        <li><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 8 })" href="https://stackoverflow.com/legal/privacy-policy">Privacy Policy</a></li>
+                        <li><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 37 })" href="https://stackoverflow.com/legal/terms-of-service/public">Terms of Service</a></li>
+                            <li id="consent-footer-link"><button type="button" data-controller="cookie-settings" data-action="click->cookie-settings#toggle" class="s-btn s-btn__link py4 js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 38 })" data-consent-popup-loader="footer">Cookie Settings</button></li>
+                        <li><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 39 })" href="https://stackoverflow.com/legal/cookie-policy">Cookie Policy</a></li>
+                    </ul>
+                </div>
+                <div class="site-footer--col site-footer--categories-nav">
+                    <div>
+                        <h5 class="-title"><a href="https://stackexchange.com" data-gps-track="footer.click({ location: 2, link: 30 })">Stack Exchange Network</a></h5>
+                        <ul class="-list">
+                            <li>
+                                <a href="https://stackexchange.com/sites#technology" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 24 })">
+                                    Technology
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://stackexchange.com/sites#culturerecreation" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 24 })">
+                                    Culture &amp; recreation
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://stackexchange.com/sites#lifearts" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 24 })">
+                                    Life &amp; arts
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://stackexchange.com/sites#science" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 24 })">
+                                    Science
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://stackexchange.com/sites#professional" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 24 })">
+                                    Professional
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://stackexchange.com/sites#business" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 24 })">
+                                    Business
+                                </a>
+                            </li>
+
+                            <li class="mt16 md:mt0">
+                                <a href="https://api.stackexchange.com/" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 24 })">
+                                    API
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="https://data.stackexchange.com/" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 24 })">
+                                    Data
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+            <div class="site-footer--copyright fs-fine md:mt24">
+                <ul class="-list -social md:mb8">
+                    <li><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link:4 })" href="https://stackoverflow.blog?blb=1">Blog</a></li>
+                    <li><a href="https://www.facebook.com/officialstackoverflow/" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 31 })">Facebook</a></li>
+                    <li><a href="https://twitter.com/stackoverflow" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 32 })">Twitter</a></li>
+                    <li><a href="https://linkedin.com/company/stack-overflow" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 33 })">LinkedIn</a></li>
+                    <li><a href="https://www.instagram.com/thestackoverflow" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 36 })">Instagram</a></li>
+                </ul>
+
+                <p class="md:mb0">
+Site design / logo &#169; 2024 Stack Exchange Inc; user contributions licensed under <span class='td-underline'><a href="https://stackoverflow.com/help/licensing">CC BY-SA</a></span>.                    <span id="svnrev">rev&nbsp;2024.3.12.6097</span>
+                </p>
+            </div>
+        </div>
+
+    </footer>
+
+
+    
+
+            <!-- Google tag (gtag.js) -->
+            <script async src="https://www.googletagmanager.com/gtag/js?id=G-S812YQPLT2"></script>
+            <script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag() { dataLayer.push(arguments); }
+            </script>
+        <script>
+            StackExchange.ready(function() {
+
+                var ga3Settings = {
+                    autoLink: ["stackoverflow.blog","info.stackoverflowsolutions.com","stackoverflowsolutions.com"],
+                    sendTitles: true,
+                    tracker: window.ga,
+                    trackingCodes: [
+                        'UA-108242619-5'
+                    ],
+                    checkDimension: 'dimension42'
+                };
+
+                var customGA4Dimensions = {};
+
+
+                    customGA4Dimensions["routename"] = "Questions/Show";
+
+
+                    customGA4Dimensions["post_id"] = "31321";
+
+
+                    customGA4Dimensions["tags"] = "|first-appearance|";
+
+
+                var ga4Settings = {
+                    tracker: gtag,
+                    trackingCodes: [
+                        'G-S812YQPLT2'
+                    ],
+                    consentsToPerformanceCookies: "denied",
+                    consentsToTargetingCookies: "denied",
+                    eventParameters: customGA4Dimensions,
+                    checkForAdBlock: true,
+                    sendTitles: true,
+                    trackClicks: false,
+                };
+
+                StackExchange.ga.init({ GA3: ga3Settings, GA4: ga4Settings });
+
+
+                StackExchange.ga.setDimension('dimension2', '|first-appearance|');
+
+
+                StackExchange.ga.setDimension('dimension3', 'Questions/Show');
+
+
+                StackExchange.ga.setDimension('dimension7', "1710350251.1698419832");
+
+                StackExchange.ga.trackPageView();
+            });
+        </script>
+        
+            <script src="https://cdn.cookielaw.org/scripttemplates/otSDKStub.js" charset="UTF-8" data-document-language="true" data-domain-script="cb0f3c87-b769-4e66-bbaa-377f9194216d"></script>
+<script defer src="https://cdn.sstatic.net/Js/modules/cookie-consent.en.js?v=36bebc18e04f"></script>
+
+    
+    </body>
+    </html>

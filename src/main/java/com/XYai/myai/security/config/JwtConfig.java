@@ -1,22 +1,16 @@
 package com.XYai.myai.security.config;
 
+import com.XYai.myai.security.RsaKeyLoader;
 import com.XYai.myai.security.pojo.JwtProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
-import org.springframework.util.StreamUtils;
 
-import java.nio.charset.StandardCharsets;
-import java.security.KeyFactory;
-import java.security.PublicKey;
-import java.security.spec.X509EncodedKeySpec;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
-import java.util.Base64;
 import java.util.Map;
 
 @Configuration
@@ -24,21 +18,9 @@ public class JwtConfig {
 
     @Bean
     public JwtDecoder jwtDecoder(JwtProperties props, StringRedisTemplate stringRedisTemplate) throws Exception {
-        Resource publicKeyResource = props.getRsaPublicKeyPath();
-        if (publicKeyResource == null || !publicKeyResource.exists()) {
-            throw new IllegalStateException("RSA public key not configured");
-        }
-        RSAPublicKey publicKey = (RSAPublicKey) loadPublicKey(publicKeyResource);
+        RSAPublicKey publicKey = (RSAPublicKey) RsaKeyLoader.loadPublicKey(
+                props.getRsaPublicKey(), props.getRsaPublicKeyPath());
         return new RsaJwtDecoder(publicKey, stringRedisTemplate);
-    }
-
-    private PublicKey loadPublicKey(Resource resource) throws Exception {
-        String pem = StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
-        String base64 = pem.replaceAll("-----BEGIN (.*)-----", "")
-                .replaceAll("-----END (.*)-----", "")
-                .replaceAll("\\s", "");
-        byte[] der = Base64.getDecoder().decode(base64);
-        return KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(der));
     }
 
     private static class RsaJwtDecoder implements JwtDecoder {

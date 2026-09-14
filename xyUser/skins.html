@@ -1,0 +1,92 @@
+
+        <!-- ÆøÅÝÆ¤·ô¾ø¶Ô¶¨Î»²ã (²»¸ÉÈÅÖ÷ÌåÁ÷) -->
+        <template v-if="store.bubbleSkin === 'cat'">
+          <div class="skin-overlay" :class="{ 'flip-for-user': role === 'user' }">
+            <svg class="skin-decor top-left">
+              <!-- ×ó¶ú -->
+              <path d="M 0,20 Q 5,0 20,10" class="skin-stroke skin-fill" />
+              <path d="M 0,20 Q 5,0 20,10" class="skin-stroke" fill="none"/>
+              <!-- ÓÒ¶ú -->
+              <path d="M 20,20 Q 35,0 40,10" class="skin-stroke skin-fill" />
+              <path d="M 20,20 Q 35,0 40,10" class="skin-stroke" fill="none"/>
+              <!-- Ðë -->
+              <path d="M 35,30 L 45,28 M 35,35 L 45,35" class="skin-stroke" fill="none" />
+            </svg>
+            <svg class="skin-decor bottom-right">
+              <!-- Ã¨Î²°Í -->
+              <path d="M 0,0 Q 30,10 15,30" class="skin-stroke" fill="none" />
+            </svg>
+          </div>
+        </template>
+
+        <template v-else-if="store.bubbleSkin === 'dog'">
+          <div class="skin-overlay" :class="{ 'flip-for-user': role === 'user' }">
+            <svg class="skin-decor top-left">
+              <!-- ¹·Í·µ×É« -->
+              <circle cx="20" cy="20" r="16" class="skin-fill" />
+              <!-- ¹·Í·±ß¿ò -->
+              <circle cx="20" cy="20" r="16" class="skin-stroke" />
+              <!-- ´¹¶ú ×ó -->
+              <path d="M 4,20 Q 0,35 10,25" class="skin-stroke skin-fill" />
+              <!-- ´¹¶ú ÓÒ -->
+              <path d="M 36,20 Q 40,35 30,25" class="skin-stroke skin-fill" />
+              <!-- ÑÛ¾¦ -->
+              <circle cx="12" cy="16" r="2" class="skin-feature" />
+              <circle cx="28" cy="16" r="2" class="skin-feature" />
+              <!-- ±Ç×Ó -->
+              <ellipse cx="20" cy="24" rx="3" ry="2" class="skin-feature" />
+              <!-- ×ì°Í -->
+              <path d="M 20,26 L 20,29 M 16,29 Q 20,32 24,29" class="skin-feature-stroke" />
+            </svg>
+            <svg class="skin-decor top-right">
+              <!-- ¹·Î²°Í -->
+              <path d="M 10,20 Q 30,-5 25,15 Q 15,10 10,20" class="skin-stroke skin-fill" />
+            </svg>
+          </div>
+        </template>
+
+        <template v-else-if="store.bubbleSkin === 'fish'">
+          <div class="skin-overlay" :class="{ 'flip-for-user': role === 'user' }">
+            <svg class="skin-decor center-left">
+              <!-- ÓãÉíÇ°°ë²¿·Ö / ×ì -->
+              <path d="M 40,10 Q 5,20 40,30" class="skin-stroke skin-fill" />
+              <circle cx="25" cy="15" r="2" class="skin-feature" />
+            </svg>
+            <svg class="skin-decor center-right">
+              <!-- ÓãÎ²°Í -->
+              <path d="M 0,20 L 25,5 L 25,35 Z" class="skin-stroke skin-fill" />
+            </svg>
+            <svg class="skin-decor top-right" style="left: 50%; right: auto; transform: translateX(-50%);">
+              <!-- Óã¶¥÷¢ -->
+              <path d="M 10,35 Q 20,0 25,30" class="skin-stroke skin-fill" />
+            </svg>
+          </div>
+        </template>
+
+        <template v-else-if="store.bubbleSkin === 'helloKitty'">
+          <div class="skin-overlay" :class="{ 'flip-for-user': role === 'user' }">
+            <svg class="skin-decor top-left">
+              <!-- Á½Ö»¼â¶ú -->
+              <path d="M 5,20 L 10,5 L 20,15" class="skin-stroke skin-fill" />
+              <path d="M 20,15 L 30,5 L 35,20" class="skin-stroke skin-fill" />
+              <!-- ×ó¶úºûµû½á -->
+              <ellipse cx="25" cy="10" rx="6" ry="4" transform="rotate(-20 25 10)" class="skin-stroke skin-fill" />
+              <ellipse cx="37" cy="14" rx="6" ry="4" transform="rotate(20 37 14)" class="skin-stroke skin-fill" />
+              <circle cx="31" cy="12" r="3" class="skin-stroke skin-fill" />
+              <!-- ÑÛ¾¦ -->
+              <ellipse cx="15" cy="22" rx="1.5" ry="2.5" class="skin-feature" />
+              <ellipse cx="28" cy="22" rx="1.5" ry="2.5" class="skin-feature" />
+              <!-- ±Ç×Ó -->
+              <ellipse cx="21.5" cy="26" rx="2" ry="1.5" class="skin-feature" />
+              <!-- ºúÐë -->
+              <path d="M 0,22 L 8,23 M 0,26 L 8,26 M 0,30 L 8,29" class="skin-stroke" />
+              <path d="M 43,22 L 35,23 M 43,26 L 35,26 M 43,30 L 35,29" class="skin-stroke" />
+            </svg>
+            <svg class="skin-decor bottom-right" style="left: 50%; right: auto; transform: translateX(-50%); height: 20px; width: 40px; bottom: -5px;">
+              <!-- ×¦×Ó -->
+              <ellipse cx="10" cy="10" rx="6" ry="4" class="skin-stroke skin-fill" />
+              <ellipse cx="30" cy="10" rx="6" ry="4" class="skin-stroke skin-fill" />
+            </svg>
+          </div>
+        </template>
+

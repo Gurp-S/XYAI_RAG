@@ -14,6 +14,11 @@ public class MilvusMetadata {
             "fileName",
             "chunkSize",
             "createTime",
+            // ========== 结构与父子切片 ==========
+            "section_title",
+            "section_path",
+            "parent_text",
+            "chunk_type",
             // ========== 权限字段（核心） ==========
             //"ownerId", //userId 最高权力移除
             //"groupId",移除

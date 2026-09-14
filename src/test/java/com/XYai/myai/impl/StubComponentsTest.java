@@ -1,15 +1,13 @@
 package com.XYai.myai.impl;
 
-
 import org.junit.jupiter.api.Test;
 
-import java.util.concurrent.ExecutionException;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class StubComponentsTest {
+class StubComponentsTest {
 
     @Test
-    public void testStubRetrieverCoordinatorAndOrchestrator() throws ExecutionException, InterruptedException {
+    void placeholderPasses() {
+        assertTrue(true);
     }
 }
-
-

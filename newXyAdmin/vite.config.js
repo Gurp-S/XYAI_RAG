@@ -10,7 +10,9 @@ export default defineConfig({
     proxy: {
       '/xyAdmin': { target: 'http://localhost:8080', changeOrigin: true },
       '/upload': { target: 'http://localhost:8080', changeOrigin: true },
-      '/ai': { target: 'http://localhost:8080', changeOrigin: true }
+      '/ai': { target: 'http://localhost:8080', changeOrigin: true },
+      '/user': { target: 'http://localhost:8080', changeOrigin: true },
+      '/actuator': { target: 'http://localhost:8080', changeOrigin: true }
     }
   },
   build: {

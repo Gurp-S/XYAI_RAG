@@ -1,6 +1,9 @@
 package com.XYai.myai.exception;
 
+import com.XYai.myai.config.Result;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
@@ -9,15 +12,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ExceptionController {
 
-    /**
-     * 处理限流异常并返回固定提示。
-     *
-     * @param e 限流异常
-     * @return 限流提示文本
-     */
     @ExceptionHandler(RateLimitException.class)
-    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.TOO_MANY_REQUESTS)
-    public String rateLimitExceptionHandle(RateLimitException e) {
-        return "rateLimit";
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    public Result<Void> rateLimitExceptionHandle(RateLimitException e) {
+        String msg = e.getMessage() != null ? e.getMessage() : "rate limit exceeded";
+        return Result.error(429, msg);
     }
 }

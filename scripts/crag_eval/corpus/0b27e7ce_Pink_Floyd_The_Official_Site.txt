@@ -1,0 +1,430 @@
+<link rel="stylesheet" href="../css/pf.css" type="text/css" />
+<style type="text/css">
+body { 
+scrollbar-arrow-color:#000000; 
+scrollbar-base-color:#e1dfd5; 
+}
+</style>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Pink Floyd | The Official Site</title>
+<link rel="stylesheet" href="https://www.pinkfloyd.com/css/pf.css" type="text/css" />
+<meta name="facebook-domain-verification" content="p582lhmt2t2aca9i6waw52rt8lj8lk" />
+</head> 
+<body> 
+<div class="header">
+<div class="dataBox"><a href="https://www.pinkfloyd.com/home.php"><img src="https://www.pinkfloyd.com/images/spacer.gif" width="53" height="52" border="0" alt="Home Page"/></a></div>
+    <div style="height:30px; margin: 4px 50px 0 50px; float:left; width: 25%; text-align: left;"><a href="https://www.pinkfloyd.com/gdpr/Privacy_Policy.pdf" target="_blank"><font color="#FFFFFF"><b>PRIVACY POLICY</b></font></a></div>
+    <div style="height:30px; margin: 4px 50px 0 50px; float:left; width: 25%; text-align: right;"><a href="https://www.clientearth.org/" target="_blank"><img src="https://www.pinkfloyd.com/images/clientearth.jpg" width="86" height="30" border="0" /></a></div>
+	<div class="rss"><a href="https://feeds.feedburner.com/brain-damage-news" target="_blank"><img src="https://www.pinkfloyd.com/images/spacer.gif" width="40" height="30" border="0" alt="RSS Feeds"/></a></div>
+    <div class="signup"><a href="https://lnk.to/PF_mailinglist" target="_blank"><img src="https://www.pinkfloyd.com/images/spacer.gif" width="40" height="30" border="0" alt="Newsletter Signup"/></a></div>
+    <div class="sitemap"><a href="https://www.pinkfloyd.com/sitemap.php"><img src="https://www.pinkfloyd.com/images/spacer.gif" width="40" height="30" border="0" alt="Site Map"/></a></div>
+    <div class="audiop"><a href="https://www.pinkfloyd.com/audio_player.php" target="_blank"><img src="https://www.pinkfloyd.com/images/spacer.gif" width="40" height="30" border="0" alt="Launch Audio Player"/></a></div>
+	</div>
+
+
+
+	<img class="bgimage" src="images/bg_band.png" />
+
+<div id="content"> 
+<table width="100%" id="fullheight" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td align="center" valign="middle">
+    <div id="biographybox">
+	<span class="h10">Remember a Day?</span>
+      <div class="biotext">
+			<br /><br />
+            The early Sixties. Everything is up in the air, not least love, drugs 
+            and sex. A group of talented teenagers from academic backgrounds in 
+            Cambridge &#151; Roger 'Syd' Barrett, Roger Waters and David Gilmour &#151; 
+            are all keen guitarists and among many who move to London, keen to 
+            discover more of this new world and express themselves in it. Mainly 
+            in further education &#151; studying the arts, architecture, music &#151; they 
+            mix with like-minded incomers in the big city.<br />
+            <br />
+            In 1965, Barrett and Waters meet an experimental percussionist and 
+            an extraordinarily gifted keyboards-player &#151; Nick Mason and Rick Wright 
+            respectively. The result is Pink Floyd, which more than 40 years later 
+            has moved from massive to almost mythic standing.<br />
+            <br />
+			Through several changes of personnel, through several musical phases, 
+            the band has earned a place on the ultimate roll call of rock, along 
+            with the Beatles, the Stones and Led Zeppelin. Their album sales have 
+            topped 250 million. In 2005, at Live 8 &#151; the biggest global music 
+            event in history &#151; the reunion of the four-man line-up that recorded 
+            most of the Floyd canon stole the show. And yet, true to their beginnings, 
+            there has always been an enigma at their heart.<br />
+            <br />
+			Roger 'Syd' Barrett, for example. This cool and charismatic son of 
+            a university don was the original creative force behind the band (which 
+            he named after the Delta bluesmen Pink Anderson and Floyd Council). 
+            His vision was perfect for the times, and vice versa. He would lead 
+            the band to its first precarious fame, and damage himself irreparably 
+            along the way. And though the Floyd's Barrett era only lasted three 
+            years, it always informed what they became.<br />
+            <br />
+			These were the summers of love, when LSD was less an hallucinogenic 
+            interval than a lifestyle choice for some young people, who found 
+            their culture in science fiction, the pastoral tradition, and a certain 
+            strain of the Victorian imagination. Drawing on such themes, the elfin 
+            Barrett wrote and sang on most of the early Floyd's material, which 
+            made use of new techniques, such as tape-loops, feedback and echo 
+            delay.<br />
+            <br />
+			Live, the Floyd played sonic freak-outs &#151; half-hidden by new-fangled 
+            light-shows and projections &#151; with Barrett's spacey lead guitar swooping 
+            over Waters' trance-like bass, while Wright and Mason created soundscapes 
+            above and beneath. On record they were tighter, if still 'psychedelic'. 
+            Either way, they sounded 'trippy'. And perhaps that was Barrett's 
+            intention. He certainly ingested plenty of LSD and other drugs, which 
+            didn't help his delicate mental balance.<br />
+            <br />
+			Over the spring of 1966, the young band were regulars at the Spontaneous 
+            Underground 'happenings' on Sundays at the legendary Marquee Club, 
+            where they were spotted by their future managers Peter Jenner and 
+            Andrew King. And by the autumn, the Floyd had become the house band 
+            of the so-called London Free School in west London.<br />
+            <br />
+            A semi-residency at the All Saint's Hall led to bigger bookings &#151; 
+            at the UFO and the <i>International Times</i>' launch in the Roundhouse 
+            &#151; as well as the recording of the instrumental 'Interstellar 
+            Overdrive' with the UFO's co-founder, producer Joe Boyd. (This track 
+            was later used on hip documentaries of the scene.) A signing to EMI 
+            followed in early 1967.<br />
+            <br />
+			&quot;We want to be pop stars,&quot; said Syd. In March, Boyd recorded 
+            Barrett's oddly commercial 'Arnold Layne' as a three-minute single. 
+            And with a Top Twenty hit to promote, the band took on a gruelling 
+            schedule of gigs and recordings.<br />
+            <br />
+			They appeared at the coolest event of the summer, The 14-Hour Technicolor 
+            Dream in Alexandra Palace. They gave a concert under the banner 'Games 
+            for May' in a classical venue &#151; the Queen Elizabeth Hall &#151; where they 
+            displayed their theatrical ambitions through the use of props, pre-recorded 
+            tapes and the world's first quadraphonic sound system. (They received 
+            a lifetime ban for throwing daffodils into the audience.) And in June 
+            the Floyd released a single originally written for this event.<br />
+            <br />
+            'See Emily Play', which was produced by EMI's Norman Smith, charted 
+            at Number Six and made it on to primetime TV's Top of the Pops three 
+            times (with Barrett acting increasingly strangely). This was followed 
+            in August by Pink Floyd's first LP, <i>The Piper At The Gates of Dawn</i>, 
+            which they recorded at Abbey Road next door to the Beatles, then working 
+            on <i>Sergeant Pepper</i>. Again making the Top Ten, the album is 
+            mainly Barrett's and is a precious relic of its time, a wonderful 
+            mix of the whimsical and weird.<br />
+            <br />
+			Talking of which, Barrett's behaviour and output were threatening 
+            to bring the band down with him: refusing to speak, playing one de-tuned 
+            string all night, writing material like 'Scream Thy Last Scream, Old 
+            Woman with a Basket'. The band wanted to keep their frontman and hoped 
+            he would recover himself, so they asked David Gilmour &#151; now back in 
+            London after a sojourn abroad &#151; to take over Syd's role on stage, 
+            and thought Barrett might become their off-stage songwriter. They 
+            tried a few gigs as a five-piece. But in the end, they decided they 
+            could do without Barrett, and by March 1968 were in their second incarnation 
+            and under new management.<br />
+			<br />
+			<br />
+			<span class="h10">Set the Controls</span><br />
+			<br />
+            Barrett went his way with Jenner and King, and later recorded two 
+            haunting solo albums &#151; on which Waters, Wright and especially 
+            Gilmour helped &#151; before retreating to Cambridge for the rest 
+            of his life. The other four acquired a new manager &#151; Steve O'Rourke 
+            &#151; and in a state of some consternation finished their second 
+            album, <i>A Saucerful of Secrets</i> (begun the previous year).<br />
+            <br />
+			Lyrical duties had now fallen to the bassist Roger Waters. And apart 
+            from 'Jugband Blues' &#151; a disturbing track by Barrett, who contributed 
+            little else &#151; the album's standout moments included the title track 
+            and Waters' 'Set the Controls for the Heart of the Sun'.<br />
+			<br />
+            This hypnotic epic signposted the style the band would expand on in 
+            the Seventies, its vision at first more appreciated by an 'intellectual' 
+            and European audience. The Floyd played the first free concert in 
+            Hyde Park, and laid down the soundtrack for the bizarre Paul Jones 
+            movie vehicle, The Committee. They toured continually, developing 
+            new material on stage as well as in the studio.<br />
+			<br />
+            And they worked on the experience, in April 1969 revealing an early 
+            form of surround-sound at the Royal Festival Hall &#151; their rebuilt 
+            'Azimuth Co-Ordinator'. (The prototype, first constructed and used 
+            in 1967, had been stolen.) They worked on their concepts, too - at 
+            that concert, performing two long pieces fusing old and new material, 
+            entitled 'The Man' and 'The Journey'.<br />
+            <br />
+            So their star continued its inevitable ascent. In July, the Floyd 
+            released More, less a soundtrack than an accompaniment to Barbet Schroder's 
+            eponymous film about a group of hippies on the drug trail in Ibiza. 
+            The same month, they played live 'atmospherics' to the BBC's live 
+            coverage of the first moon landing. In November, they released the 
+            double-album <i>Ummagumma</i>, a mixture of live and studio tracks 
+            &#151; and that same month reworked its outstanding number, the eerie 
+            'Careful With That Axe, Eugene', for Antonioni's cult film Zabriskie 
+            Point.<br />
+			<br />
+            With <i>Ummagumma</i> at Number Five in the UK charts, and a growing 
+            reputation in both Europe and the US underground, the Floyd played 
+            some of the key festivals of their time &#151; Bath, Antibes, Rotterdam, 
+            Montreux &#151; and between October 1970 and November 1971, put out 
+            two more albums.<br />
+            <br />
+            <i>Atom Heart Mother</i>, their first Number One, featured the Floyd 
+            in their pomp &#151; 'I like a bit of pomp,' says Gilmour (who also 
+            made his first lyrical contribution with the gentle 'Fat Old Sun'). 
+            And <i>Meddle</i> included two timeless and largely instrumental tracks 
+            that showcased their lead guitarist in all his vertiginous, keening 
+            glory: 'Echoes', which took up the whole of Side One and began with 
+            a single 'ping' created almost accidentally by Wright, and 'One of 
+            These Days'.<br />
+			<br />
+            Increasingly successful, in 1972 the band was still pushing the boundaries. 
+            They shot the film 'Live at Pompei' in a Roman amphitheatre, recorded 
+            another movie soundtrack for Schroder &#151; <i>Obscured by Clouds</i> 
+            &#151; and performed with the Ballet de Marseille. But more importantly, 
+            they began to work on an idea that would become their most popular 
+            album and with 45 million sold, the world's third biggest.<br />
+            <br />
+            Provisionally entitled 'Eclipse' and honed through an extensive world 
+            tour, <i>The Dark Side of the Moon</i> was released in March 1973, 
+            and defies a potted critique here. Demonstrating Waters' talents as 
+            both lyricist and conceptualist, it was also a musical <i>tour de 
+            force</i> by Gilmour. But Waters was becoming <i>de facto</i> leader 
+            of the band &#151; which in public at least was becoming less about 
+            the individuals than the experience.<br />
+            <br />
+            That was (as Barrett had always intended) increasingly visual. The 
+            intriguing sleeve artwork commissioned from the ex-Cambridge outfit 
+            Hipgnosis was complemented by stage shows featuring crashing aeroplanes, 
+            circular projection screens and flaming gongs. There were backing 
+            singers on-stage and a guest slot for another pal from Cambridge, 
+            the saxophonist Dick Parry. In the dawning age of stadium rock, the 
+            Floyd were truly its masters.<br />
+            <br />
+            Or maybe its servants? Even before <i>Dark Side</i> broke Middle America 
+            through FM radio &#151; with the single 'Money' &#151; alienation, 
+            isolation and mental fragility had long been Waters' themes. As a 
+            stadium performer, and a cog in the music business machine, he was 
+            becoming more prone to all three. As Barrett's ex-colleague, he had 
+            seen them embodied in his old friend. The results were evident in 
+            two of his best lyrics &#151; for 'Shine On, You Crazy Diamond' and 
+            'Wish You Were Here'. These tracks were the high points of the Floyd's 
+            next LP, also called <i>Wish You Were Here</i>, which was begun in 
+            January 1975 and released that summer.<br />
+			<br />
+            Famously, Barrett briefly appeared unannounced at Abbey Road during 
+            the recording of 'Shine On' and shocked the band by his appearance 
+            and demeanour. It was the last time any of them saw him &#151; but they 
+            were seeing less of each other, too. Personal and musical differences 
+            were starting to tell on the band, though it would be several years 
+            until these became unbearable &#151; and two more LPs.<br />
+			<br />
+			<br />
+			<span class="h10">Which One's Pink?</span><br />
+			<br />
+            The first was <i>Animals</i>, released in January 1977 (although work 
+            had also begun on it in 1975). When this was toured with lavish special 
+            effects, including giant inflatables, Waters was dismayed that the 
+            crowds kept calling for old hits. In Montreal his patience snapped 
+            and he spat into the audience. It was a cathartic moment that gave 
+            birth to the Floyd's most ambitious project ever: <i>The Wall</i>, 
+            a largely autobiographical reflection by Waters on the nature of love, 
+            life and art.<br />
+            <br />
+			The double album charts the progress of a rock star, 'Pink', facing 
+            the break-up of his marriage while on tour. This leads him to review 
+            his life from the death of his father - like Waters' killed on the 
+            battlefield before he was born - to his spiteful teachers, his business, 
+            even his audience. He sees each as a brick in a metaphorical wall 
+            between him and the rest of the world. This wall intensifies his isolation, 
+            until he imagines the only solution is to become a fascist dictator. 
+            When he confronts his madness and deals with his issues, his torments 
+            cease and the wall crumbles.<br />
+            <br />
+			The show &#151; in which the band were slowly obscured by a giant wall 
+            of cardboard 'bricks' &#151; was the most ambitious the rock world had 
+            ever seen, and was also turned into an Alan Parker film, starring 
+            Bob Geldof (who would return to the Floyd story 25 years later). The 
+            album sold 20 million, and spawned the band's only Number One single, 
+            the anti-authoritarian 'Another Brick in the Wall, Part 2'.<br />
+			<br />
+            Though the album had its musical highlights &#151; Gilmour's solo on 'Comfortably 
+            Numb' being the most memorable &#151; it was largely a lyrical piece. Waters 
+            drove the project and the others fitted in. They ceded their vision 
+            to his increasingly personal direction, and worked together on no 
+            new material for more than two years.<br />
+			<br />
+            When they did get back in the studio, it was to record <i>The Final 
+            Cut</i>. This prophetically titled album, prompted by the Falklands 
+            conflict of 1982 and released the next year, explores themes of remembrance 
+            and the undelivered post-war dream &#151; for which Waters' father 
+            had given his life. Completely credited to Waters, it was attributed 
+            to 'Roger Waters, performed by Pink Floyd' and featured Gilmour's 
+            vocals on one track.<br />
+			<br />
+            After three years &#151; during which all four band members had pursued 
+            solo projects &#151; Waters announced he was leaving the Floyd and 
+            disbanding them. Wright had left the legal entity some time before, 
+            transferring to the payroll for <i>The Wall</i> tour and playing no 
+            part in <i>The Final Cut</i>, but Gilmour and Mason decided to continue 
+            Pink Floyd without its erstwhile 'leader'. A turbulent period followed, 
+            but agreement was eventually reached: Waters would continue to perform 
+            the songs on which he worked while he was with the band, as well as 
+            new solo material. Gilmour &#151; now first among equals &#151; and 
+            Mason would continue to record and perform with Wright as Pink Floyd.<br />
+			<br />
+            In 1987 came their next album, <i>A Momentary Lapse of Reason</i> 
+            &#151; which emphatically proved that the Floyd could exist without 
+            Waters. The subsequent world tour, which also spawned the live <i>Delicate 
+            Sound of Thunder</i>, was the band's longest and most successful ever. 
+            Over four years, 5.5 million people saw 200 shows, including one on 
+            a floating stage in Venice (which again earned them a venue-ban) while 
+            <i>Thunder</i> became the first rock album to be played in space, 
+            by the Soviet-French Soyuz-7 mission.<br />
+			<br />
+            1994's album and tour, <i>The Division Bell</i>, broke similar records; 
+            but more, it showed Gilmour and the band on a creative roll, with 
+            Wright contributing to some of the writing and Gilmour forging a new 
+            writing partnership with his wife, the novelist Polly Samson &#151; 
+            'High Hopes' being one of their new classics. However, since then, 
+            the Floyd has recorded no new material in the studio.<br />
+			<br />
+            Not that they have been inactive &#151; nor untouched by sorrows. 
+            In 2003, the band's manager Steve O'Rourke died from a stroke and 
+            the three-man Floyd played 'Fat Old Sun' and <i>Dark Side</i>'s 'Great 
+            Gig in the Sky', at his funeral in Chichester Cathedral. In 2006, 
+            Syd Barrett died from pancreatic cancer. And in 2008 Rick Wright followed 
+            him &#151; but not before he had helped re-write the Pink Floyd story 
+            a couple more times.<br />
+            <br />
+            In 2005, prompted by Bob Geldof, the band decided to perform at Live 
+            8 (on the 20th anniversary of Live Aid) and invited Waters to join 
+            them. He accepted and &#151; sharing vocals with Gilmour &#151; they 
+            played two numbers from <i>Dark Side</i>, plus 'Wish You Were Here' 
+            and 'Comfortably Numb'. It was an epoch-making moment in rock history, 
+            and their final group hug became one of Live 8's iconic images.<br />
+			<br />
+            After that, the three-man Floyd performed together on two occasions 
+            &#151; once during a solo gig by Gilmour in 2006 (Wright played the whole 
+            three-month tour and was 'in great form', says Gilmour); and again 
+            at an all-star memorial tribute to Barrett in 2007. Waters also appeared 
+            at the gig but was unable to join his old colleagues due to a previous 
+            appointment. Still, that was not the end of their association.<br />
+			<br />
+            On 10 July 2010, with some of their favourite musicians, Waters and 
+            Gilmour performed a few Floyd songs &#151; plus Phil Spector's 'To 
+            Know Him Is To Love Him'! &#151; at a private charity event in Oxfordshire. 
+            And on 12 May 2011, during one of Waters' <i>Wall</i> concerts at 
+            the London O2, Gilmour appeared on top of the wall as of old, to sing 
+            and play his parts on 'Comfortably Numb'. Nick Mason, who was at the 
+            gig, then joined them for the final song, 'Outside the Wall'. Departing 
+            the stage, as they had before, Waters played trumpet, Gilmour mandolin 
+            and Mason tambourine. The audience was stunned and delighted.<br />
+			<br />
+            But a handful of concerts was never going to sate the interest of 
+            the diehard fans. In 1995, they were rewarded with the double-album 
+            <i>P&#149;U&#149;L&#149;S&#149;E</i>, all recorded on the <i>Division Bell</i> tour and 
+            containing the first complete live version of <i>Dark Side</i>. A 
+            live compilation of <i>The Wall</i> from 1980-1 &#151; called <i>Is 
+            There Anybody Out There?</i> &#151; followed in 2000, and then a re-mastered 
+            'best of', called <i>Echoes</i>. There have also been collectors' 
+            editions of <i>Dark Side</i>, a complete works box-set &#151; <i>Oh, 
+            By the Way</i> &#151; and now (autumn 2011) an extensive reissue campaign 
+            by EMI, with new packaging and production values, not to mention some 
+            rare and archival recordings that go back to the Barrett days.<br />
+			<br />
+            Nor, as individuals, have the survivors from those times been strangers 
+            to the studio or stage these last dozen or so years (and before). 
+            Gilmour put out his third solo album, <i>On an Island</i>, in 2006; 
+            Waters has had a prolific and varied career since 1986; Mason and 
+            Wright released one or two collaborative albums respectively.<br />
+			<br />
+            There have been awards and honours along the way: induction into both 
+            the US and UK Rock 'n' Roll Halls of Fame; Sweden's Polar Music Prize 
+            in 2008 for their 'monumental contribution over the decades to the 
+            fusion of art and music in the development of popular culture'. And 
+            in 2010, The Royal Mail used <i>Division Bell</i> visuals on their 
+            stamps, also creating a unique sheet using only the Floyd's imagery.<br />
+			<br />
+            So is that the end of the Floyd's road? Do they still exist? Yes, they do.<p>&nbsp;</p>
+			<p>&nbsp;</p>
+			</div></div></td>
+  </tr>
+</table>
+
+</div>		
+
+<link rel="stylesheet" href="https://www.pinkfloyd.com/css/pf.css" type="text/css" />
+
+<div id="footer">
+      <div id="backarrow"><a href="javascript:history.back()"><img src="https://www.pinkfloyd.com/images/nav_arrow_back.png" width="26" height="30" border="0" /></a></div>
+    <div id="forwardarrow"><a href="javascript:history.forward()"><img src="https://www.pinkfloyd.com/images/nav_arrow_fwd.png" width="26" height="30" border="0" /></a></div>
+    <div id="storeBox"><a href="https://www.pinkfloyd.com/store.php"><img src="https://www.pinkfloyd.com/images/nav_store.png" width="38" height="38" border="0" /></a></div>
+</div>
+<!-- Facebook Pixel Code -->
+<script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '1447330645497320');
+  fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=1447330645497320&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Facebook Pixel Code -->
+<!-- Global site tag (gtag.js) - Google Ads: 996921893 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-996921893"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'AW-996921893');
+</script>
+<!-- Event snippet for Pink Floyd - Website Retargeting remarketing page -->
+<script>
+  gtag('event', 'conversion', {
+      'send_to': 'AW-996921893/eQO6CKPzmAgQpaSv2wM',
+      'aw_remarketing_only': true
+  });
+</script>
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-22010924-1']);
+  _gaq.push(['_trackPageview']);
+ 
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+<!-- Google Code for Pink Floyd -->
+<!-- Remarketing tags may not be associated with personally identifiable information or placed on pages related to sensitive categories. For instructions on adding this tag and more information on the above requirements, read the setup guide: google.com/ads/remarketingsetup -->
+<script type="text/javascript">
+/* <![CDATA[ */
+var google_conversion_id = 1066447043;
+var google_conversion_label = "z1-CCMmiqwUQw-HC_AM";
+var google_custom_params = window.google_tag_params;
+var google_remarketing_only = true;
+/* ]]> */
+</script>
+<script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
+</script>
+<noscript>
+<div style="display:inline;">
+<img height="1" width="1" style="border-style:none;" alt="" src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/1066447043/?value=0&amp;label=z1-CCMmiqwUQw-HC_AM&amp;guid=ON&amp;script=0"/>
+</div>
+</noscript>
+</body>
+</html>

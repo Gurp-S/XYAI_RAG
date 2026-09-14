@@ -1,0 +1,1138 @@
+[
+ {
+  "interaction_id": "02078fd7-8b65-496e-8b14-79bd27880e01",
+  "query": "what's krys's market price right now?",
+  "answer": "$169.21",
+  "domain": "finance",
+  "question_type": "simple",
+  "pages": [
+   "02078fd7_Krystal_Biotech_-_KRYS_-_Stock_Price_Today_-_Zacks.txt",
+   "02078fd7_Krystal_Biotech_-_KRYS_-_Stock_Price_Today_-_Zacks.txt",
+   "02078fd7_Krystal_Biotech_-_KRYS_-_Stock_Price_Today_-_Zacks.txt",
+   "02078fd7_Krystal_Biotech_Stock_Price_KRYS_Stock_Quote-_News-_and_Hist.txt",
+   "02078fd7_KRYS_Stock_Quote_Price_and_Forecast_CNN.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 11
+ },
+ {
+  "interaction_id": "02168244-0ceb-4dc4-822b-cee786c77189",
+  "query": "what was alcc's opening stock price on the previous friday?",
+  "answer": "$10.64",
+  "domain": "finance",
+  "question_type": "simple",
+  "pages": [
+   "02168244_ALCC_Stock_Price_and_Chart_-_NYSE_ALCC_-_TradingView.txt",
+   "02168244_AltC_Acquisition_Corp_-_Ordinary_Shares_-_Class_A_-ALCC-_Pro.txt",
+   "02168244_ALCC_AltC_Acquisition_Corp-_Cl_A_Stock_Price_-_News_-_WSJ.txt",
+   "02168244_Altc_Acquisition_Stock_Price_Today_-NYSE_ALCC-_Quote-_Market.txt",
+   "02168244_Check_out_AltC_Acquisition_Corp-s_stock_price_-ALCC-_in_real.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 142
+ },
+ {
+  "interaction_id": "024f1e5c-4e81-416a-ad60-c934c5038cc0",
+  "query": "can you tell me lottery.com's open price for today?",
+  "answer": "$2.28",
+  "domain": "finance",
+  "question_type": "simple",
+  "pages": [
+   "024f1e5c_Keen_Vision_Acquisition_Corporation_Announces_the_Separate_T.txt",
+   "024f1e5c_Keen_Vision_Acquisition_Corp-_IPOScoop.txt",
+   "024f1e5c_Keen_Vision_Acquisition_Company_Profile_Valuation_-_Investor.txt",
+   "024f1e5c_Keen_Vision_Acquisition_Corporation_Units_-KVACU-_Stock_Pric.txt",
+   "024f1e5c_Keen_Vision_Acquisition_Company_Profile_Valuation_-_Investor.txt"
+  ],
+  "hit": 0,
+  "cover": 0,
+  "mrr": 0.0,
+  "hit_rank": 0,
+  "latency": 4
+ },
+ {
+  "interaction_id": "03201e9b-aab2-4171-9b17-711526235983",
+  "query": "what was the price of hofv stock at the end of the last day?",
+  "answer": "$3.12",
+  "domain": "finance",
+  "question_type": "simple",
+  "pages": [
+   "03201e9b_Hall_of_Fame_Resort_-_Entertainment_Company_-HOFV-_Stock_Pri.txt",
+   "03201e9b_Hall_of_Fame_Resort_-_Entertainment_Company_-HOFV-_Stock_Pri.txt",
+   "03201e9b_Hall_of_Fame_Resort_-_Entertainment_Company_-HOFV-_Stock_Pri.txt",
+   "03201e9b_Hall_Of_Fame_Village_Llc_Stock_Price_Forecast-_Should_You_Bu.txt",
+   "03201e9b_Hall_of_Fame_Resort_-_Entertainment_Company_-HOFV-_Stock_Pri.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 5
+ },
+ {
+  "interaction_id": "03220362-8d05-4003-821a-7776365a87ee",
+  "query": "this week, what was the highest daily high stock price that imppp reached?",
+  "answer": "$22.24",
+  "domain": "finance",
+  "question_type": "simple",
+  "pages": [
+   "03220362_Climate_-_Weather_Averages_in_Chicago-_Illinois-_USA.txt",
+   "03220362_Past_Weather_in_United_States-_USA_-_Yesterday_or_Further_Ba.txt",
+   "03220362_High-Low_Index_Definition-_Formula-_Example_Chart.txt",
+   "03220362_Atlanta-_GA_Weather_History_Weather_Underground.txt",
+   "03220362_Local_Climate_Data_and_Plots.txt"
+  ],
+  "hit": 0,
+  "cover": 0,
+  "mrr": 0.0,
+  "hit_rank": 0,
+  "latency": 103
+ },
+ {
+  "interaction_id": "03e1923a-ef68-4d20-b064-ef7996831b17",
+  "query": "what's the price-to-earnings ratio of moln as of now?",
+  "answer": "-2.33",
+  "domain": "finance",
+  "question_type": "simple",
+  "pages": [
+   "03e1923a_Stock_Analysis_Using_the_P_E_Ratio_Charles_Schwab.txt",
+   "03e1923a_Price-earnings_ratio_-_Wikipedia.txt",
+   "03e1923a_Price_Earnings_Ratio_-_Formula-_Examples_and_Guide_to_P_E_Ra.txt",
+   "03e1923a_Price_Earnings_Analysis_Indicates_Stock_Market_is_Overvalued.txt",
+   "03e1923a_Price-earnings_ratio_-_Wikipedia.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 120
+ },
+ {
+  "interaction_id": "049ab05b-fd1a-42a0-b749-38eeedb0ac72",
+  "query": "what's the open price for intellicheck today?",
+  "answer": "$1.75",
+  "domain": "finance",
+  "question_type": "simple",
+  "pages": [
+   "049ab05b_What_is_the_Market-s_View_on_Intellicheck_Inc_-IDN-_Stock-s_.txt",
+   "049ab05b_IDN_Stock_Price_Intellicheck_Inc-_Stock_Quote_-U-S-_Nasdaq-_.txt",
+   "049ab05b_Intellicheck-_Inc-_Common_Stock_-IDN-_Stock_Price-_News-_Quo.txt",
+   "049ab05b_Investors_-_Intellicheck.txt",
+   "049ab05b_Intellicheck-_Inc-_Common_Stock_-IDN-_Stock_Price-_News-_Quo.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 4
+ },
+ {
+  "interaction_id": "04b7a5da-c716-48af-8a3b-7709963b4401",
+  "query": "which country had the lowest 2022 corporate income tax rate?",
+  "answer": "barbados has the lowest statutory corporate income tax rate at 5.5% in 2022.",
+  "domain": "finance",
+  "question_type": "simple",
+  "pages": [
+   "04b7a5da_-New-_20_Countries_with_the_Highest_Tax_Rates_Worldwide_2023.txt",
+   "04b7a5da_-New-_20_Countries_with_the_Highest_Tax_Rates_Worldwide_2023.txt",
+   "04b7a5da_Is_the_U-S-_the_Highest_Taxed_Nation_in_the_World_Committee_.txt",
+   "04b7a5da_Is_the_U-S-_the_Highest_Taxed_Nation_in_the_World_Committee_.txt",
+   "04b7a5da_-New-_20_Countries_with_the_Highest_Tax_Rates_Worldwide_2023.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 6
+ },
+ {
+  "interaction_id": "055d5b5b-6659-4a78-afe4-7c946e8ec62b",
+  "query": "which company has a higher price-to-book ratio, splunk or mongodb?",
+  "answer": "as of the current financial data, splunk has a higher price-to-book ratio than mongodb, with a price-to-book ratio of 132.33 compared to mongodb's 32.98.",
+  "domain": "finance",
+  "question_type": "comparison",
+  "pages": [
+   "055d5b5b_Splunk_Price_to_Book_Ratio_2011-2023_SPLK_MacroTrends.txt",
+   "055d5b5b_MongoDB_Vs_Splunk_Which_Data_Analytics_Stock_is_a_.txt",
+   "055d5b5b_MongoDB_Vs_Splunk_Which_Data_Analytics_Stock_is_a_.txt",
+   "055d5b5b_Splunk_Price_to_Book_Ratio_2011-2023_SPLK_MacroTrends.txt",
+   "055d5b5b_What_is_the_Price-To-Book_ratio_GoCardless.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 125
+ },
+ {
+  "interaction_id": "06014752-99fc-416d-974b-5eb552947ccd",
+  "query": "what was the open price of sabsw on the most recent friday?",
+  "answer": "$0.03",
+  "domain": "finance",
+  "question_type": "simple",
+  "pages": [
+   "06014752_SAB_Industries_Share_Price_Today_-12_Feb-_2024-_-_SAB_Indust.txt",
+   "06014752_SABSW_SAB_Biotherapeutics_Inc-_Wt_Stock_Overview_-U-S-_Nasda.txt",
+   "06014752_Silver_Prices_Today_Current_Live_Spot_Price_of_Silver_Per_Ou.txt",
+   "06014752_SAB_Industries_Share_Price_Today_-12_Feb-_2024-_-_SAB_Indust.txt",
+   "06014752_Silver_Prices_Today_Current_Live_Spot_Price_of_Silver_Per_Ou.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 4
+ },
+ {
+  "interaction_id": "061fac22-480f-4ff9-8a79-d76c5bbfe175",
+  "query": "what was the total value of all mergers and acquisitions (m&a) deals in the technology sector in 2023, as of october?",
+  "answer": "the total value of all m&a deals in the technology sector was $286.4 billion for the first nine months of 2023.",
+  "domain": "finance",
+  "question_type": "simple_w_condition",
+  "pages": [
+   "061fac22_Value_of_M-A_deals_globally_1985-2023_Statista.txt",
+   "061fac22_Mergers_and_acquisitions_-_Wikipedia.txt",
+   "061fac22_United_States_-_M-A_Statistics_-_IMAA_-_Institute_for_Merger.txt",
+   "061fac22_United_States_-_M-A_Statistics_-_IMAA_-_Institute_for_Merger.txt",
+   "061fac22_Mergers_and_acquisitions_-_Wikipedia.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 122
+ },
+ {
+  "interaction_id": "072d3845-d4b5-44a5-b4f3-e92006dcd072",
+  "query": "how much does flex ltd.'s stock open today?",
+  "answer": "$27.42",
+  "domain": "finance",
+  "question_type": "simple",
+  "pages": [
+   "072d3845_How_to_Use_Stock_Volume_to_Improve_Your_Trading.txt",
+   "072d3845_Flex_Ltd-_-FLEX-_Stock_Price-_News-_Quote_-_History_-_Yahoo_.txt",
+   "072d3845_FLEX_Price_USD_converter-_Charts_Crypto-com.txt",
+   "072d3845_Flex_Ltd-_-FLEX-_Stock_Price-_News-_Quote_-_History_-_Yahoo_.txt",
+   "072d3845_How_to_Use_Stock_Volume_to_Improve_Your_Trading.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 4
+ },
+ {
+  "interaction_id": "0045efd0-3dbe-472a-8678-cdd413e538a6",
+  "query": "who directed the original the italian job?",
+  "answer": "peter collinson",
+  "domain": "movie",
+  "question_type": "simple_w_condition",
+  "pages": [
+   "0045efd0_The_Italian_Job_-1969-_-_7-2_Action-_Comedy-_Crime.txt",
+   "0045efd0_-The_Italian_Job_-1969-_directed_by_Peter_Collinson_-_Review.txt",
+   "0045efd0_Is_The_Italian_Job_a_True_Story_Is_the_2003_Movie_Based_on_R.txt",
+   "0045efd0_The_Italian_Job_Heist-_Heist_Movie-_British_Comedy_Britannic.txt",
+   "0045efd0_The_Italian_Job_-1969_film-_-_Wikiquote.txt"
+  ],
+  "hit": 1,
+  "cover": 1,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 151
+ },
+ {
+  "interaction_id": "00b55b76-cb1d-49be-8515-6248a86bdded",
+  "query": "who was crowned the best actor at the academy awards in 1993 for their role in a movie?",
+  "answer": "al pacino",
+  "domain": "movie",
+  "question_type": "simple",
+  "pages": [
+   "00b55b76_1993_Academy_Awards-_Winners_and_History.txt",
+   "00b55b76_Best_Actor_Oscars_Every_Male_Star_Who_Has_Won_the_Academy_Aw.txt",
+   "00b55b76_Oscar_Winners_1993_Complete_list_of_winners_of_Oscars_1993.txt",
+   "00b55b76_1993_Academy_Awards-_Winners_and_History.txt",
+   "00b55b76_65th_Academy_Awards_-_Wikipedia.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 183
+ },
+ {
+  "interaction_id": "00b7ce03-bf1a-4a99-8775-8ef75d68c843",
+  "query": "what was the first movie to feature a person who can control the weather?",
+  "answer": "the first movie to feature a person who can control the weather was \"the thief of bagdad\" in 1940, which starred conrad viedt. where the genie in the fim manipulates the weather.",
+  "domain": "movie",
+  "question_type": "simple_w_condition",
+  "pages": [
+   "00b7ce03_-Geostorm-_Trailer_Satellite-Controlled_Weather_Goes_Wrong_i.txt",
+   "00b7ce03_Weather_Control_Movies-_Weather_Manipulation-_Weather_Modifi.txt",
+   "00b7ce03_Cloud_Kings_-Geostorm-_Film_Imagines_Human-Controlled_Weathe.txt",
+   "00b7ce03_weather_manipulation_Movies_-_The_Movie_Database_-TMDB.txt",
+   "00b7ce03_What_was_the_first_movie_to_feature_a_person_sit_on_a_toilet.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 120
+ },
+ {
+  "interaction_id": "00df257b-0ffc-42f0-ad09-cf99f558a23f",
+  "query": "what's the latest film that walt becker has directed?",
+  "answer": "clifford the big red dog",
+  "domain": "movie",
+  "question_type": "simple_w_condition",
+  "pages": [
+   "00df257b_Walt_Becker_News_-_Biography_-_Empire.txt",
+   "00df257b_Walt_Becker_Movies_-_IMDb.txt",
+   "00df257b_Walt_Becker_-_Wikipedia.txt",
+   "00df257b_Walt_Becker_-_Rotten_Tomatoes.txt",
+   "00df257b_Walt_Becker_Director-_Producer-_Writer.txt"
+  ],
+  "hit": 1,
+  "cover": 1,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 115
+ },
+ {
+  "interaction_id": "019d8522-68f2-4686-ae49-0690636e2a6e",
+  "query": "can you tell me the birthday of fanny howe?",
+  "answer": "1940-10-15",
+  "domain": "movie",
+  "question_type": "simple",
+  "pages": [
+   "019d8522_Fanny_Howe_Poetry_Foundation.txt",
+   "019d8522_Fanny_Howe_-Author_of_The_Wedding_Dress.txt",
+   "019d8522_Fanny_Howe_-_Wikipedia.txt",
+   "019d8522_Fanny_Howe_-_Wikipedia.txt",
+   "019d8522_A_Life_and_Vocation_Outside_of_the_Law_Fanny_Howe_Poetry_Cen.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 142
+ },
+ {
+  "interaction_id": "01c1e744-c33f-4318-b482-7293ee0f7883",
+  "query": "do you know who the director of renegade is?",
+  "answer": "jan kounen",
+  "domain": "movie",
+  "question_type": "simple",
+  "pages": [
+   "01c1e744_Renegades_-2022_film-_-_Wikipedia.txt",
+   "01c1e744_Renegades_-2022-_-_3-7_Action-_Crime-_Thriller.txt",
+   "01c1e744_Renegades_-2022_film-_-_Wikipedia.txt",
+   "01c1e744_Renegade_-TV_series-_-_Wikipedia.txt",
+   "01c1e744_Renegade_-TV_Series_1992-1997-_-_IMDb.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 189
+ },
+ {
+  "interaction_id": "02475276-3a61-4c12-8a51-7a13af1ff70c",
+  "query": "in 2012, which movie earned the oscar for best visual effects?",
+  "answer": "hugo",
+  "domain": "movie",
+  "question_type": "simple",
+  "pages": [
+   "02475276_Best_Visual_Effects_Oscars_Wiki_Fandom.txt",
+   "02475276_Academy_Award_for_Best_Visual_Effects_-_Wikipedia.txt",
+   "02475276_Category_Films_that_won_the_Best_Visual_Effects_Academy_Awar.txt",
+   "02475276_94th_Academy_Awards.txt",
+   "02475276_94th_Academy_Awards.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 120
+ },
+ {
+  "interaction_id": "0427e7bc-88c1-4c96-9f33-13d054ee085a",
+  "query": "who played the lead role in the movie \"forrest gump\"?",
+  "answer": "tom hanks",
+  "domain": "movie",
+  "question_type": "simple",
+  "pages": [
+   "0427e7bc_Forrest_Gump_-_Wikipedia.txt",
+   "0427e7bc_The_Cast_of_-Forrest_Gump-_Then_and_Now.txt",
+   "0427e7bc_Here-s_Where_the_Cast_of_Forrest_Gump_is_Today.txt",
+   "0427e7bc_Forrest_Gump_-1994-_-_8-8_Drama-_Romance.txt",
+   "0427e7bc_Forrest_Gump_Turns_25_Where_Is_the_Cast_Now.txt"
+  ],
+  "hit": 1,
+  "cover": 1,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 152
+ },
+ {
+  "interaction_id": "0534010a-d780-4a3a-8c33-d7ec11f06185",
+  "query": "which movie is considered the best political film, \"the godfather\" or \"schindler's list\"?",
+  "answer": "schindler's list",
+  "domain": "movie",
+  "question_type": "comparison",
+  "pages": [
+   "0534010a_The_Godfather-_The_Shawshank_Redemption-_and_Schindler-s_Lis.txt",
+   "0534010a_List_of_IMDB_Top_Movies_Keeperfacts.txt",
+   "0534010a_Schindler-s_List_vs-_The_Godfather_-_Flickchart.txt",
+   "0534010a_Schindler-s_List_-1993-_FilmBooster-com.txt"
+  ],
+  "hit": 1,
+  "cover": 1,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 181
+ },
+ {
+  "interaction_id": "055fb452-e365-4e2d-851c-3f4f53bf16a0",
+  "query": "what professional won the best actor oscar in 2007?",
+  "answer": "forest whitaker",
+  "domain": "movie",
+  "question_type": "simple",
+  "pages": [
+   "055fb452_Best_Actor_Oscar-Winners_of_the_21st_Century-_Ranked_Worst_t.txt",
+   "055fb452_Oscar_Best_Actor_winner_from_the_year_you_were_born_Yardbark.txt",
+   "055fb452_Academy_Awards-_USA_-2007-_-_IMDb.txt",
+   "055fb452_Academy_Award_for_best_actor_Years-_Winners-_List-_-_Facts_.txt",
+   "055fb452_Academy_Award_for_best_actor_Years-_Winners-_List-_-_Facts_.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 186
+ },
+ {
+  "interaction_id": "057c45ad-c9b5-4973-8746-8b158a29f574",
+  "query": "when was robert zemeckis born?",
+  "answer": "1952-05-14",
+  "domain": "movie",
+  "question_type": "simple",
+  "pages": [
+   "057c45ad_How_Many_Children_Does_Director_Robert_Zemeckis_Have_.txt",
+   "057c45ad_All_About_Robert_De_Niro_and_Tiffany_Chen-s_Baby_Girl-_Gia.txt",
+   "057c45ad_Robert_Zemeckis-s_Vacation_Home_Is_a_Castle_in_Italy_.txt",
+   "057c45ad_Robert_Zemeckis_Biography-_Movies-_-_Facts_Britannica.txt",
+   "057c45ad_Every_Robert_Zemeckis_Movie-_Ranked.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 116
+ },
+ {
+  "interaction_id": "057ff5c5-79c7-40e1-a875-565a74e8da95",
+  "query": "is leprechaun: back 2 tha hood how that movie was officially named at first?",
+  "answer": "yes",
+  "domain": "movie",
+  "question_type": "simple",
+  "pages": [
+   "057ff5c5_Leprechaun_Back_2_tha_Hood_Leprechaun_Wiki_Fandom.txt",
+   "057ff5c5_Leprechaun_Back_2_tha_Hood_-2003-_Not_a_Gangsta_Retro_Review.txt",
+   "057ff5c5_Leprechaun_Back_2_tha_Hood_-2003-_Not_a_Gangsta_Retro_Review.txt",
+   "057ff5c5_Leprechaun_Back_2_tha_Hood_Leprechaun_Wiki_Fandom.txt",
+   "057ff5c5_Leprechaun_Back_2_tha_Hood_Rotten_Tomatoes.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 140
+ },
+ {
+  "interaction_id": "0308e86f-757c-4eb7-8d3a-7084809a9b19",
+  "query": "which date did one direction release their first album?",
+  "answer": "november 18, 2011",
+  "domain": "music",
+  "question_type": "simple",
+  "pages": [
+   "0308e86f_Up_All_Night_-One_Direction_album-_-_Wikipedia.txt",
+   "0308e86f_One_Direction_All_Albums_In_Order_Of_Release_-_Capital.txt",
+   "0308e86f_THEN_AND_NOW_The_members_of_One_Direction_12_years_later.txt",
+   "0308e86f_Up_All_Night_-One_Direction_album-_-_Wikipedia.txt",
+   "0308e86f_One_Direction_One_Direction_Wiki_Fandom.txt"
+  ],
+  "hit": 1,
+  "cover": 1,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 138
+ },
+ {
+  "interaction_id": "0617e574-3ffa-4179-9c39-5a7b44f41ea6",
+  "query": "who has had more number one hits on the us billboard rock songs chart, imagine dragons or twenty one pilots?",
+  "answer": "imagine dragons have had more number one hits on the us billboard rock songs chart than twenty one pilots, with 5 number one hits compared to twenty one pilots' 4.",
+  "domain": "music",
+  "question_type": "comparison",
+  "pages": [
+   "0617e574_Imagine_Dragons_Biography-_Music_-_News_Billboard.txt",
+   "0617e574_Twenty_One_Pilots_Now_Claim_The_Second-Most_Top_10_Rock_Hits.txt",
+   "0617e574_Coldplay_Ties_Twenty_One_Pilots_for_Second-Most_Top_10s_on_H.txt",
+   "0617e574_Imagine_Dragons_Biography-_Music_-_News_Billboard.txt",
+   "0617e574_The_Decade_in_Rock_Charts_Imagine_Dragons_On_Fire-_High-Flyi.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 129
+ },
+ {
+  "interaction_id": "08a02c19-6f1c-415f-8bf3-bb5eec27ab2c",
+  "query": "what country does elvis presley come from?",
+  "answer": "us",
+  "domain": "music",
+  "question_type": "simple",
+  "pages": [
+   "08a02c19_Elvis_Presley-s_1968_Comeback_Special_Is_Getting_the_Documen.txt",
+   "08a02c19_Elvis_Presley-s_1968_Comeback_Special_Is_Getting_the_Documen.txt",
+   "08a02c19_Elvis_Presley_The_Early_Years_-_2007-01.txt",
+   "08a02c19_Elvis_Presley_The_Early_Years_-_2007-01.txt",
+   "08a02c19_Elvis_Presley_-_Wikipedia.txt"
+  ],
+  "hit": 1,
+  "cover": 1,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 139
+ },
+ {
+  "interaction_id": "0a56850a-08e7-4640-a12a-460533743759",
+  "query": "how many members does the teknoist have?",
+  "answer": "2",
+  "domain": "music",
+  "question_type": "simple",
+  "pages": [
+   "0a56850a_The_Teknoist_Albums_songs-_discography-_biography-_and_liste.txt",
+   "0a56850a_The_Teknoist_biography_Last-fm.txt",
+   "0a56850a_Tekno_Modular_Equipment_Solutions_-_Manufacturing_Success.txt",
+   "0a56850a_Tekno_Modular_Equipment_Solutions_-_Manufacturing_Success.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 114
+ },
+ {
+  "interaction_id": "0afea407-2fbb-4d55-8d79-25efda059719",
+  "query": "who has had more weeks at number one on the uk singles chart, ed sheeran or madonna?",
+  "answer": "ed sheeran has had more weeks at number one on the uk singles chart than madonna, with 61 weeks compared to madonna's 29 weeks at number one.",
+  "domain": "music",
+  "question_type": "comparison",
+  "pages": [
+   "0afea407_Ed_Sheeran_Now_Claims_The_Third-Most_No-_1_Hits_In_U-K-_Hist.txt",
+   "0afea407_ED_SHEERAN_songs_and_albums_full_Official_Chart_history.txt",
+   "0afea407_UK_Singles_Chart_records_and_statistics_-_Wikipedia.txt",
+   "0afea407_Ed_Sheeran_scores_10th_UK_Number_1_single_with_Bad_Habits_Th.txt",
+   "0afea407_Did_Ed_Sheeran_kill_the_UK_Singles_Chart_-_or_was_it_dead_al.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 169
+ },
+ {
+  "interaction_id": "0b0fa6ed-669a-42c7-822f-cc843ceef5a2",
+  "query": "what album did olivia rodrigo release in 2021, which included the songs \"traitor\" and \"deja vu\"?",
+  "answer": "olivia rodrigo released the album \"sour\" in 2021, which included the songs \"traitor\" and \"deja vu\".",
+  "domain": "music",
+  "question_type": "simple_w_condition",
+  "pages": [
+   "0b0fa6ed_Olivia_Rodrigo_-_-traitor_Lyrics_Genius_Lyrics.txt",
+   "0b0fa6ed_Olivia_Rodrigo_earns_the_biggest_debut_of_the_year_with_her_.txt",
+   "0b0fa6ed_Olivia_Rodrigo_earns_the_biggest_debut_of_the_year_with_her_.txt",
+   "0b0fa6ed_Olivia_Rodrigo-s_debut_album_-Sour-_is_pop_savagery_wrapped_.txt",
+   "0b0fa6ed_Olivia_Rodrigo_-_SOUR_Lyrics_and_Tracklist_Genius.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 155
+ },
+ {
+  "interaction_id": "0b27e7ce-16d6-4aab-91ba-7e793c4f5660",
+  "query": "which band had more member changes in their career, the offspring or pink floyd?",
+  "answer": "in total, the offspring had more member changes throughout their career.",
+  "domain": "music",
+  "question_type": "comparison",
+  "pages": [
+   "0b27e7ce_Pink_Floyd_The_Official_Site.txt",
+   "0b27e7ce_History_Of_Pink_Floyd-s_Lineup_Changes.txt",
+   "0b27e7ce_Pink_Floyd_The_Official_Site.txt",
+   "0b27e7ce_See_the_Last_Living_Members_of_Pink_Floyd_Now-_at_76_and_78_.txt",
+   "0b27e7ce_Pink_Floyd_-_Wikipedia.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 136
+ },
+ {
+  "interaction_id": "0bc90619-c2c7-4cf2-958a-1bf05d8dff72",
+  "query": "what album did bruno mars release in 2012, which included the songs \"locked out of heaven\" and \"when i was your man\"?",
+  "answer": "bruno mars released the album \"unorthodox jukebox\" in 2012, which included the songs \"locked out of heaven\" and \"when i was your man\".",
+  "domain": "music",
+  "question_type": "simple_w_condition",
+  "pages": [
+   "0bc90619_Unorthodox_Jukebox_-_Wikipedia.txt",
+   "0bc90619_KISS_New_Music_Bruno_Mars_When_I_Was_Your_Man_-AUDIO.txt",
+   "0bc90619_Locked_Out_of_Heaven_-_Excellent_Music_Wiki.txt",
+   "0bc90619_Bruno_Mars_discography_-_Wikipedia.txt",
+   "0bc90619_Bruno_Mars_-Music-_-_TV_Tropes.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 190
+ },
+ {
+  "interaction_id": "0da96dff-58b2-44ed-8970-c224a5a3b575",
+  "query": "who wrote the lyrics of go crazy?",
+  "answer": "chris brown, jeffery williams, tre samuels, omari akinlolu",
+  "domain": "music",
+  "question_type": "simple",
+  "pages": [
+   "0da96dff_Go_Crazy_-_Wikipedia.txt",
+   "0da96dff_Go_Crazy_-Chris_Brown_and_Young_Thug_song-_-_Wikipedia.txt",
+   "0da96dff_Let-s_Go_Crazy_Prince_and_the_Making_of_Purple_Rain_by_Alan_.txt",
+   "0da96dff_Go_Crazy_-_Wikipedia.txt",
+   "0da96dff_Crazy_-Willie_Nelson_song-_-_Wikipedia.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 0.5,
+  "hit_rank": 2,
+  "latency": 215
+ },
+ {
+  "interaction_id": "0f528b34-ce6a-438c-9a74-56e761f97f21",
+  "query": "which song came out more recently, all alone or one more time?",
+  "answer": "all alone",
+  "domain": "music",
+  "question_type": "comparison",
+  "pages": [
+   "0f528b34_All_Alone_on_Christmas_-_Wikipedia.txt",
+   "0f528b34_Britney_Spears_-Baby_One_More_Time-_A_Groundbreaking_Debut_A.txt",
+   "0f528b34_All_Alone_on_Christmas_-_Wikipedia.txt",
+   "0f528b34_One_Last_Time_Ariana_Grande_Wiki_Fandom.txt",
+   "0f528b34_Alone_Again_Or_-_Wikipedia.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 123
+ },
+ {
+  "interaction_id": "11e475cb-75b4-4840-b944-653f4346b01c",
+  "query": "which artist was younger, alice cooper or nina simone?",
+  "answer": "alice cooper",
+  "domain": "music",
+  "question_type": "comparison",
+  "pages": [
+   "11e475cb_Alice_Cooper_Songs-_Albums-_Reviews-_Bio_-_More_AllMusic.txt",
+   "11e475cb_Alice_Cooper_Songs-_Albums-_Reviews-_Bio_-_More_AllMusic.txt",
+   "11e475cb_Alice_Cooper_Portrait_of_the_Artist_as_a_Burnt-Out_Old_Man_.txt",
+   "11e475cb_Alice_Cooper_-_Wikipedia.txt",
+   "11e475cb_Nita_Strauss_-_Wikipedia.txt"
+  ],
+  "hit": 1,
+  "cover": 1,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 132
+ },
+ {
+  "interaction_id": "12a47336-9e10-4a00-a94b-fade06d41eb8",
+  "query": "who sang the hit song \"thriller\"?",
+  "answer": "michael jackson",
+  "domain": "music",
+  "question_type": "simple",
+  "pages": [
+   "12a47336_Thriller_-song.txt",
+   "12a47336_Behind_the_Song_Lyrics_of_Thriller_by_Michael_Jackson_.txt",
+   "12a47336_-Thriller-_Songwriter_Rod_Temperton_Dies_At_66_NPR.txt",
+   "12a47336_Thriller_by_Michael_Jackson_-_Songfacts.txt",
+   "12a47336_Rod_Temperton-_Who_Wrote_-Thriller-_for_Michael_Jackson_and_.txt"
+  ],
+  "hit": 1,
+  "cover": 1,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 167
+ },
+ {
+  "interaction_id": "00255b3e-abb0-4a1d-9222-866460a52962",
+  "query": "which college did denzel washington attend?",
+  "answer": "fordham university",
+  "domain": "open",
+  "question_type": "simple",
+  "pages": [
+   "00255b3e_Denzel_Washington_Fordham.txt",
+   "00255b3e_Denzel_Washington_-_Wikipedia.txt",
+   "00255b3e_Denzel_Washington_went_to_university_to_become_a_doctor-_He_.txt",
+   "00255b3e_Denzel_Washington_-_Movies-_Age_-_Son.txt",
+   "00255b3e_Denzel_Washington_-_Wikipedia.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 147
+ },
+ {
+  "interaction_id": "0046851e-506f-4925-b769-bda66af48f9e",
+  "query": "can i make cookies in an air fryer?",
+  "answer": "yes",
+  "domain": "open",
+  "question_type": "simple",
+  "pages": [
+   "0046851e_The_BEST_Air_Fryer_Chocolate_Chip_Cookies.txt",
+   "0046851e_Air_Fryer_Chocolate_Chip_Cookies_Gimme_Delicious.txt",
+   "0046851e_Air_Fryer_Chocolate_Chip_Cookies_-_Fed_-_Fit.txt",
+   "0046851e_Can_You_Bake_Cookies_in_an_Air_Fryer_Yes-_Here-s_How.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 21
+ },
+ {
+  "interaction_id": "02c16b07-4593-4cbc-aef9-7ad83307ef64",
+  "query": "who has more subscribers on youtube, mr. beast or pewdiepie?",
+  "answer": "mr. beast",
+  "domain": "open",
+  "question_type": "comparison",
+  "pages": [
+   "02c16b07_MrBeast_overtakes_PewDiePie_as_most-subscribed_YouTuber.txt",
+   "02c16b07_MrBeast_has_unseated_Pewdiepie_as_the_most-followed_creator_.txt",
+   "02c16b07_PewDiePie_VS_MrBeast_Who_Has_the_Most_Subscribers_on_YouTube.txt",
+   "02c16b07_Mr_Beast_now_most-subscribed_YouTuber_ever-_overtaking_PewDi.txt",
+   "02c16b07_Mr_Beast_now_most-subscribed_YouTuber_ever-_overtaking_PewDi.txt"
+  ],
+  "hit": 1,
+  "cover": 1,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 6
+ },
+ {
+  "interaction_id": "05f3814f-5d03-4674-9579-32e3c73bb017",
+  "query": "is asia a bigger continent than europe?",
+  "answer": "yes, asia (17,226,000 sq mi) is bigger than europe (3,900,000 sq mi)",
+  "domain": "open",
+  "question_type": "comparison",
+  "pages": [
+   "05f3814f_Is_Europe_a_Continent_Why_are_Europe_and_Asia_Different_Cont.txt",
+   "05f3814f_Continent_Definition-_Map-_-_Facts_Britannica.txt",
+   "05f3814f_Continent_National_Geographic_Society.txt",
+   "05f3814f_Continent_Definition-_Map-_-_Facts_Britannica.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 4
+ },
+ {
+  "interaction_id": "0872a91f-a4ed-4b5d-8120-426bc69546bb",
+  "query": "which city was hailey bieber born?",
+  "answer": "tucson, az",
+  "domain": "open",
+  "question_type": "simple",
+  "pages": [
+   "0872a91f_Hailey_Bieber_-_Biography-_Height_-_Life_Story_Super_Stars_B.txt",
+   "0872a91f_Hailey_Bieber_-_Wikipedia.txt",
+   "0872a91f_Hailey_Bieber_-_Wikipedia.txt",
+   "0872a91f_Hailey_Bieber-s_Age-_Bio-_Net_Worth-_Career-_Personal_Life_a.txt",
+   "0872a91f_Hailey_Bieber_Justin_Bieber_Wiki_Fandom.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 7
+ },
+ {
+  "interaction_id": "088b8e27-660e-41c1-b8e4-9ce81ae52ad7",
+  "query": "what is a prime number?",
+  "answer": "a prime number is a natural number greater than 1 which has only two factors, 1 & the number itself.",
+  "domain": "open",
+  "question_type": "simple",
+  "pages": [
+   "088b8e27_What_Is_a_Prime_Number_Explained_for_Teachers.txt",
+   "088b8e27_What_Is_a_Prime_Number_Wonderopolis.txt",
+   "088b8e27_Prime_Numbers_-_Definition-_Chart-_Prime_Numbers_1_to_1000-_.txt",
+   "088b8e27_Prime_Number_Calculator.txt",
+   "088b8e27_Prime_Numbers_-_Elementary_Math.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 126
+ },
+ {
+  "interaction_id": "0b22e4a1-6b40-4017-a981-3c6a2c649636",
+  "query": "who has a longer streak of consecutive number one hits, ariana grande or taylor swift?",
+  "answer": "ariana grande has a longer streak of consecutive number one hits than taylor swift, with her first seven singles reaching number one on the billboard hot 100 chart, while taylor swift's streak of consecutive number one hits stopped at four.",
+  "domain": "open",
+  "question_type": "comparison",
+  "pages": [
+   "0b22e4a1_-Anti-Hero-_Is_Taylor_Swift-s_Longest-Running_No-_1_Hit_at_E.txt",
+   "0b22e4a1_Ariana_Grande_Biography-_Music_-_News_Billboard.txt",
+   "0b22e4a1_Taylor_Swift_Sets_Record_for_Longest_No-_1_Song-_Beating_Out.txt",
+   "0b22e4a1_Taylor_Swift_Sets_Record_for_Longest_No-_1_Song-_Beating_Out.txt",
+   "0b22e4a1_Ariana_Grande_shatters_her_20th_Guinness_World_Records_title.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 117
+ },
+ {
+  "interaction_id": "0c7f9987-95ff-49c4-af48-62a9c5114c12",
+  "query": "how many weeks are in a year?",
+  "answer": "52 weeks",
+  "domain": "open",
+  "question_type": "simple",
+  "pages": [
+   "0c7f9987_How_Many_Weeks_In_A_Year_How_to_Calculate_it_Right_-_Eduard_.txt",
+   "0c7f9987_How_Many_Weeks_In_A_Year_How_to_Calculate_it_Right_-_Eduard_.txt",
+   "0c7f9987_How_many_weeks_in_a_year_-_Simple_Online_Calculator.txt",
+   "0c7f9987_How_Many_Weeks_In_A_Year_How_to_Calculate_it_Right_-_Eduard_.txt",
+   "0c7f9987_How_many_weeks_in_a_year_-_Simple_Online_Calculator.txt"
+  ],
+  "hit": 1,
+  "cover": 1,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 6
+ },
+ {
+  "interaction_id": "0d862391-3ab9-4049-a722-50c9d940d171",
+  "query": "what is the name of dolly parton's non-profit organization?",
+  "answer": "dollywood foundation",
+  "domain": "open",
+  "question_type": "simple_w_condition",
+  "pages": [
+   "0d862391_About_Dolly_Parton-s_Imagination_Library.txt",
+   "0d862391_Dollywood_Foundation_-_Wikipedia.txt",
+   "0d862391_Dolly_Parton_Biography_Nashville_Tennesee_Country_Music_Hall.txt",
+   "0d862391_About_Dolly_Parton-s_Imagination_Library.txt",
+   "0d862391_Dolly_Parton_Official_Website.txt"
+  ],
+  "hit": 1,
+  "cover": 1,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 130
+ },
+ {
+  "interaction_id": "0db2e19f-213b-40ab-818d-aaf7bb0c5074",
+  "query": "how many times has meryl streep been nominated for an academy award for best actress?",
+  "answer": "meryl streep has been nominated for an academy award for best actress 17 times, winning twice for her performances in \"sophie's choice\" and \"the iron lady.\"",
+  "domain": "open",
+  "question_type": "simple_w_condition",
+  "pages": [
+   "0db2e19f_How_Many_Oscars_Has_Meryl_Streep_Won_In_Total_TIME.txt",
+   "0db2e19f_Meryl_Streep_Is_The_Only_Person_In_Oscars_History_To_Surpass.txt",
+   "0db2e19f_Meryl_Streep_-_Emmy_Awards-_Nominations_and_Wins_Television_.txt",
+   "0db2e19f_Meryl_Streep_Is_The_Only_Person_In_Oscars_History_To_Surpass.txt",
+   "0db2e19f_Meryl_Streep_Is_The_Only_Person_In_Oscars_History_To_Surpass.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 6
+ },
+ {
+  "interaction_id": "0dd446e0-097b-4e36-b449-e8286c284cd1",
+  "query": "longest known length of a tiger shark in meters.",
+  "answer": "7.5 meters",
+  "domain": "open",
+  "question_type": "simple",
+  "pages": [
+   "0dd446e0_Discover_the_Largest_Tiger_Shark_Ever_Recorded-_-_A-Z_Animal.txt",
+   "0dd446e0_Galeocerdo_cuvier_-_Discover_Fishes.txt",
+   "0dd446e0_Tiger_shark_-_Wikipedia.txt",
+   "0dd446e0_Tiger_shark_-_Wikipedia.txt",
+   "0dd446e0_Tiger_shark_-_Wikipedia.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 5
+ },
+ {
+  "interaction_id": "0e072d6e-d69c-408b-97b8-46e024b7a4b9",
+  "query": "how many minarets does al-muhdhar mosque have?",
+  "answer": "1",
+  "domain": "open",
+  "question_type": "simple",
+  "pages": [
+   "0e072d6e_Al-Azhar_Mosque_-_Wikipedia.txt",
+   "0e072d6e_Introduction_to_mosque_architecture_-article-_Khan_Academy.txt",
+   "0e072d6e_Al-Azhar_Mosque_-_Wikipedia.txt",
+   "0e072d6e_Minaret_-_World_History_Encyclopedia.txt",
+   "0e072d6e_How_Many_Minarets_does_a_Mosque_Have.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 129
+ },
+ {
+  "interaction_id": "002539d4-06b1-4948-a950-0b5650aeec59",
+  "query": "who has won more grand slam titles in tennis, roger federer or rafael nadal?",
+  "answer": "rafael nadal",
+  "domain": "sports",
+  "question_type": "comparison",
+  "pages": [
+   "002539d4_Grand_slam_winners_record_How_Djokovic-_Nadal_and_Federer_co.txt",
+   "002539d4_Who_has_won_most_men-s_Grand_Slam_titles_Most_Wimbledon_titl.txt",
+   "002539d4_Who_has_won_most_men-s_Grand_Slam_titles_Most_Wimbledon_titl.txt",
+   "002539d4_Most_Grand_Slam_Wins_Men_Nadal-_Federer-_Djokovic_-_List_of_.txt",
+   "002539d4_Who_has_won_most_men-s_Grand_Slam_titles_Most_Wimbledon_titl.txt"
+  ],
+  "hit": 1,
+  "cover": 1,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 5
+ },
+ {
+  "interaction_id": "034588e7-cd79-45b3-be7c-3b16009838ce",
+  "query": "who are the highest paid players for fc barcelona?",
+  "answer": "frenkie de jong and robert lewandowski",
+  "domain": "sports",
+  "question_type": "simple_w_condition",
+  "pages": [
+   "034588e7_Best_paid_FC_Barcelona_soccer_players_2023_24_Statista.txt",
+   "034588e7_Ranking_every_Barcelona_player_by_how_much_they_earn_in_2022.txt",
+   "034588e7_FC_Barcelona-s_12_Highest_Paid_Players_-_Soccer_Laduma.txt",
+   "034588e7_Ranking_every_Barcelona_player_by_how_much_they_earn_in_2022.txt",
+   "034588e7_Ranking_every_Barcelona_player_by_how_much_they_earn_in_2023.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 133
+ },
+ {
+  "interaction_id": "05b6bfd4-e39f-456a-a299-30f677ea6441",
+  "query": "in 2022, which basketball team had more overall wins, new york knicks or dallas mavericks?",
+  "answer": "dallas mavericks",
+  "domain": "sports",
+  "question_type": "comparison",
+  "pages": [
+   "05b6bfd4_2023-24_Team_Comparison_-_Dallas_Mavericks_vs-_New_York_Knic.txt",
+   "05b6bfd4_Dallas_Mavericks_on_the_Forbes_NBA_Team_Valuations_List.txt",
+   "05b6bfd4_NBA_Team_Standings_-_Stats_NBA-com.txt",
+   "05b6bfd4_Dallas_Mavericks_vs-_New_York_Knicks_Prediction-_Preview-_an.txt",
+   "05b6bfd4_Three_Years_Later_Did_Dallas_Mavs_or_New_York_Knicks_-Win-_K.txt"
+  ],
+  "hit": 1,
+  "cover": 1,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 147
+ },
+ {
+  "interaction_id": "084af7c7-3f1f-4ce7-8933-46016c69e141",
+  "query": "how many goals did barcelona put the ball in the back of the net last week?",
+  "answer": "3",
+  "domain": "sports",
+  "question_type": "simple_w_condition",
+  "pages": [
+   "084af7c7_Barcelona_Stats-_La_Liga_FBref-com.txt",
+   "084af7c7_Barcelona_Scores-_Stats_and_Highlights_-_ESPN.txt",
+   "084af7c7_Barcelona_-_Football_Statistics_WhoScored-com.txt",
+   "084af7c7_Barcelona_Fixtures_-_Results.txt",
+   "084af7c7_Barcelona_-_Football_Statistics_WhoScored-com.txt"
+  ],
+  "hit": 1,
+  "cover": 1,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 192
+ },
+ {
+  "interaction_id": "08ba2a01-0d55-43ad-89c7-ebf5c3e04602",
+  "query": "what was the date of the last time metz competed in fra-ligue 1?",
+  "answer": "2024-03-10",
+  "domain": "sports",
+  "question_type": "simple_w_condition",
+  "pages": [
+   "08ba2a01_Metz_-_Wikipedia.txt",
+   "08ba2a01_FC_Metz_-_Wikipedia.txt",
+   "08ba2a01_FC_Metz_-_Wikipedia.txt",
+   "08ba2a01_France_-_FC_Metz_-_Results-_fixtures-_squad-_statistics-_pho.txt",
+   "08ba2a01_Ligue_1_History_-_All_Winners_and_Runners_Up.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 139
+ },
+ {
+  "interaction_id": "08d2c81b-f627-4de9-a142-fdd585f45cd6",
+  "query": "how much does a super bowl ad cost?",
+  "answer": "~$7 million for 30 seconds of ad time.",
+  "domain": "sports",
+  "question_type": "simple",
+  "pages": [
+   "08d2c81b_The_Rise_in_the_Cost_of_A_Super_Bowl_Commercial.txt",
+   "08d2c81b_What_to_Know_about_Super_Bowl_2023_Commercials_-_NBC_5_Dalla.txt",
+   "08d2c81b_How_Much_Does_a_Super_Bowl_Ad_Cost_in_2024_-_Parade.txt",
+   "08d2c81b_How_much_does_a_Super_Bowl_commercial_cost_Here-s_the_averag.txt",
+   "08d2c81b_Super_Bowl_commercial_cost_in_2023_How_much_money_is_an_ad_f.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 154
+ },
+ {
+  "interaction_id": "0a36d3a6-588b-4b3b-af1b-a9aa4a2792be",
+  "query": "what was the goal total for rennes in their last match in fra-ligue 1?",
+  "answer": "2",
+  "domain": "sports",
+  "question_type": "simple_w_condition",
+  "pages": [
+   "0a36d3a6_2023-24_French_Ligue_1_Standings_-_ESPN.txt",
+   "0a36d3a6_French_Ligue_1_Stats-_2023-24_Season_-_ESPN.txt",
+   "0a36d3a6_Stade_Rennais_live_score-_schedule_-_player_stats_Sofascore.txt",
+   "0a36d3a6_Stade_Rennais_live_score-_schedule_-_player_stats_Sofascore.txt",
+   "0a36d3a6_Rennes_Stats-_Ligue_1_FBref-com.txt"
+  ],
+  "hit": 1,
+  "cover": 1,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 160
+ },
+ {
+  "interaction_id": "0a3edfc5-b4b4-41ed-ad48-ad9588770419",
+  "query": "what team will celta vigo go head-to-head against in esp-la liga in their next league fixture?",
+  "answer": "sevilla",
+  "domain": "sports",
+  "question_type": "simple_w_condition",
+  "pages": [
+   "0a3edfc5_Celta_Vigo_Fixtures.txt",
+   "0a3edfc5_Squad_for_final_Liga_fixture_against_Celta.txt",
+   "0a3edfc5_Celta_Vigo_Scores-_Stats_and_Highlights_-_ESPN.txt",
+   "0a3edfc5_Celta_Vigo_Scores-_Stats_and_Highlights_-_ESPN.txt",
+   "0a3edfc5_Calendar_and_Upcoming_Matches_of_the_RC_Celta_LALIGA.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 7
+ },
+ {
+  "interaction_id": "0b7dd5c9-f589-4cac-95a5-d86d9ec8a56f",
+  "query": "who won more rings, jordan or lebron?",
+  "answer": "jordan",
+  "domain": "sports",
+  "question_type": "comparison",
+  "pages": [
+   "0b7dd5c9_Michael_Jordan_Versus_LeBron_James_Who_Is_the_GOAT_-_HowThey.txt",
+   "0b7dd5c9_List_of_NBA_players_with_most_championships_-_Wikipedia.txt",
+   "0b7dd5c9_Michael_Jordan_Versus_LeBron_James_Who_Is_the_GOAT_-_HowThey.txt",
+   "0b7dd5c9_LeBron_James_vs-_Michael_Jordan_Comparison.txt",
+   "0b7dd5c9_This_NBA_Player_Won_More_NBA_Titles_Than_Michael_Jordan_and_.txt"
+  ],
+  "hit": 1,
+  "cover": 1,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 112
+ },
+ {
+  "interaction_id": "0c0acf4b-4ab3-4c38-afe9-284cd2e119dd",
+  "query": "which driver won more f1 races last season, sergio perez or carlos sainz jr?",
+  "answer": "sergio perez",
+  "domain": "sports",
+  "question_type": "comparison",
+  "pages": [
+   "0c0acf4b_Sergio_Perez_F1_driver_biography_RaceFans.txt",
+   "0c0acf4b_Sergio_Perez_F1_driver_biography_RaceFans.txt",
+   "0c0acf4b_Sergio_Perez_F1_driver_biography_RaceFans.txt",
+   "0c0acf4b_Sergio_P-rez_-_Wikipedia.txt",
+   "0c0acf4b_Carlos_Sainz_Ferrari_driver_F1_Statistics_and_news_RacingNew.txt"
+  ],
+  "hit": 1,
+  "cover": 1,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 122
+ },
+ {
+  "interaction_id": "0c48df36-669a-4d3d-8cf2-f4bf16b6b700",
+  "query": "who is the youngest player in the san antonio spurs?",
+  "answer": "sidy cissoko is the youngest player of the san antonio spurs.",
+  "domain": "sports",
+  "question_type": "simple_w_condition",
+  "pages": [
+   "0c48df36_San_Antonio_Spurs_Roster_NBA-com.txt",
+   "0c48df36_Antonio_Spurs_players_Ages-_Full_Name-_Position-_-_More_2022.txt",
+   "0c48df36_San_Antonio_Spurs_History_-_Notable_Players_Britannica.txt",
+   "0c48df36_San_Antonio_Spurs_all-time_roster_-_Wikipedia.txt",
+   "0c48df36_2023-24_San_Antonio_Spurs_Roster_and_Players_-_NBA_FOX_Sport.txt"
+  ],
+  "hit": 1,
+  "cover": 0,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 114
+ },
+ {
+  "interaction_id": "0cccde09-5d42-47ca-89ce-278a629792ec",
+  "query": "how many laliga teams remain in the uefa champions league?",
+  "answer": "4",
+  "domain": "sports",
+  "question_type": "simple",
+  "pages": [
+   "0cccde09_How_many_more_teams_qualify_for_the_2024_25_Champions_League.txt",
+   "0cccde09_LaLiga_Santander_clubs_have_now_won_33_UEFA_titles_in_the_21.txt",
+   "0cccde09_Teams_UEFA_Champions_League_2023_24_UEFA-com.txt",
+   "0cccde09_LaLiga_Santander_clubs_have_now_won_33_UEFA_titles_in_the_21.txt",
+   "0cccde09_LaLiga_Santander_clubs_have_now_won_33_UEFA_titles_in_the_21.txt"
+  ],
+  "hit": 1,
+  "cover": 1,
+  "mrr": 1.0,
+  "hit_rank": 1,
+  "latency": 132
+ }
+]

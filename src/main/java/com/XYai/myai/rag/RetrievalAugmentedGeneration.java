@@ -40,6 +40,7 @@ public class RetrievalAugmentedGeneration {
             工具调用结果:<<%s>>
             更早的历史对话摘要:<<%s>>
             历史对话:<<%s>>
+            用户长期记忆(个性化背景,非知识库证据):<<%s>>
             用户提交文档:<<%s>>
             用户消息:<<%s>>
             """;
@@ -61,9 +62,6 @@ public class RetrievalAugmentedGeneration {
 
     @Resource(name = "mcpExecutor")
     private TaskExecutor mcpExecutor;
-
-    @Resource(name = "memeryExecutor")
-    private TaskExecutor memoryExecutor;
 
     // ==================== 步骤1：获取用户上下文 ====================
 
@@ -133,17 +131,49 @@ public class RetrievalAugmentedGeneration {
         }
         String historyText = (memorySession == null) ? "无" : memorySession.getHistoryAsText();
         String summaryText = (memorySession == null) ? "无" : memorySession.getSummary();
-        String retrieveText = retrieved.isEmpty() ? "无"
-                : retrieved.stream()
-                  .map(RetrievedChunk::getContent)
-                  .filter(Objects::nonNull)
-                  .collect(Collectors.joining("\n---\n"));
+
+        // 引用溯源：每个 chunk 带 [n] 编号与来源标识，供模型按 [n] 引用、前端/审计回溯
+        List<String> citations = new java.util.ArrayList<>();
+        String retrieveText;
+        if (retrieved.isEmpty()) {
+            retrieveText = "无";
+        } else {
+            StringBuilder sb = new StringBuilder();
+            int idx = 1;
+            for (RetrievedChunk chunk : retrieved) {
+                if (chunk == null || chunk.getContent() == null) continue;
+                String docId = resolveChunkSource(chunk);
+                citations.add(docId);
+                sb.append("[").append(idx++).append("] 来源:").append(docId).append("\n")
+                  .append(chunk.getContent()).append("\n---\n");
+            }
+            retrieveText = sb.isEmpty() ? "无" : sb.toString();
+        }
         String mcpText = toolResults.isEmpty() ? "无"
                 : toolResults.stream()
                   .filter(ToolProcessorResult::isSuccess)
                   .map(t -> t.getToolName() + ":\n" + t.getResult())
                   .collect(Collectors.joining("\n----------------\n"));
-        return new RAGResult(retrieveText, mcpText, summaryText, historyText, originalMessage);
+        RAGResult result = RAGResult.builder()
+                .retrieveText(retrieveText)
+                .mcpText(mcpText)
+                .summaryText(summaryText)
+                .historyText(historyText)
+                .originalMessage(originalMessage)
+                .citations(citations)
+                .insufficientEvidence(false)
+                .build();
+        return result;
+    }
+
+    /** 解析 chunk 来源标识：优先 id，其次 metadata.doc_id */
+    private String resolveChunkSource(RetrievedChunk chunk) {
+        if (chunk.getId() != null && !chunk.getId().isBlank()) return chunk.getId();
+        if (chunk.getMetadata() != null) {
+            Object v = chunk.getMetadata().get("doc_id");
+            if (v != null) return String.valueOf(v);
+        }
+        return "unknown";
     }
 
     // ==================== 步骤8：格式化最终Prompt ====================
@@ -154,6 +184,8 @@ public class RetrievalAugmentedGeneration {
                 ragResult.getMcpText(),
                 ragResult.getSummaryText(),
                 ragResult.getHistoryText(),
+                ragResult.getLongTermMemoryText() == null || ragResult.getLongTermMemoryText().isBlank()
+                        ? "无" : ragResult.getLongTermMemoryText(),
                 fileContent,
                 ragResult.getOriginalMessage());
         return systemMessage + "\n\n" + userMessage;

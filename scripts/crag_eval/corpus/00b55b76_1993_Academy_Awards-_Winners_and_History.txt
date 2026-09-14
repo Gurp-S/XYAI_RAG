@@ -1,0 +1,970 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"> 
+<head>
+<title>1993 Academy Awards&reg; Winners and History</title>
+<link rel="canonical" href="https://www.filmsite.org/aa93.html" /><base href="/">
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+<!--<link rel="stylesheet" type="text/css" href="/css/style.css" />//-->
+<link rel="preload" href="/css/style.css" as="style" />
+<link rel="stylesheet" type="text/css" href="/css/style.css?v1.1.2" />
+<link rel="stylesheet" type="text/css" href="/css/mobile.css?v1.1.2" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0" />
+<meta property="fb:app_id" content="157306244349105" />
+<!-- InMobi Choice. Consent Manager Tag v3.0 (for TCF 2.2) -->
+<script type="text/javascript" async=true>
+  (function() {
+    var host = window.location.hostname;
+    var element = document.createElement('script');
+    var firstScript = document.getElementsByTagName('script')[0];
+    var url = 'https://cmp.inmobi.com'
+      .concat('/choice/', '3Y-Uz5Ndy6q41', '/', host, '/choice.js?tag_version=V3');
+    var uspTries = 0;
+    var uspTriesLimit = 3;
+    element.async = true;
+    element.type = 'text/javascript';
+    element.src = url;
+
+    firstScript.parentNode.insertBefore(element, firstScript);
+
+    function makeStub() {
+      var TCF_LOCATOR_NAME = '__tcfapiLocator';
+      var queue = [];
+      var win = window;
+      var cmpFrame;
+
+      function addFrame() {
+        var doc = win.document;
+        var otherCMP = !!(win.frames[TCF_LOCATOR_NAME]);
+
+        if (!otherCMP) {
+          if (doc.body) {
+            var iframe = doc.createElement('iframe');
+
+            iframe.style.cssText = 'display:none';
+            iframe.name = TCF_LOCATOR_NAME;
+            doc.body.appendChild(iframe);
+          } else {
+            setTimeout(addFrame, 5);
+          }
+        }
+        return !otherCMP;
+      }
+
+      function tcfAPIHandler() {
+        var gdprApplies;
+        var args = arguments;
+
+        if (!args.length) {
+          return queue;
+        } else if (args[0] === 'setGdprApplies') {
+          if (
+            args.length > 3 &&
+            args[2] === 2 &&
+            typeof args[3] === 'boolean'
+          ) {
+            gdprApplies = args[3];
+            if (typeof args[2] === 'function') {
+              args[2]('set', true);
+            }
+          }
+        } else if (args[0] === 'ping') {
+          var retr = {
+            gdprApplies: gdprApplies,
+            cmpLoaded: false,
+            cmpStatus: 'stub'
+          };
+
+          if (typeof args[2] === 'function') {
+            args[2](retr);
+          }
+        } else {
+          if (args[0] === 'init' && typeof args[3] === 'object') {
+            args[3] = Object.assign(args[3], {
+              tag_version: 'V3'
+            });
+          }
+          queue.push(args);
+        }
+      }
+
+      function postMessageEventHandler(event) {
+        var msgIsString = typeof event.data === 'string';
+        var json = {};
+
+        try {
+          if (msgIsString) {
+            json = JSON.parse(event.data);
+          } else {
+            json = event.data;
+          }
+        } catch (ignore) {}
+
+        var payload = json.__tcfapiCall;
+
+        if (payload) {
+          window.__tcfapi(
+            payload.command,
+            payload.version,
+            function(retValue, success) {
+              var returnMsg = {
+                __tcfapiReturn: {
+                  returnValue: retValue,
+                  success: success,
+                  callId: payload.callId
+                }
+              };
+              if (msgIsString) {
+                returnMsg = JSON.stringify(returnMsg);
+              }
+              if (event && event.source && event.source.postMessage) {
+                event.source.postMessage(returnMsg, '*');
+              }
+            },
+            payload.parameter
+          );
+        }
+      }
+
+      while (win) {
+        try {
+          if (win.frames[TCF_LOCATOR_NAME]) {
+            cmpFrame = win;
+            break;
+          }
+        } catch (ignore) {}
+
+        if (win === window.top) {
+          break;
+        }
+        win = win.parent;
+      }
+      if (!cmpFrame) {
+        addFrame();
+        win.__tcfapi = tcfAPIHandler;
+        win.addEventListener('message', postMessageEventHandler, false);
+      }
+    };
+
+    makeStub();
+
+    var uspStubFunction = function() {
+      var arg = arguments;
+      if (typeof window.__uspapi !== uspStubFunction) {
+        setTimeout(function() {
+          if (typeof window.__uspapi !== 'undefined') {
+            window.__uspapi.apply(window.__uspapi, arg);
+          }
+        }, 500);
+      }
+    };
+
+    var checkIfUspIsReady = function() {
+      uspTries++;
+      if (window.__uspapi === uspStubFunction && uspTries < uspTriesLimit) {
+        console.warn('USP is not accessible');
+      } else {
+        clearInterval(uspInterval);
+      }
+    };
+
+    if (typeof window.__uspapi === 'undefined') {
+      window.__uspapi = uspStubFunction;
+      var uspInterval = setInterval(checkIfUspIsReady, 6000);
+    }
+  })();
+</script>
+<!-- End InMobi Choice. Consent Manager Tag v3.0 (for TCF 2.2) --><!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-239165-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+  gtag("js", new Date());
+
+  gtag("config", "UA-239165-1");
+</script>
+
+  <!--  start Newor Media // -->
+  <script type="text/javascript" src="//cdn.thisiswaldo.com/static/js/17358.js"></script>
+  <!--  end Newor Media // -->
+</head>
+<body>
+<br />   
+
+<!-- Start includes/header-nav -->
+<div class="site-header mb">
+  <div class="site-header__top clear">
+    <div class="site-header__left">
+      <a class="site-header__logo" href="/">
+        <img src="/images/filmsite-header-bold-A.jpg" alt="Filmsite.org Logo" width="1097" height="95" />
+        <span class="screen-reader-text"> Filmsite: written by Tim Dirks </span>
+      </a>
+    </div>
+    <div class="site-header__right">
+      <div class="site-header__search">
+        <form action="/search-results.html" id="cse-search-box" class="form form--site-search">
+          <div class="form__fields">
+            <div class="form__field">
+              <label for="siteSearchInput" class="screen-reader-text">Search for:
+              </label>
+              <input type="text" placeholder="Search Here - Click GO" id="siteSearchInput" name="q" />
+            </div>
+          </div>
+          <button type="submit">Go</button>
+        </form>
+      </div>
+      <div class="site-header__social">
+        <ul>
+          <li>
+            <a class="site-header__social-link site-header__social-link--facebook" href="https://www.facebook.com/filmsite.org/" target="_blank">
+              Facebook
+            </a>
+          </li>
+          <li>
+            <a class="site-header__social-link site-header__social-link--twitter" href="http://twitter.com/_Filmsite" target="_blank">
+              Twitter
+            </a>
+          </li>
+          <li>
+            <a class="site-header__social-link site-header__social-link--email" href="mailto:filmsite@gmail.com" target="_blank">
+              Email
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <nav role="navigation" id="top_nav">
+  <div id="menuToggle">
+    <input type="checkbox" />
+    <span></span>
+    <span></span>
+    <span></span> 
+    <div class="navigation navigation--primary" id="menu">
+    <ul class="navigation__menu">
+        <li class="menu-item"><a href="/greatlists.html">GREATEST FILMS</a>
+            <ul class="navigation__submenu">
+                <li class="menu-item"><a href="/greatlists.html">Greatest Films: Overview</a></li>
+                <li class="menu-item"><a href="/momentsindx.html">100 Greatest Films</a></li>
+                <li class="menu-item"><a href="/momentsindx200.html">101-200 Greatest Films</a></li>
+                <li class="menu-item"><a href="/momentsindx300.html">201-300 Greatest Films</a></li>
+                <li class="menu-item"><a href="/200films.html">200 Greatest Films - By Decade</a></li>
+                <li class="menu-item"><a href="/300films.html">300 Greatest Films - By Decade</a></li>
+                <li class="menu-item"><a href="/greatestfilms-byyear.html">Greatest Films - By Year</a></li>
+                <li class="menu-item"><a href="/boxoffice.html">Top 100 Box Office of All-Time</a></li>
+                <li class="menu-item"><a href="/greatfilmssummary.html">Top Films of All-Time</a></li>
+                <li class="menu-item"><a href="/series-introduction.html">Greatest Film Series-Franchises</a></li>
+                <li class="menu-item"><a href="/criteria.html">Greatest Films - Criteria</a></li>
+                <li class="menu-item"><a href="/mostinfluentialfilms.html">Most Influential Films</a></li>
+                <li class="menu-item"><a href="/afiseries.html">Greatest American Movies - AFI</a></li>
+                <li class="menu-item"><a href="/greatlists2.html">Other Lists of Great Films</a></li>
+            </ul>
+        </li>
+		        <li class="menu-item"><a href="/filmreviews-overview.html">REVIEWS</a>
+            <ul class="navigation__submenu">
+			<li class="menu-item"><a href="/filmreviews-overview.html">Film Reviews: Overview</a></li>
+                <li class="menu-item"><a href="/allfilms.html">All Film Reviews</a></li>
+                <li class="menu-item"><a href="/allfilms2.html">Greatest Film
+                    Reviews - By Decade </a></li>
+                <li class="menu-item"><a href="/allfilms3.html">Film Reviews - Most Popular</a></li>
+				<li class="menu-item"><a href="/scenes-alltitles1.html">Film Reviews - Moments & Scenes</a></li>
+				<li class="menu-item"><a href="/filmterms.html">Film Terms - Glossary</a></li>
+                <li class="menu-item"><a href="/filmview.html">Film Viewing - Tips</a></li>
+				<li class="menu-item"><a href="/movie-trivia.html">Movie Trivia Quizzes</a></li>
+				<li class="menu-item"><a href="/references.html">Film References</a></li>
+            </ul>
+        </li>
+		
+        <li class="menu-item"><a href="/best-overview.html">THE BEST</a>
+            <ul class="navigation__submenu">
+                <li class="menu-item"><a href="/bestscenes.html">"Greatest" and "Best" Collections</a></li>
+                <li class="menu-item has-sub"><a href="javascript:void(0);">Best
+                    Genre-Type Films</a>
+                    <ul class="navigation__submenu">
+                        <li class="menu-item"><a href="/bondfilms-ranked.html">Bond
+                        Films - Best to Worst</a></li>
+                        <li class="menu-item"><a href="/chickflicks.html">'Chick
+                        Flicks'</a></li>
+                        <li class="menu-item"><a href="/guy-movies.html">Guy Movies</a></li>
+						<li class="menu-item"><a href="/horrorfilmfranchises.html">Three Great Horror Franchises</a></li>
+                        <li class="menu-item"><a href="/sexiestfilms.html">Sexiest
+                        Films of All-Time</a></li>
+                        <li class="menu-item"><a href="/greatwarfilms.html">Greatest
+                            War Films</a></li>
+                        <li class="menu-item"><a href="/greatwesterns.html">Greatest
+                        Westerns</a></li>
+                        <li class="menu-item"><a href="/zombiefilms.html">Greatest Zombie Films</a></li>
+                    </ul>
+                </li>
+				<li class="menu-item"><a href="/series-boxoffice.html">Top Film Franchises-Series</a></li>
+				<li class="menu-item"><a href="/movietitlescreens.html">Movie Title Screens</a></li>
+				<li class="menu-item"><a href="/greattwists.html">Plot Twists, Spoilers, Surprise Endings</a></li>
+                <li class="menu-item"><a href="/scaryfilmimages.html">100 + Scariest Movie Images of All-Time</a> </li>
+                <li class="menu-item"><a href="/bestspeeches.html">Best Film Speeches &amp; Monologues</a></li>
+                <li class="menu-item"><a href="/series-jamesbond0.html">James Bond Films</a></li>
+                <li class="menu-item"><a href="/bondgirls.html">Great Bond Girls</a></li>
+                <li class="menu-item"><a href="/femmesfatales.html">Film Noir - Greatest Femmes Fatales</a></li>
+				<li class="menu-item"><a href="/bestfilmnoirs.html">100 Greatest Film Noirs of All-Time</a></li>        
+                <li class="menu-item"><a href="/50states-films.html">50 States: Most Authentic Films</a></li>
+                <li class="menu-item"><a href="/movieprops.html">Greatest Movie Props of All-Time</a></li>
+                <li class="menu-item"><a href="/robotsinfilm.html">Robots in Film</a></li>
+            </ul>
+        </li>
+		
+ 
+		        <li class="menu-item"><a href="/filmhistory-overview.html">HISTORY</a>
+            <ul class="navigation__submenu">
+			<li class="menu-item"><a href="/filmhistory-overview.html">Film History: Overview</a></li>
+                <li class="menu-item"><a href="/filmh.html">Film History - By Decade</a></li>
+                <li class="menu-item"><a href="/milestones.html">Film History Milestones - By Year </a></li>
+                <li class="menu-item"><a href="/greatestfilms-byyear.html">Great Films - By Year</a></li>
+                <li class="menu-item has-sub"><a href="javascript:void(0);">Box Office Greats</a>
+                    <ul class="navigation__submenu">
+                        <li class="menu-item"><a href="/boxoffice.html">Top 100 Blockbusters</a></li>
+                        <li class="menu-item"><a href="/boxoffice3.html">Top 100 Films of All-Time</a></li>
+                        <li class="menu-item"><a href="/boxoffice2.html">Top Box-Office Hits - By Decade/Year</a></li>
+                        <li class="menu-item"><a href="/summerblockbusters.html">Top Summer Blockbusters of All-Time</a></li>
+                    </ul>
+                </li>
+				<li class="menu-item"><a href="/sexinfilms-index.html">Sex in Cinema - Comprehensive History</a></li>
+				<li class="menu-item"><a href="/controversialfilms.html">Most Controversial Films</a></li>
+				<li class="menu-item"><a href="/visualeffects.html">Visual &amp; Special Effects Milestones</a></li>
+				<li class="menu-item"><a href="/series-titles-intro.html">Movie Title Screens: Film Franchises</a></li>
+				<li class="menu-item"><a href="/greatestflops.html">Biggest Box Office Bombs
+				    &amp; Flops</a></li>
+				<li class="menu-item"><a href="/movieprops.html">Greatest Movie Props in Film History</a></li> 
+                <li class="menu-item"><a href="/christmasmovies.html">Great Christmas Movies</a></li>        
+            </ul>
+      </li>
+
+        <li class="menu-item"><a href="/filmgenres.html">GENRES</a>
+            <ul class="navigation__submenu">
+                <li class="menu-item has-sub"><a href="/genres.html">Main Film Genres</a>
+                    <ul class="navigation__submenu">
+                        <li class="menu-item"><a href="/actionfilms.html">Action</a></li>
+                        <li class="menu-item"><a href="/adventurefilms.html">Adventure</a></li>
+                        <li class="menu-item"><a href="/comedyfilms.html">Comedy</a></li>
+                        <li class="menu-item"><a href="/crimefilms.html">Crime-Gangster</a></li>
+                        <li class="menu-item"><a href="/dramafilms.html">Drama</a></li>
+                        <li class="menu-item"><a href="/epicsfilms.html">Epics-Historical</a></li>
+                        <li class="menu-item"><a href="/horrorfilms.html">Horror</a></li>
+                        <li class="menu-item"><a href="/musicalfilms.html">Musicals-Dance</a></li>
+                        <li class="menu-item"><a href="/sci-fifilms.html">Science Fiction</a></li>
+                        <li class="menu-item"><a href="/warfilms.html">War</a></li>
+                        <li class="menu-item"><a href="/westernfilms.html">Westerns</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item has-sub"><a href="/subgenres.html">Film Sub-Genres</a>
+                    <ul class="navigation__submenu">
+                        <li class="menu-item"><a href="/biopics.html">Biopics</a></li>
+                        <li class="menu-item"><a href="/chickflicks.html">Chick Flicks</a></li>
+                        <li class="menu-item"><a href="/greatcourtroomdramas.html">Courtroom Dramas</a></li>
+                        <li class="menu-item"><a href="/mysteryfilms.html">Detective-Mystery</a></li>
+                        <li class="menu-item"><a href="/disasterfilms.html">Disaster</a></li>
+                        <li class="menu-item"><a href="/fantasyfilms.html">Fantasy</a></li>
+                        <li class="menu-item"><a href="/filmnoir.html">Film Noir</a></li>
+                        <li class="menu-item"><a href="/guy-movies.html">Guy Films</a></li>
+                        <li class="menu-item"><a href="/melodramafilms.html">Melodramas</a></li>
+                        <li class="menu-item"><a href="/roadfilms.html">Road Films</a></li>
+                        <li class="menu-item"><a href="/romancefilms.html">Romance</a></li>
+                        <li class="menu-item"><a href="/sportsfilms.html">Sports</a></li>
+                        <li class="menu-item"><a href="/superheroesonfilm.html">Super-Heroes</a></li>
+                        <li class="menu-item"><a href="/supernatfilms.html">Supernatural</a></li>
+                        <li class="menu-item"><a href="/thrillerfilms.html">Thrillers-Suspense</a></li>
+                        <li class="menu-item"><a href="/zombiefilms.html">Zombies</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item has-sub"><a href="/genres2.html">Other Major Film Categories</a>
+                    <ul class="navigation__submenu">
+                        <li class="menu-item"><a href="/animatedfilms.html">Animated</a></li>
+                        <li class="menu-item"><a href="/ukfilms.html">British-UK</a></li>
+                        <li class="menu-item"><a href="/childrensfilms.html">Children/Family</a></li>
+                        <li class="menu-item"><a href="/classicsfilms.html">Classic</a></li>
+                        <li class="menu-item"><a href="/cultfilms.html">Cult</a></li>
+                        <li class="menu-item"><a href="/docfilms.html">Documentary</a></li>
+                        <li class="menu-item"><a href="/serialfilms.html">Serial</a></li>
+                        <li class="menu-item"><a href="/sexualfilms.html">Sexual-Erotic</a></li>
+                        <li class="menu-item"><a href="/silentfilms.html">Silent</a></li>
+                    </ul>
+                </li>
+				<li class="menu-item"><a href="/subgenres2.html">Sub-Genres Types (and Hybrids)</a></li>
+                <li class="menu-item"><a href="/bestpics2.html">Best Picture Genre Biases</a></li>
+				<li class="menu-item"><a href="/greatfilmssummary2.html#start">Summary of Top Films by Genre</a></li>
+                <li class="menu-item"><a href="/top100filmsbygenre.html">Top 100 Films By Genre Type</a></li>
+				<li class="menu-item"><a href="/bestfilmnoirs.html">100 Greatest Film Noirs of All-Time</a></li>
+				<li class="menu-item"><a href="/afi10topten.html">AFI's Top 10 Film Genres</a></li>
+                <li class="menu-item"><a href="/highestgrossingbygenre.html">All-Time Highest-Grossing by Genre</a></li>
+            </ul>
+        </li>
+        <li class="menu-item"><a href="/scenes-overview.html">SCENES</a>
+            <ul class="navigation__submenu">
+                <li class="menu-item"><a href="/scenes-overview.html">Scenes: Overview</a></li>
+                <li class="menu-item"><a href="/scenes.html">Scenes: Compilations</a></li>
+                <li class="menu-item has-sub"><a href="javascript:void(0);">Greatest Scenes: Collections</a>
+                    <ul class="navigation__submenu">
+                        <li class="menu-item"><a href="/filmchases.html">Greatest Chases</a></li>
+                        <li class="menu-item"><a href="/filmcrowds.html">Greatest Crowds</a></li>
+                        <li class="menu-item"><a href="/bestdeaths.html">Greatest Deaths</a></li>
+                        <li class="menu-item"><a href="/filmdisasters.html">Greatest Disasters</a></li>
+                        <li class="menu-item"><a href="/entrances.html">Greatest Entrances</a></li>
+                        <li class="menu-item"><a href="/funniestscenes.html">Funniest Scenes</a></li>
+                        <li class="menu-item"><a href="/scariestscenes.html">Scariest Scenes</a></li>
+                        <li class="menu-item"><a href="/sexinfilms0.html">Sexual - Erotic Scenes</a></li>
+                        <li class="menu-item"><a href="/filmkisses.html">Film Kisses
+                        of All-Time</a></li>
+                        <li class="menu-item"><a href="/greatmusicalsongs.html">Greatest
+                            Music: Song &amp; Dance</a></li>
+                        <li class="menu-item"><a href="/tearjerkers.html">Greatest Tearjerkers</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item"><a href="/scenesintro.html">What's a Great
+                    Film Scene?</a></li>
+                <li class="menu-item"><a href="/scenesquiz.html">Scenes Mini-Quiz</a></li>
+                <li class="menu-item"><a href="/scenes-alltitles1.html">100s of the Greatest
+                Film Scenes </a></li>
+                <li class="menu-item"><a href="/scenes100.html">100 Greatest
+                    Film Scenes</a></li>
+                    <li class="menu-item"><a href="/iconicfilmscenes.html">100 Most Iconic
+                        Film Scenes</a></li>
+				<li class="menu-item"><a href="/100greatscenes.html">100 Great Movie Moments (Ebert)</a></li>
+                <li class="menu-item"><a href="/tvguidemoments1.html">50 Greatest Moments (TV Guide)</a></li>
+				<li class="menu-item"><a href="/sexinfilms-index.html">Sex in
+                Cinema - Scenes</a></li>
+            </ul>
+      </li>
+	  
+       <li class="menu-item"><a href="/oscars.html">OSCARS</a>
+            <ul class="navigation__submenu">
+                <li class="menu-item"><a href="/oscars-overview.html">Academy
+                    Awards: Overview</a></li>
+                <li class="menu-item"><a href="/oscars30.html">Academy Awards:
+                    By Decade and Year</a></li>
+                <li class="menu-item"><a href="/oscars2.html">Top Award Winners:
+                    Summary </a></li>
+                <li class="menu-item"><a href="/bestpics.html">Best Picture</a></li>
+                <li class="menu-item"><a href="/titles-bestpics.html">Best Picture: Movie Title Screens</a> </li>
+                <li class="menu-item"><a href="/bestpicsmilestones.html">Best Picture - Milestones</a></li>
+                <li class="menu-item"><a href="/bestpics2.html">Best Picture - Genre Biases</a></li>
+                <li class="menu-item"><a href="/bestdirs.html">Best Director</a></li>
+                <li class="menu-item"><a href="/bestactor.html">Best Actor</a></li>
+                <li class="menu-item"><a href="/bestactress.html">Best Actress</a></li>
+                <li class="menu-item"><a href="/bestsuppactor.html">Best Supporting Actor</a></li>
+                <li class="menu-item"><a href="/bestsuppactress.html">Best Supporting Actress</a></li>
+                <li class="menu-item"><a href="/bestscreenplays.html">Best Screenplay/Writer</a></li>
+                <li class="menu-item"><a href="/noawards.html">Mistakes and Omissions</a></li>
+                <li class="menu-item"><a href="/noawards2.html">Snubbed by Oscar</a></li>
+                <li class="menu-item"><a href="/worstoscars.html">Worst Oscar Awards</a></li>
+            </ul>
+      </li>
+		
+		
+		        <li class="menu-item"><a href="/greatfilmquotes.html">QUOTES</a>
+            <ul class="navigation__submenu">
+			<li class="menu-item"><a href="/greatfilmquotes.html">Great Quotes: Overview</a></li>
+                <li class="menu-item"><a href="/top100filmquotes.html">Top 100 Greatest Film Quotes</a></li>
+                <li class="menu-item"><a href="/quotes.html">Great Film Quotes:
+                    By Decade</a></li>
+                <li class="menu-item"><a href="/greatquotes.html">50 Great Movie Quotes</a></li>
+                <li class="menu-item"><a href="/greatquotes2.html">Most Popular Movie Quotes</a></li>
+                <li class="menu-item"><a href="/topquotes.html">Top 10 Most Famous Quotes</a></li>
+                <li class="menu-item"><a href="/topquotes2.html">Top 10 Best Lines Ever</a></li>
+                <li class="menu-item"><a href="/topquotes3.html">Top 10 Comedy Movie Lines</A> </li>
+                <li class="menu-item"><a href="/worstquotes.html">Top 10 Worst Quotes</a></li>
+                <li class="menu-item"><a href="/bestspeeches.html">Quotes: Speeches &amp; Monologues</a></li>
+                <li class="menu-item"><a href="/moments0.html">Greatest Film
+                Misquotes</a></li>
+                <li class="menu-item"><a href="/greatfirstlines.html">Great Opening
+                    Film Lines</a></li>
+                <li class="menu-item"><a href="/greatlastlines.html">Great Last
+                    Film Lines</a></li>
+                <li class="menu-item"><a href="/funniestquotes.html">Funniest
+                Movie Quotes</a></li>
+                <li class="menu-item"><a href="/briefquotes.html">Greatest Brief Film Quotes</a></li>
+                <li class="menu-item"><a href="/taglines.html">Film Taglines</a></li>
+            </ul>
+        </li>
+		
+		
+        <li class="menu-item"><a href="/filmstarsanddirectors.html">DIRECTORS &amp; STARS</a>
+            <ul class="navigation__submenu">
+			<li class="menu-item"><a href="/filmstarsanddirectors.html">Directors/Stars: Overview</a></li>
+                <li class="menu-item"><a href="/100greatfilmstars.html">50 Greatest Actors/Actresses </a></li>
+                <li class="menu-item"><a href="/grroles.html">Greatest Stars: Roles &amp; Films</a></li>
+                <li class="menu-item"><a href="/greatfilmcharacters.html">Greatest Film Characters of All-Time</a></li>
+                <li class="menu-item"><a href="/afilegends.html">Greatest Film
+                Star Legends</a></li>
+                <li class="menu-item"><a href="/bombshells.html">Sexy Hollywood Bombshells</a></li>
+                <li class="menu-item"><a href="/directors.html">Greatest Film Directors</a></li>
+                <li class="menu-item"><a href="/moredirectors.html">More Great Directors</a></li>
+                <li class="menu-item"><a href="/directorcameos.html">Film Director Cameos</a></li>
+                <li class="menu-item"><a href="/hitchcockcameos.html">Hitchcock's Film Cameos</a></li>
+				<li class="menu-item"><a href="/hitchcockmacguffins.html">Hitchcock's MacGuffins</a></li>
+            </ul>
+        </li>
+    </ul>
+    </div>
+  </div>
+</nav></div>
+<!-- End includes/header-nav -->
+  <!-- start Newor Media //-->
+  <!-- 728x90/970x90/970x250/300x250/320x50 -->
+  <div id="waldo-tag-17385"></div>
+  <!-- end Newor Media //-->
+
+<div id="mainBodyWrapper"></div><br />  
+
+  <center>
+    <table width="80%" border="0" align="center" cellpadding="6" cellspacing="0" bordercolor="#CCCCCC">
+      <tr>
+        <td><center>
+            <img src="images/oscarstitle.gif" width="296" height="49" border="0" /><br />
+            <br />
+            <img src="images/oscars-1990s.jpg" alt="" width="240" height="240" /> <br />
+            <br />
+            <font size="5"><strong>1993 Academy Awards&reg;<br />
+            Winners and History</strong></font>
+        </center></td>
+      </tr>
+      <tr>
+        <td><center>
+            <font size="1"><b>Note: </b>Oscar&reg; and Academy Awards&reg; 
+              and Oscar&reg; design mark are the trademarks and service marks and the Oscar&copy; 
+              statuette the copyrighted property, of the Academy of Motion Picture Arts 
+              and Sciences. This site is neither endorsed by nor affiliated with the Academy 
+              of Motion Picture Arts and Sciences.</font>
+        </center></td>
+      </tr>
+      <tr>
+        <td><center>
+            <font size="2"><b>Academy Awards History (By Decade): <br />
+            </b><a href="oscars.html">Introduction</a>, <a href="oscars30.html">1927/8-39</a>, <a href="oscars40.html">1940s</a>, <a href="oscars50.html">1950s</a>, <a href="oscars60.html">1960s</a>, <a href="oscars70.html">1970s</a>, <a href="oscars80.html">1980s</a>, <a href="oscars90.html">1990s</a>, <a href="oscars00.html">2000s</a>, <a href="oscars2010.html">2010s</a>, <a href="oscars2020.html">2020s</a><br />
+            <a href="oscars2.html">Academy Awards Summaries</a></font>
+        </center></td>
+      </tr>
+      <tr>
+        <td><center>
+            <strong><font size="2">Winners Charts:</font></strong><br />
+            <font size="2"><a href="bestpics3.html">&quot;Best
+              Picture&quot; Oscar&reg;</a>, <a href="bestdirs2.html">&quot;Best
+                Director&quot;  Oscar&reg;</a>, <a href="bestactor2.html">&quot;Best
+                  Actor&quot; Oscar&reg;</a>, <a href="bestactor2.html">&quot;Best
+                    Supporting Actor&quot; Oscar&reg;</a>,<br />
+                              <a href="bestactress2.html">&quot;Best
+                                Actress&quot; Oscar&reg;</a>, <a href="bestactress2.html">&quot;Best
+                                  Supporting Actress&quot; Oscar&reg;</a>, <a href="bestscreenplays4.html">&quot;Best
+                                    Screenplay/Writer&quot; 
+                                    Oscar&reg;</a></font>
+        </center></td>
+      </tr>
+    </table>
+  </center>
+  
+  <center>
+    <p> <img width="419" height="18"  src="starsbar.gif" /> </p>
+  </center>
+  
+  <hr align="center" width="80%" size="1" />
+
+<center>
+      <table width="80%" border="0" align="center" cellpadding="1" cellspacing="0">
+        <tr>
+          <td><center>
+            <p><strong><font size="5">1993</font></strong> <br />
+                <font size="2">The winner is listed first, in CAPITAL letters.</font></p>
+            <p><font size="2"><i><a href="1993.html">Filmsite's Greatest Films
+            of 1993</a></i></font> </p>
+          </center>
+          
+              <table width="90%" border="1" align="center" cellpadding="1" cellspacing="0" bordercolor="#CCCCCC">
+                <tr>
+                  <td colspan="5"><center>
+                      <b><font size="2">Best Picture </font></b>
+                  </center></td>
+                </tr>
+                <tr>
+                  <td width="20%"><center>
+                      <img src="titles/schindlerslist-title.jpg" width="160" height="119" /><br />
+                      <font size="2"><a href="schi.html"> SCHINDLER'S LIST (1993) </a></font>
+                  </center></td>
+                  <td width="20%"><center>
+                      <img src="titles/fugitive.jpg" alt="" width="160" height="122" /><br />
+                      <font size="2">The Fugitive (1993) </font>
+                  </center></td>
+                  <td width="20%"><center>
+                      <img src="titles/innameoffather.jpg" alt="" width="160" height="126" /><br />
+                      <font size="2">In the Name of the Father (1993, UK/Ireland) </font>
+                  </center></td>
+                  <td width="20%"><center>
+                      <img src="titles/piano1993.jpg" alt="" width="160" height="120" /><br />
+                      <font size="2">The Piano (1993, NZ/Australia/Fr.) </font>
+                  </center></td>
+                  <td width="20%"><center>
+                      <img src="titles/remainsofday.jpg" alt="" width="160" height="127" /><br />
+                      <font size="2">The Remains of the Day (1993, UK) </font>
+                  </center></td>
+                </tr>
+              </table>
+      <p><font size="2"><b>Actor:</b><br />
+                TOM HANKS in &quot;Philadelphia&quot;, Daniel Day-Lewis in &quot;In
+                the Name of the Father&quot;, Laurence Fishburne in &quot;What's
+                Love Got to Do With It&quot;, Anthony Hopkins in &quot;The Remains
+                of the Day&quot;, Liam Neeson in <a href="schi.html">&quot;Schindler's
+                  List&quot;</a><br />
+              <b>Actress:</b><br />
+                HOLLY HUNTER in &quot;The Piano&quot;, Angela Bassett in &quot;What's
+                Love Got to Do With It&quot;, Stockard Channing in &quot;Six
+                Degrees of Separation&quot;, Emma Thompson in &quot;The Remains
+                of the Day&quot;, Debra Winger in &quot;Shadowlands&quot;<br />
+      <b>Supporting Actor:</b><br />
+                TOMMY LEE JONES in &quot;The Fugitive&quot;, Leonardo DiCaprio
+                in &quot;What's Eating Gilbert Grape&quot;, Ralph Fiennes in <a href="schi.html">&quot;Schindler's
+                  List&quot;</a>, John Malkovich in &quot;In the Line of Fire&quot;,
+                Pete Postlethwaite in &quot;In the Name of the Father&quot;<br />
+              <b>Supporting Actress:</b><br />
+                ANNA PAQUIN in &quot;The Piano&quot;, Holly Hunter in &quot;The
+                Firm&quot;, Rosie Perez in &quot;Fearless&quot;, Winona Ryder
+                in &quot;The Age of Innocence&quot;, Emma Thompson in &quot;In
+                the Name of the Father&quot;<br />
+      <b>Director:</b> <br />
+                STEVEN SPIELBERG for <a href="schi.html">&quot;Schindler's
+                  List&quot;</a>, Robert Altman for &quot;Short Cuts&quot;, Jane
+                Campion for &quot;The Piano&quot;, James Ivory for &quot;The
+                Remains of the Day&quot;, Jim Sheridan for 
+                &quot;In the Name of the Father&quot;</font></p>
+              
+                <hr width="90%" />
+                
+                <p><font size="2"><img src="posters/schindlerslist.jpg" width="375" height="555" align="right" />Finally,
+                  after many years of dubious treatment and neglect, producer/director
+                  Steven Spielberg (with his <i>sixth</i> directorial and <i>seventh</i> Best
+                  Picture nomination) won the Best Picture Oscar (and Best Director
+                  Oscar) for his monumental, mature masterpiece <a href="schi.html"><b>Schindler's
+                    List</b></a>. [Note: The film - although mostly black and
+                    white - contained a few segments in color, thereby disqualifying
+                    it from being the most recent completely black and white
+                    film to win the Best Picture Oscar. That honor still applied
+                    to <a href="apar.html"><b>The
+                  Apartment (1960)</b></a>.]</font></p>
+                <p><font size="2">Spielberg won his <i>first</i> competitive Oscars
+                  for the powerful, documentary-style, 'historical' dramatization
+                  of Thomas Keneally's 1982 book (from a screenplay by Steven
+                  Zaillian) about the Third Reich's Holocaust, and the role of
+                  one complex man named Schindler (Liam Neeson) - a failed German
+                  industrialist and Catholic war profiteer (a pots-and-pans factory
+                  owner), who struggled to save more than a thousand Polish-Jewish
+                  lives in Nazi-occupied Poland with the assistance of Jewish
+                  accountant and confidante Itzhak Stern (Ben Kingsley).</font></p>
+                <p><font size="2">The three hour-long, small-budget ($23 million)
+                  film had <i>twelve</i> nominations and <i>seven</i> overall
+                  wins (Best Picture, Best Director, Best Screenplay, Best Art
+                  Direction, Best Cinematography for Janusz Kaminski, Best Film
+                  Editing, and Best Original Score - by John Williams). Surprisingly,
+                  the film won no acting awards. Spielberg also triumphed in
+                  the same year with three technical-achievement awards for his
+                  box-office hit <b><a href="series-jurassicpark.html">Jurassic
+                    Park</a></b>: Best Sound, Best Sound Effects Editing, and Best
+                  Visual Effects.</font></p>
+                <p><font size="2"> Four of the five Best Picture nominees were
+                  serious-minded films. The one exception was the box-office
+                  hit and action thriller <b>The Fugitive</b> (with seven nominations
+                  and one win - Best Supporting Actor) - the story of the relentless
+                  tracking of a convicted innocent man in director Andrew Davis'
+                  re-make of the 60's long-running TV series - it was notable
+                  as the <i>first</i> - and only - Best Picture nominee remake
+                  to be based on a popular TV series.</font></p>
+                <p><font size="2">The other three Best Picture nominees included:</font></p>
+                <ul>
+                  <li><font size="2">the strange love story between a mute-by-choice
+                    19th century Scotswoman (and pianist) and a New Zealand neighbor
+                    in producer/writer/director Jane Campion's offbeat film <b>The
+                      Piano</b> (with eight nominations and three wins - Best Actress,
+                    Best Supporting Actress, and Best Screenplay)</font></li>
+                  <li><font size="2">director Jim Sheridan's political-injustice
+                    drama about an accused IRA bomber who is wrongfully imprisoned
+                    in <b>In the Name of the Father</b> (with seven nominations
+                    and no wins)</font></li>
+                  <li><font size="2">the Merchant Ivory period drama of unrequited
+                    love in director James Ivory's film <b>The Remains of the
+                      Day</b> (with eight nominations and no wins)</font></li>
+                </ul>
+                <p><font size="2">Andrew Davis, the director of Best Picture-nominated <b>The
+                  Fugitive</b>, failed to receive a nomination in the Best
+                  Director category. Davis' place was filled by director Robert
+                  Altman for his three-hour long film, a collage of Raymond
+                  Carver's short stories, <b>Short Cuts</b> (the film's <i>sole</i> nomination).
+                  [This was Altman's second consecutive Best Director nomination
+                  for a film that did not receive a Best Picture nomination
+                  - <b>The Player (1992)</b> also received a Best Director
+                  nomination without a Best Picture nod. And it was also Altman's
+                  fourth unsuccessful bid to be Best Director.]</font></p>
+                <p><font size="2">Jane Campion's nomination as Best Director for <b>The
+                  Piano</b> made her only the <i>second</i> woman in Oscar
+                  history to be nominated in the category. Campion is the first
+                  (and only) woman to have directed a Best Picture nominee
+                  AND to have received a Best Director nomination for herself.
+                  [The <i>first</i> woman ever nominated for Best Director
+                  was Lina Wertmuller for <b>Seven Beauties (1976)</b>, seventeen
+                  years earlier.] Although Campion lost the Best Director Oscar,
+                  she won an Oscar for Best Original Screenplay.</font></p>
+                <p><font size="2">Half of all the male acting nominations went
+                  to British performers (Day-Lewis, Hopkins, Neeson, Postlethwaite,
+                  and Fiennes). All four of the year's acting winners were first-time
+                  Academy Award winners.</font></p>
+                <p><font size="2">The Best Actor Oscar was presented to Tom Hanks
+                  (with his second nomination and <i>first</i> Oscar win), best-known
+                  for comedic roles, for his serious performance as AIDS-infected
+                  corporate attorney and victim Andrew Beckett, fired from his
+                  job and fighting homophobia in director Jonathan Demme's bold
+                  adaptation of Ron Nyswaner's screenplay for <b>Philadelphia</b> (with
+                  five nominations and two wins - the <i>second</i> Oscar was
+                  for Bruce Springsteen's Best Song &quot;Streets of Philadelphia&quot;).
+                  In the same year, Hanks starred in Nora Ephron's very popular
+                  romantic comedy <b>Sleepless in Seattle</b>, a remake of <b>An
+                    Affair to Remember (1957)</b> - with two unsuccessful nominations
+                  for Best Original Screenplay and Best Original Song. [Note:
+                  During Hanks' acceptance speech, he paid homage to his high
+                  school gay teacher Rawley Farnsworth - the situation was later
+                  used as the basis for the comedy <b>In &amp; Out (1997)</b> in
+                  which a passionate Oscar winner during his acceptance speech
+                  inadvertently outed a teacher.]</font></p>
+                <p><font size="2">The other Best Actor nominees were:</font></p>
+                <ul>
+                  <li><font size="2">Daniel Day-Lewis (with his second nomination)
+                    as wrongly-imprisoned IRA terrorist and political prisoner
+                    Gerald Conlon in <b>In the Name of the Father</b></font></li>
+                  <li><font size="2">Laurence Fishburne (with his first nomination)
+                    as abusive wife-beater Ike Turner in <b>What's Love Got to
+                      Do With It</b> (with two nominations and no wins); Fishburne,
+                    whose nomination was bumped up to a lead one, performed his
+                    own songs in the film</font></li>
+                  <li><font size="2">Anthony Hopkins (with his second nomination)
+                    as faithful, yet repressed head butler Stevens in <b>The
+                      Remains of the Day</b></font></li>
+                  <li><font size="2">N. Ireland native Liam Neeson (with his first
+                    nomination) as conscience-stricken German industrialist Oskar
+                    Schindler, the savior of a thousand Polish Jews in <a href="schi.html"><b>Schindler's
+                      List</b></a></font></li>
+                </ul>
+                <p><font size="2">Among the female acting nominees, two were simultaneously
+                  nominated in the lead and supporting acting categories in 1993
+                  - Holly Hunter and Emma Thompson. They were the <i>first</i> nominees
+                  to compete against each other in <i>both</i> the Actress and
+                  Supporting Actress categories, in the same year:</font></p>
+                <blockquote>
+                  <p><font size="2">[Because Emma Thompson lost <i>both</i> Oscars
+                    in the Best Actress and Best Supporting Actress categories,
+                    she shares the same dubious 'achievement' with actress Sigourney
+                    Weaver - who was also unsuccessful with her nominations for <b>Gorillas
+                      in the Mist (1988)</b> and <b>Working Girl (1988)</b>. Although
+                    Thompson and Weaver both lost, usually a double-nominee wins
+                    one of the categories.]</font></p>
+                </blockquote>
+                <p><font size="2">Holly Hunter (with her <i>second/third</i> nominations
+                  and <i>first</i> Oscar win) won the Best Actress Oscar for
+                  her dialogue-less performance as the 19th century mute (since
+                  childhood) and mail-order bride Ada McGrath - the erotic, Scottish
+                  woman and gifted pianist in <b>The Piano</b>. [This was another
+                  instance in which an award was given for an actress' non-speaking
+                  role, i.e., Jane Wyman in <b>Johnny Belinda (1948)</b>, Patty
+                  Duke in <b>The Miracle Worker (1962)</b>, Marlee Matlin in <b>Children
+                  of a Lesser God (1986)</b>.]</font></p>
+                <p><font size="2">The other four Best Actress nominees were:</font></p>
+                <ul>
+                  <li><font size="2">Angela Bassett (with her first nomination)
+                    as abused rock singer Tina Turner in <b>What's Love Got to
+                      Do With It</b></font></li>
+                  <li><font size="2">Stockard Channing (with her first nomination)
+                    as privileged Fifth Avenue wife Ouisa Kittredge in director
+                    Fred Schepisi's satirical comedy/drama of race and class,<b> Six
+                      Degrees of Separation</b> (the film's <i>sole</i> nomination)</font></li>
+                  <li><font size="2">Emma Thompson (with her second - or third
+                    nomination) as housekeeper Miss Kenton in <b>The Remains
+                      of the Day</b></font></li>
+                  <li><font size="2">Debra Winger (with her third unsuccessful
+                    nomination) as Joy Gresham, the forthright American fan/poet
+                    and romantic lover of Oxford author/lecturer C. S. Lewis
+                    in director Richard Attenborough's exquisite melodrama, <b>Shadowlands</b> (with
+                    only two nominations, also Best Adapted Screenplay - and
+                    no wins)</font></li>
+                </ul>
+                <p><font size="2">The Best Supporting Actor Oscar was won by Tommy
+                  Lee Jones (with his second nomination and <i>first</i> Oscar
+                  win) for his performance as determined and relentless, laconic
+                  Deputy U.S. Marshal Samuel Gerard who tracks fugitive Harrison
+                  Ford in the exciting chase film <b>The Fugitive</b>. Many felt
+                  the award should have gone to Ralph Fiennes instead.</font></p>
+                <p><font size="2">The other four Best Supporting Actor nominees
+                  in the category were:</font></p>
+                <ul>
+                  <li><font size="2">nineteen year-old (pre-<b>Titanic</b>) Leonardo
+                    DiCaprio (with his first nomination) as co-star Johnny Depp's
+                    impaired, mentally-challenged teenage brother Arnie Grape
+                    in director Lasse Hallstrom's <b>What's Eating Gilbert Grape</b> (the
+                    film's sole nomination)</font></li>
+                  <li><font size="2">Ralph Fiennes (with his first nomination)
+                    as the merciless and vicious Nazi labor camp commander Amon
+                    Goeth in Plaszow in <a href="schi.html"><b>Schindler's
+                      List</b></a></font></li>
+                  <li><font size="2">John Malkovich (with his second nomination)
+                    as former CIA agent and cold-blooded Presidential assassin
+                    Mitch Leary in director Wolfgang Petersen's thriller <b>In
+                      the Line of Fire</b> (with three nominations and no wins)</font></li>
+                  <li><font size="2">Pete Postlethwaite (with his first nomination)
+                    as Guiseppe Conlon, the father of wrongly-imprisoned co-star
+                    Daniel Day-Lewis in <b>In the Name of the Father</b></font></li>
+                </ul>
+                <p><font size="2">The unexpected winner of the Best Supporting
+                  Actress Oscar was 11 year-old Anna Paquin for her R-rated film
+                  role as co-star (and competitive nominee) Holly Hunter's illegitimate
+                  daughter Flora in <b>The Piano</b>. [Paquin's Oscar, in her
+                  debut film, made her the <i>second</i> youngest competitive
+                  Oscar winner, second to 10 year-old Tatum O'Neal who won the
+                  Oscar twenty years earlier for <b>Paper Moon (1973)</b>. Paquin
+                  also became the <i>first</i> New Zealander to receive an Oscar
+                  for Best Supporting Actress.]</font></p>
+                <p><font size="2">The other Best Supporting Actress nominees included:</font></p>
+                <ul>
+                  <li><font size="2">Holly Hunter (with her second - or third nomination)
+                    as tough, bleach-blonde secretary Tammy Hemphill in producer/director
+                    Sydney Pollack's thriller based on John Grisham's best-selling
+                    novel about a corrupted law firm, <b>The Firm</b> (with two
+                    nominations and no wins)</font></li>
+                  <li><font size="2">Brooklyn-born Puerto Rican Rosie Perez (with
+                    her first nomination) as co-star Jeff Bridges' fellow airplane
+                    crash survivor and guilt-stricken Hispanic mother Carla Rodrigo
+                    in director Peter Weir's <b>Fearless</b> (the film's <i>sole</i> nomination)</font></li>
+                  <li><font size="2">Winona Ryder (with her first nomination and
+                    the favored nominee) as May Welland - the emotionally-proper
+                    fiancee of co-star Daniel Day-Lewis in director Martin Scorsese's
+                    film adaptation of Edith Wharton's novel <b>The Age of Innocence</b> (with
+                    five nominations and one win - Best Costume Design)</font></li>
+                  <li><font size="2">Emma Thompson (with her second - or third
+                    nomination) as Gareth Peirce - Gerald Conlon's (Daniel Day-Lewis')
+                    English solicitor in <b>In the Name of the Father</b></font></li>
+                </ul>
+                <p><font size="2">Six-time Best Actress nominee (in 1949, 1953,
+                  1956-1958, and 1960) and win-less Deborah Kerr received an
+                  Honorary award during the ceremonies, 
+                  &quot;in appreciation for a full career's worth of elegant and
+                  beautifully-crafted performances.&quot; She had appeared in some
+                  of cinema's greatest films, including <b><a href="blacknarcissus.html">Black Narcissus (1947)</a></b>, <b>I
+                    See A Dark Stranger (1947)</b>, <b>Edward, My Son (1949)</b>, <b>The
+                      Prisoner of Zenda (1952)</b>, <a href="from.html"><b>From Here
+                        to Eternity (1953)</b></a>, <a href="kingi.html"><b>The King
+                          and I (1956)</b></a>, <b>Tea and Sympathy (1956)</b>, <b>Heaven
+                            Knows, Mr. Allison (1957)</b>, <b>Separate Tables (1958)</b>, <b>The
+                Night of the Iguana (1964)</b>, and <b>The Arrangement (1969)</b>.</font></p>
+                <p><font size="2"><b>Oscar Snubs and Omissions:</b></font></p>
+                <p><font size="2">Brad Pitt was un-nominated for his performance
+                  as terrifying, homicidal serial killer Early Grayce in <b>Kalifornia</b>,
+                  nor was Val Kilmer as philosophical, ravaged Doc Holliday in <b>Tombstone</b>,
+                  nor was Ben Kingsley as Schindler's Jewish accountant in <a href="schi.html"><b>Schindler's
+                    List</b></a>, nor was Debra Winger as Arliss Howard's wife
+                  Vida in a romantic triangle in the pyrokinetic, incendiary <b>Wilder
+                  Napalm</b>.</font></p>
+                <p><font size="2">Tim Burton's offbeat, stop-action animated musical <b>The
+                  Nightmare Before Christmas</b> was nominated (and lost) for
+                  only one award: Best Visual Effects, but was ignored for
+                  Danny Elfman's original musical score, and for the songs
+                  in its soundtrack (there were about a dozen songs in its
+                  74 minutes). Unexpectedly, there were no nominations for
+                  Wayne Wang's mother-daughter stories (adapted from Amy Tan's
+                  novel) in <b>The Joy Luck Club</b>.</font></p>
+                <p><font size="2">Juliette Binoche was denied a nomination as grieving
+                  wife Julie Vignon de Courcy in the first film of director Krzysztof
+                  Kieslowski's three-color trilogy, <b>Three Colors: Blue (Fr.)
+                  (aka Trois Couleurs: Bleu)</b>.</font></p>
+                <p><font size="2">Denzel Washington was denied an acting nomination
+                  for his performance as black, ambulance-chasing defense lawyer
+                  Joe Miller (opposite Best Actor-winning Tom Hanks) in <b>Philadelphia</b>,
+                  as was Jeff Bridges for his role as post-traumatic stress disorder
+                  victim Max Klein in Weir's <b>Fearless</b>, and Arnold Schwarzenegger
+                  as fictional action hero film character Sgt. Jack Slater (and
+                  himself) in <b>Last Action Hero</b>. Although nominated for <b>Remains
+                    of the Day</b>, Anthony Hopkins should also have been nominated
+                  for his role as Christian novelist C.S. Lewis in <b>Shadowlands</b> (a
+                  film mostly neglected by the Academy). And Matthew McConaughey
+                  was un-nominated for his memorable performance as the seasoned
+                  suitor named Wooderson of Texas high school girls in <b>Dazed
+                  and Confused</b>.</font></p>
+                <p><font size="2">An emerging romantic comedy masterpiece, <b>Groundhog
+                  Day</b>, struck out for Oscar nominations. There was no recognition
+                  for director/screenwriter Harold Ramis, or for actor Bill
+                  Murray's superb characterization as TV weatherman Phil who
+                  was forced to repeat the same day over and over again in
+                  an endless loop, and (supporting) actress Andie MacDowell
+                  as TV producer Rita (Phil's love interest). Composer John
+                  Williams' musical score for <b><a href="series-jurassicpark.html">Jurassic
+                    Park</a></b> was also not nominated.</font></p>
+          </td>
+        </tr>
+      </table>
+  </center>
+
+
+<hr width="70%" align="center" noshade="noshade" />
+  <center>
+<a href="aa92.html"><img src="images/prevpage.gif" width="102" height="35" alt="Previous Page" border="0" /></a> 
+  <img src="images/spacer.gif" width="200" height="8" border="0" /> <a href="aa94.html"><img src="images/nextpage.gif" width="77" height="35" alt="Next Page" border="0" /></a> 
+ </center>  
+  <hr width="70%" align="center" noshade="noshade" />
+ 
+
+</div>
+  <!-- start Newor Media //-->
+  <!-- 728x90/320x50 -->
+  <div id="waldo-tag-17389"></div>
+  <!-- end Newor Media //-->
+<!-- Start includes/footer -->
+<div class="site-footer mt mbl">
+  <nav role="navigation">
+  <div id="menuToggleFooter">
+    <div class="navigation navigation--primary">
+      <ul class="navigation__menu" id="footermenu">
+        <li class="menu-item"><a href="/greatlists.html">GREATEST FILMS</a></li>
+        <li class="menu-item">
+          <a href="/filmreviews-overview.html">REVIEWS</a>
+        </li>
+        <li class="menu-item"><a href="/best-overview.html">THE BEST</a></li>
+        <li class="menu-item">
+          <a href="/filmhistory-overview.html">HISTORY</a>
+        </li>
+        <li class="menu-item"><a href="/filmgenres.html">GENRES</a></li>
+        <li class="menu-item"><a href="/scenes-overview.html">SCENES</a></li>
+        <li class="menu-item"><a href="/oscars.html">OSCARS</a></li>
+        <li class="menu-item"><a href="/greatfilmquotes.html">QUOTES</a></li>
+        <li class="menu-item">
+          <a href="/filmstarsanddirectors.html">DIRECTORS &amp; STARS</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+  <div class="navigation navigation--secondary-footer-menu">
+    <ul class="navigation__menu">
+      <li class="menu-item"><a href="/index.html">Filmsite Home</a></li>
+      <li class="menu-item"><a href="/films.html">About &amp; Contact</a></li>
+      <li class="menu-item"><a href="/sitemap.html">Sitemap</a></li>
+      <li class="menu-item"><a href="/faq.html">FAQ</a></li>
+      <li class="menu-item"><a href="/references.html">Reference</a></li>
+      <li class="menu-item"><a href="/privacy-filmsite.html">Privacy Policy</a></li>
+      <li class="menu-item"><a href="/termsofuse-filmsite.html">Terms of Use</a></li>
+    </ul>
+  </div>
+  <div class="site-footer__legal" role="contentinfo">
+    <p class="site-footer__copyright">
+            Copyright &copy; 1996-2024 Filmsite LLC. All rights reserved.
+    </p>
+  </div>
+</div>
+
+<!-- End includes/footer -->
+  <!-- start Newor Media //-->
+  <!-- Sticky Footer --><!-- 728x90/320x50 -->
+  <div id="waldo-tag-17384"></div>
+  <!-- end Newor Media //-->
+</body>
+</html>

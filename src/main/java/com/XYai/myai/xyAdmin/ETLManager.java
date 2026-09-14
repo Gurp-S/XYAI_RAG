@@ -1,5 +1,7 @@
 package com.XYai.myai.xyAdmin;
 
+import com.XYai.myai.security.annotation.AdminOnly;
+
 import com.XYai.myai.config.ConfigPersistence;
 import com.XYai.myai.config.Result;
 import com.XYai.myai.rag.etlpipeline.UploadTaskStore;
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
+@AdminOnly
 @RestController
 @RequestMapping("/xyAdmin/etl")
 public class ETLManager {

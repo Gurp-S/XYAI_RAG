@@ -2,10 +2,13 @@ package com.XYai.myai.rag.channel.search;
 
 import com.XYai.myai.commonUtils.FloatArrayList;
 import com.XYai.myai.rag.aop.annotation.RagTraceNode;
+import com.XYai.myai.rag.channel.cache.RetrievalCacheService;
+import com.XYai.myai.rag.channel.pojo.RetrievalProperties;
 import com.XYai.myai.rag.channel.pojo.RetrievedChunk;
 import com.XYai.myai.rag.channel.pojo.SearchChannel;
 import com.XYai.myai.rag.channel.pojo.SearchChannelResult;
 import com.XYai.myai.rag.channel.pojo.SearchContext;
+import com.XYai.myai.rag.milvus.MilvusAclManager;
 import com.XYai.myai.rag.rewrite.pojo.RewriteResult;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
@@ -33,7 +36,6 @@ import java.util.stream.Collectors;
 public class VectorGlobalSearchChannel implements SearchChannel {
 
     private static final double SIMILARITY_THRESHOLD = 0.5;   // COSINE 相似度阈值
-    private static final int DEFAULT_TOP_K = 5;
     // 向量字段名
     private static final String VECTOR_FIELD_CONTEXT = "embedding_context";
     private static final String VECTOR_FIELD_QUESTION = "embedding_question";
@@ -41,6 +43,12 @@ public class VectorGlobalSearchChannel implements SearchChannel {
     private EmbeddingModel embeddingModel;
     @Resource
     private MilvusClient milvusClient;
+    @Resource
+    private MilvusAclManager milvusAclManager;
+    @Resource
+    private RetrievalProperties retrievalProperties;
+    @Resource
+    private RetrievalCacheService retrievalCacheService;
     @Value("${spring.ai.vectorstore.milvus.collectionName:my_ai}")
     private String defaultCollectionName;
     @Value("${spring.ai.vectorstore.milvus.databaseName:my_xy}")
@@ -87,14 +95,45 @@ public class VectorGlobalSearchChannel implements SearchChannel {
                     return (q != null && !q.isBlank()) ? List.of(q) : List.of(context.getOriginalQuery());
                 });
 
-        // 并行多查询检索
+        // 并行多查询检索（L1 embedding 缓存：命中跳过向量化）
+        Long userId = com.XYai.myai.user.LoginUserInfoManager.getUserId();
+        String primaryQuery = queryList.getFirst();
+        String normQuery = RetrievalCacheService.normalizeQuery(primaryQuery);
         long t0 = System.currentTimeMillis();
-        List<float[]> queryVectorList = embeddingModel.embed(queryList);
+        List<float[]> queryVectorList = new ArrayList<>(queryList.size());
+        for (String q : queryList) {
+            float[] vector = retrievalCacheService.getEmbedding(q);
+            if (vector == null) {
+                vector = embeddingModel.embed(q);
+                retrievalCacheService.putEmbedding(q, vector);
+            }
+            queryVectorList.add(vector);
+        }
         long t1 = System.currentTimeMillis();
         log.info("向量问题时间: {}ms", t1 - t0);
+
+        // L2 精确 / L3 语义缓存：仅单查询时启用（多子查询合并语义复杂，直接走检索）
+        if (queryVectorList.size() == 1) {
+            float[] primaryVector = queryVectorList.getFirst();
+            List<RetrievedChunk> semanticHit = retrievalCacheService.getSemanticRetrieval(primaryVector, userId);
+            if (semanticHit != null) {
+                log.info("语义缓存命中: normQuery={}", normQuery);
+                return toChannelResult(semanticHit);
+            }
+            List<RetrievedChunk> exactHit = retrievalCacheService.getRetrieval(normQuery, userId);
+            if (exactHit != null) {
+                log.info("检索缓存命中: normQuery={}", normQuery);
+                return toChannelResult(exactHit);
+            }
+        }
+
+        // ACL 查询层下推：public 或用户授权文件前缀，未授权 chunk 不再进入候选集
+        String aclExpr = buildAclExpr();
+        int channelTopK = retrievalProperties.getChannelTopK();
+
         List<CompletableFuture<List<RetrievedChunk>>> futures = queryVectorList.stream()
                 .map(query -> CompletableFuture.supplyAsync(
-                        () -> searchWithDualVectors(query),
+                        () -> searchWithDualVectors(query, aclExpr, channelTopK),
                         searchChannelExecutor
                 ))
                 .toList();
@@ -104,29 +143,69 @@ public class VectorGlobalSearchChannel implements SearchChannel {
                 .flatMap(List::stream)
                 .filter(Objects::nonNull)
                 .sorted(Comparator.comparingDouble(RetrievedChunk::getScore).reversed())
-                .limit(DEFAULT_TOP_K)
+                .limit(channelTopK)
                 .collect(Collectors.toList());
 
+        // 回写 L2/L3 缓存（仅单查询）
+        if (queryVectorList.size() == 1 && !allChunks.isEmpty()) {
+            retrievalCacheService.putRetrieval(normQuery, userId, allChunks);
+            retrievalCacheService.putSemanticRetrieval(queryVectorList.getFirst(), userId, allChunks);
+        }
+
+        return toChannelResult(allChunks);
+    }
+
+    private SearchChannelResult toChannelResult(List<RetrievedChunk> chunks) {
         return SearchChannelResult.builder()
                 .channelName(getName())
-                .chunks(allChunks)
-                .metadata(allChunks.stream().map(RetrievedChunk::getMetadata).toList())
+                .chunks(chunks)
+                .metadata(chunks.stream().map(RetrievedChunk::getMetadata).toList())
                 .build();
+    }
+
+    /**
+     * 构建 ACL 查询层过滤表达式：公开文档 或 命中用户授权文件前缀。
+     * <p>授权文件子句超过上限时放弃下推（expr 超长风险），由后置 FilterPostProcessor 兜底。</p>
+     */
+    private String buildAclExpr() {
+        if (retrievalProperties == null || !retrievalProperties.isAclPushdownEnabled()) {
+            return null;
+        }
+        try {
+            Set<String> fileIds = milvusAclManager.getAuthorizedFileIds();
+            int max = retrievalProperties.getAclPushdownMaxFileClauses();
+            List<String> clauses = new ArrayList<>();
+            clauses.add("metadata[\"visibility\"] == \"public\"");
+            int used = 0;
+            for (String fileId : fileIds) {
+                if (fileId == null || fileId.isBlank()) continue;
+                if (used >= max) {
+                    log.warn("授权文件数超过下推上限({})，放弃 ACL 下推，回退后置过滤", max);
+                    return null;
+                }
+                clauses.add("doc_id like \"" + fileId.replace("\"", "") + ":%\"");
+                used++;
+            }
+            return String.join(" or ", clauses);
+        } catch (Exception e) {
+            log.warn("构建 ACL 下推表达式失败，回退后置过滤", e);
+            return null;
+        }
     }
 
     /**
      * 双向量搜索 + 合并（取每个 chunk 在两个字段中的最大余弦分数）
      */
-    private List<RetrievedChunk> searchWithDualVectors(float[] queryVector) {
+    private List<RetrievedChunk> searchWithDualVectors(float[] queryVector, String aclExpr, int topK) {
         try {
             List<Float> vectorList = new FloatArrayList(queryVector);
 
             // 并行搜索两个向量字段
             long t2 = System.currentTimeMillis();
             CompletableFuture<List<RetrievedChunk>> contextFuture = CompletableFuture.supplyAsync(
-                    () -> searchByField(vectorList, VECTOR_FIELD_CONTEXT), searchChannelExecutor);
+                    () -> searchByField(vectorList, VECTOR_FIELD_CONTEXT, aclExpr, topK), searchChannelExecutor);
             CompletableFuture<List<RetrievedChunk>> questionFuture = CompletableFuture.supplyAsync(
-                    () -> searchByField(vectorList, VECTOR_FIELD_QUESTION), searchChannelExecutor);
+                    () -> searchByField(vectorList, VECTOR_FIELD_QUESTION, aclExpr, topK), searchChannelExecutor);
 
             List<RetrievedChunk> contextResults = contextFuture.join();
             log.info("文本搜索分数:{}",contextResults.stream().map(RetrievedChunk::getScore).toList());
@@ -166,17 +245,22 @@ public class VectorGlobalSearchChannel implements SearchChannel {
 
     /**
      * 针对指定向量字段进行一次搜索
+     *
+     * @param aclExpr ACL 查询层过滤表达式，null 表示不下推（后置过滤兜底）
      */
-    private List<RetrievedChunk> searchByField(List<Float> vectorList, String vectorFieldName) {
-        SearchParam searchParam = SearchParam.newBuilder()
+    private List<RetrievedChunk> searchByField(List<Float> vectorList, String vectorFieldName, String aclExpr, int topK) {
+        SearchParam.Builder paramBuilder = SearchParam.newBuilder()
                 .withDatabaseName(databaseName)
                 .withCollectionName(defaultCollectionName)
                 .withVectorFieldName(vectorFieldName)
                 .withFloatVectors(Collections.singletonList(vectorList))
-                .withTopK(DEFAULT_TOP_K)
+                .withTopK(topK)
                 .withMetricType(MetricType.COSINE)
-                .withOutFields(Arrays.asList("doc_id", "content", "metadata"))
-                .build();
+                .withOutFields(Arrays.asList("doc_id", "content", "metadata"));
+        if (aclExpr != null && !aclExpr.isBlank()) {
+            paramBuilder.withExpr(aclExpr);
+        }
+        SearchParam searchParam = paramBuilder.build();
 
         R<SearchResults> searchResponse = milvusClient.search(searchParam);
         if (searchResponse.getStatus() != R.Status.Success.getCode()) {

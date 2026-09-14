@@ -1,7 +1,7 @@
 package com.XYai.myai.config;
 
-import com.alibaba.ttl.TtlRunnable;
 import com.XYai.myai.user.LoginUserInfoManager;
+import com.alibaba.ttl.TtlRunnable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,10 +9,6 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskDecorator;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Configuration
@@ -62,6 +58,7 @@ public class ThreadPoolConfig {
         return executor;
     }
 
+
     @Bean("ioBoundExecutor")
     public SimpleAsyncTaskExecutor ioBoundExecutor() {
         return createVirtualExecutor("io-bound-");
@@ -72,24 +69,9 @@ public class ThreadPoolConfig {
         return createVirtualExecutor("user-task-");
     }
 
-    @Bean("uploadExecutor")
-    public SimpleAsyncTaskExecutor uploadExecutor() {
-        return createVirtualExecutor("upload-");
-    }
-
     @Bean("userExecutor")
     public SimpleAsyncTaskExecutor userExecutor() {
         return taskUserExecutor();
-    }
-
-    @Bean("memeryExecutor")
-    public SimpleAsyncTaskExecutor memeryExecutor() {
-        return ioBoundExecutor();
-    }
-
-    @Bean("summaryExecutor")
-    public SimpleAsyncTaskExecutor summaryExecutor() {
-        return ioBoundExecutor();
     }
 
     @Bean("mcpExecutor")
@@ -97,8 +79,8 @@ public class ThreadPoolConfig {
         return ioBoundExecutor();
     }
 
-    @Bean("neo4jExecutor")
-    public SimpleAsyncTaskExecutor neo4jExecutor() {
+    @Bean("evaluateExecutor")
+    public SimpleAsyncTaskExecutor evaluateExecutor() {
         return ioBoundExecutor();
     }
 
@@ -130,32 +112,5 @@ public class ThreadPoolConfig {
     @Bean("traceExecutor")
     public SimpleAsyncTaskExecutor traceExecutor() {
         return createVirtualExecutor("trace-");
-    }
-
-    @Bean("evaluateExecutor")
-    public SimpleAsyncTaskExecutor evaluateExecutor() {
-        return createVirtualExecutor("eval-");
-    }
-
-    // ======================== 异步DB写入线程池 ========================
-    @Bean("traceDbExecutor")
-    public ThreadPoolExecutor traceDbExecutor() {
-        ThreadPoolExecutor executor = new ThreadPoolExecutor(
-                2,                              // corePoolSize
-                4,                              // maximumPoolSize — 不超过DB连接池上限
-                60L,                            // keepAliveTime
-                TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(2048), // 有界队列防OOM
-                r -> {
-                    Thread t = new Thread(r);
-                    t.setName("trace-db-pool");
-                    t.setDaemon(true);
-                    return t;
-                },
-                // 队列满时由提交线程直接执行，自然背压
-                new ThreadPoolExecutor.CallerRunsPolicy()
-        );
-        executor.allowCoreThreadTimeOut(true);
-        return executor;
     }
 }

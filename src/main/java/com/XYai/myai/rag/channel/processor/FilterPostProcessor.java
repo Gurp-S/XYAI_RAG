@@ -146,18 +146,23 @@ public class FilterPostProcessor implements SearchResultPostProcessor {
 
         Set<String> authorizedFileIds = new HashSet<>();
         try {
-            Set<String> loadCollections = stringRedisTemplate.opsForSet().members(RedisKeyConfig.userLoadCollectionsKey(userId));
-            if (loadCollections != null && !loadCollections.isEmpty()) {
-                for (String collectionName : loadCollections) {
-                    Set<String> fileChunkSet = stringRedisTemplate.opsForSet().members(RedisKeyConfig.collectionFileIds(collectionName));
-                    if (fileChunkSet != null && !fileChunkSet.isEmpty()) {
-                        for (String fileChunkId : fileChunkSet) {
-                            if (StrUtil.isNotBlank(fileChunkId)) {
-                                String fileId = extractFileIdFromChunkId(fileChunkId);
-                                if (fileId != null) {
-                                    authorizedFileIds.add(fileId);
-                                }
-                            }
+            // 从已加载和未加载集合中均读取，确保刚上传的文件也能被查询到
+            Set<String> allCollections = new HashSet<>();
+            Set<String> loadCollections = stringRedisTemplate.opsForSet()
+                    .members(RedisKeyConfig.userLoadCollectionsKey(userId));
+            if (loadCollections != null) allCollections.addAll(loadCollections);
+            Set<String> unloadCollections = stringRedisTemplate.opsForSet()
+                    .members(RedisKeyConfig.userUnloadCollectionsKey(userId));
+            if (unloadCollections != null) allCollections.addAll(unloadCollections);
+
+            for (String collectionName : allCollections) {
+                Set<String> fileChunkSet = stringRedisTemplate.opsForSet()
+                        .members(RedisKeyConfig.collectionFileIds(collectionName));
+                if (fileChunkSet != null && !fileChunkSet.isEmpty()) {
+                    for (String fileChunkId : fileChunkSet) {
+                        if (StrUtil.isNotBlank(fileChunkId)) {
+                            String fileId = extractFileIdFromChunkId(fileChunkId);
+                            if (fileId != null) authorizedFileIds.add(fileId);
                         }
                     }
                 }
@@ -166,7 +171,10 @@ public class FilterPostProcessor implements SearchResultPostProcessor {
             log.error("加载用户授权文件ID失败，userId={}", userId, e);
         }
 
-        localCache.put(cacheKey, authorizedFileIds);
+        // 仅缓存非空结果，避免刚上传后空缓存导致后续查询仍读不到
+        if (!authorizedFileIds.isEmpty()) {
+            localCache.put(cacheKey, authorizedFileIds);
+        }
         return authorizedFileIds;
     }
 
@@ -225,7 +233,9 @@ public class FilterPostProcessor implements SearchResultPostProcessor {
         }
 
         double bm25 = bm25Score;
-        boolean commonScore = score > retrievalProperties.getCommonScoreThreshold() && bm25 > retrievalProperties.getCommonScoreThreshold();
+        // 向量与 BM25 量纲不同（BM25 为 max 归一分，除第一名外均 <1），分开设阈值
+        boolean commonScore = score > retrievalProperties.getCommonScoreThreshold()
+                && bm25 > retrievalProperties.getBm25ScoreThreshold();
         boolean highAndLowScore = (score > retrievalProperties.getHighScoreThreshold() && bm25 > retrievalProperties.getLowScoreThreshold())
                 || (bm25 > retrievalProperties.getHighScoreThreshold() && score > retrievalProperties.getLowScoreThreshold());
         boolean pass = commonScore || highAndLowScore;

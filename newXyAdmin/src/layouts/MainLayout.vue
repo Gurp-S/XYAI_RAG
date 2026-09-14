@@ -47,6 +47,7 @@
               <Sunny v-else />
             </el-icon>
           </el-button>
+          <el-button text @click="onLogout">退出</el-button>
         </div>
       </header>
 
@@ -64,12 +65,19 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useTimeTheme } from '../styles/time-theme'
+import { clearAccessToken } from '../utils/auth'
 
 const route = useRoute()
+const router = useRouter()
 const sidebarCollapsed = ref(false)
 const { isDark, toggleTheme } = useTimeTheme()
+
+function onLogout() {
+  clearAccessToken()
+  router.replace('/login')
+}
 
 const menuItems = computed(() => [
   { path: '/dashboard', title: '仪表盘', icon: 'Odometer' },

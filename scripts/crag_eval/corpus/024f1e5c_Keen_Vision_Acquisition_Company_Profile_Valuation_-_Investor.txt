@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Keen Vision Acquisition Company Profile: Stock Performance & Earnings | PitchBook</title>
+<meta name="description" content="Information on stock, financials, earnings, subsidiaries, investors, and executives for Keen Vision Acquisition. Use the PitchBook Platform to explore the full profile.">
+<meta property="og:title" content="Keen Vision Acquisition Company Profile: Stock Performance & Earnings | PitchBook"/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://pitchbook.com/profiles/company/519737-14"/>
+<meta property="og:description" content="Information on stock, financials, earnings, subsidiaries, investors, and executives for Keen Vision Acquisition. Use the PitchBook Platform to explore the full profile."/>
+<meta property="og:image" content="https://pitchbook.com/img/sm/PitchBook-Profile.jpg?uq=7u3wMnG5"/>
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@PitchBook">
+<meta name="twitter:title" content="Keen Vision Acquisition Company Profile: Stock Performance & Earnings | PitchBook">
+<meta name="twitter:description" content="Information on stock, financials, earnings, subsidiaries, investors, and executives for Keen Vision Acquisition. Use the PitchBook Platform to explore the full profile.">
+<meta name="twitter:image" content="https://pitchbook.com/img/sm/PitchBook-Profile.jpg">
+<script type="application/ld+json">[ {
+"@context" : "http://schema.org",
+"@type" : "WebPage",
+"name" : "Keen Vision Acquisition Company Profile: Stock Performance & Earnings | PitchBook",
+"description" : "Information on stock, financials, earnings, subsidiaries, investors, and executives for Keen Vision Acquisition. Use the PitchBook Platform to explore the full profile.",
+"mainEntityOfPage" : "https://pitchbook.com/profiles/company/519737-14"
+}, {
+"@context" : "http://schema.org",
+"@type" : "PostalAddress",
+"streetAddress" : "37 Greenbriar Drive Summit",
+"postalCode" : "07901",
+"addressLocality" : "Summit",
+"addressRegion" : "New Jersey"
+}, {
+"@context" : "http://schema.org",
+"@type" : "Country",
+"name" : "United States"
+}, {
+"@context" : "http://schema.org",
+"@type" : "Table",
+"name" : "Overview"
+}, {
+"@context" : "http://schema.org",
+"@type" : "Table",
+"name" : "Stock Performance"
+}, {
+"@context" : "http://schema.org",
+"@type" : "Table",
+"name" : "Financials Summary"
+}, {
+"@context" : "http://schema.org",
+"@type" : "Table",
+"name" : "Valuation & Funding"
+}, {
+"@context" : "http://schema.org",
+"@type" : "Table",
+"name" : "Team"
+}, {
+"@context" : "http://schema.org",
+"@type" : "Table",
+"name" : "Board Members"
+}, {
+"@context" : "http://schema.org",
+"@type" : "Table",
+"name" : "Signals"
+}, {
+"@context" : "http://schema.org",
+"@type" : "Table",
+"name" : "Data Transparency"
+}, {
+"@context" : "http://schema.org",
+"@type" : "Corporation",
+"name" : "Keen Vision Acquisition",
+"url" : "https://pitchbook.com/profiles/company/519737-14",
+"description" : "Keen Vision Acquisition Corp is a blank check company.",
+"foundingDate" : "2021",
+"tickerSymbol" : "KVAC",
+"numberOfEmployees" : "2"
+}, {
+"@context" : "http://schema.org",
+"@type" : "TradeAction",
+"price" : "$10.42"
+}, {
+"@context" : "http://schema.org",
+"@type" : "Person",
+"name" : "Wong Kenneth",
+"jobTitle" : "Chief Executive Officer & Chairman"
+}, {
+"@context" : "http://schema.org",
+"@type" : "Person",
+"name" : "Davidkhanian Alex",
+"jobTitle" : "Chief Financial Officer & Director"
+} ]</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="google-site-verification" content="sy6scgGdwIgNSeBaV_uRKrUwqUbi6vbslZSNxpqY_70"/>
+<meta name="msvalidate.01" content="B4DB534BB1FA9A4B348D6C398A40EBBD" />
+<meta name="p:domain_verify" content="cd49808082659fabd87a856ea1dfabab"/>
+<meta name="format-detection" content="telephone=no">
+<meta name="mkto" content="942-MYM-356">
+<meta name="sentry-environment" content="prod">
+<meta name="sentry-dsn" content="https://72c04adf3097b6c87fe4fcf8d3dbc89a@o45691.ingest.sentry.io/4505645806387200">
+<meta name="sample-rate" content="0.2">
+<meta name="sentry-release" content="146ba300">
+<meta name="sentry-side" content="frontend">
+<link rel="shortcut icon" href="/favicon.ico?uq=7u3wMnG5"/>
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png?uq=7u3wMnG5"/>
+<link rel="stylesheet" type="text/css" href="/lib/swiper/swiper.css?uq=7u3wMnG5">
+<link rel="stylesheet" type="text/css" href="/css/main.css?uq=7u3wMnG5"/>
+<link rel="dns-prefetch" href="//files.pitchbook.com" data-append-uq="off">
+<link rel="dns-prefetch" href="//image.pitchbook.com" data-append-uq="off">
+<link rel="dns-prefetch" href="//client-registry.mutinycdn.com" data-append-uq="off">
+<link rel="search" type="application/opensearchdescription+xml" title="PitchBook" href="/opensearch.xml" />
+<link rel="canonical" href="https://pitchbook.com/profiles/company/519737-14" data-append-uq="off"/>
+<script crossorigin="anonymous" src="/lib/sentry/bundle.js?uq=7u3wMnG5"></script>
+<script src="https://cdn.jsdelivr.net/npm/node-forge@0.7.0/dist/forge.min.js?uq=7u3wMnG5"></script>
+<script id="s-analytics" data-gtm-id="GTM-NKGGLQ" src="/js/analytics.js?uq=7u3wMnG5"></script>
+<script src="/js/app-head.js?uq=7u3wMnG5"></script>
+<script data-cfasync="false" src="https://client-registry.mutinycdn.com/personalize/client/24c95c928c7bb0da.js?uq=7u3wMnG5"></script>
+<script async type="text/javascript" src="https://js.clrt.ai/12114.js?uq=7u3wMnG5"></script>
+</head>
+<body data-highlight-menu="data" class="pp-wrap">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NKGGLQ" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<div class="simplify-menu__container bg-eggshell" id="simplifyMenuContainer" role="navigation" aria-label="Main navigation menu">
+<div data-simplify-menu class="container simplify-menu">
+<div class="height-100 flex-container flex-align-center shift-negative-L-35 shift-negative-M-0">
+<a class="logo" href="/" title="Home" aria-label="Home page link"></a>
+<div class="burger-menu-container">
+<div data-burger-button class="burger-menu"></div>
+<ul class="menu M-0 flex-container pt-m-20 pb-m-10 mr-xl-50 mr-l-10 mr-m-0 list-type-none" data-menu>
+<li data-sub-menu class="XL-0 menu-button d-block-M mb-m-10">
+<div data-sub-menu-content class="flex-container flex-column-S">
+<a class="M-6 S-12 btn btn-primary btn-primary_orange btn-block-M py-xl-0 mr-m-20 mr-s-0 mb-s-20" href="/free-trial">Request a free trial</a>
+<a class="M-6 S-12 btn btn-secondary btn-secondary_transparent btn-block-M py-xl-0"
+href="https://my.pitchbook.com">Log in</a>
+</div>
+</li>
+<li class="data-sub-menu" data-sub-menu>
+<a class="menu__items menu__items-product" href="/products">Products</a>
+</li>
+<li class="data-sub-menu" data-sub-menu>
+<a class="menu__items menu__items-solutions" href="/solutions">Solutions</a>
+</li>
+<li class="data-sub-menu" data-sub-menu>
+<a class="menu__items menu__items-data" href="/data">Data</a>
+</li>
+<li class="data-sub-menu" data-sub-menu>
+<a class="menu__items menu__items-news" href="/news">News & Analysis</a>
+</li>
+<li class="data-sub-menu" data-sub-menu>
+<a class="menu__items menu__items-about" href="/about">About</a>
+</li>
+<li class="data-sub-menu" data-sub-menu>
+<a class="menu__items menu__items-blog" href="/blog">Blog</a>
+</li>
+</ul>
+</div>
+<div class="header-button flex-container M-0 ml-auto">
+<a class="btn btn-secondary btn-secondary_transparent px-xl-20 py-xl-0" href="https://my.pitchbook.com">Log in</a>
+<a class="btn btn-primary btn-primary_orange ml-xl-15 ml-l-10 px-xl-20 py-xl-0" href="/free-trial">Request a free trial</a>
+</div>
+</div>
+</div>
+</div>
+<section class="pp-header bg-navy-blue py-xl-25" role="banner">
+<div data-form-collapsed class="pp-search-wrap form-collapsed container flex-centered-container flex-justify-between flex-column-reverse-XS relative-position">
+<div class="XL-8 M-7 XS-12">
+<h1 class="pp-search-wrap__title font-color-white mb-xl-0 pr-s-5 pr-xs-45">Keen Vision Acquisition</h1>
+<button data-btn-search-collapsed class="btn-search btn-search_collapsed XL-0 px-xl-10 py-xl-5 d-block-S"></button>
+</div>
+<div class="XL-3 L-4 M-5 XS-12 flex-container flex-end rightward-XL centered-S">
+<form action="/profiles/search" class="search-form search-form_focused float-right-XL align-right" role="search">
+<input type="text" name="q" value="" maxlength="200" aria-label="Search" class="search-form__input" placeholder="Search profile previews"/>
+<button type="submit" aria-label="Search button" role="button" class="btn-search search-form__submit"></button>
+<span data-btn-search-collapsed class="XL-0 d-block-XS icon-profile-close secondary-text search-form__close px-xl-10 py-xl-5"></span>
+</form>
+</div>
+</div>
+</section>
+<div class="pb-xl-60 pb-m-10">
+<div class="container flex-container flex-wrap">
+<aside class="XL-3 M-0 pp-aside pt-xl-20 pb-xl-20 sticky-position">
+<div class="sticky-position__elem">
+<div class="M-0">
+<div class="pp-aside-sta mt-xl-20 py-xl-20 px-xl-20 px-l-10 px-m-20 centered-XL">
+<p class="font-weight-bold font-height-normal mb-xl-0">This is a profile preview from the PitchBook Platform.</p>
+<a href="/profiles/request-access" class="btn btn_text-medium btn-primary btn-primary_orange mt-xl-20 py-xl-10 px-xl-20" role="button">Request a free trial</a>
+</div>
+<div class="pp-nav-sidebar pt-xl-20" aria-label="Profile sections navigation">
+<nav class="pp-nav-sidebar__main-menu" role="navigation">
+<ul itemscope itemtype="https://schema.org/SiteNavigationElement" class="pp-nav-sidebar__list list-type-none mb-xl-30 secondary-text" data-pp-nav-list role="menu">
+<li tabindex="0" class="pp-nav-sidebar__item relative-position pr-xl-20 pl-xl-10 flex-container flex-justify-between flex-align-center active" role="menuitem">
+<span class="h2 pp-nav-sidebar__link text-small full-width secondary-text primary-dark-text-color font-weight-normal mb-xl-0" data-href="#overview">Overview</span>
+</li>
+<li tabindex="-1" class="pp-nav-sidebar__item relative-position pr-xl-20 pl-xl-10 flex-container flex-justify-between flex-align-center" role="menuitem">
+<span class="h2 pp-nav-sidebar__link-locked heading-text-color text-small font-weight-normal mb-xl-0 full-width flex-container flex-align-center">Timeline</span>
+</li>
+<li tabindex="0" class="pp-nav-sidebar__item relative-position pr-xl-20 pl-xl-10 flex-container flex-justify-between flex-align-center" role="menuitem">
+<span class="h2 pp-nav-sidebar__link text-small full-width secondary-text primary-dark-text-color font-weight-normal mb-xl-0" data-href="#stock">Stock Performance</span>
+</li>
+<li tabindex="0" class="pp-nav-sidebar__item relative-position pr-xl-20 pl-xl-10 flex-container flex-justify-between flex-align-center" role="menuitem">
+<span class="h2 pp-nav-sidebar__link text-small full-width secondary-text primary-dark-text-color font-weight-normal mb-xl-0" data-href="#financials">Financials Summary</span>
+</li>
+<li tabindex="-1" class="pp-nav-sidebar__item relative-position pr-xl-20 pl-xl-10 flex-container flex-justify-between flex-align-center" role="menuitem">
+<span class="h2 pp-nav-sidebar__link-locked heading-text-color text-small font-weight-normal mb-xl-0 full-width flex-container flex-align-center">Earnings Call Transcripts</span>
+</li>
+<li tabindex="0" class="pp-nav-sidebar__item relative-position pr-xl-20 pl-xl-10 flex-container flex-justify-between flex-align-center" role="menuitem">
+<span class="h2 pp-nav-sidebar__link text-small full-width secondary-text primary-dark-text-color font-weight-normal mb-xl-0" data-href="#funding">Valuation &amp; Funding</span>
+</li>
+<li tabindex="-1" class="pp-nav-sidebar__item relative-position pr-xl-20 pl-xl-10 flex-container flex-justify-between flex-align-center" role="menuitem">
+<span class="h2 pp-nav-sidebar__link-locked heading-text-color text-small font-weight-normal mb-xl-0 full-width flex-container flex-align-center">Equity Research (Morningstar)</span>
+</li>
+<li tabindex="-1" class="pp-nav-sidebar__item relative-position pr-xl-20 pl-xl-10 flex-container flex-justify-between flex-align-center" role="menuitem">
+<span class="h2 pp-nav-sidebar__link-locked heading-text-color text-small font-weight-normal mb-xl-0 full-width flex-container flex-align-center">Cap Table</span>
+</li>
+<li tabindex="-1" class="pp-nav-sidebar__item relative-position pr-xl-20 pl-xl-10 flex-container flex-justify-between flex-align-center" role="menuitem">
+<span class="h2 pp-nav-sidebar__link-locked heading-text-color text-small font-weight-normal mb-xl-0 full-width flex-container flex-align-center">Comparisons</span>
+</li>
+<li tabindex="-1" class="pp-nav-sidebar__item relative-position pr-xl-20 pl-xl-10 flex-container flex-justify-between flex-align-center" role="menuitem">
+<span class="h2 pp-nav-sidebar__link-locked heading-text-color text-small font-weight-normal mb-xl-0 full-width flex-container flex-align-center">Competitors</span>
+</li>
+<li tabindex="-1" class="pp-nav-sidebar__item relative-position pr-xl-20 pl-xl-10 flex-container flex-justify-between flex-align-center" role="menuitem">
+<span class="h2 pp-nav-sidebar__link-locked heading-text-color text-small font-weight-normal mb-xl-0 full-width flex-container flex-align-center">Research &amp; Analysis</span>
+</li>
+<li tabindex="-1" class="pp-nav-sidebar__item relative-position pr-xl-20 pl-xl-10 flex-container flex-justify-between flex-align-center" role="menuitem">
+<span class="h2 pp-nav-sidebar__link-locked heading-text-color text-small font-weight-normal mb-xl-0 full-width flex-container flex-align-center">Patents</span>
+</li>
+<li tabindex="0" class="pp-nav-sidebar__item relative-position pr-xl-20 pl-xl-10 flex-container flex-justify-between flex-align-center" role="menuitem">
+<span class="h2 pp-nav-sidebar__link text-small full-width secondary-text primary-dark-text-color font-weight-normal mb-xl-0" data-href="#team">Team</span>
+</li>
+<li tabindex="0" class="pp-nav-sidebar__item relative-position pr-xl-20 pl-xl-10 flex-container flex-justify-between flex-align-center" role="menuitem">
+<span class="h2 pp-nav-sidebar__link text-small full-width secondary-text primary-dark-text-color font-weight-normal mb-xl-0" data-href="#board">Board Members</span>
+</li>
+<li tabindex="0" class="pp-nav-sidebar__item relative-position pr-xl-20 pl-xl-10 flex-container flex-justify-between flex-align-center" role="menuitem">
+<span class="h2 pp-nav-sidebar__link text-small full-width secondary-text primary-dark-text-color font-weight-normal mb-xl-0" data-href="#signals">Signals</span>
+</li>
+<li tabindex="-1" class="pp-nav-sidebar__item relative-position pr-xl-20 pl-xl-10 flex-container flex-justify-between flex-align-center" role="menuitem">
+<span class="h2 pp-nav-sidebar__link-locked heading-text-color text-small font-weight-normal mb-xl-0 full-width flex-container flex-align-center">Investors</span>
+</li>
+<li tabindex="-1" class="pp-nav-sidebar__item relative-position pr-xl-20 pl-xl-10 flex-container flex-justify-between flex-align-center" role="menuitem">
+<span class="h2 pp-nav-sidebar__link-locked heading-text-color text-small font-weight-normal mb-xl-0 full-width flex-container flex-align-center">Acquisitions</span>
+</li>
+<li tabindex="-1" class="pp-nav-sidebar__item relative-position pr-xl-20 pl-xl-10 flex-container flex-justify-between flex-align-center" role="menuitem">
+<span class="h2 pp-nav-sidebar__link-locked heading-text-color text-small font-weight-normal mb-xl-0 full-width flex-container flex-align-center">Subsidiaries</span>
+</li>
+<li tabindex="-1" class="pp-nav-sidebar__item relative-position pr-xl-20 pl-xl-10 flex-container flex-justify-between flex-align-center" role="menuitem">
+<span class="h2 pp-nav-sidebar__link-locked heading-text-color text-small font-weight-normal mb-xl-0 full-width flex-container flex-align-center">ESG</span>
+</li>
+<li tabindex="-1" class="pp-nav-sidebar__item relative-position pr-xl-20 pl-xl-10 flex-container flex-justify-between flex-align-center" role="menuitem">
+<span class="h2 pp-nav-sidebar__link-locked heading-text-color text-small font-weight-normal mb-xl-0 full-width flex-container flex-align-center">Exits</span>
+</li>
+<li tabindex="0" class="pp-nav-sidebar__item relative-position pr-xl-20 pl-xl-10 flex-container flex-justify-between flex-align-center" role="menuitem">
+<span class="h2 pp-nav-sidebar__link text-small full-width secondary-text primary-dark-text-color font-weight-normal mb-xl-0" data-href="#data">Data Transparency</span>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+</aside>
+<div class="XL-9 M-12 pp-main flex-container flex-wrap pl-xl-20 pl-m-0" role="main">
+<div id="overview" data-anchor-section class="pp-overview XL-12 pt-xl-50 pt-l-30 pt-s-20" role="region" aria-label="Company Overview">
+<div class="mb-xl-30 mb-m-20 flex-container flex-wrap flex-justify-between flex-align-center">
+<h2 class="XL-8 L-7 M-5 S-4 pp-overview__title mb-xl-0" role="heading" aria-level="1">
+<span class="M-0">Keen Vision Acquisition</span> Overview
+</h2>
+<button data-tab="trigger" data-request-update data-popup-iframe data-src="/profiles/company/519737-14/request-update" class="btn btn-secondary btn-secondary_transparent height-100 px-xl-35 px-s-20 py-s-10 pp-overview--button">
+Update this profile
+</button>
+</div>
+<div class="XL-12">
+<div class="flex-container flex-wrap flex-align-start" role="list" aria-label="Quick Facts">
+<div data-pp-overview-item class="pp-overview-item relative-position mb-xl-30 mb-m-20 flex-container pr-xl-30 pr-xs-20 mr-xl-30 mr-xs-20 " role="listitem">
+<h2 class="mb-xl-0 font-weight-normal">
+<ul class="height-100 list-type-none flex-container flex-justify-center-XL flex-direction-column flex-end">
+<li class="dont-break text-small">Year Founded</li>
+<li title="2021">
+<span class="pp-overview-item__title font-weight-bold d-block-XL mb-xl-0">2021</span>
+</li>
+</ul>
+</h2>
+<div class="statistic-item__icon flex-container flex-align-end pl-xl-10" style="min-width: 34px">
+<img src="/img/profile-preview/icons/flag.png" alt="Year Founded">
+</div>
+</div>
+<div data-pp-overview-item class="pp-overview-item relative-position mb-xl-30 mb-m-20 flex-container pr-xl-30 pr-xs-20 mr-xl-30 mr-xs-20 " role="listitem">
+<h2 class="mb-xl-0 font-weight-normal">
+<ul class="height-100 list-type-none flex-container flex-justify-center-XL flex-direction-column flex-end">
+<li class="dont-break text-small">Status</li>
+<li title="Public">
+<span class="pp-overview-item__title font-weight-bold d-block-XL mb-xl-0">Public</span>
+</li>
+</ul>
+</h2>
+</div>
+<div data-pp-overview-item class="pp-overview-item relative-position mb-xl-30 mb-m-20 flex-container pr-xl-30 pr-xs-20 mr-xl-30 mr-xs-20 " role="listitem">
+<h2 class="mb-xl-0 font-weight-normal">
+<ul class="height-100 list-type-none flex-container flex-justify-center-XL flex-direction-column flex-end">
+<li class="dont-break text-small">Employees</li>
+<li title="2">
+<span class="pp-overview-item__title font-weight-bold d-block-XL mb-xl-0">2</span>
+</li>
+</ul>
+</h2>
+<div class="statistic-item__icon flex-container flex-align-end pl-xl-10" style="min-width: 30px">
+<img src="/img/profile-preview/icons/employee-count.png" alt="Employees">
+</div>
+</div>
+<div data-pp-overview-item class="pp-overview-item relative-position mb-xl-30 mb-m-20 flex-container pr-xl-30 pr-xs-20 mr-xl-30 mr-xs-20 " role="listitem">
+<h2 class="mb-xl-0 font-weight-normal">
+<ul class="height-100 list-type-none flex-container flex-justify-center-XL flex-direction-column flex-end">
+<li class="dont-break text-small">Stock Symbol</li>
+<li title="KVAC">
+<span class="pp-overview-item__title font-weight-bold d-block-XL mb-xl-0">KVAC</span>
+</li>
+</ul>
+</h2>
+<div class="statistic-item__icon flex-container flex-align-end pl-xl-10" style="min-width: 37px">
+<img src="/img/profile-preview/icons/stock-arrow.png" alt="Stock Symbol">
+</div>
+</div>
+<div data-pp-overview-item class="pp-overview-item relative-position mb-xl-30 mb-m-20 flex-container no-border pr-xl-0" role="listitem">
+<h2 class="mb-xl-0 font-weight-normal">
+<ul class="height-100 list-type-none flex-container flex-justify-center-XL flex-direction-column flex-end">
+<li class="dont-break text-small">Share Price</li>
+<li title="$10.42">
+<span class="pp-overview-item__title font-weight-bold d-block-XL mb-xl-0">$10.42</span>
+</li>
+<li class="mt-xl-5 statistic-item__announced">(As of Tuesday Closing)</li>
+</ul>
+</h2>
+</div>
+</div>
+</div></div>
+<div class="XL-12">
+<div class="general-info pb-xl-30 mb-xl-50 border-bottom_grey" role="region" aria-label="Company General information">
+<div data-general-info-description class="XL-12 pp-description mb-xl-20" role="definition">
+<h3 class="M-0 mb-xl-20"><span class="L-0">Keen Vision Acquisition</span> General Information</h3>
+<h4 class="text-large font-weight-normal mb-xl-20 mb-l-10">Description</h4>
+<p class="pp-description_title mb-xl-0">Keen Vision Acquisition Corp is a blank check company.</p>
+</div>
+<script src="/js/profiles/pp-description.js?uq=7u3wMnG5"></script>
+<h4 class="text-large font-weight-normal mb-xl-20 mb-m-10">Contact Information</h4>
+<div class="full-width flex-container flex-wrap pp-contact-info">
+<div class="XL-4 S-12 pr-xl-45 pr-s-0">
+<div class="mb-xl-15 mb-s-10 pp-contact-info_item">
+<div class="font-weight-bold font-color-black">Ownership Status</div>
+<div class="font-weight-normal font-color-black ellipsis-XL" title="Publicly Held">Publicly Held</div>
+</div>
+<div class="mb-xl-15 mb-s-10 pp-contact-info_item">
+<div class="font-weight-bold font-color-black">Financing Status</div>
+<div class="font-weight-normal font-color-black ellipsis-XL" title="Corporation">Corporation</div>
+</div>
+</div>
+<div class="XL-4 S-12 pr-xl-45 pr-s-0 mt-s-10">
+<div class="mb-xl-15 mb-s-10 pp-contact-info_item">
+<div class="font-weight-bold font-color-black">Primary Industry</div>
+<div class="font-weight-normal font-color-black ellipsis-XL" title="Special Purpose Acquisition Company (SPAC)">Special Purpose Acquisition Company (SPAC)</div>
+</div>
+<div class="mb-xl-15 mb-s-10 pp-contact-info_item">
+<div class="font-weight-bold font-color-black">Stock Exchange</div>
+<div class="font-weight-normal font-color-black ellipsis-XL" title="NAS">NAS</div>
+</div>
+</div>
+<div class="XL-4 S-12 mt-s-10">
+<div class="shift-bottom-XL-15 shift-bottom-S-10 pp-contact-info_item">
+<h5 class="font-size-body font-color-black XL-12">Corporate Office</h5>
+<ul class="list-type-none XL-12">
+<li class="font-weight-normal font-color-black ellipsis-XL" title="37 Greenbriar Drive Summit">37 Greenbriar Drive Summit</li>
+<li class="font-weight-normal font-color-black ellipsis-XL" title="Summit, NJ 07901">Summit, NJ 07901</li>
+<li class="font-weight-normal font-color-black ellipsis-XL" title="United States">United States</li>
+</ul>
+<div class="offset-right-S-35">+1 (203) <span class="data-table__gray-box">000-0000</span></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="XL-7 S-12 pp-cta-wrap pr-s-0 pt-xl-30 pt-s-30 M-6 pr-xl-5 pr-l-15">
+<div class="flex-container flex-column flex-justify-between flex-align-center-XL pp-cta-block pp-cta-block_blue height-100 centered-XL dark-blue-border-color py-xl-30 px-xl-50 px-m-30 px-s-20">
+<h3 class="font-color-white mb-xl-20 mb-m-10">Want detailed data on 3M+ companies? </h3>
+<p class="font-color-white mb-xl-30 mb-m-20">What you see here scratches the surface</p>
+<a class="M-12 btn btn-primary btn-primary_orange" href="/profiles/request-access">Request a free trial</a>
+</div>
+</div>
+<div class="XL-5 S-12 pp-cta-wrap pt-xl-30 pt-s-10 M-6 pl-xl-5 pl-l-15 pl-s-0">
+<div class="flex-container flex-column flex-justify-center flex-align-center-XL pp-cta-block pp-cta-block_gray primary-bg height-100 centered-XL light-border-color py-xl-30 px-xl-50 px-m-30 px-s-20">
+<h3 class="font-color-navy mb-xl-20 mb-m-10">Want to dig into this profile?</h3>
+<p class="font-color-black font-weight-normal mb-xl-30 mb-m-20">We’ll help you find what you need</p>
+<a data-tab="trigger" data-request-update data-popup-iframe data-src="/profiles/company/519737-14/data-inquiry" class="M-12 btn btn-secondary btn-secondary_transparent px-l-25" href="/profiles/request-access">Learn more</a>
+</div>
+</div>
+<div id="stock" data-anchor-section class="XL-12 data-table">
+<div class="offset-top-XL-35 offset-bottom-XL-20">
+<h2 class="data-table__name mt-xl-5 mb-xl-0 mt-l-0">Keen Vision Acquisition Stock Performance</h2>
+</div>
+<p class="data-table__formers shift-top-XL-0 shift-bottom-XL-15">(As of Tuesday Closing)</p>
+<table>
+<thead>
+<tr>
+<th class="data-table__cell data-table__cell_max55 align-right font-color-black pl-xl-5 pb-xl-10">Stock Price</th>
+<th class="data-table__cell data-table__cell_max90 align-right font-color-black pl-xl-10 pb-xl-10">Previous Close</th>
+<th class="data-table__cell data-table__cell_max85 align-right font-color-black pl-xl-5 pb-xl-10">52 wk Range</th>
+<th class="data-table__cell data-table__cell_max90 align-right font-color-black pl-xl-10 pb-xl-10">Market Cap</th>
+<th class="data-table__cell data-table__cell_max90 align-right font-color-black pl-xl-10 pb-xl-10">Shares</th>
+<th class="data-table__cell data-table__cell_max90 align-right font-color-black pl-xl-10 pb-xl-10">Average Volume</th>
+<th class="data-table__cell data-table__cell_max90 align-right font-color-black pl-xl-10 pb-xl-10 offset-right-XL-15">EPS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="data-table__cell align-right offset-left-XL-5">$10.42</td>
+<td class="data-table__cell align-right pl-xl-10">$10.39</td>
+<td class="data-table__cell align-right pl-xl-10">$10.14 - $10.98</td>
+<td class="data-table__cell align-right pl-xl-10">$202M</td>
+<td class="data-table__cell align-right pl-xl-10">19.4M</td>
+<td class="data-table__cell align-right pl-xl-10">80.2K</td>
+<td class="data-table__cell align-right pl-xl-10 offset-right-XL-15">-$1.57</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="financials" data-anchor-section class="XL-12 data-table">
+<div class="offset-top-XL-35 offset-bottom-XL-20">
+<h2 class="data-table__name mt-xl-5 mb-xl-0 mt-l-0">Keen Vision Acquisition Financials Summary</h2>
+</div>
+<table>
+<thead>
+<tr>
+<th class="data-table__cell data-table__cell_max120 align-left primary-text-color offset-left-XL-5 offset-bottom-XL-15">
+<span class="subtitle regular-font-weight">In Thousands,<br>USD</span>
+</th>
+<th class="data-table__cell align-right offset-left-XL-10 offset-right-XL-10 offset-bottom-XL-15">
+<span class="d-block-XL">TTM</span>
+<span class="d-block-XL subtitle offset-top-XL-10 regular-font-weight">30-Sep-2023</span>
+</th>
+<th class="data-table__cell align-right offset-left-XL-10 offset-right-XL-10 offset-bottom-XL-15">
+<span class="d-block-XL">FY 2022</span>
+<span class="d-block-XL subtitle offset-top-XL-10 regular-font-weight">31-Dec-2022</span>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="data-table__cell align-left offset-left-XL-5">EV</td>
+<td class="data-table__cell align-right offset-right-XL-10">197,227</td>
+<td class="data-table__cell align-right offset-right-XL-10"></td>
+</tr>
+<tr>
+<td class="data-table__cell align-left offset-left-XL-5">Revenue</td>
+<td class="data-table__cell align-right offset-right-XL-10">0</td>
+<td class="data-table__cell align-right offset-right-XL-10">0</td>
+</tr>
+<tr>
+<td class="data-table__cell align-left offset-left-XL-5">EBITDA</td>
+<td class="data-table__cell align-right offset-right-XL-10">(311)</td>
+<td class="data-table__cell align-right offset-right-XL-10">(1)</td>
+</tr>
+<tr>
+<td class="data-table__cell align-left offset-left-XL-5">Net Income</td>
+<td class="data-table__cell align-right offset-right-XL-10">(311)</td>
+<td class="data-table__cell align-right offset-right-XL-10">(1)</td>
+</tr>
+<tr>
+<td class="data-table__cell align-left offset-left-XL-5">Total Assets</td>
+<td class="data-table__cell align-right offset-right-XL-10">153,815</td>
+<td class="data-table__cell align-right offset-right-XL-10">195</td>
+</tr>
+<tr>
+<td class="data-table__cell align-left offset-left-XL-5">Total Debt</td>
+<td class="data-table__cell align-right offset-right-XL-10">0</td>
+<td class="data-table__cell align-right offset-right-XL-10">174</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="disclaimer semi-font-weight secondary-dark-text-color offset-top-XL-10 offset-bottom-XL-15">Public Fundamental Data provided by Morningstar, Inc.
+<a class="font-underline" data-disclaimer data-popup-iframe data-src="/profiles/public-data-terms-and-conditions">disclaimer</a>
+</div>
+<div id="funding" data-anchor-section class="XL-12 data-table section-blur">
+<div class="offset-top-XL-35 offset-bottom-XL-20">
+<h2 class="data-table__name mt-xl-5 mb-xl-0 mt-l-0">Keen Vision Acquisition Valuation & Funding</h2>
+</div>
+<table class="data-table__blur">
+<thead>
+<tr>
+<th class="data-table__cell data-table__cell_max170 align-left font-color-black pl-xl-5 pb-xl-10">Deal Type</th>
+<th class="data-table__cell data-table__cell_max95 align-left font-color-black pl-xl-15 pb-xl-10">Date</th>
+<th class="data-table__cell data-table__cell_max85 align-left font-color-black pl-xl-15 pb-xl-10">Amount</th>
+<th class="data-table__cell data-table__cell_max95 align-left font-color-black pl-xl-15 pb-xl-10">Valuation/<br />EBITDA</th>
+<th class="data-table__cell data-table__cell_max95 align-left font-color-black pl-xl-15 pb-xl-10">Post-Val</th>
+<th class="data-table__cell data-table__cell_max65 align-left font-color-black pl-xl-15 pb-xl-10">Status</th>
+<th class="data-table__cell data-table__cell_max65 align-left font-color-black pl-xl-15 pb-xl-10">Debt</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+<div class="table-blurred flex-vertical-align flex-align-center primary-bg py-xl-40 px-xl-10 relative-position">
+<p class="XL-11 L-12 mb-xl-30 mb-m-20 px-xl-20 px-m-0 text-small font-color-black centered-XL relative-position">This information is available in the PitchBook Platform. To explore Keen Vision Acquisition&lsquo;s full profile, request access.</p>
+<a href="/profiles/request-access" class="btn btn-primary btn-primary_orange relative-position">Request a free trial</a>
+<div class="lock-icon mb-xl-20">
+<svg width="50" height="55" version="1.1" viewBox="0 0 50 55" xmlns="http://www.w3.org/2000/svg">
+<path d="m25 51.338c13.807 0 25-10.848 25-24.231s-11.193-24.231-25-24.231-25 10.848-25 24.231 11.193 24.231 25 24.231z" fill="#f0ebde"/>
+<path class="lock-shackle" d="m7.286 33.206 6.2572-0.01203-0.0015-6.9641c0.22946-7.1382 5.9502-11.201 11.44-11.114 5.4895 0.08642 9.6973 2.9302 11.291 9.1298h6.3219c-1.1892-8.5045-8.1898-15.227-17.594-15.179-9.4045 0.047515-17.736 7.406-17.708 17.163z" fill="#e88f36"/>
+<path d="m45.833 24.207h-41.667v30.692h41.667z" fill="#051c38"/>
+<path d="m25 40.232c2.3011 0 4.1666-1.808 4.1666-4.0384s-1.8655-4.0385-4.1666-4.0385c-2.3012 0-4.1667 1.8081-4.1667 4.0385s1.8655 4.0384 4.1667 4.0384z" fill="#f0ebde"/>
+<path d="m27.083 38.884h-4.1667v8.4126h4.1667z" fill="#f0ebde"/>
+</svg>
+</div>
+</div>
+</div>
+<div id="team" data-anchor-section class="XL-12 data-table">
+<div class="offset-top-XL-35 offset-bottom-XL-20 flex-container flex-justify-between flex-align-start">
+<h2 class="data-table__name mt-xl-5 mb-xl-0 mt-l-0">Keen Vision Acquisition Executive Team (2)</h2>
+<button data-tab="trigger" data-request-update data-popup-iframe data-src="/profiles/company/519737-14/request-update" class="btn btn-secondary btn-secondary_transparent height-100 px-xl-35 px-s-20 py-s-10 pp-overview--button">
+Update this profile
+</button>
+</div>
+<table>
+<thead>
+<tr>
+<th class="data-table__cell data-table__cell_max215 align-left font-color-black pl-xl-5 pb-xl-10">Name</th>
+<th class="data-table__cell offset-bottom-XL-15 align-left font-color-black pl-xl-10 pb-xl-10">Title</th>
+<th class="data-table__cell data-table__cell_max180 align-center font-color-black pl-xl-10 pb-xl-10">Board Seat</th>
+<th class="data-table__cell data-table__cell_max95 align-center font-color-black pl-xl-10 pb-xl-10">Contact Info</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="data-table__cell align-left pl-xl-5">Wong Kenneth</td>
+<td class="data-table__cell align-left pl-xl-10">Chief Executive Officer & Chairman</td>
+<td class="data-table__cell align-center pl-xl-10"><span class="icon-check"></span></td>
+<td class="data-table__cell align-center pl-xl-10">
+<a class="d-inline-block" href="https://my.pitchbook.com/?p=334901-26P&anchor=contact-info" data-ppv-form data-popup-iframe aria-label="Contact info link">
+<span class="icon-vcard" aria-hidden="true"></span>
+</a>
+</td>
+</tr>
+<tr>
+<td class="data-table__cell align-left pl-xl-5">Davidkhanian Alex</td>
+<td class="data-table__cell align-left pl-xl-10">Chief Financial Officer & Director</td>
+<td class="data-table__cell align-center pl-xl-10"></td>
+<td class="data-table__cell align-center pl-xl-10">
+<a class="d-inline-block" href="https://my.pitchbook.com/?p=334902-52P&anchor=contact-info" data-ppv-form data-popup-iframe aria-label="Contact info link">
+<span class="icon-vcard" aria-hidden="true"></span>
+</a>
+</td>
+</tr>
+</tbody>
+</table>
+<a class="mt-xl-25 mt-m-20 d-inline-block font-underline font-size-small" href="/profiles/request-access">
+To view Keen Vision Acquisition&#8217;s complete executive team members history, request access&nbsp;&raquo;
+</a>
+</div>
+<div id="board" data-anchor-section class="XL-12 data-table">
+<div class="pb-xl-20 pt-xl-35">
+<h2 class="data-table__name mt-xl-5 mb-xl-0 mt-l-0">Keen Vision Acquisition Board Members (2)</h2>
+</div>
+<table>
+<thead>
+<tr>
+<th class="data-table__cell data-table__cell_max180 align-left font-color-black pl-xl-10 offset-bottom-XL-5 color font-size-small">Name</th>
+<th class="data-table__cell data-table__cell_max180 align-left font-color-black pl-xl-10 pb-xl-15 color font-size-small">Representing</th>
+<th class="data-table__cell data-table__cell_max215 align-left font-color-black pl-xl-10 pb-xl-15 color font-size-small">Role</th>
+<th class="data-table__cell data-table__cell_max90 align-left font-color-black pl-xl-10 pb-xl-15 color font-size-small">Since</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="data-table__cell align-left pl-xl-10">Ronald Li</td>
+<td class="data-table__cell align-left pl-xl-10" title="Self">Self</td>
+<td class="data-table__cell align-left pl-xl-10">Board Member</td>
+<td class="data-table__cell no-ellipsis align-left pl-xl-10">
+<span class="data-table__gray-box">000 0000</span>
+</td>
+</tr>
+<tr>
+<td class="data-table__cell align-left pl-xl-10">Wong Kenneth</td>
+<td class="data-table__cell align-left pl-xl-10" title="Keen Vision Acquisition"><a href="/profiles/company/519737-14" target="_blank" class="font-underline">Keen Vision Acquisition</a></td>
+<td class="data-table__cell align-left pl-xl-10">Chief Executive Officer & Chairman</td>
+<td class="data-table__cell no-ellipsis align-left pl-xl-10">
+<span class="data-table__gray-box">000 0000</span>
+</td>
+</tr>
+</tbody>
+</table>
+<a class="mt-xl-25 mt-m-20 d-inline-block font-underline font-size-small" href="/profiles/request-access">
+To view Keen Vision Acquisition&#8217;s complete board members history, request access&nbsp;&raquo;
+</a>
+</div>
+<div id="signals" data-anchor-section class="XL-12 data-table">
+<div class="offset-top-XL-35 offset-bottom-XL-20">
+<h2 class="data-table__name mt-xl-5 mb-xl-0 mt-l-0">Keen Vision Acquisition Signals</h2>
+</div>
+<div class="signals-table graph-blurred py-xl-25 px-l-20 relative-position">
+<div class="signals-table__wrap flex-container flex-align-start flex-wrap">
+<div class="XL-12 flex-container shift-bottom-XL-20">
+<div class="XL-3 L-2 signals-table__chart flex-container flex-direction-column mr-xl-10 mr-l-15">
+<p class="signals-table__chart-title mb-xl-15 mb-l-5 font-weight-bold font-size-small centered-XL">Growth Rate</p>
+<div class="relative-position centered-XL">
+<img src="/img/profile-preview/signals/type-2/growth-rate-pie.jpg" alt="" width="98">
+<div class="signals-table__chart-label flex-vertical-align flex-align-center">
+<span class="data-table__gray-box">0.80%</span>
+<span>Weekly<br>Growth</span>
+</div>
+</div>
+</div>
+<div class="XL-3 L-4 signals-table__chart flex-container flex-direction-column mr-xl-10 mr-l-20">
+<div class="signals-table__chart-title mb-xl-15 flex-container flex-justify-between font-weight-bold font-size-small">
+<span>Weekly Growth</span>
+<span class="data-table__gray-box">0.80%, 93rd %</span>
+</div>
+<img src="/img/profile-preview/signals/type-2/weekly-growth-visual.jpg" alt="" width="191">
+<div class="mt-xl-5 flex-container flex-justify-between font-size-small">
+<span class="data-table__gray-box">-35.5%.</span>
+<span class="data-table__gray-box">530%</span>
+</div>
+</div>
+<div class="XL-3 L-2 flex-container flex-direction-column shift-right-L-15 shift-right-XL-10 signals-table__chart">
+<p class="signals-table__chart-title mb-xl-15 mb-l-5 font-weight-bold font-size-small centered-XL">Size Multiple</p>
+<div class="relative-position centered-XL">
+<img src="/img/profile-preview/signals/type-2/size-multiple-pie.jpg" alt="" width="98">
+<div class="signals-table__chart-label flex-vertical-align flex-align-center">
+<span class="data-table__gray-box">219x</span>
+<span>Median</span>
+</div>
+</div>
+</div>
+<div class="XL-3 L-4 signals-table__chart flex-container flex-direction-column">
+<div class="signals-table__chart-title mb-xl-15 flex-container flex-justify-between font-weight-bold font-size-small">
+<span>Size Multiple</span>
+<span class="data-table__gray-box">219x, 100th %ile</span>
+</div>
+<img src="/img/profile-preview/signals/type-2/size-multiple-bell-curve.jpg" alt="" width="191">
+<div class="mt-xl-5 flex-container flex-justify-between font-size-small">
+<span class="data-table__gray-box">0.00x</span>
+<span class="data-table__gray-box">0.95x.</span>
+<span class="data-table__gray-box">413Kx</span>
+</div>
+</div>
+</div>
+<div class="XL-12 flex-container flex-wrap pl-xl-50 pl-l-25">
+<p class="XL-12 mb-xl-15 pl-xl-50 pl-l-0 font-weight-bold font-size-small">Key Data Points</p>
+<div class="XL-3 L-4 flex-container flex-direction-column ml-xl-50 mr-xl-15 mr-l-0 ml-l-0 signals-table__chart">
+<p class="signals-table__chart-title mb-xl-10 mb-s-0 font-weight-bold font-size-small">Twitter Followers</p>
+<p class="mb-xl-0"><span class="font-size-small data-table__gray-box">5.5k</span></p>
+<img src="/img/profile-preview/signals/type-2/twitter-chart.jpg" alt="" width="188">
+</div>
+<div class="XL-3 L-4 flex-container flex-direction-column mr-xl-15 mr-l-0 signals-table__chart">
+<p class="signals-table__chart-title mb-xl-10 font-weight-bold font-size-small">Similarweb Unique Visitors</p>
+<p class="mb-xl-0"><span class="font-size-small data-table__gray-box">15.0K</span></p>
+<img src="/img/profile-preview/signals/type-2/unique-chart.jpg" alt="" width="188">
+</div>
+<div class="XL-3 L-4 flex-container flex-direction-column signals-table__chart">
+<p class="signals-table__chart-title mb-xl-10 font-weight-bold font-size-small">Majestic Referring Domains</p>
+<p class="mb-xl-0"><span class="font-size-small data-table__gray-box">314</span></p>
+<img src="/img/profile-preview/signals/type-2/majestic-chart.jpg" alt="" width="188">
+</div>
+</div>
+</div>
+<div class="graph-blurred__hover-el flex-container flex-content-center flex-justify-center flex-wrap">
+<div class="XL-11 L-12 centered-XL flex-container flex-justify-center flex-content-center flex-wrap px-xl-20 px-m-15 px-s-0 px-xs-30">
+<p class="mb-xl-30 mb-l-20 font-color-white">PitchBook’s non-financial metrics help you gauge a company’s traction and growth using web presence and social reach.</p>
+<a href="/profiles/request-access" class="XS-12 btn btn-primary btn-primary_orange px-xs-10">Request a free trial</a>
+<div class="lock-icon mb-xl-20">
+<svg width="50" height="55" version="1.1" viewBox="0 0 50 55" xmlns="http://www.w3.org/2000/svg">
+<path d="m25 51.338c13.807 0 25-10.848 25-24.231s-11.193-24.231-25-24.231-25 10.848-25 24.231 11.193 24.231 25 24.231z" fill="#f0ebde"/>
+<path class="lock-shackle" d="m7.286 33.206 6.2572-0.01203-0.0015-6.9641c0.22946-7.1382 5.9502-11.201 11.44-11.114 5.4895 0.08642 9.6973 2.9302 11.291 9.1298h6.3219c-1.1892-8.5045-8.1898-15.227-17.594-15.179-9.4045 0.047515-17.736 7.406-17.708 17.163z" fill="#e88f36"/>
+<path d="m45.833 24.207h-41.667v30.692h41.667z" fill="#051c38"/>
+<path d="m25 40.232c2.3011 0 4.1666-1.808 4.1666-4.0384s-1.8655-4.0385-4.1666-4.0385c-2.3012 0-4.1667 1.8081-4.1667 4.0385s1.8655 4.0384 4.1667 4.0384z" fill="#f0ebde"/>
+<path d="m27.083 38.884h-4.1667v8.4126h4.1667z" fill="#f0ebde"/>
+</svg>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="data" data-anchor-section class="XL-12 pp-data-transparency data-table">
+<div class="pt-xl-35 pb-xl-20">
+<h3 class="data-table__name mt-xl-5 mb-xl-0 mt-l-0">Data Transparency</h3>
+</div>
+<ul class="list-type-none flex-container mb-xl-35">
+<li class="XL-5 L-6 pp-data-transparency__item flex-container flex-direction-column mr-xl-30 mr-l-15">
+<picture class="flex-container">
+<img class="pp-data-transparency__image full-width" src="/img/profile-preview/data-transparency/blog-card.png" alt=""/>
+</picture>
+<div class="px-xl-20 py-xl-20 border flex-container flex-direction-column height-100">
+<p class="font-weight-bold mb-xl-10">Meet our data hygiene team</p>
+<p class="mb-xl-10">Discover how our experts ensure you’re getting the most accurate financial data in the industry.</p>
+<a href="/blog/meet-pitchbooks-data-hygiene-team" class="btn btn-tertiary">Read blog »</a>
+</div>
+</li>
+<li class="XL-7 L-6 pp-data-transparency__item flex-container flex-direction-column flex-shrink-zero ml-l-15">
+<picture class="flex-container">
+<source media="(max-width: 1229px)" srcset="/img/profile-preview/data-transparency/blog-card-mob2.png"/>
+<source media="(min-width: 1230px)" srcset="/img/profile-preview/data-transparency/blog-card2.png"/>
+<img class="pp-data-transparency__image full-width" src="/img/profile-preview/data-transparency/blog-card2.png" alt=""/>
+</picture>
+<div class="px-xl-20 py-xl-20 border flex-container flex-wrap height-100">
+<p class="font-weight-bold mb-xl-10">How PitchBook sources data</p>
+<p class="mb-xl-10">Our data operations team has logged over 3.5 million hours researching, organizing, and integrating the information you need most.</p>
+<a href="/research-process" class="btn btn-tertiary flex-align-self-end">Discover our process »</a>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-navy-blue">
+<div class="footer bg-navy-blue">
+<div class="container flex-container flex-wrap py-xl-100 py-l-70 py-m-50" role="navigation" aria-label="Footer navigation menu">
+<div class="XL-3 M-3 S-12">
+<span class="d-block-XL mb-xl-20 mb-l-10 mb-s-30"><a class="font-color-white font-weight-bold" href="/products">Products</a></span>
+<ul class="footer-menu S-0 mb-xl-30 pr-xl-25 pr-l-15 font-height-normal list-type-none">
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/products/desktop">PitchBook Desktop</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/products/mobile">PitchBook Mobile</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/products/excel-plugin">Excel and Powerpoint Plugins</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/products/chrome-extension">Chrome Extension</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/products/institutional-research-group">PitchBook Institutional Research</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/leveraged-commentary-data">LCD Credit Analysis</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/products/morningstar-institutional-equity-research">Morningstar Institutional Equity Research</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/products/crm-integration">CRM Integration</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/products/direct-access-data">Direct Data</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/blog#product-releases">Product Releases</a>
+</li>
+</ul>
+<p class="font-color-white font-weight-bold S-0">PitchBook for</p>
+<ul class="footer-menu S-0 mb-xl-30 pr-xl-25 pr-l-15 font-height-normal list-type-none">
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/private-company-valuations">Private Market Valuations</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/venture-capital-database">Venture Capital</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/private-equity-database">Private Equity</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/hedge-fund-database">Hedge Funds</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/solutions/startups">Startups</a>
+</li>
+</ul>
+<span class="d-block-XL mb-s-30"><a class="font-color-white font-weight-bold" href="/profiles">Profile Previews</a></span>
+</div>
+<div class="XL-3 M-3 S-12">
+<span class="d-block-XL mb-xl-20 mb-l-10 mb-s-30"><a class="font-color-white font-weight-bold" href="/solutions">Solutions</a></span>
+<ul class="footer-menu S-0 mb-xl-30 pr-xl-25 pr-l-15 font-height-normal list-type-none">
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/solutions/private-market-intelligence">Private Market Intel</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/solutions/fundraising">Fundraising</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/solutions/deal-sourcing">Deal Sourcing</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/solutions/due-diligence">Due Diligence</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/solutions/business-development">Business Development</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/solutions/networking">Networking</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/solutions/deal-execution">Deal Execution</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/private-market-benchmarks">Benchmarking</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/solutions/asset-allocation">Asset Allocation</a>
+</li>
+</ul>
+<span class="d-block-XL mb-xl-30"><a class="font-color-white font-weight-bold" href="/blog">Blog</a></span>
+<span class="d-block-XL mb-xl-30"><a class="font-color-white font-weight-bold" href="/webinars">Webinars</a></span>
+<span class="d-block-XL mb-s-30"><a class="font-color-white font-weight-bold" href="/video-library">Video Library</a></span>
+</div>
+<div class="XL-3 M-3 S-12">
+<span class="d-block-XL mb-xl-20 mb-l-10 mb-s-30"><a class="font-color-white font-weight-bold" href="/data">Data</a></span>
+<ul class="footer-menu S-0 mb-xl-30 pr-xl-25 pr-l-15 font-height-normal list-type-none">
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/platform-data/companies">Companies</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/platform-data/investors">Investors</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/platform-data/deals">Deals</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/platform-data/mergers-and-acquisitions">M&amp;A</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/platform-data/limited-partners">Limited Partners</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/platform-data/funds">Funds</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/platform-data/financials">Financials</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/platform-data/advisors">Advisors</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/platform-data/professionals">Professionals</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/platform-data/debt">Debt</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/platform-data/lenders">Lenders</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/research-process">Data Operations</a>
+</li>
+</ul>
+</div>
+<div class="XL-3 M-3 S-12">
+<span class="d-block-XL mb-xl-20 mb-l-10 mb-s-30"><a class="font-color-white font-weight-bold" href="/news">News & analysis</a></span>
+<ul class="footer-menu S-0 mb-xl-30 pr-xl-25 pr-l-15 font-height-normal list-type-none">
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/news/reports">Reports</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/subscribe">Newsletter</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/sponsorship">Advertise</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/news/research-and-analysis-team">Research &amp; Analysis Team</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/news/news-team">News Team</a>
+</li>
+</ul>
+<span class="d-block-XL mb-xl-20 mb-l-10 mb-s-30"><a class="font-color-white font-weight-bold" href="/about">About</a></span>
+<ul class="footer-menu S-0 mb-xl-30 pr-xl-25 pr-l-15 font-height-normal list-type-none">
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/service">Customer Success</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/client-testimonials">Client Testimonials</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/resources/customer-stories">Case Studies</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/pitchbook-key-differentiators">What Sets Us Apart</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/media">Press Inquiries</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/partners">Partnerships</a>
+</li>
+<li class="mb-xl-20 mb-l-10">
+<a class="font-color-white" href="/about/careers">Careers</a>
+</li>
+</ul>
+</div>
+<div class="XL-0 XS-12 d-block-S pt-xl-10">
+<p class="font-color-white font-weight-bold mb-s-30">Follow us</p>
+<ul class="social-icon flex-container flex-wrap list-type-none">
+<li class="mr-s-15">
+<a class="flex-container flex-justify-center flex-align-center icon icon-squared linkedin" rel="nofollow" target="_blank" href="https://www.linkedin.com/company/pitchbook" aria-label="PitchBook LinkedIn link">&#xeac9;</a>
+</li>
+<li class="mr-s-15">
+<a class="flex-container flex-justify-center flex-align-center icon icon-squared twitter" rel="nofollow" target="_blank" href="https://twitter.com/PitchBook" aria-label="PitchBook Twitter link">&#xea91;</a>
+</li>
+<li class="mr-s-15">
+<a class="flex-container flex-justify-center flex-align-center icon icon-squared facebook" rel="nofollow" target="_blank" href="https://www.facebook.com/PitchBookData" aria-label="PitchBook Facebook link">&#xea8c;</a>
+</li>
+<li class="mr-s-15">
+<a class="flex-container flex-justify-center flex-align-center icon icon-squared youtube" rel="nofollow" target="_blank" href="https://www.youtube.com/user/PitchBook" aria-label="PitchBook YouTube link">&#xf16a;</a>
+</li>
+<li>
+<a class="flex-container flex-justify-center flex-align-center icon icon-squared instagram" rel="nofollow" target="_blank" href="https://www.instagram.com/pitchbookdata/" aria-label="PitchBook Instagram link">&#xea92;</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="footer-contacts py-xl-100 py-l-70 py-m-50" role="contentinfo">
+<div class="container flex-container flex-wrap">
+<div class="XL-3 XS-12 S-0 pr-l-15">
+<p class="font-color-white font-weight-bold">US Headquarters</p>
+<ul class="font-color-white list-type-none">
+<li><a class="font-color-white" href="tel:+12066231986">+1 (206) 623.1986</a></li>
+<li>901 Fifth Avenue</li>
+<li>Suite 1200</li>
+<li>Seattle, WA 98164</li>
+</ul>
+</div>
+<div class="XL-3 XS-12 S-0 pr-l-15">
+<p class="font-color-white font-weight-bold">European Headquarters</p>
+<ul class="font-color-white list-type-none">
+<li><a class="font-color-white" href="tel:+4402080372308">+44 (0) 20 8037.2308</a></li>
+<li>1st Floor Saffron House</li>
+<li>6-10 Kirby Street</li>
+<li>London EC1N 8TS</li>
+<li>United Kingdom</li>
+</ul>
+</div>
+<div class="XL-3 XS-12 S-0 pr-xl-20 pr-l-15">
+<p class="font-color-white font-weight-bold">Asia-Pacific Headquarters</p>
+<ul class="font-color-white list-type-none">
+<li>80 Raffles Place</li>
+<li>#41-01 UOB Plaza 1</li>
+<li>Singapore 048624</li>
+</ul>
+</div>
+<div class="XL-3 XS-12 S-0">
+<span class="d-block-XL mb-xl-20"><a class="font-color-white font-weight-bold" href="/contact">Contact Us</a></span>
+<ul class="list-type-none">
+<li><a class="font-color-white" class="pb-email" href="/cdn-cgi/l/email-protection#85ecebe3eac5f5ecf1e6ede7eaeaeeabe6eae8"><span class="__cf_email__" data-cfemail="dab3b4bcb59aaab3aeb9b2b8b5b5b1f4b9b5b7">[email&#160;protected]</span></a></li>
+<li><a class="font-color-white" href="/request-research">Request Research</a></li>
+<li><a class="font-color-white" href="/request-your-pitchbook-profile">Profile Request</a></li>
+<li><a class="font-color-white" href="/submit-a-deal">Deal Submission</a></li>
+</ul>
+<div class="S-0 pt-xl-30">
+<p class="font-color-white font-weight-bold mb-xl-15">Follow us</p>
+<ul class="M-10 social-icon flex-container flex-wrap list-type-none">
+<li class="mr-s-15 align-middle">
+<a class="flex-container flex-justify-center flex-align-center icon icon-squared linkedin" rel="nofollow" target="_blank" href="https://www.linkedin.com/company/pitchbook" aria-label="PitchBook LinkedIn link">&#xeac9;</a>
+</li>
+<li class="mr-s-15 align-middle ml-xl-10">
+<a class="flex-container flex-justify-center flex-align-center icon icon-squared twitter" rel="nofollow" target="_blank" href="https://twitter.com/PitchBook" aria-label="PitchBook Twitter link">&#xea91;</a>
+</li>
+<li class="mr-s-15 align-middle shift-left-XL-10 offset-bottom-M-10">
+<a class="flex-container flex-justify-center flex-align-center icon icon-squared facebook" rel="nofollow" target="_blank" href="https://www.facebook.com/PitchBookData" aria-label="PitchBook Facebook link">&#xea8c;</a>
+</li>
+<li class="align-middle ml-xl-10 ml-m-0 pr-m-10">
+<a class="flex-container flex-justify-center flex-align-center icon icon-squared youtube" rel="nofollow" target="_blank" href="https://www.youtube.com/user/PitchBook" aria-label="PitchBook YouTube link">&#xf16a;</a>
+</li>
+<li class="align-middle ml-xl-10 ml-m-0">
+<a class="flex-container flex-justify-center flex-align-center icon icon-squared instagram" rel="nofollow" target="_blank" href="https://www.instagram.com/pitchbookdata/" aria-label="PitchBook Instagram link">&#xea92;</a>
+</li>
+</ul>
+</div>
+</div>
+<div class="XL-12 pt-s-0 pt-xl-30">
+<p class="copyright text-small font-color-white centered-XL mb-xl-5 mb-m-10 mb-s-15">
+&copy; 2024 PitchBook. Win what’s next. All rights reserved.
+</p>
+<ul class="footer-link-separator centered-XL list-type-none">
+<li class="d-inline-block mr-xl-15 mr-m-30 mr-s-20"><a class="text-small font-color-white" href="/terms-of-use">Terms of Use</a></li>
+<li class="d-inline-block mr-xl-15 mr-m-30 mr-s-20 mr-xs-0"><a class="text-small font-color-white" href="/privacy-policy">Privacy Policy</a></li>
+<li class="d-inline-block"><a class="text-small font-color-white" href="/privacy-policy" id="privacyLink">California Consumer: Do Not Sell My Info</a></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="/js/app.js?uq=7u3wMnG5"></script>
+<script async src="//cdn.bizible.com/scripts/bizible.js?uq=7u3wMnG5"></script>
+<script src="/js/analytics-footer.js?uq=7u3wMnG5"></script>
+<script async src="//fast.wistia.com/assets/external/E-v1.js?uq=7u3wMnG5"></script>
+<noscript>
+<img height="1" width="1" style="display:none;" alt="" src="https://dc.ads.linkedin.com/collect/?pid=15937&fmt=gif" data-append-uq="off" />
+</noscript>
+<noscript>
+<img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=1752955298289295&ev=PageView&noscript=1" data-append-uq="off"/>
+</noscript>
+<script type="text/javascript" src="https://www.google.com/recaptcha/api.js?onload=reCaptchaOnloadCallback&render=explicit&uq=7u3wMnG5"></script>
+<div class="re-captcha-bl">
+<script type="text/javascript">
+var reCaptchaOnloadCallback = function () {
+$('.re-captcha').each(function (index, element) {
+var reCaptchaId = grecaptcha.render(element, {
+'sitekey': '6LfrvxUTAAAAAGN6l9psIK7yoGOSnL09yd7n8ee1',
+'callback': function () {
+var $reCaptcha = $(element);
+$reCaptcha.data('id', reCaptchaId);
+// jQuery Validation works on keyup
+$reCaptcha.find('.g-recaptcha-response').trigger('keyup');
+}
+});
+});
+};
+</script>
+</div>
+<script src="/js/drift.js?uq=7u3wMnG5"></script>
+<script src="/lib/swiper/swiper.js?uq=7u3wMnG5"></script>
+<script>platformContext = 'https://my.pitchbook.com';</script>
+<script src="/js/ppv-popup-init.js?uq=7u3wMnG5"></script>
+<iframe class="platform-login-checker" src="https://my.pitchbook.com/loginAction.do?action=isLoggedToPlatform"></iframe>
+<script src="/js/profiles/tippy-ie-polyfill.js?uq=7u3wMnG5"></script>
+<script src="/lib/popper.js?uq=7u3wMnG5"></script>
+<script src="/lib/tippy.umd.js?uq=7u3wMnG5"></script>
+<script src="/js/profiles/pp-profile.js?uq=7u3wMnG5"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v84a3a4012de94ce1a686ba8c167c359c1696973893317" integrity="sha512-euoFGowhlaLqXsPWQ48qSkBSCFs3DPRyiwVu3FjR96cMPx+Fr+gpWRhIafcHwqwCqWS42RZhIudOvEI+Ckf6MA==" data-cf-beacon='{"rayId":"85c9bddf0fd20569","b":1,"version":"2024.2.1","token":"972ee60e598b495e907da733fffbd127"}' crossorigin="anonymous"></script>
+</body>
+</html>

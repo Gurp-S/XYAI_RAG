@@ -1,0 +1,164 @@
+[
+ {
+  "question": "XYAI 后端 Kafka 改造一共设计了哪几个 Topic？各自用途是什么？",
+  "groundTruth": "共 7 个 Topic：etl-file（文件级 ETL，Parse+Chunk，16 分区按 fileHash 作 key）、etl-chunk（chunk 级并行 Enrich+Insert，8 分区轮询）、trace-log（链路追踪写入，4 分区）、analytics-event（评估结果与使用计数）、memory-cmd（记忆持久化与摘要，按 conversationId 作 key）、neo4j-cmd（Neo4j 操作）、milvus-cmd（Milvus 向量删除）。",
+  "expectedDocIds": "[\"9f3fdadc7e133a3dd28753761f71a426cb09311a8f757d0e84c62a4a0efa3138\"]",
+  "source": "MANUAL",
+  "enabled": 1,
+  "remark": "对应 kafka教程.md 第一节架构总览的 Topic 设计表"
+ },
+ {
+  "question": "etl-file 和 etl-chunk 两个 Topic 的分区数和消息 key 策略有什么区别？为什么这样设计？",
+  "groundTruth": "etl-file 为 16 分区，key 用 fileHash，保证同一文件的消息有序落到同一分区，文件级 ETL 串行处理；etl-chunk 为 8 分区，key 为 null 轮询分发，让 chunk 级任务尽可能并行、均匀分配到多个消费者实例。",
+  "expectedDocIds": "[\"9f3fdadc7e133a3dd28753761f71a426cb09311a8f757d0e84c62a4a0efa3138\"]",
+  "source": "MANUAL",
+  "enabled": 1,
+  "remark": "考察分区与 key 策略的理解"
+ },
+ {
+  "question": "文件上传后 ETL 的完整处理流程是什么？经过哪些组件？",
+  "groundTruth": "UploadController 生产 etl-file 消息 → FileUploadConsumer 消费执行 Parser（解析文档）+ Chunker（分块），再发送 etl-chunk 消息 → ChunkConsumer 消费执行 Enricher（LLM 增强）+ Indexer（Milvus 入库），最后 UploadTracker 在 Redis 中跟踪 chunk 完成进度直到整个文件处理结束。",
+  "expectedDocIds": "[\"9f3fdadc7e133a3dd28753761f71a426cb09311a8f757d0e84c62a4a0efa3138\"]",
+  "source": "MANUAL",
+  "enabled": 1,
+  "remark": "对应 ETL 链路 Parser→Chunker→Enricher→Indexer"
+ },
+ {
+  "question": "为什么 Redis 的 ACL 权限操作不走 Kafka 而是同步执行？",
+  "groundTruth": "所有 Redis 权限操作（MilvusAclManager 的 addFileUserACl、grantFileChunksToUser、deleteDocumentAcl、deleteCollectionAcl 等）保持同步执行，保证权限变更立即可见、检索鉴权不出现窗口期；只有当 deleteDocumentAcl 判定为唯一父级（count<=0）需要实际清理数据时，才双发 milvus-cmd 和 neo4j-cmd 异步删除向量与关系，由消费者 IdempotentChecker 保证幂等。",
+  "expectedDocIds": "[\"9f3fdadc7e133a3dd28753761f71a426cb09311a8f757d0e84c62a4a0efa3138\"]",
+  "source": "MANUAL",
+  "enabled": 1,
+  "remark": "对应 Step 3 ACL 权限设计"
+ },
+ {
+  "question": "Kafka 消费者如何保证消息幂等，防止重复消费导致数据重复入库？",
+  "groundTruth": "通过 IdempotentChecker 组件基于 Redis 做幂等去重，消费者处理消息前先检查事件 eventId 是否已处理过，已处理则跳过，从而在重复投递场景下保证向量删除、关系删除等操作不会重复执行。",
+  "expectedDocIds": "[\"9f3fdadc7e133a3dd28753761f71a426cb09311a8f757d0e84c62a4a0efa3138\"]",
+  "source": "MANUAL",
+  "enabled": 1,
+  "remark": "对应 KafkaConfig/IdempotentChecker"
+ },
+ {
+  "question": "trace-log 链路追踪的写入链路是怎样的？",
+  "groundTruth": "RagTraceAspect 切面采集各 RAG 节点的执行信息后，通过 kafkaTemplate.send 发送到 trace-log Topic（4 分区轮询），TraceConsumer 消费后攒批合并写入 MySQL（使用 updateRun 合并处理），替代了原来同步写库的方式，避免追踪开销阻塞主链路。",
+  "expectedDocIds": "[\"9f3fdadc7e133a3dd28753761f71a426cb09311a8f757d0e84c62a4a0efa3138\"]",
+  "source": "MANUAL",
+  "enabled": 1,
+  "remark": "对应 Step 4 链路追踪"
+ },
+ {
+  "question": "memory-cmd Topic 承担了哪些职责？消息的 key 是什么？",
+  "groundTruth": "memory-cmd（4 分区）承担记忆持久化与摘要生成职责，包括消息保存、会话摘要生成与落库；消息 key 使用 conversationId，保证同一会话的消息有序处理，避免摘要生成时出现乱序。MemoryConsumer 消费后调用 generateAndSaveSummary 完成持久化。",
+  "expectedDocIds": "[\"9f3fdadc7e133a3dd28753761f71a426cb09311a8f757d0e84c62a4a0efa3138\"]",
+  "source": "MANUAL",
+  "enabled": 1,
+  "remark": "对应 Step 6 记忆持久化"
+ },
+ {
+  "question": "删除一个文档时，Milvus 向量和 Neo4j 关系是如何被清理的？",
+  "groundTruth": "deleteDocumentAcl 判定该文档是唯一父级（引用计数 count<=0）时，双发 milvus-cmd（删 Milvus 向量）和 neo4j-cmd（删 Neo4j 关系）两条消息，由各自消费者异步执行删除，IdempotentChecker 保证幂等；若仍有其他引用则不触发清理。",
+  "expectedDocIds": "[\"9f3fdadc7e133a3dd28753761f71a426cb09311a8f757d0e84c62a4a0efa3138\"]",
+  "source": "MANUAL",
+  "enabled": 1,
+  "remark": "对应 Step 7 / C12"
+ },
+ {
+  "question": "Kafka 改造中哪些消费者已经完成，哪些还未开始？",
+  "groundTruth": "已完成：FileUploadConsumer、ChunkConsumer（ETL 链路）、TraceConsumer（链路追踪）、MemoryConsumer（记忆持久化）。未开始：AnalyticsConsumer（analytics-event 评估与计数）、Neo4jConsumer（neo4j-cmd Neo4j 操作），需新建。",
+  "expectedDocIds": "[\"9f3fdadc7e133a3dd28753761f71a426cb09311a8f757d0e84c62a4a0efa3138\"]",
+  "source": "MANUAL",
+  "enabled": 1,
+  "remark": "对应改造完成度总表"
+ },
+ {
+  "question": "RAG 检索为什么要把 ACL 权限过滤下推到 Milvus 查询层，而不是检索后过滤？",
+  "groundTruth": "检索后过滤有两个问题：一是未授权 chunk 已经进入检索结果集和上下文候选，属于信息泄露（OWASP LLM02 反模式）；二是未授权文档可能占满 TopK 名额后被过滤掉，导致用户有权限的内容反而检索不到。下推到查询层用 expr（visibility 为 public 或 doc_id 属于授权文件集）让未授权 chunk 根本不进入候选集，后置过滤只作为纵深防御保留。",
+  "expectedDocIds": "[\"a01d85a799448bc1ba4827fd1e180e41d38023a1879b366be0d23aa5af1d548e\"]",
+  "source": "MANUAL",
+  "enabled": 1,
+  "remark": "对应实施计划包① #1"
+ },
+ {
+  "question": "Contextual Retrieval 是什么？为什么说它是性价比最高的检索质量优化？",
+  "groundTruth": "Anthropic 提出的方法：入库前让 LLM 通读全文，为每个 chunk 生成 50-100 token 的定位说明（来自哪份文档、哪个章节、什么背景），拼接在 chunk 文本前再做 embedding 和 BM25 索引。官方实测将 Top-20 检索失败率从 5.7% 降到 1.9%（-67%）。性价比高是因为只改入库管道的增强环节，不动检索架构，成本可控。",
+  "expectedDocIds": "[\"84bfb3630e4411b666dc209a97f6ac79f5ed5d8e9934f7d76b20ff027d88516a\"]",
+  "source": "MANUAL",
+  "enabled": 1,
+  "remark": "对应对标报告第三节"
+ },
+ {
+  "question": "RAG 评估常用的四个指标是什么？分别衡量什么？",
+  "groundTruth": "RAGAS 四指标：Faithfulness（忠实度，答案是否基于检索内容、有无幻觉）、Context Precision（检索结果中相关内容的占比）、Context Recall（期望要点被检索内容覆盖的比例）、Answer Relevancy（答案与问题的相关性）。业界用它们作为上线门控阈值。",
+  "expectedDocIds": "[\"84bfb3630e4411b666dc209a97f6ac79f5ed5d8e9934f7d76b20ff027d88516a\"]",
+  "source": "MANUAL",
+  "enabled": 1,
+  "remark": "评估闭环核心概念"
+ },
+ {
+  "question": "为什么要用父子切片（parent-child chunking）？解决什么问题？",
+  "groundTruth": "小块语义聚焦、适合向量匹配召回，但内容太碎、送给 LLM 生成时缺少上下文；父块是完整章节，信息完整但向量匹配精度差。父子切片用子块做检索与精排，命中后展开父块全文进入 Prompt，兼顾检索精度和生成上下文完整性，解决'检索命中碎片、生成缺上下文'的问题。",
+  "expectedDocIds": "[\"a01d85a799448bc1ba4827fd1e180e41d38023a1879b366be0d23aa5af1d548e\"]",
+  "source": "MANUAL",
+  "enabled": 1,
+  "remark": "对应实施计划包④ #13"
+ },
+ {
+  "question": "RAG 系统的多层缓存应该怎么设计？每层缓存什么？",
+  "groundTruth": "典型四层：L1 查询 embedding 缓存（Redis，key 为查询哈希，避免重复调 embedding 模型）；L2 检索结果缓存（key 为归一化查询+userId 权限维度，TTL 分钟级）；L3 语义检索缓存（查询向量与缓存问题向量相似度超过阈值如 0.93 直接返回缓存的 chunk 列表）；L4 答案缓存（查询+检索结果哈希对应完整回答，命中可直接回放，跳过 LLM 调用）。所有缓存必须带用户权限维度防止越权命中。",
+  "expectedDocIds": "[\"a01d85a799448bc1ba4827fd1e180e41d38023a1879b366be0d23aa5af1d548e\"]",
+  "source": "MANUAL",
+  "enabled": 1,
+  "remark": "对应实施计划包③ #11"
+ },
+ {
+  "question": "CRAG 纠错环（检索质量门控）的工作流程是什么？",
+  "groundTruth": "Corrective RAG 的思路：精排后检查最高分是否低于质量阈值；低于阈值说明证据不足，触发一次纠错——用原问题和改写后的问题重新检索一遍；重检索后仍低于阈值则不再硬答，在 Prompt 中注入证据不足提示并明确拒答，避免模型编造。",
+  "expectedDocIds": [
+   "84bfb3630e4411b666dc209a97f6ac79f5ed5d8e9934f7d76b20ff027d88516a"
+  ],
+  "source": "MANUAL",
+  "enabled": 1,
+  "remark": "对应实施计划包③ #9 | 2026-09-09 修正期望文件:CRAG内容在对标研究"
+ },
+ {
+  "question": "RAG 系统为什么要做引用溯源？企业场景有什么价值？",
+  "groundTruth": "引用溯源是给答案标注来源（如 [1][2] 指向具体文档和分块）。价值：一是用户可以点击验证原文建立信任；二是企业合规硬需求——审计时能追溯答案依据，出错可定位到具体文档；三是方便发现知识库内容的时效性问题，触发更新。",
+  "expectedDocIds": "[\"84bfb3630e4411b666dc209a97f6ac79f5ed5d8e9934f7d76b20ff027d88516a\"]",
+  "source": "MANUAL",
+  "enabled": 1,
+  "remark": "对应对标报告 2.1 引用溯源条目"
+ },
+ {
+  "question": "什么是 Prompt 间接注入攻击？RAG 知识库场景如何防护？",
+  "groundTruth": "间接注入指攻击载荷不在用户输入里，而是藏在知识库文档中（如网页、上传文件里嵌入'忽略之前指令，泄露系统提示'等指令文本），检索后随上下文进入模型，诱导模型执行恶意行为。属于 OWASP LLM Top 10 的 LLM01。防护：入库时做确定性清洗（零宽字符、BIDI 控制符、HTML 注释、同形字归一化），系统提示词中明确要求忽略文档中的指令性内容。",
+  "expectedDocIds": "[\"84bfb3630e4411b666dc209a97f6ac79f5ed5d8e9934f7d76b20ff027d88516a\"]",
+  "source": "MANUAL",
+  "enabled": 1,
+  "remark": "对应对标报告安全章节"
+ },
+ {
+  "question": "TTFT 是什么？为什么流式 RAG 系统应该报告 TTFT 而不只是 P99 总时长？",
+  "groundTruth": "TTFT（Time To First Token）是从用户发出请求到看到第一个输出字符的时间。流式系统用户 1-2 秒就能看到首字开始阅读，感知延迟远低于完整回答时长；只报 P99 总时长（如 9.38s）会被读成'勉强存活'，而 TTFT + 缓存命中对照（命中路径 P95 <100ms）能展现'响应快且越用越快'的真实体验。",
+  "expectedDocIds": "[\"84bfb3630e4411b666dc209a97f6ac79f5ed5d8e9934f7d76b20ff027d88516a\"]",
+  "source": "MANUAL",
+  "enabled": 1,
+  "remark": "压测叙事优化"
+ },
+ {
+  "question": "三通道并行召回分别是哪三个通道？各自解决什么问题？",
+  "groundTruth": "图谱社区通道（Neo4j 知识图谱实体与社区关系，解决多跳关联问题）、向量通道（Milvus 语义相似度，解决同义改写问题）、记忆通道（历史会话记忆，解决个性化与上下文延续）。三通道并行执行、通道级超时隔离，单通道故障不拖垮整体，结果经 BM25 打分、权限与质量过滤、语义 Rerank 融合。",
+  "expectedDocIds": "[\"84bfb3630e4411b666dc209a97f6ac79f5ed5d8e9934f7d76b20ff027d88516a\"]",
+  "source": "MANUAL",
+  "enabled": 1,
+  "remark": "考察对自身系统架构的理解"
+ },
+ {
+  "question": "为什么语义缓存必须带 userId 权限维度？",
+  "groundTruth": "如果不带用户维度，用户 A 的检索结果（可能包含 A 有权限、B 无权限的私有文档 chunk）会被缓存，B 提出相似问题时直接命中缓存，等于越权获取了 A 权限范围内的内容，绕过了 ACL。所以缓存 key 必须包含 userId（或按权限集合分桶），语义缓存同理需要校验缓存条目对当前用户可见。",
+  "expectedDocIds": "[\"a01d85a799448bc1ba4827fd1e180e41d38023a1879b366be0d23aa5af1d548e\"]",
+  "source": "MANUAL",
+  "enabled": 1,
+  "remark": "安全与缓存的交叉考点"
+ }
+]

@@ -7,11 +7,14 @@ import com.XYai.myai.rag.aop.annotation.RagTraceContext;
 import com.XYai.myai.rag.aop.annotation.RagTraceNode;
 import com.XYai.myai.rag.chat.ModelInvocationService;
 import com.XYai.myai.rag.chat.pojo.ChatMessage;
+import com.XYai.myai.rag.kafka.event.AnalyticsEvent;
+import com.XYai.myai.rag.kafka.event.MemoryEvent;
 import com.XYai.myai.rag.memory.pojo.ChatConversation;
 import com.XYai.myai.rag.memory.pojo.ChatSessionRecord;
 import com.XYai.myai.rag.memory.pojo.LoadSession;
 import com.XYai.myai.rag.memory.pojo.MemoryProperties;
 import com.XYai.myai.user.LoginUserInfoManager;
+import com.XYai.myai.xyAdmin.pojo.TokenUse;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -26,18 +29,12 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -67,10 +64,10 @@ public class ConversationMemorySummaryService {
     private static final String userMessage = """
             历史摘要（不要复述）：
             %s
-
+            
             新对话：
             %s
-
+            
             输出更新后的摘要：
             """;
 
@@ -89,6 +86,9 @@ public class ConversationMemorySummaryService {
     private ChatModel chatModel;
 
     @Resource
+    private KafkaTemplate<String, Object> kafkaTemplate;
+
+    @Resource
     @Lazy
     private ModelInvocationService modelInvocation;
 
@@ -100,12 +100,6 @@ public class ConversationMemorySummaryService {
 
     @Resource
     private RedissonClient redissonClient;
-
-    @Resource(name = "memeryExecutor")
-    private TaskExecutor memoryCompactExecutor;
-
-    @Resource(name = "summaryExecutor")
-    private TaskExecutor summaryExecutor;
 
     /**
      * 异步触发摘要压缩（本地去重）
@@ -122,13 +116,9 @@ public class ConversationMemorySummaryService {
             return;
         }
 
-        memoryCompactExecutor.execute(() -> {
-            try {
-                doCompressIfNeeded(conversationId, message, userId);
-            } catch (Exception e) {
-                log.error("压缩任务执行失败: conversationId={}", conversationId, e);
-            }
-        });
+        kafkaTemplate.send("memory-cmd", String.valueOf(conversationId),
+                new MemoryEvent(UUID.randomUUID().toString(), "COMPRESS",
+                        conversationId, userId, JSON.toJSONString(message)));
     }
 
     /**
@@ -189,7 +179,7 @@ public class ConversationMemorySummaryService {
     /**
      * 核心压缩逻辑
      */
-    private void doCompressIfNeeded(Long conversationId, ChatMessage message, Long userId) {
+    public void doCompressIfNeeded(Long conversationId, ChatMessage message, Long userId) {
         int maxTurns = memoryProperties.getSummaryStartTurns();
         int keepTurns = memoryProperties.getHistoryKeepTurns();
 
@@ -206,7 +196,9 @@ public class ConversationMemorySummaryService {
         localCache.invalidate(chatMessageKey);
 
         // 2. 异步保存到数据库
-        asyncSaveToDatabase(conversationId, message);
+        kafkaTemplate.send("memory-cmd", null, new MemoryEvent(
+                UUID.randomUUID().toString(),"SAVE_MESSAGE",
+                conversationId,userId,JSON.toJSONString(message)));
 
         // 3. 检查是否需要压缩
         int total = scoredSet.size();
@@ -230,39 +222,52 @@ public class ConversationMemorySummaryService {
         // 失效Caffeine缓存
         localCache.invalidate(chatMessageKey);
 
-        // 6. 获取现有摘要
+        // 6. 提交摘要生成任务到Kafka
+        String summaryJson = JSON.toJSONString(toCompress);
+        kafkaTemplate.send("memory-cmd", String.valueOf(conversationId),
+                new MemoryEvent(UUID.randomUUID().toString(), "GENERATE_SUMMARY",
+                        conversationId, userId, summaryJson));
+    }
+
+    /**
+     * 从 MemoryEvent 生成摘要（供 MemoryConsumer 调用）
+     */
+    public void generateAndSaveSummary(MemoryEvent event) {
+        Long conversationId = event.getConversationId();
+        Long userId = event.getUserId();
+
+        // 从 Redis 获取现有摘要
         String summaryKey = RedisKeyConfig.userSummaryRecord(userId, conversationId);
         RBucket<String> summaryBucket = redissonClient.getBucket(summaryKey);
         String existingSummary = summaryBucket.get();
 
-        // 7. 提交摘要生成任务到专用线程池（不阻塞当前线程）
-        generateAndSaveSummary(conversationId, message.getChatMessageId(), userId, existingSummary, toCompress);
+        // 解析需要压缩的消息列表
+        Collection<String> toCompress = JSON.parseObject(
+                event.getMessageJson(), Collection.class);
+
+        generateAndSaveSummary(conversationId, null, userId, existingSummary, toCompress);
     }
 
     /**
      * 异步生成摘要并保存（使用 summaryGeneratorExecutor）
      */
-    private void generateAndSaveSummary(Long conversationId, Long chatMessageId, Long userId,
-                                        String existingSummary, Collection<String> toCompress) {
-        summaryExecutor.execute(() -> {
-            try {
-                String newSummary = generateSummary(existingSummary, toCompress, conversationId, chatMessageId, userId);
-                if (newSummary != null && !newSummary.equals(existingSummary)) {
-                    // 保存摘要到 Redis
-                    String summaryKey = RedisKeyConfig.userSummaryRecord(userId, conversationId);
-                    RBucket<String> summaryBucket = redissonClient.getBucket(summaryKey);
-                    summaryBucket.set(newSummary);
+    public void generateAndSaveSummary(Long conversationId, Long chatMessageId, Long userId,
+                                       String existingSummary, Collection<String> toCompress) {
+        String newSummary = generateSummary(existingSummary, toCompress, conversationId, chatMessageId, userId);
+        if (newSummary != null && !newSummary.equals(existingSummary)) {
+            // 保存摘要到 Redis
+            String summaryKey = RedisKeyConfig.userSummaryRecord(userId, conversationId);
+            RBucket<String> summaryBucket = redissonClient.getBucket(summaryKey);
+            summaryBucket.set(newSummary);
 
-                    // 同步修改Caffeine缓存
-                    localCache.put(summaryKey, newSummary);
+            // 同步修改Caffeine缓存
+            localCache.put(summaryKey, newSummary);
 
-                    // 更新数据库（异步，继续使用 summaryGeneratorExecutor 或 memoryCompactExecutor）
-                    asyncUpdateSummary(conversationId, newSummary);
-                }
-            } catch (Exception e) {
-                log.error("生成摘要失败: conversationId={}", conversationId, e);
-            }
-        });
+            // 更新数据库（异步，继续使用 summaryGeneratorExecutor 或 memoryCompactExecutor）
+            UpdateWrapper<ChatSessionRecord> wrapper = new UpdateWrapper<>();
+            wrapper.eq("conversation_id", conversationId).set("summary_text", newSummary);
+            chatSessionRecordMapper.update(null, wrapper);
+        }
     }
 
     /**
@@ -281,30 +286,25 @@ public class ConversationMemorySummaryService {
                     new SystemMessage(systemMessage),
                     new UserMessage(userMessage));
             long startTime = System.currentTimeMillis();
-            CompletableFuture<String> future = CompletableFuture.supplyAsync(
-                    () -> chatModel.call(prompt).getResult().getOutput().getText(),
-                    summaryExecutor);
-            String raw;
-            try {
-                raw = future.get(15, TimeUnit.SECONDS);
-            } catch (TimeoutException e) {
-                log.warn("摘要生成超时，使用现有摘要");
-                return existingSummary;
-            }
+            String summary = chatModel.call(prompt).getResult().getOutput().getText();
             long durationMs = System.currentTimeMillis() - startTime;
             // 记录 Token 使用
             RagTraceContext.setPhase("对话摘要");
-            modelInvocation.saveTokenUseAsync(
+            TokenUse tokenUse = new TokenUse(
                     conversationId,
                     chatMessageId,
-                    (long) prompt.toString().length(),
-                    (long) raw.length(),
+                    prompt.toString().length(),
+                    summary.length(),
                     userId,
                     durationMs,
                     chatModel.getDefaultOptions().getModel(),
                     "summary");
+            kafkaTemplate.send("analytics-event", null, new AnalyticsEvent(
+                    UUID.randomUUID().toString(), "evaluate",
+                    null, tokenUse, null
+            ));
             log.debug("摘要生成完成，耗时: {}ms", durationMs);
-            return raw.isBlank() ? existingSummary : raw;
+            return summary.isBlank() ? existingSummary : summary;
 
         } catch (Exception e) {
             log.error("生成摘要失败", e);
@@ -335,16 +335,10 @@ public class ConversationMemorySummaryService {
     /**
      * 异步保存会话数据到数据库
      */
-    private void asyncSaveToDatabase(Long conversationId, ChatMessage message) {
-        memoryCompactExecutor.execute(() -> {
-            try {
-                saveOrUpdateSessionRecord(conversationId, message);
-                saveConversationMessage(conversationId, message);
-                cleanupOldMessages(conversationId);
-            } catch (Exception e) {
-                log.error("保存会话到数据库失败: conversationId={}", conversationId, e);
-            }
-        });
+    public void asyncSaveToDatabase(Long conversationId, ChatMessage message) {
+        saveOrUpdateSessionRecord(conversationId, message);
+        saveConversationMessage(conversationId, message);
+        cleanupOldMessages(conversationId);
     }
 
     private void saveOrUpdateSessionRecord(Long conversationId, ChatMessage message) {
@@ -416,20 +410,5 @@ public class ConversationMemorySummaryService {
         } catch (Exception e) {
             log.warn("清理旧消息失败: conversationId={}", conversationId, e);
         }
-    }
-
-    /**
-     * 异步更新数据库中的摘要字段
-     */
-    private void asyncUpdateSummary(Long conversationId, String summary) {
-        memoryCompactExecutor.execute(() -> {
-            try {
-                UpdateWrapper<ChatSessionRecord> wrapper = new UpdateWrapper<>();
-                wrapper.eq("conversation_id", conversationId).set("summary_text", summary);
-                chatSessionRecordMapper.update(null, wrapper);
-            } catch (Exception e) {
-                log.error("更新摘要失败: conversationId={}", conversationId, e);
-            }
-        });
     }
 }

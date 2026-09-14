@@ -1,0 +1,3360 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<link rel="canonical" href="https://www.macrotrends.net/stocks/charts/SPLK/splunk/price-book" />
+		<title>Splunk Price to Book Ratio 2011-2023 | SPLK | MacroTrends</title>
+		<link rel="icon" type="image/x-icon" href="/assets/images/icons/FAVICON/macrotrends-favicon.ico">
+		<meta name="description" content="&lt;p&gt;Historical price to book ratio values for Splunk (SPLK) over the last 10 years. The current price to book ratio for Splunk as of March 12, 2024 is &lt;strong&gt;132.59&lt;/strong&gt;.&lt;/p&gt;
+		
+		&lt;p&gt;Please refer to the &lt;a href='https://blog.data.nasdaq.com/the-comprehensive-guide-to-stock-price-calculation'&gt;Stock Price Adjustment Guide&lt;/a&gt; for more information on our historical prices.&lt;/p&gt;" />
+		<meta name="robots" content="" />
+				
+
+		<meta name="msvalidate.01" content="1228954C688F5907894001CD8E5E624B" />
+		<meta name="google-site-verification" content="6MnD_3iDtAP1ZyoGK1YMyVIVck4r5Ws80I9xD3ue4_A" />
+
+		<!-- Load in Roboto Font -->
+		<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:400,600,700'>
+
+		<!-- Bootstrap -->
+		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> <!--for Bootstrap CDN version-->
+		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+
+		<!-- Font Awesome -->
+		<link rel="stylesheet" href="//stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"> <!--for Font Awesome CDN version-->
+    		
+		<!-- Jquery, Bootstrap and Menu Javascript -->	
+		<script src="//code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+		<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+				
+		<!-- Modernizr for cross-browser support -->		
+		<script type="text/javascript" src="/assets/javascript/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="//www.fuelcdn.com/fuelux/3.13.0/css/fuelux.min.css">
+
+		<!-- Latest compiled and minified JavaScript -->
+		<script src="//www.fuelcdn.com/fuelux/3.13.0/js/fuelux.min.js"></script>
+		
+		
+		 <!-- Twitter Card data -->
+		  <meta name="twitter:card" content="summary_large_image">
+		  <meta name="twitter:site" content="@tmacrotrends">
+		  <meta name="twitter:title" content="Splunk Price to Book Ratio 2011-2023 | SPLK">
+		  <meta name="twitter:description" content="<p>Historical price to book ratio values for Splunk (SPLK) over the last 10 years. The current price to book ratio for Splunk as of March 12, 2024 is <strong>132.59</strong>.</p>
+		
+		<p>Please refer to the <a href='https://blog.data.nasdaq.com/the-comprehensive-guide-to-stock-price-calculation'>Stock Price Adjustment Guide</a> for more information on our historical prices.</p>">
+
+		  <!-- Open Graph data -->
+		  <meta property="og:url" content="https://www.macrotrends.net/stocks/charts/SPLK/splunk/price-book" />  
+		  <meta property="og:title" content="Splunk Price to Book Ratio 2011-2023 | SPLK" />
+		  <meta property="og:description" content="<p>Historical price to book ratio values for Splunk (SPLK) over the last 10 years. The current price to book ratio for Splunk as of March 12, 2024 is <strong>132.59</strong>.</p>
+		
+		<p>Please refer to the <a href='https://blog.data.nasdaq.com/the-comprehensive-guide-to-stock-price-calculation'>Stock Price Adjustment Guide</a> for more information on our historical prices.</p>" />
+
+		<!-- JQXGRID STYLES AND JAVASCRIPT -->
+		<link rel="stylesheet" href="/assets/php/jqfiles/jqwidgets/styles/jqx.base.css" type="text/css" />
+		<link rel="stylesheet" href="/assets/php/jqfiles/jqwidgets/styles/jqx.bootstrap.css" type="text/css" />
+
+		<!-- LOAD THESE SCRIPTS EARLY SO THE TICKER INPUT FIELD IS STYLED INSTANTLY -->
+		<script type="text/javascript" src="/assets/php/jqfiles/jqwidgets/jqxcore.js"></script>
+		<script type="text/javascript" src="/assets/php/jqfiles/jqwidgets/jqxdata.js"></script> 
+		<script type="text/javascript" src="/assets/php/jqfiles/jqwidgets/jqxinput.js"></script> 
+
+		<!-- Styling for search box -->	
+		<link rel="stylesheet" type="text/css" href="/assets/php/jquery-typeahead/jquery.typeahead_pages.css">
+
+		<!-- Search box javascript -->
+		<script src="/assets/php/jquery-typeahead/jquery.typeahead.min.js"></script>
+		
+
+		<link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+		<script src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+	
+	<!-- ToolTips -->	
+		<script src="/assets/php/tipped-4.6.1/js/tipped/tipped.js"></script>
+		<link rel="stylesheet" href="/assets/php/tipped-4.6.1/css/tipped/tipped.css">
+		
+		<!-- FORM VALIDATION -->
+		<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+
+		
+			
+		<!-- START IC AD INSERT -->
+		
+    <script>InvestingChannelQueue = window.InvestingChannelQueue || [];</script>
+
+	<script src="https://u5.investingchannel.com/static/uat.js"></script>
+
+    <script type="text/javascript">
+    
+        //Push Run command with the API-Key, so that UAT will start processing publishers request.
+        InvestingChannelQueue.push(function() {
+            ic_page = InvestingChannel.UAT.Run("df17ac1e-cc7f-11e8-82a5-0abbb61c4a6a");        
+        });
+		
+		var tickerValue = 'SPLK';			
+        var oopDivTag;
+		var subLeaderboardTag;
+		var rightSidebarTag1;
+		var rightSidebarTag2;
+		var searchButtonTag;
+		var partner_center_tag;
+		var videoTag;
+		var ic_3x7_1;
+ 		//var IC_D_300x250_BCC;
+		//var IC_D_3x7_BCC;
+   
+        //To define new tags/out of page tags.
+        InvestingChannelQueue.push(function() {
+			
+			ic_page.setKval({'t': tickerValue});
+			
+            //videoTag = ic_page.defineNativeTag("Macrotrends/fundamentalanalysis","3x6, 728x90, Fluid","IC_D_3x6",35);
+			
+            oopDivTag = ic_page.defineOutOfPageTag("Macrotrends/fundamentalanalysis","oopDivTag_1");
+			oopDivTag.setKval({"adslot":"IC_OOP_1"});
+            
+			
+			//LeaderboardTag = ic_page.defineTag("Macrotrends/fundamentalanalysis","970x250,728x90,970x90,fluid", "IC_D_970x250_1");
+			//LeaderboardTag.setKval({"adslot":"IC_D_970x250_1"});
+
+
+			subLeaderboardTag = ic_page.defineTag("Macrotrends/fundamentalanalysis","728x90","ic_728x90_1");
+			subLeaderboardTag.setKval({"adslot":"IC_728x90_1"});
+			
+			subChartTag = ic_page.defineTag("Macrotrends/fundamentalanalysis","728x90","ic_728x90_2");
+			subChartTag.setKval({"adslot":"IC_728x90_2"});
+			
+			rightSidebarTag1 = ic_page.defineTag("Macrotrends/fundamentalanalysis","300x250,Fluid","ic_300x250_1");
+			rightSidebarTag1.setKval({"adslot":"IC_300x250_1"});
+			
+			
+			rightSidebarTag2 = ic_page.defineTag("Macrotrends/fundamentalanalysis","300x250,Fluid","ic_300x250_2");
+			rightSidebarTag2.setKval({"adslot":"IC_300x250_2"});
+						
+			rightSidebarTag3 = ic_page.defineTag("Macrotrends/fundamentalanalysis","300x250,Fluid","ic_300x250_3");
+			rightSidebarTag3.setKval({"adslot":"IC_300x250_3"});
+
+			searchButtonTag = ic_page.defineTag("Macrotrends/fundamentalanalysis","88x31","ic_88x31_1");
+			searchButtonTag.setKval({"pc":"pc","adslot":"IC_88x31"});
+			
+			partner_center_tag = ic_page.defineTag("macrotrends/fundamentalanalysis","728x214, 728x90","IC_728x214_1");
+			partner_center_tag.setKval({"pc":"pc","adslot":"d_728x90_2"});
+
+			//ic_3x7_1 = ic_page.defineNativeTag("macrotrends/fundamentalanalysis","3x7,728x90,Fluid","IC_3x7_1", 35);
+			
+			//IC_D_300x250_BCC = ic_page.defineTag(adCategory,"300x250,Fluid","IC_D_300x250_BCC");
+			//IC_D_300x250_BCC.setKval({"adslot":"IC_D_300x250_BCC"});
+
+			//IC_D_3x7_BCC = ic_page.defineTag(adCategory,"3x7, Fluid","IC_D_3x7_BCC");
+			//IC_D_3x7_BCC.setKval({"adslot":"IC_D_3x7_BCC"});
+			
+
+        });
+    
+        //To render tags.
+			InvestingChannelQueue.push(function() {
+            ic_page.renderTags();
+			
+			
+        });
+        
+    </script>
+
+		<!-- END IC AD INSERT -->
+		
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3KL0LYERBH"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3KL0LYERBH');
+</script>	
+
+		
+<style> 
+
+#style-1::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 3px;
+	background-color: #F5F5F5;
+}
+
+#style-1::-webkit-scrollbar
+{
+	width: 18px;
+	background-color: #F5F5F5;
+}
+
+#style-1::-webkit-scrollbar-thumb
+{
+	border-radius: 3px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: #5B9BD5;
+}
+
+html {
+	width:100%;
+	position: relative;
+	min-height: 100%;
+}
+
+body {
+	
+	width:100%;
+
+	/* Margin bottom by footer height */
+	  margin-bottom: 80px;
+	  color: #444;
+	  background-color:#fff;
+	  font-family: 'Roboto', sans-serif;
+	  font-size:14px;
+}
+
+
+
+
+
+.header_content_container {
+	
+	min-width: 1280px;
+	padding: 0px;
+}
+
+.main_content_container {
+	
+	min-width: 1280px;
+	max-width: 1280px;
+	padding: 0px 30px 100px 30px;
+	
+}
+
+.sub_main_content_container {
+	
+	
+}
+
+
+
+#main_content {
+	
+	padding:0px 20px 0px 0px;
+	width:826px;
+    float:left;
+	
+}
+
+#right_sidebar {
+	
+  width: 300px;
+  float:left;
+  height:8210px;
+	
+}
+
+#sticky_ad_left {
+	
+  position: -webkit-sticky;
+  position: sticky;
+  top: 30px;
+	
+	
+}
+
+#sticky_ad_right {
+	
+  position: -webkit-sticky;
+  position: sticky;
+  top: 10px;
+	
+	
+}
+
+
+
+
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 100px;
+  margin-top: 10px;	
+  padding: 30px 20px 20px 20px;
+  color:#fff !important;
+  background-color:#444;
+  text-align: center;
+  font-size:16px;
+}
+
+.footer a {
+  color:#fff !important;
+}
+
+.ticker_search_box {
+	
+	background-color:#F5F5F5;
+	border: 1px solid #E0E0E0;
+	border-bottom:none;
+	padding:10px 30px 10px 10px;
+	margin:0px 0px 0px 0px;
+	text-align:center;
+	
+}
+
+.related_tickers {
+	
+	width:100%;
+	background-color:#F5F5F5;
+	border: 1px solid #E0E0E0;
+	border-top: 0px;
+	padding:3px 30px 3px 10px;
+	margin:0px 0px 0px 0px;
+	text-align:center;
+	
+}
+
+.statement_type_select {
+
+	width:100%;
+	height:28px;
+	
+}
+
+.frequency_select {
+
+	width:100%;
+	height:28px;
+	font-weight:600;
+	
+}
+
+
+.select2 {
+	
+	text-align:left;
+	font-weight:600;
+	
+	}
+	
+#jqxInput {
+
+		width:100%;
+		height:28px;
+		
+}
+
+
+
+.header__parent_container {
+
+	width:100%;
+	height:50px;
+	padding:15px 0px 10px -20px; 
+	margin:0px 0px 0px 0px;
+	background-color:#444;
+
+}
+
+.header_container {
+
+	width:100%;
+	height:50px;
+	padding:15px 0px 10px -20px; 
+	margin:0px 0px 0px 0px;
+	background-color:#444;
+
+}
+
+.header_logo {
+	
+	padding-top:10px;
+	margin-left:50px;
+	
+}
+
+.menu_parent_container {
+	
+	width:100%;
+	height:34px;
+	font-size:16px;
+	padding:15px 0px 10px -20px; 
+	margin:0px 0px 0px 0px;
+	background-color:#0089de;
+}
+
+.menu_container {
+	
+	width:1280px;
+	height:34px;
+	font-size:16px;
+	padding:11px 0px 0px -20px; 
+	margin: 0 auto;
+	background-color:#0089de;
+	z-index:1000;
+}
+
+.menu_item {
+
+	height:34px;
+	float:left;
+	font-size:14px;
+	font-weight:bold;
+	color:#fff;
+	text-align:center;
+	padding:7px 16px 0px 16px;	
+
+}
+
+.menu_item:hover
+{
+	background-color:#32a0e4;
+	cursor: pointer;
+}
+
+.menu_item a
+{
+	color:#fff;
+	cursor: pointer;
+}
+
+.menu_item a:hover
+{
+	text-decoration:none;
+	cursor: pointer;
+}
+
+.leaderboard_ad {
+
+	margin-top:20px;
+	margin-bottom:20px;
+	text-align:center;
+	min-height:100px;
+
+}
+
+#filter_result_count {
+	
+	width:100%;
+	text-align:center;
+	font-size:24px;
+	font-weight:bold;
+	padding:10px 15px;
+	background-color:#efefef;
+	border: 1px solid #dfdfdf;
+	margin:20px;
+	
+}
+
+
+select {
+  color: #444;
+  background-color: #FFF;
+  border: 1px solid #AAA;
+  border-radius: 4px;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: block;
+  height:40px;
+  line-height: 40px;
+}
+
+.historical_data_table  {
+    table-layout: fixed;
+	margin:20px;
+}
+
+.historical_data_table tbody tr td {
+	
+	padding:6px;
+	vertical-align: middle !important;
+
+}
+
+
+.descriptors {
+	
+	text-align:center;
+	font-size:14px;
+	padding:15px;
+	
+}
+
+.td_metric_name {
+	
+	width:110px;
+	padding-top:17px;
+	
+}
+
+.metric_link {
+	
+	font-size:14px;
+	font-weight:bold;
+
+}
+
+.help_icon {
+	
+	width:15px;
+	height:18px; 
+	padding-bottom:3px;
+	
+}
+
+.td_min_value {
+	
+	width:75px;
+	text-align:center;
+	font-size:13px;
+	
+}
+
+.td_max_value {
+	
+	width:75px;
+	text-align:center;
+	font-size:13px;
+	
+}
+
+#myCombobox .form-control {
+	
+	background-color: #99d5ff;
+
+	
+}
+
+.dropdown-toggle {
+	
+	height:24px;
+	padding-top:0px;
+	padding-left:7px;
+	width:24px;
+	
+}
+
+.dropdown-menu-right {
+	
+	min-width:75px;
+	font-size:13px;
+	
+}
+
+#myPills1 {
+	
+	margin:0px 15px 10px 0px;
+	
+}
+
+#jqxgrid {
+	
+	border-radius:0px;
+	
+}
+
+.jqx-widget-header {
+	
+    font-family: 'Roboto', sans-serif;
+	font-size:13px;	
+	
+}
+
+.jqx-item {
+	
+    font-family: 'Roboto', sans-serif;
+	font-size: 13px;
+	
+}
+
+.jqx-widget-content {
+	
+	border-color: #E0E0E0;
+	
+}
+
+#jqxgrid .jqx-grid-cell {
+	
+	border-color: #E0E0E0;
+	
+}
+
+#jqxgrid .jqx-grid-cell-pinned {
+	
+	border-color: #E0E0E0;
+	background-color: #F5F5F5;
+	
+}
+
+#jqxgrid .jqx-grid-column-header {
+	
+	border-color: #E0E0E0;
+	background-color: #F5F5F5;
+	
+}
+
+.clear_zero {
+
+	height:0px;
+
+}
+
+
+
+/* Styles for Popup Charts */
+
+.tpd-size-large {
+	
+	margin:0px;	
+	padding: 0px;
+}
+
+.popup_window_wrapper {
+	
+	margin:15px;
+	
+}
+
+.popup_stock_name {
+
+	font-size:16px;
+	font-weight:bold;
+	margin:5px;
+
+}
+
+.popup_stock_attributes {
+
+	font-size:13px;
+	font-weight:bold;
+	margin:5px;
+
+}
+
+.popup_stock_description {
+
+	font-size:12px;
+	margin:5px;
+
+}
+
+.jqx-input {
+	
+	font-size:14px;
+	
+} 
+
+.jqx-menu-item {
+	
+	font-size:14px;
+	
+}
+
+.jqx-input {
+	
+	padding:5px 10px;
+	
+}
+
+.nav-tabs {
+    border: 1px solid #E0E0E0;
+	background-color:#F5F5F5;
+	padding: 3px 5px 0px 5px;
+	margin: 0px 0px 10px 0px;
+}
+
+.nav-tabs>li>a {
+	font-size:13px;
+	padding:7px 11px;
+	font-weight:600;
+    margin-right: 0px;
+    line-height: 1.42857143;
+    border: 0px;
+    border-radius: 0px 0px 0 0;
+	background-color:#F5F5F5;
+
+}
+
+.nav-tabs>li>a .active {
+    margin-right: 0px;
+    line-height: 1.42857143;
+    border: 1px solid #E0E0E0;
+    border-radius: 0px 0px 0 0;
+	background-color:#F5F5F5;
+
+}
+
+.nav-tabs>li>a:hover { 
+    background-color: #F5F5F5;
+	text-decoration: underline;
+
+}
+
+.donate_buttons {
+
+	margin-left:20px;
+	
+	}	
+
+
+</style>	
+
+
+</head>
+	<body class="fuelux">
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+<div class="header_content_container container-fluid">
+
+
+<div class="header_parent_container">
+
+<div class="header_container">
+
+	<div class="header_logo col-xs-2">
+		<a class="logo" href="https://www.macrotrends.net" title="MacroTrends Home Page"><img src="/assets/images/logo_bright1.png"/></a>
+	</div>
+
+
+	  <div class="col-xs-1 pull-right" style="padding-top:8px; margin-right:10px; margin-left:0px; padding-left:0px;">
+	  	 					
+		<div id="ic_88x31_1">
+
+					
+		</div> 
+	  
+	  </div>
+	  
+
+	  <div class="col-xs-5 pull-right" style="padding-top:8px;">
+       <form>
+        <div class="typeahead__container">
+            <div class="typeahead__field">
+
+            <span class="typeahead__query">
+                <input class="js-typeahead"
+                       name="q"
+                       type="search"
+					   placeholder="Search over 200,000 charts..."
+                       autofocus
+                       autocomplete="off">
+            </span>
+            <span class="typeahead__button">
+                <button type="submit">
+                    <span class="typeahead__search-icon"></span>
+                </button>
+            </span>
+
+            </div>
+        </div>
+    </form>
+		
+	  </div>
+	  
+	  </div>
+
+
+
+</div>
+
+<div class="menu_parent_container">
+
+<div class="menu_container">
+		
+	<a href="/stocks/stock-screener"><div class="menu_item">Stock Screener</div></a>
+	<a href="/stocks/research"><div class="menu_item">Stock Research</div></a>
+	<a href="/stocks/delisted"><div class="menu_item">Delisted Stocks</div></a>
+	<a href="/charts/stock-indexes"><div class="menu_item">Market Indexes</div></a>
+	<a href="/charts/precious-metals"><div class="menu_item">Precious Metals</div></a>
+	<a href="/charts/energy"><div class="menu_item">Energy</div></a>
+	<a href="/charts/commodities"><div class="menu_item">Commodities</div></a>
+	<a href="/charts/interest-rates"><div class="menu_item">Interest Rates</div></a>
+	<a href="/charts/economy"><div class="menu_item">Economy</div></a>
+	<a href="/countries/topic-overview"><div class="menu_item">Global Metrics</div></a>
+	
+
+		
+</div>
+
+</div>
+
+</div>
+
+<div id="main_content_container" class="main_content_container container-fluid">
+
+
+	<div id="ic_leaderboard" class="adx_top_ad col-xs-12" style="margin: 20px 20px 30px 20px; min-height:265px; text-align:center;">
+	
+		<div id="IC_D_970x250_1"></div>
+
+		<!--Smartad # 4058: Macrotrends - 970x250 Image - Placement 2-->
+		<iframe id="dianomi_leaderboard" WIDTH="970" HEIGHT="250" SCROLLING="NO" src="//www.dianomi.com/smartads.epl?id=4058"  style="height: 250px; border: none; overflow: hidden;"></iframe>
+				 		
+	</div>
+			
+			<div style="margin:20px 20px 20px 5px;">
+			
+				<h2 style="margin-left:0px; font-weight:600; color:#444;">Splunk Price to Book Ratio 2011-2023 | SPLK</h2>
+			
+			</div>
+			
+			
+	<div class="sub_main_content_container">
+		
+
+
+		
+
+			<div id="main_content">
+			
+			
+			
+<div class="navigation_tabs" style="margin-bottom:20px;">
+			
+	<ul class="nav nav-tabs" id="myTabs" style="font-size:15px;">
+
+		
+			
+			
+				<li><a href="https://www.macrotrends.net/stocks/charts/SPLK/splunk/stock-price-history">Prices</a></li>
+
+			
+		
+			
+			
+				<li><a href="https://www.macrotrends.net/stocks/charts/SPLK/splunk/financial-statements">Financials</a></li>
+
+			
+		
+			
+			
+				<li><a href="https://www.macrotrends.net/stocks/charts/SPLK/splunk/revenue">Revenue & Profit</a></li>
+
+			
+		
+			
+			
+				<li><a href="https://www.macrotrends.net/stocks/charts/SPLK/splunk/total-assets">Assets & Liabilities</a></li>
+
+			
+		
+			
+			
+				<li><a href="https://www.macrotrends.net/stocks/charts/SPLK/splunk/profit-margins">Margins</a></li>
+
+			
+		
+			
+			
+				<li class="active"><a href="https://www.macrotrends.net/stocks/charts/SPLK/splunk/pe-ratio">Price Ratios</a></li>
+
+			
+		
+			
+			
+				<li><a href="https://www.macrotrends.net/stocks/charts/SPLK/splunk/current-ratio">Other Ratios</a></li>
+
+			
+		
+			
+			
+				<li><a href="https://www.macrotrends.net/stocks/charts/SPLK/splunk/dividend-yield-history">Other Metrics</a></li>
+
+			
+		
+	</ul>
+
+
+	<ul class="nav nav-tabs" id="myTabs" style="font-size:15px;">
+
+		
+			
+						
+				<li><a href="https://www.macrotrends.net/stocks/charts/SPLK/splunk/pe-ratio">PE Ratio</a></li>			
+
+						
+		
+			
+						
+				<li><a href="https://www.macrotrends.net/stocks/charts/SPLK/splunk/price-sales">P/S Ratio</a></li>			
+
+						
+		
+			
+			
+				<li class="active"><a href="https://www.macrotrends.net/stocks/charts/SPLK/splunk/price-book">Price/Book Ratio</a></li>
+
+
+						
+		
+			
+						
+				<li><a href="https://www.macrotrends.net/stocks/charts/SPLK/splunk/price-fcf">Price-FCF Ratio</a></li>			
+
+						
+		
+			
+						
+				<li><a href="https://www.macrotrends.net/stocks/charts/SPLK/splunk/net-worth">Net Worth</a></li>			
+
+						
+		
+
+	</ul>
+	
+			
+</div>
+
+
+
+
+			
+
+		
+
+			<div style="background-color:#fff; margin: 0px 0px 20px 0px; padding:20px 30px; border:1px solid #dfdfdf;">
+			
+				<span style="color:#444; line-height: 1.8;"><p>Historical price to book ratio values for Splunk (SPLK) over the last 10 years. The current price to book ratio for Splunk as of March 12, 2024 is <strong>132.59</strong>.</p>
+		
+		<p>Please refer to the <a href='https://blog.data.nasdaq.com/the-comprehensive-guide-to-stock-price-calculation'>Stock Price Adjustment Guide</a> for more information on our historical prices.</p></span>
+			
+			</div>
+
+		
+			
+			<div style="background-color:#fff; margin: 0px 0px 0px 0px; text-align:center; min-height:90px;">
+			
+			
+
+				<div id="ic_728x90_1" style="min-height:100px; margin:10px;">
+
+
+				</div>
+
+
+				<!--<iframe id="dianomi_leaderboard" WIDTH="728" HEIGHT="50" SCROLLING="NO" src="//www.dianomi.com/smartads.epl?id=6341"  style="border: none; overflow: hidden;"></iframe>-->
+
+			
+			</div>		
+			
+			
+
+			<div class="ticker_search_box" style="text-align:center;">			
+
+		<div style="width:400px; margin-left:20px; border-bottom:none;">
+		
+		
+
+		
+        <script type="text/javascript">
+            $(document).ready(function () {
+				                
+					var url = "https://www.macrotrends.net/assets/php/ticker_search_list.php";
+				
+                // prepare the data
+                var source =
+                {
+                    datatype: "json",
+					cache: true,
+                    datafields: [
+                        { name: 'n' },
+						{ name: 's'}
+                    ],
+                    url: url
+                };
+                var dataAdapter = new $.jqx.dataAdapter(source);
+                // Create a jqxInput
+                $("#jqxInput").jqxInput({ source: dataAdapter, minLength: 1, placeHolder: "Search for ticker or company name...", items: 20, searchMode: 'containsignorecase', displayMember: "n", valueMember: "s", width: '100%', height: 22, theme: 'bootstrap'});
+                $("#jqxInput").on('select', function (event) {
+                    if (event.args) {
+                        var item = event.args.item;
+						
+						//Have to split the ticker and slug back out since jqxinput only seems to allow one data value
+						var itemArray = item.value.split("\/"); 
+						var ticker = itemArray[0];
+						var slug = itemArray[1];
+                        if (item) {
+							
+														
+								window.location = "https://www.macrotrends.net/stocks/charts/" + ticker + "/" + slug + "/price-book";
+							
+							                        }
+                    }
+                });
+            });
+        </script>
+        <input id="jqxInput" autocomplete="off"/>
+
+		</div>
+				
+		<div style="width:280px; margin-top: -32px; margin-left:80px; border-bottom:none; float:right;">
+		
+		
+<button id="compareStocks" style="margin-right:15px;" class="chart_buttons btn btn-success btn-sm"><span class="glyphicon glyphicon-stats"></span>&nbsp;&nbsp;<strong>Compare SPLK With Other Stocks</strong></button>&nbsp;&nbsp;
+
+</div>	
+		
+		</div>
+		
+			<div style="border:1px solid #dfdfdf; border-bottom:none; background-color:#fff; padding: 10px 30px; height:70px;">
+
+				<iframe id="dianomi_leaderboard" WIDTH="728" HEIGHT="50" SCROLLING="NO" src="//www.dianomi.com/smartads.epl?id=6341"  style="border: none; overflow: hidden;"></iframe>
+
+			
+			</div>			
+		
+		<div style="height:690px; background-color:#fff; border:1px solid #dfdfdf;">
+		
+<iframe id="chart_iframe" title="Interactive chart: Splunk Price to Book Ratio 2011-2023 | SPLK" valign="middle" margin="0px" width="800" height="680" marginheight=0 marginwidth=0 frameborder=0 vspace=0 hspace=0 scrolling=NO  src="https://www.macrotrends.net/assets/php/fundamental_iframe.php?t=SPLK&type=price-book&statement=price-ratios&freq=Q"></iframe>	
+	
+		
+		</div>
+		
+		
+
+			<div id="ic_video_ad" style="height:317px; margin:30px;">
+			
+			
+				<div id="IC_D_3x6"></div>
+						
+			
+			</div>
+
+			
+
+			<div style="background-color:#fff; margin: 20px 0px; padding:10px 30px; border:1px solid #dfdfdf;">
+			
+			
+		
+		
+			<iframe id="dianomi_below_chart" valign="middle" width="100%" height="300" marginheight=0 marginwidth=0 frameborder=0 vspace=0 hspace=0 scrolling=NO  src="//www.dianomi.com/smartads.epl?id=4057"></iframe>
+
+			<!--<div id="IC_D_3x7_BCC"></div>-->
+			
+		
+		</div>		
+
+			
+
+<div id="style-1" style="background-color:#fff; height: 500px; overflow:auto; margin: 0px 0px 30px 0px; padding:0px 30px 20px 0px; border:1px solid #dfdfdf;">
+			
+
+				<table class="table">
+				<thead>
+				  <tr>
+					<th colspan=4 style="text-align:center;">Splunk Price/Book Ratio Historical Data</th>
+				  </tr>
+				</thead>
+				<thead>
+				  <tr>
+					<th style="text-align:center;">Date</th>
+					<th style="text-align:center;">Stock Price</th>
+					<th style="text-align:center;">Book Value per Share</th>
+					<th style="text-align:center;">Price to Book Ratio</th>
+				  </tr>
+				</thead>
+				<tbody><tr>
+					<td style="text-align:center;">2024-03-12</td>
+					<td style="text-align:center;">156.60</td>
+					<td style="text-align:center;"></td>
+					<td style="text-align:center;">132.70</td>
+				 </tr><tr>
+					<td style="text-align:center;">2023-10-31</td>
+					<td style="text-align:center;">147.16</td>
+					<td style="text-align:center;">$1.18</td>
+					<td style="text-align:center;">124.70</td>
+				 </tr><tr>
+					<td style="text-align:center;">2023-07-31</td>
+					<td style="text-align:center;">108.33</td>
+					<td style="text-align:center;">$-0.23</td>
+					<td style="text-align:center;">-465.74</td>
+				 </tr><tr>
+					<td style="text-align:center;">2023-04-30</td>
+					<td style="text-align:center;">86.24</td>
+					<td style="text-align:center;">$-0.94</td>
+					<td style="text-align:center;">-91.53</td>
+				 </tr><tr>
+					<td style="text-align:center;">2023-01-31</td>
+					<td style="text-align:center;">95.77</td>
+					<td style="text-align:center;">$-0.67</td>
+					<td style="text-align:center;">-142.83</td>
+				 </tr><tr>
+					<td style="text-align:center;">2022-10-31</td>
+					<td style="text-align:center;">83.11</td>
+					<td style="text-align:center;">$-3.48</td>
+					<td style="text-align:center;">-23.85</td>
+				 </tr><tr>
+					<td style="text-align:center;">2022-07-31</td>
+					<td style="text-align:center;">103.91</td>
+					<td style="text-align:center;">$-4.20</td>
+					<td style="text-align:center;">-24.72</td>
+				 </tr><tr>
+					<td style="text-align:center;">2022-04-30</td>
+					<td style="text-align:center;">122.02</td>
+					<td style="text-align:center;">$-4.11</td>
+					<td style="text-align:center;">-29.67</td>
+				 </tr><tr>
+					<td style="text-align:center;">2022-01-31</td>
+					<td style="text-align:center;">123.92</td>
+					<td style="text-align:center;">$1.39</td>
+					<td style="text-align:center;">89.03</td>
+				 </tr><tr>
+					<td style="text-align:center;">2021-10-31</td>
+					<td style="text-align:center;">164.82</td>
+					<td style="text-align:center;">$1.12</td>
+					<td style="text-align:center;">147.27</td>
+				 </tr><tr>
+					<td style="text-align:center;">2021-07-31</td>
+					<td style="text-align:center;">141.98</td>
+					<td style="text-align:center;">$6.94</td>
+					<td style="text-align:center;">20.45</td>
+				 </tr><tr>
+					<td style="text-align:center;">2021-04-30</td>
+					<td style="text-align:center;">126.42</td>
+					<td style="text-align:center;">$7.60</td>
+					<td style="text-align:center;">16.63</td>
+				 </tr><tr>
+					<td style="text-align:center;">2021-01-31</td>
+					<td style="text-align:center;">165.03</td>
+					<td style="text-align:center;">$9.77</td>
+					<td style="text-align:center;">16.89</td>
+				 </tr><tr>
+					<td style="text-align:center;">2020-10-31</td>
+					<td style="text-align:center;">198.04</td>
+					<td style="text-align:center;">$9.95</td>
+					<td style="text-align:center;">19.90</td>
+				 </tr><tr>
+					<td style="text-align:center;">2020-07-31</td>
+					<td style="text-align:center;">209.82</td>
+					<td style="text-align:center;">$10.41</td>
+					<td style="text-align:center;">20.16</td>
+				 </tr><tr>
+					<td style="text-align:center;">2020-04-30</td>
+					<td style="text-align:center;">140.36</td>
+					<td style="text-align:center;">$11.40</td>
+					<td style="text-align:center;">12.32</td>
+				 </tr><tr>
+					<td style="text-align:center;">2020-01-31</td>
+					<td style="text-align:center;">155.26</td>
+					<td style="text-align:center;">$12.67</td>
+					<td style="text-align:center;">12.25</td>
+				 </tr><tr>
+					<td style="text-align:center;">2019-10-31</td>
+					<td style="text-align:center;">119.96</td>
+					<td style="text-align:center;">$11.71</td>
+					<td style="text-align:center;">10.24</td>
+				 </tr><tr>
+					<td style="text-align:center;">2019-07-31</td>
+					<td style="text-align:center;">135.31</td>
+					<td style="text-align:center;">$9.47</td>
+					<td style="text-align:center;">14.28</td>
+				 </tr><tr>
+					<td style="text-align:center;">2019-04-30</td>
+					<td style="text-align:center;">138.04</td>
+					<td style="text-align:center;">$9.50</td>
+					<td style="text-align:center;">14.54</td>
+				 </tr><tr>
+					<td style="text-align:center;">2019-01-31</td>
+					<td style="text-align:center;">124.84</td>
+					<td style="text-align:center;">$10.19</td>
+					<td style="text-align:center;">12.25</td>
+				 </tr><tr>
+					<td style="text-align:center;">2018-10-31</td>
+					<td style="text-align:center;">99.84</td>
+					<td style="text-align:center;">$9.62</td>
+					<td style="text-align:center;">10.38</td>
+				 </tr><tr>
+					<td style="text-align:center;">2018-07-31</td>
+					<td style="text-align:center;">96.10</td>
+					<td style="text-align:center;">$7.82</td>
+					<td style="text-align:center;">12.29</td>
+				 </tr><tr>
+					<td style="text-align:center;">2018-04-30</td>
+					<td style="text-align:center;">102.65</td>
+					<td style="text-align:center;">$7.71</td>
+					<td style="text-align:center;">13.31</td>
+				 </tr><tr>
+					<td style="text-align:center;">2018-01-31</td>
+					<td style="text-align:center;">92.37</td>
+					<td style="text-align:center;">$7.92</td>
+					<td style="text-align:center;">11.66</td>
+				 </tr><tr>
+					<td style="text-align:center;">2017-10-31</td>
+					<td style="text-align:center;">67.30</td>
+					<td style="text-align:center;">$5.47</td>
+					<td style="text-align:center;">12.30</td>
+				 </tr><tr>
+					<td style="text-align:center;">2017-07-31</td>
+					<td style="text-align:center;">60.01</td>
+					<td style="text-align:center;">$5.49</td>
+					<td style="text-align:center;">10.93</td>
+				 </tr><tr>
+					<td style="text-align:center;">2017-04-30</td>
+					<td style="text-align:center;">64.31</td>
+					<td style="text-align:center;">$5.52</td>
+					<td style="text-align:center;">11.65</td>
+				 </tr><tr>
+					<td style="text-align:center;">2017-01-31</td>
+					<td style="text-align:center;">57.86</td>
+					<td style="text-align:center;">$5.87</td>
+					<td style="text-align:center;">9.86</td>
+				 </tr><tr>
+					<td style="text-align:center;">2016-10-31</td>
+					<td style="text-align:center;">60.19</td>
+					<td style="text-align:center;">$6.01</td>
+					<td style="text-align:center;">10.02</td>
+				 </tr><tr>
+					<td style="text-align:center;">2016-07-31</td>
+					<td style="text-align:center;">62.54</td>
+					<td style="text-align:center;">$6.17</td>
+					<td style="text-align:center;">10.14</td>
+				 </tr><tr>
+					<td style="text-align:center;">2016-04-30</td>
+					<td style="text-align:center;">51.98</td>
+					<td style="text-align:center;">$6.28</td>
+					<td style="text-align:center;">8.28</td>
+				 </tr><tr>
+					<td style="text-align:center;">2016-01-31</td>
+					<td style="text-align:center;">46.29</td>
+					<td style="text-align:center;">$6.53</td>
+					<td style="text-align:center;">7.09</td>
+				 </tr><tr>
+					<td style="text-align:center;">2015-10-31</td>
+					<td style="text-align:center;">56.16</td>
+					<td style="text-align:center;">$6.49</td>
+					<td style="text-align:center;">8.66</td>
+				 </tr><tr>
+					<td style="text-align:center;">2015-07-31</td>
+					<td style="text-align:center;">69.94</td>
+					<td style="text-align:center;">$6.53</td>
+					<td style="text-align:center;">10.72</td>
+				 </tr><tr>
+					<td style="text-align:center;">2015-04-30</td>
+					<td style="text-align:center;">66.35</td>
+					<td style="text-align:center;">$6.50</td>
+					<td style="text-align:center;">10.21</td>
+				 </tr><tr>
+					<td style="text-align:center;">2015-01-31</td>
+					<td style="text-align:center;">51.65</td>
+					<td style="text-align:center;">$6.58</td>
+					<td style="text-align:center;">7.85</td>
+				 </tr><tr>
+					<td style="text-align:center;">2014-10-31</td>
+					<td style="text-align:center;">66.08</td>
+					<td style="text-align:center;">$6.60</td>
+					<td style="text-align:center;">10.02</td>
+				 </tr><tr>
+					<td style="text-align:center;">2014-07-31</td>
+					<td style="text-align:center;">47.02</td>
+					<td style="text-align:center;">$6.64</td>
+					<td style="text-align:center;">7.08</td>
+				 </tr><tr>
+					<td style="text-align:center;">2014-04-30</td>
+					<td style="text-align:center;">54.57</td>
+					<td style="text-align:center;">$6.63</td>
+					<td style="text-align:center;">8.23</td>
+				 </tr><tr>
+					<td style="text-align:center;">2014-01-31</td>
+					<td style="text-align:center;">77.03</td>
+					<td style="text-align:center;">$6.76</td>
+					<td style="text-align:center;">11.39</td>
+				 </tr><tr>
+					<td style="text-align:center;">2013-10-31</td>
+					<td style="text-align:center;">62.71</td>
+					<td style="text-align:center;">$2.34</td>
+					<td style="text-align:center;">26.78</td>
+				 </tr><tr>
+					<td style="text-align:center;">2013-07-31</td>
+					<td style="text-align:center;">50.01</td>
+					<td style="text-align:center;">$2.35</td>
+					<td style="text-align:center;">21.24</td>
+				 </tr><tr>
+					<td style="text-align:center;">2013-04-30</td>
+					<td style="text-align:center;">40.80</td>
+					<td style="text-align:center;">$2.31</td>
+					<td style="text-align:center;">17.67</td>
+				 </tr><tr>
+					<td style="text-align:center;">2013-01-31</td>
+					<td style="text-align:center;">32.96</td>
+					<td style="text-align:center;">$2.35</td>
+					<td style="text-align:center;">14.00</td>
+				 </tr><tr>
+					<td style="text-align:center;">2012-10-31</td>
+					<td style="text-align:center;">28.03</td>
+					<td style="text-align:center;">$2.31</td>
+					<td style="text-align:center;">12.11</td>
+				 </tr><tr>
+					<td style="text-align:center;">2012-07-31</td>
+					<td style="text-align:center;">29.40</td>
+					<td style="text-align:center;">$2.32</td>
+					<td style="text-align:center;">12.65</td>
+				 </tr><tr>
+					<td style="text-align:center;">2012-04-30</td>
+					<td style="text-align:center;">33.95</td>
+					<td style="text-align:center;">$2.34</td>
+					<td style="text-align:center;">14.50</td>
+				 </tr></tbody>
+			  </table>			
+			
+			</div>
+
+			
+		
+		<div style="background-color:#fff; margin: 0px 0px 20px 0px; padding:5px 50px 5px 10px; border:1px solid #dfdfdf;">
+
+			  <table class="historical_data_table table">
+				<thead>
+				  <tr>
+					<th style="text-align:center">Sector</th>
+					<th style="text-align:center">Industry</th>
+					<th style="text-align:center">Market Cap</th>
+					<th style="text-align:center">Revenue</th>
+				  </tr>
+				</thead>
+				<tbody>
+				  <tr>
+					<td style="text-align:center"><a href='https://www.macrotrends.net/stocks/sector/10/computer-and-technology'>Computer and Technology</a></td>
+					<td style="text-align:center"><a href='https://www.macrotrends.net/stocks/industry/214/'>Internet Software</a></td>
+					<td style="text-align:center">$26.370B</td>
+					<td style="text-align:center">$4.216B</td>
+				  </tr>
+				  <tr>
+					  <td colspan="4" style="padding:15px;">
+						<span>Splunk Inc. provides software solutions that enable enterprises to gain real-time operational intelligence by harnessing the value of their data. The company's offerings enable users to investigate, monitor, analyze and act on machine data and big data, irrespective of format or source, and helps in operational decision making. The company's flagship offering, Splunk Enterprise, is primarily a machine data platform. It can collect and index petabytes of machine data on a daily basis. Splunk Enterprise also enables users to interactively explore, analyze and visualize data stored in sources such as Hadoop and Amazon S3.Splunk Cloud delivers the benefits of Splunk Enterprise deployed and managed reliably and scalably as a service. Splunk Light provides log search and analysis, which are designed, priced and packaged for small IT environments. The company's premium solutions include Splunk Enterprise Security, Splunk IT Service Intelligence and Splunk User Behavior Analytics.</span>
+					  </td>
+				  </tr>
+				</tbody>
+			  </table>			
+			</div>	
+	
+		
+		<div style="background-color:#fff; margin: 20px 0px 30px 0px; padding:5px 50px 5px 10px; border:1px solid #dfdfdf;">
+			
+
+				<table class="historical_data_table table">
+				<thead>
+				  <tr>
+					<th style="text-align:center; width:40%;">Stock Name</th>
+					<th style="text-align:center; width:20%;">Country</th>
+					<th style="text-align:center; width:20%;">Market Cap</th>
+					<th style="text-align:center; width:20%;">PE Ratio</th>
+				  </tr>
+				</thead>
+				<tbody>			
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/META/meta-platforms/price-book'>Meta Platforms (META)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$1232.867B</td>
+					<td style="text-align:center">31.02</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/PANW/palo-alto-networks/price-book'>Palo Alto Networks (PANW)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$91.544B</td>
+					<td style="text-align:center">108.56</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/CRWD/crowdstrike/price-book'>CrowdStrike (CRWD)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$76.215B</td>
+					<td style="text-align:center">647.69</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/WDAY/workday/price-book'>Workday (WDAY)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$70.147B</td>
+					<td style="text-align:center">215.10</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/PYPL/paypal-holdings/price-book'>PayPal Holdings (PYPL)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$64.390B</td>
+					<td style="text-align:center">15.98</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/TEAM/atlassian/price-book'>Atlassian (TEAM)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$55.936B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/FTNT/fortinet/price-book'>Fortinet (FTNT)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$54.526B</td>
+					<td style="text-align:center">52.16</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/SNOW/snowflake/price-book'>Snowflake (SNOW)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$53.442B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/DDOG/datadog/price-book'>Datadog (DDOG)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$40.306B</td>
+					<td style="text-align:center">714.41</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/VEEV/veeva-systems/price-book'>Veeva Systems (VEEV)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$36.671B</td>
+					<td style="text-align:center">77.47</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/SE/sea/price-book'>Sea (SE)</a></td>
+					<td style="text-align:center">Singapore</td>
+					<td style="text-align:center">$32.988B</td>
+					<td style="text-align:center">243.38</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/NET/cloudflare/price-book'>Cloudflare (NET)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$32.590B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/HUBS/hubspot/price-book'>HubSpot (HUBS)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$31.038B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/MDB/mongodb/price-book'>MongoDB (MDB)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$26.488B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/PINS/pinterest/price-book'>Pinterest (PINS)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$23.316B</td>
+					<td style="text-align:center">228.93</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/ZM/zoom-video-communications/price-book'>Zoom Video Communications (ZM)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$21.212B</td>
+					<td style="text-align:center">30.70</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/IOT/samsara/price-book'>Samsara (IOT)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$20.717B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/SNAP/snap/price-book'>Snap (SNAP)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$19.593B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/TOITF/topicus/price-book'>Topicus (TOITF)</a></td>
+					<td style="text-align:center">Canada</td>
+					<td style="text-align:center">$19.056B</td>
+					<td style="text-align:center">105.88</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/NICE/nice/price-book'>Nice (NICE)</a></td>
+					<td style="text-align:center">Israel</td>
+					<td style="text-align:center">$15.194B</td>
+					<td style="text-align:center">36.96</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/BSY/bentley-systems/price-book'>Bentley Systems (BSY)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$13.929B</td>
+					<td style="text-align:center">65.86</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/AZPN/aspen-technology/price-book'>Aspen Technology (AZPN)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$12.983B</td>
+					<td style="text-align:center">42.74</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/FFIV/f5/price-book'>F5 (FFIV)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$11.388B</td>
+					<td style="text-align:center">20.21</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/TWLO/twilio/price-book'>Twilio (TWLO)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$11.210B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/TOST/toast/price-book'>Toast (TOST)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$10.772B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/PAYC/paycom-software/price-book'>Paycom Software (PAYC)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$10.618B</td>
+					<td style="text-align:center">31.70</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/DAY/dayforce/price-book'>Dayforce (DAY)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$10.591B</td>
+					<td style="text-align:center">107.35</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/MNDY/monday/price-book'>Monday (MNDY)</a></td>
+					<td style="text-align:center">Israel</td>
+					<td style="text-align:center">$10.481B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/U/unity-software/price-book'>Unity Software (U)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$10.459B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/PCTY/paylocity-holding/price-book'>Paylocity Holding (PCTY)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$9.520B</td>
+					<td style="text-align:center">51.21</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/INFA/informatica/price-book'>Informatica (INFA)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$9.416B</td>
+					<td style="text-align:center">113.96</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/GTLB/gitlab/price-book'>GitLab (GTLB)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$8.788B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/APPF/appfolio/price-book'>AppFolio (APPF)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$8.169B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/BILL/bill-holdings/price-book'>BILL Holdings (BILL)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$7.109B</td>
+					<td style="text-align:center">6762.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/BZ/kanzhun-limited/price-book'>KANZHUN LIMITED (BZ)</a></td>
+					<td style="text-align:center">China</td>
+					<td style="text-align:center">$6.567B</td>
+					<td style="text-align:center">102.94</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/SMAR/smartsheet/price-book'>Smartsheet (SMAR)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$5.702B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/FRSH/freshworks/price-book'>Freshworks (FRSH)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$5.688B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/TENB/tenable-holdings/price-book'>Tenable Holdings (TENB)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$5.606B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/DV/doubleverify-holdings/price-book'>DoubleVerify Holdings (DV)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$5.513B</td>
+					<td style="text-align:center">78.51</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/STNE/stoneco/price-book'>StoneCo (STNE)</a></td>
+					<td style="text-align:center">Cayman Islands </td>
+					<td style="text-align:center">$5.330B</td>
+					<td style="text-align:center">23.56</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/HCP/hashicorp/price-book'>HashiCorp (HCP)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$5.110B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/ALIT/alight/price-book'>Alight (ALIT)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$5.095B</td>
+					<td style="text-align:center">20.57</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/CLVT/clarivate/price-book'>Clarivate (CLVT)</a></td>
+					<td style="text-align:center">United Kingdom</td>
+					<td style="text-align:center">$4.771B</td>
+					<td style="text-align:center">10.23</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/WK/workiva/price-book'>Workiva (WK)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$4.653B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/VERX/vertex/price-book'>Vertex (VERX)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$4.502B</td>
+					<td style="text-align:center">138.90</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/FIVN/five9/price-book'>Five9 (FIVN)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$4.445B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/FROG/jfrog/price-book'>JFrog (FROG)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$4.251B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/BOX/box/price-book'>Box (BOX)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$4.247B</td>
+					<td style="text-align:center">246.50</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/ASAN/asana/price-book'>Asana (ASAN)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$4.181B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/BL/blackline/price-book'>BlackLine (BL)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$4.130B</td>
+					<td style="text-align:center">479.57</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/CWAN/clearwater-analytics-holdings/price-book'>Clearwater Analytics Holdings (CWAN)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$4.116B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/EVH/evolent-health/price-book'>Evolent Health (EVH)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$3.910B</td>
+					<td style="text-align:center">66.41</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/KGDEY/kingdee-software-group/price-book'>Kingdee Software Group (KGDEY)</a></td>
+					<td style="text-align:center">China</td>
+					<td style="text-align:center">$3.760B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/DOCN/digitalocean-holdings/price-book'>DigitalOcean Holdings (DOCN)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$3.644B</td>
+					<td style="text-align:center">68.02</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/PYCR/paycor-hcm/price-book'>Paycor HCM (PYCR)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$3.495B</td>
+					<td style="text-align:center">196.30</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/AYX/alteryx/price-book'>Alteryx (AYX)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$3.486B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/RPD/rapid7/price-book'>Rapid7 (RPD)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$3.366B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/NCNO/ncino/price-book'>NCino (NCNO)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$3.320B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/ZD/ziff-davis/price-book'>Ziff Davis (ZD)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$3.134B</td>
+					<td style="text-align:center">12.13</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/AVDX/avidxchange-holdings/price-book'>AvidXchange Holdings (AVDX)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$2.642B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/APPN/appian/price-book'>Appian (APPN)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$2.639B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/RUM/rumble/price-book'>Rumble (RUM)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$2.579B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/ODD/oddity-tech/price-book'>ODDITY Tech (ODD)</a></td>
+					<td style="text-align:center">Israel</td>
+					<td style="text-align:center">$2.565B</td>
+					<td style="text-align:center">46.29</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/INTA/intapp/price-book'>Intapp (INTA)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$2.523B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/CALX/calix/price-book'>Calix (CALX)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$2.304B</td>
+					<td style="text-align:center">42.45</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/ALKT/alkami-technology/price-book'>Alkami Technology (ALKT)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$2.253B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/PD/pagerduty/price-book'>PagerDuty (PD)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$2.215B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/SWI/solarwinds/price-book'>SolarWinds (SWI)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$2.037B</td>
+					<td style="text-align:center">27.16</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/GETY/getty-images-holdings/price-book'>Getty Images Holdings (GETY)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$1.922B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/FSLY/fastly/price-book'>Fastly (FSLY)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$1.877B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/EVCM/evercommerce/price-book'>EverCommerce (EVCM)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$1.825B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/COMP/compass/price-book'>Compass (COMP)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$1.788B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/UDMY/udemy/price-book'>Udemy (UDMY)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$1.750B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/GRND/grindr/price-book'>Grindr (GRND)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$1.657B</td>
+					<td style="text-align:center">237.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/VTEX/vtex/price-book'>VTEX (VTEX)</a></td>
+					<td style="text-align:center">United Kingdom</td>
+					<td style="text-align:center">$1.640B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/DCBO/docebo/price-book'>Docebo (DCBO)</a></td>
+					<td style="text-align:center">Canada</td>
+					<td style="text-align:center">$1.590B</td>
+					<td style="text-align:center">106.92</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/MGNI/magnite/price-book'>Magnite (MGNI)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$1.588B</td>
+					<td style="text-align:center">283.75</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/SEMR/semrush-holdings/price-book'>SEMrush Holdings (SEMR)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$1.576B</td>
+					<td style="text-align:center">1100.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/BMBL/bumble/price-book'>Bumble (BMBL)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$1.448B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/EVBG/everbridge/price-book'>Everbridge (EVBG)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$1.440B</td>
+					<td style="text-align:center">89.36</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/MOMO/hello-group/price-book'>Hello Group (MOMO)</a></td>
+					<td style="text-align:center">China</td>
+					<td style="text-align:center">$1.341B</td>
+					<td style="text-align:center">5.23</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/ZUO/zuora/price-book'>Zuora (ZUO)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$1.332B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/ETWO/e2open-parent-holdings/price-book'>E2open Parent Holdings (ETWO)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$1.310B</td>
+					<td style="text-align:center">21.40</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/BASE/couchbase/price-book'>Couchbase (BASE)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$1.301B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/DBD/diebold-nixdorf/price-book'>Diebold Nixdorf (DBD)</a></td>
+					<td style="text-align:center"></td>
+					<td style="text-align:center">$1.280B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/SHCO/soho-house-co/price-book'>Soho House & Co (SHCO)</a></td>
+					<td style="text-align:center">United Kingdom</td>
+					<td style="text-align:center">$1.162B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/ENFN/enfusion/price-book'>Enfusion (ENFN)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$1.086B</td>
+					<td style="text-align:center">94.67</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/ARLO/arlo-technologies/price-book'>Arlo Technologies (ARLO)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$1.067B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/PUBM/pubmatic/price-book'>PubMatic (PUBM)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$1.019B</td>
+					<td style="text-align:center">119.82</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/MODN/model-n/price-book'>Model N (MODN)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.988B</td>
+					<td style="text-align:center">148.88</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/TUYA/tuya/price-book'>Tuya (TUYA)</a></td>
+					<td style="text-align:center">China</td>
+					<td style="text-align:center">$0.933B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/RSKD/riskified/price-book'>Riskified (RSKD)</a></td>
+					<td style="text-align:center">Israel</td>
+					<td style="text-align:center">$0.931B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/OLO/olo/price-book'>Olo (OLO)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.908B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/RDWR/radware/price-book'>Radware (RDWR)</a></td>
+					<td style="text-align:center">Israel</td>
+					<td style="text-align:center">$0.895B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/KC/kingsoft-cloud-holdings/price-book'>Kingsoft Cloud Holdings (KC)</a></td>
+					<td style="text-align:center">China</td>
+					<td style="text-align:center">$0.878B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/KIND/nextdoor-holdings/price-book'>Nextdoor Holdings (KIND)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.874B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/CHGG/chegg/price-book'>Chegg (CHGG)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.844B</td>
+					<td style="text-align:center">82.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/YALA/yalla-group/price-book'>Yalla Group (YALA)</a></td>
+					<td style="text-align:center"></td>
+					<td style="text-align:center">$0.835B</td>
+					<td style="text-align:center">8.36</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/THRY/thryv-holdings/price-book'>Thryv Holdings (THRY)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.782B</td>
+					<td style="text-align:center">100.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/IIIV/i3-verticals/price-book'>I3 Verticals (IIIV)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.755B</td>
+					<td style="text-align:center">25.72</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/WKME/walkme/price-book'>WalkMe (WKME)</a></td>
+					<td style="text-align:center">Israel</td>
+					<td style="text-align:center">$0.749B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/BLND/blend-labs/price-book'>Blend Labs (BLND)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.722B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/PL/planet-labs-pbc/price-book'>Planet Labs PBC (PL)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.633B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/CGNT/cognyte-software/price-book'>Cognyte Software (CGNT)</a></td>
+					<td style="text-align:center">Israel</td>
+					<td style="text-align:center">$0.500B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/LAW/cs-disco/price-book'>CS Disco (LAW)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.418B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/BLZE/backblaze/price-book'>Backblaze (BLZE)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.399B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/EGHT/8x8-inc/price-book'>8x8 Inc (EGHT)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.389B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/PRCH/porch/price-book'>Porch (PRCH)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.372B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/OSPN/onespan-inc/price-book'>ONESPAN INC (OSPN)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.362B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/DOMO/domo/price-book'>Domo (DOMO)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.358B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/JFIN/jiayin-group/price-book'>Jiayin Group (JFIN)</a></td>
+					<td style="text-align:center">China</td>
+					<td style="text-align:center">$0.333B</td>
+					<td style="text-align:center">1.60</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/APPS/digital-turbine/price-book'>Digital Turbine (APPS)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.317B</td>
+					<td style="text-align:center">14.14</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/MTLS/materialise/price-book'>Materialise (MTLS)</a></td>
+					<td style="text-align:center">Belgium</td>
+					<td style="text-align:center">$0.308B</td>
+					<td style="text-align:center">26.10</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/QBTS/d-wave-quantum/price-book'>D-Wave Quantum (QBTS)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.294B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/CTV/innovid/price-book'>Innovid (CTV)</a></td>
+					<td style="text-align:center">Israel</td>
+					<td style="text-align:center">$0.282B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/CCSI/consensus-cloud-solutions/price-book'>Consensus Cloud Solutions (CCSI)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.281B</td>
+					<td style="text-align:center">3.42</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/RMNI/rimini-street/price-book'>Rimini Street (RMNI)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.279B</td>
+					<td style="text-align:center">7.80</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/ONTF/on24/price-book'>ON24 (ONTF)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.276B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/AIP/arteris/price-book'>Arteris (AIP)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.263B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/TRAK/repositrak/price-book'>ReposiTrak (TRAK)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.259B</td>
+					<td style="text-align:center">49.03</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/EGAN/egain/price-book'>EGain (EGAN)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.204B</td>
+					<td style="text-align:center">29.68</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/MIXT/mix-telematics/price-book'>MiX Telematics (MIXT)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.203B</td>
+					<td style="text-align:center">22.92</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/KLTR/kaltura/price-book'>Kaltura (KLTR)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.192B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/REKR/rekor-systems/price-book'>Rekor Systems (REKR)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.181B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/ZFOX/zerofox-holdings/price-book'>ZeroFox Holdings (ZFOX)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.138B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/TGRVF/tian-ge-interac/price-book'>TIAN GE INTERAC (TGRVF)</a></td>
+					<td style="text-align:center">China</td>
+					<td style="text-align:center">$0.137B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/SNCR/synchronoss-technologies/price-book'>Synchronoss Technologies (SNCR)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.118B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/LDTC/leddartech-holdings/price-book'>LeddarTech Holdings (LDTC)</a></td>
+					<td style="text-align:center">Canada</td>
+					<td style="text-align:center">$0.113B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/SANG/sangoma-technologies/price-book'>Sangoma Technologies (SANG)</a></td>
+					<td style="text-align:center">Canada</td>
+					<td style="text-align:center">$0.110B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/SURG/surgepays/price-book'>SurgePays (SURG)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.109B</td>
+					<td style="text-align:center">4.34</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/AEYE/audioeye/price-book'>Audioeye (AEYE)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.102B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/PHUN/phunware/price-book'>Phunware (PHUN)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.082B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/CMCM/cheetah-mobile/price-book'>Cheetah Mobile (CMCM)</a></td>
+					<td style="text-align:center">China</td>
+					<td style="text-align:center">$0.072B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/UPLD/upland-software/price-book'>Upland Software (UPLD)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.072B</td>
+					<td style="text-align:center">6.94</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/QUBT/quantum-computing/price-book'>Quantum Computing (QUBT)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.071B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/KORE/kores/price-book'>KOREs (KORE)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.067B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/GAN/gan/price-book'>GAN (GAN)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.065B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/WANSF/cirata/price-book'>Cirata (WANSF)</a></td>
+					<td style="text-align:center">Jersey</td>
+					<td style="text-align:center">$0.059B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/STIX/semantix/price-book'>Semantix (STIX)</a></td>
+					<td style="text-align:center">Brazil</td>
+					<td style="text-align:center">$0.058B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/EGIO/edgio/price-book'>Edgio (EGIO)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.049B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/MNDO/mind-cti/price-book'>MIND C.T.I (MNDO)</a></td>
+					<td style="text-align:center">Israel</td>
+					<td style="text-align:center">$0.044B</td>
+					<td style="text-align:center">8.72</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/ARBB/arb-iot-group/price-book'>ARB IOT Group (ARBB)</a></td>
+					<td style="text-align:center">Singapore</td>
+					<td style="text-align:center">$0.040B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/INSG/inseego/price-book'>Inseego (INSG)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.040B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/CREX/wireless-ronin-technologies/price-book'>Wireless Ronin Technologies (CREX)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.035B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/TWOU/2u/price-book'>2U (TWOU)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.032B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/IZEA/izea-worldwide,-inc/price-book'>IZEA WORLDWIDE, INC (IZEA)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.030B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/ONMD/onemednet/price-book'>OneMedNet (ONMD)</a></td>
+					<td style="text-align:center">United Kingdom</td>
+					<td style="text-align:center">$0.028B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/MRDB/mariadb/price-book'>MariaDB (MRDB)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.023B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/PIXY/shiftpixy/price-book'>Shiftpixy (PIXY)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.021B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/NVNI/nvni-group/price-book'>Nvni Group (NVNI)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.021B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/VHC/virnetx-holding-corp/price-book'>VirnetX Holding Corp (VHC)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.020B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/JG/aurora-mobile/price-book'>Aurora Mobile (JG)</a></td>
+					<td style="text-align:center">China</td>
+					<td style="text-align:center">$0.018B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/MSAI/multisensor-ai-holdings/price-book'>MultiSensor AI Holdings (MSAI)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.018B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/CISO/ciso-global/price-book'>CISO Global (CISO)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.015B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/MTBL/moatable/price-book'>Moatable (MTBL)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.015B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/CAUD/collective-audience/price-book'>Collective Audience (CAUD)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.014B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/ICCT/icoreconnect/price-book'>ICoreConnect (ICCT)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.013B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/IVDA/iveda-solutions/price-book'>Iveda Solutions (IVDA)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.011B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/WETG/wetrade-group/price-book'>WeTrade Group (WETG)</a></td>
+					<td style="text-align:center">China</td>
+					<td style="text-align:center">$0.009B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/EZFL/ezfill-holdings/price-book'>EzFill Holdings (EZFL)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.009B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/LCFY/locafy/price-book'>Locafy (LCFY)</a></td>
+					<td style="text-align:center">Australia</td>
+					<td style="text-align:center">$0.008B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/WAVD/wavedancer/price-book'>WaveDancer (WAVD)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.006B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/OMQS/omniq/price-book'>OMNIQ (OMQS)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.005B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/AMST/amesite/price-book'>Amesite (AMST)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.005B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/SASI/sigma-additive-solutions/price-book'>Sigma Additive Solutions (SASI)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.003B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/DATS/datchat/price-book'>DatChat (DATS)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.003B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/OBLG/oblong/price-book'>Oblong (OBLG)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.003B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/WORX/scworx/price-book'>SCWorx (WORX)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.002B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/MYSZ/my-size/price-book'>My Size (MYSZ)</a></td>
+					<td style="text-align:center">Israel</td>
+					<td style="text-align:center">$0.001B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/VS/versus-systems/price-book'>Versus Systems (VS)</a></td>
+					<td style="text-align:center">Canada</td>
+					<td style="text-align:center">$0.001B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/VERB/verb-technology/price-book'>Verb Technology (VERB)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.001B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/QTT/qutoutiao/price-book'>Qutoutiao (QTT)</a></td>
+					<td style="text-align:center">China</td>
+					<td style="text-align:center">$0.000B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/CSLT/castlight-health,-inc/price-book'>Castlight Health, Inc (CSLT)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.000B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/FORG/forgerock/price-book'>ForgeRock (FORG)</a></td>
+					<td style="text-align:center">United States</td>
+					<td style="text-align:center">$0.000B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/KARO/karooooo/price-book'>Karooooo (KARO)</a></td>
+					<td style="text-align:center">Singapore</td>
+					<td style="text-align:center">$0.000B</td>
+					<td style="text-align:center">22.03</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/PERF/perfect/price-book'>Perfect (PERF)</a></td>
+					<td style="text-align:center">Taiwan</td>
+					<td style="text-align:center">$0.000B</td>
+					<td style="text-align:center">31.25</td>
+				 </tr>
+
+						
+						
+				<tr>
+					<td style="text-align:left"><a href='/stocks/charts/RAAS/cloopen/price-book'>Cloopen (RAAS)</a></td>
+					<td style="text-align:center">China</td>
+					<td style="text-align:center">$0.000B</td>
+					<td style="text-align:center">0.00</td>
+				 </tr>
+
+						
+				</tbody>
+			  </table>			
+			
+			</div>
+			
+			
+			<div>
+			
+			<!-- Partner Center Ad Unit -->
+			<div id="IC_728x214_1" style="width:728px; height:214px; margin-left:30px;">
+			
+			
+			</div>
+			
+			
+			</div>
+			
+			
+
+			</div>
+			
+
+			<div id="right_sidebar">
+
+				<!--<a href="/stocks/stock-screener" style="text-decoration:none; color: #fff; ">
+					<div style="margin:0px; padding: 20px; width:300px; background-color: #01579b; min-height:150px; text-align:center;">
+
+						<h2 style="font-weight:600;">Try our new<br />stock screener!</h2></a>
+
+					</div>
+				</a>-->
+
+				<!--<div style="margin-top:0px; min-height:250px;">
+
+					<script src='//ads.investingchannel.com/adtags/Macrotrends/fundamentalanalysis/300x600.js?zhpos=300_2&multi_size=false' type='text/javascript' charset='utf-8'></script>
+
+				</div>-->
+				
+							
+				
+				
+				
+				
+				<div style="margin-top:0px; min-height:270px;">
+
+					<div id="ic_300x250_1">
+
+					
+					</div>
+					
+				</div>
+				
+				<div id="sticky_ad_right" style="margin-top:10px;">
+				
+					<!--<div id="ic_300x250_2" style="width:300px; height:250px; margin-bottom:20px; overflow:hidden;">
+
+
+					</div>
+					
+					<div style="width:300px; height: 310px; margin-bottom:10px; overflow:hidden;">
+
+						<script type="text/javascript" id="dianomi_context_script" src="https://www.dianomi.com/js/contextfeed.js"></script>
+						<div class="dianomi_context" data-dianomi-context-id="2234"></div>
+						
+					</div>
+
+					<div id="ic_300x250_3" style="width:300px; height:250px;">
+
+
+					</div>-->
+
+
+					<script type="text/javascript" id="dianomi_context_script" src="https://www.dianomi.com/js/contextfeed.js"></script>
+					<div class="dianomi_context" data-dianomi-context-id="743"></div>
+
+					<!-- <div id="IC_D_300x250_BCC"></div>-->
+
+					<!--Smartad # 2981: Macrotrends - 300x670 Right Rail-->
+					<iframe id="dianomi_sidebar" width="300" height="670" scrolling="NO" src="//www.dianomi.com/smartads.epl?id=4059"  style="width: 300px; border: none; overflow: hidden;"></iframe>
+					
+					<!--<div id="IC_D_300x250_BCC"></div>-->
+
+
+				</div>			
+
+	
+				
+
+				
+			</div>
+			
+			
+			
+						
+		</div>
+		</div>
+		
+
+<!--This is the div for the IC OOP ad-->
+<div id="oopDivTag_1" style="width:1px;height:1px;"></div>
+		
+
+<footer class="footer">
+
+		<span>&copy; 2010-2024 Macrotrends LLC</span>&nbsp;&nbsp;|&nbsp;&nbsp;
+		  <a href="/terms">Terms of Service</a>
+		  &nbsp;&nbsp;|&nbsp;&nbsp;
+		  <a href="/privacy">Privacy Policy</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+		  <a href="ma&#105;lt&#111;&#58;%&#54;&#57;n%66&#111;&#64;%6D&#97;c%72&#111;&#116;rends&#37;2&#69;&#110;%65t">Contact Us</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+		  <a href="/ccpa">Do Not Sell My Personal Information</a>
+		  <br />
+		  <span>Fundamental data from </span><a target="_blank" rel="nofollow" href="https://www.zacksdata.com">Zacks Investment Research, Inc.</a>
+
+
+</footer>
+
+<div class="modal" id="smallWidthModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body">
+	  	  
+		<div class="modal_title"><h2><strong>We Need Your Support!</strong></h2></div>
+
+		<p>Backlinks from other websites are the lifeblood of our site and a primary source of new traffic.<p>
+		
+<p>If you use our chart images on your site or blog, we ask that you provide attribution via a "dofollow" link back to this page.  We have provided a few examples below that you can copy and paste to your site:</p>
+
+<br />
+
+<table class="table">
+<thead>
+<tr>
+<th>Link Preview</th>
+<th>HTML Code (Click to Copy)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a>Splunk Price to Book Ratio 2011-2023 | SPLK</a></td>
+<td><input type="text" class="modal_link" size="60" value="<a href='https://www.macrotrends.net/stocks/charts/SPLK/splunk/price-book'>Splunk Price to Book Ratio 2011-2023 | SPLK</a>"></td>
+</tr>
+<tr>
+<td><a>Macrotrends</a></td>
+<td><input type="text" class="modal_link" size="60" value="<a href='https://www.macrotrends.net/stocks/charts/SPLK/splunk/price-book'>Macrotrends</a>"></td>
+</tr>
+<tr>
+<td><a>Source</a></td>
+<td><input type="text" class="modal_link" size="60" value="<a href='https://www.macrotrends.net/stocks/charts/SPLK/splunk/price-book'>Source</a>"></td>
+</tr>
+
+
+
+</tbody>
+</table>
+
+<br />
+
+<p style="text-align:center">Your image export is now complete.  Please check your download folder. </p>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close Window</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal" id="smallWidthModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body">
+	  	  
+		<div class="modal_title"><h2><strong>We Need Your Support!</strong></h2></div>
+
+		<p>Backlinks from other websites are the lifeblood of our site and a primary source of new traffic.<p>
+		
+<p>If you use our datasets on your site or blog, we ask that you provide attribution via a "dofollow" link back to this page.  We have provided a few examples below that you can copy and paste to your site:</p>
+
+<br />
+
+<table class="table">
+<thead>
+<tr>
+<th>Link Preview</th>
+<th>HTML Code (Click to Copy)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a>Splunk Price to Book Ratio 2011-2023 | SPLK</a></td>
+<td><input type="text" class="modal_link" size="50" value="<a href='https://www.macrotrends.net/stocks/charts/SPLK/splunk/price-book'>Splunk Price to Book Ratio 2011-2023 | SPLK</a>"></td>
+</tr>
+<tr>
+<td><a>Macrotrends</a></td>
+<td><input type="text" class="modal_link" size="50" value="<a href='https://www.macrotrends.net/stocks/charts/SPLK/splunk/price-book'>Macrotrends</a>"></td>
+</tr>
+<tr>
+<td><a>Source</a></td>
+<td><input type="text" class="modal_link" size="50" value="<a href='https://www.macrotrends.net/stocks/charts/SPLK/splunk/price-book'>Source</a>"></td>
+</tr>
+
+
+
+</tbody>
+</table>
+
+<br />
+
+<p style="text-align:center">Your data export is now complete.  Please check your download folder. </p>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close Window</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal" id="thanksModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div style="padding:20px 40px;" class="modal-content">
+      <div class="modal-body">
+	  	  
+		<div style="font-size:24px;" class="modal_title"><span><strong>Thanks for Registering!</strong></span></div>
+		
+		<br />
+
+		<p>Please click the button below to continue using the site.<p>
+
+<br />
+      </div>
+      <div class="text-center">
+        <button id="finish_registration" type="submit" class="btn btn-primary btn-lg">Return to Page</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal" id="registrationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div style="padding:20px 40px;" class="modal-content">
+      <div class="modal-body">
+	  	  
+		<div style="font-size:24px;" class="modal_title"><span><strong>Register to Continue Using Macrotrends</strong></span></div>
+		
+		<br />
+
+		<p>Please register using your email address to continue enjoying our free content.<p>
+
+<br />
+<form class="registration">
+  <div class="form-group">
+	<div class="row">
+		<div class="col-sm-6">
+			<input type="text" class="form-control" name="firstName" placeholder="First Name" required>
+		</div>
+		<div class="col-sm-6">
+			<input type="text" class="form-control" name="lastName" placeholder="Last Name" required>
+		</div>
+	</div>
+  </div>
+  <div class="form-group">
+    <select class="form-control"  name="jobFunction">
+      <option disabled selected>Select your Job Function...</option>
+	  <option>Registered Investment Advisor</option>
+      <option>Investment Professional</option>
+      <option>Finance Professional</option>
+      <option>Consultant/Banker</option>
+      <option>Personal Investor</option>
+      <option>Student/Educator</option>
+   </select>
+  </div>
+  <div class="form-group">
+    <input type="text" class="form-control" name="companyName" placeholder="Company Name (Optional)">
+  </div>
+  
+  <div class="form-group">
+    <input type="email" class="form-control" name="emailAddress" placeholder="Email Address" required>
+  </div>
+  
+   <div class="form-group">
+    <input id="user_id_hidden" type="hidden" class="form-control" name="userID" value="" required>
+  </div> 
+</form>
+
+      </div>
+      <div class="text-center">
+        <button id="submit_registration" type="submit" class="btn btn-primary btn-lg">Complete Registration</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+	$.typeahead({
+		input: '.js-typeahead',
+		minLength: 0,
+		filter: false,  //Disables typahead filter to just show everything in the results from the database
+		debug: false,
+		highlight: true,
+		maxItem: 10,
+		dynamic: true,
+		delay: 200,
+		searchOnFocus: true,
+		backdrop: {
+			"background-color": "#fff"
+		},
+		href: "{{url}}",
+		emptyTemplate: "no result for {{query}}",
+		display: ["name"],
+		source: {
+			users: {
+				ajax: {
+					url: '/assets/php/all_pages_query.php',
+					data: {
+						q: '{{query}}'
+					}
+				}
+			}
+		}
+	});
+</script>					
+
+
+<script>
+
+$(document).ready(function() {
+	
+	// Selects all of the text in the chart export window when clicked
+	$(".modal_link").focus(function() {
+		var $this = $(this);
+		$this.select();
+
+		// Work around Chrome's little problem
+		$this.mouseup(function() {
+			// Prevent further mouseup intervention
+			$this.unbind("mouseup");
+			return false;
+		});
+	});	
+	
+	
+	$('[data-toggle="tooltip"]').tooltip();
+	
+    $('.statement_type_select').select2({
+	
+	theme: "classic",
+	minimumResultsForSearch: 20
+	
+	});
+
+    $('.frequency_select').select2({
+	
+	theme: "classic",
+	minimumResultsForSearch: 20
+	
+	});
+	
+	
+});
+
+$( "#compareStocks" ).click(function() {
+	
+	
+	window.location.href = '/stocks/stock-comparison?s=price-book&axis=single&comp=SPLK';
+	
+	
+});
+
+$( "#chartExport" ).click(function() {
+	
+		window.$('#smallWidthModal1').modal();
+
+		//Turn off scroll bar for image export
+		chart.chartScrollbarSettings.enabled = false;
+		chart.validateNow(); 
+		
+		
+		chart.export.capture({},function() {
+			this.toPNG({},function(data) {
+				// Download the image to the browser
+				this.download( data, "image/png", "SPLK-price-book-2024-03-13-macrotrends.png" );
+				
+				});
+
+		//Turn scroll bar back on again
+		chart.chartScrollbarSettings.enabled = true;
+		chart.validateNow(); 
+				
+	});
+
+});
+
+$( ".frequency_select" ).change(function() {
+  
+  window.location.href = '/assets/php/new_chart_page.php?t=RAAS&type=price-book&freq=' + this.value;
+
+});
+
+</script>
+
+<!--CLICKY ANALYTICS CODE-->
+<script async data-id="100827248" src="//static.getclicky.com/js"></script>
+
+</body>
+
+</html>

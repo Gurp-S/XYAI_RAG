@@ -2,8 +2,9 @@ package com.XYai.myai.rag.evaluate.strategy;
 
 import cn.hutool.core.util.IdUtil;
 import com.XYai.myai.rag.aop.annotation.RagTraceContext;
-import com.XYai.myai.rag.chat.ModelInvocationService;
+import com.XYai.myai.rag.kafka.event.AnalyticsEvent;
 import com.XYai.myai.user.LoginUserInfoManager;
+import com.XYai.myai.xyAdmin.pojo.TokenUse;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import jakarta.annotation.Resource;
@@ -12,10 +13,12 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * 第三层：LLM 评估
@@ -29,7 +32,7 @@ public class LLMEvaluator {
     @Resource(name = "structuredOutputModel")
     private ChatModel chatModel;
     @Resource
-    private ModelInvocationService modelInvocationService;
+    private KafkaTemplate<String, Object> kafkaTemplate;
 
     private static final String SYSTEM_PROMPT = """
             你是一个RAG系统评测助手。请评估AI助手的回答质量，仅输出JSON。
@@ -62,18 +65,20 @@ public class LLMEvaluator {
             long durationMs = (System.nanoTime() - startTime) / 1_000_000;
 
             RagTraceContext.setPhase("LLM评估");
-            modelInvocationService.saveTokenUseAsync(
+            TokenUse tokenUse = new TokenUse(
                     conversationId,
                     IdUtil.getSnowflakeNextId(),
-                    (long) (SYSTEM_PROMPT.length()+userPrompt.length()),
-                    (long) raw.length(),
+                    SYSTEM_PROMPT.length()+userPrompt.length(),
+                    raw.length(),
                     LoginUserInfoManager.getUserId(),
                     durationMs,
                             chatModel.getDefaultOptions().getModel()+" > evaluate",
                     "evaluate"
             );
-
-
+            kafkaTemplate.send("analytics-event", null, new AnalyticsEvent(
+                    UUID.randomUUID().toString(),"evaluate",
+                    null,tokenUse,null
+            ));
             // 提取 JSON
             int start = raw.indexOf('{');
             int end = raw.lastIndexOf('}');

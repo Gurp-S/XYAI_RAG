@@ -1,5 +1,8 @@
 package com.XYai.myai.xyAdmin;
 
+import com.XYai.myai.security.annotation.AdminOnly;
+import com.XYai.myai.rag.aop.annotation.RateLimit;
+
 import com.XYai.myai.commonUtils.redis.RedisKeyConfig;
 import com.XYai.myai.mapper.*;
 import com.XYai.myai.rag.chat.pojo.ModelRouterProperties;
@@ -35,6 +38,7 @@ import java.util.concurrent.TimeUnit;
  * [趋势图表] GET /fileChart  - 每日文件使用次数
  */
 @Slf4j
+@AdminOnly
 @RestController
 @RequestMapping("/xyAdmin/dashboard")
 public class DashboardManager {
@@ -65,6 +69,7 @@ public class DashboardManager {
      * [统计概览] 聚合关键指标
      */
     @GetMapping("/stats")
+    @RateLimit(limit = 60, rateName = "admin_dashboard_stats", windowMs = 60_000)
     public Map<String, Object> getStats() {
         // 5s 缓存避免重复聚合查询
         long now = System.currentTimeMillis();

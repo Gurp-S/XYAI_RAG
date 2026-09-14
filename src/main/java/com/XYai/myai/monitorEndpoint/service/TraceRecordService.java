@@ -7,6 +7,15 @@ package com.XYai.myai.monitorEndpoint.service;
 public interface TraceRecordService {
 
     /**
+     * 统一更新链路执行状态（合并 finishRun / recordError / recordRunWarn）
+     * @param traceId   链路ID
+     * @param status    SUCCESS / ERROR / WARN
+     * @param message   错误或警告消息（可为null）
+     * @param costTimeMs 执行耗时（毫秒，可为null）
+     */
+    void updateRun(String traceId, String status, String message, Long costTimeMs);
+
+    /**
      * 记录节点报错信息
      */
     void recordNodeError(String traceId, String nodeId, String message);
@@ -30,7 +39,7 @@ public interface TraceRecordService {
     /**
      * 记录当前节点的执行情况
      */
-    void updateNode(String traceId, String nodeId, Object name, Object type, long costTime);
+    void updateNode(String traceId,String status, String nodeId, Object name, Object type, long costTime, String message);
 
     // 在 TraceRecordService 接口或实现类中添加
     void recordNodeWarn(String traceId, String nodeId, String warnMessage, long costTime);

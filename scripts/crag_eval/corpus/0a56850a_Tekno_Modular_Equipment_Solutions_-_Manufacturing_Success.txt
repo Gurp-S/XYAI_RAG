@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en-US" >
+<head>
+<meta charset="UTF-8">
+<script type="text/javascript">
+/* <![CDATA[ */
+ var gform;gform||(document.addEventListener("gform_main_scripts_loaded",function(){gform.scriptsLoaded=!0}),window.addEventListener("DOMContentLoaded",function(){gform.domLoaded=!0}),gform={domLoaded:!1,scriptsLoaded:!1,initializeOnLoaded:function(o){gform.domLoaded&&gform.scriptsLoaded?o():!gform.domLoaded&&gform.scriptsLoaded?window.addEventListener("DOMContentLoaded",o):document.addEventListener("gform_main_scripts_loaded",o)},hooks:{action:{},filter:{}},addAction:function(o,n,r,t){gform.addHook("action",o,n,r,t)},addFilter:function(o,n,r,t){gform.addHook("filter",o,n,r,t)},doAction:function(o){gform.doHook("action",o,arguments)},applyFilters:function(o){return gform.doHook("filter",o,arguments)},removeAction:function(o,n){gform.removeHook("action",o,n)},removeFilter:function(o,n,r){gform.removeHook("filter",o,n,r)},addHook:function(o,n,r,t,i){null==gform.hooks[o][n]&&(gform.hooks[o][n]=[]);var e=gform.hooks[o][n];null==i&&(i=n+"_"+e.length),gform.hooks[o][n].push({tag:i,callable:r,priority:t=null==t?10:t})},doHook:function(n,o,r){var t;if(r=Array.prototype.slice.call(r,1),null!=gform.hooks[n][o]&&((o=gform.hooks[n][o]).sort(function(o,n){return o.priority-n.priority}),o.forEach(function(o){"function"!=typeof(t=o.callable)&&(t=window[t]),"action"==n?t.apply(null,r):r[0]=t.apply(null,r)})),"filter"==n)return r[0]},removeHook:function(o,n,t,i){var r;null!=gform.hooks[o][n]&&(r=(r=gform.hooks[o][n]).filter(function(o,n,r){return!!(null!=i&&i!=o.tag||null!=t&&t!=o.priority)}),gform.hooks[o][n]=r)}}); 
+/* ]]> */
+</script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- WP_HEAD() START -->
+<title>Tekno Modular Equipment Solutions  - Manufacturing Success</title>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Commissioner:100,200,300,400,500,600,700,800,900" >
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Commissioner:100,200,300,400,500,600,700,800,900">
+<link rel="preload" as="style" href="https://use.typekit.net/nlm3tfd.css">
+<link rel="stylesheet" href="https://use.typekit.net/nlm3tfd.css">
+<meta name="dc.title" content="Tekno Modular Equipment Solutions  - Manufacturing Success" />
+<meta name="dc.description" content="We’ve been serving the industry since 1987 by creating manufacturing, assembly, and other process solutions. We offer full turn-key system solutions..." />
+<meta name="dc.relation" content="https://tekno.com/" />
+<meta name="dc.source" content="https://tekno.com/" />
+<meta name="dc.language" content="en_US" />
+<meta name="description" content="We’ve been serving the industry since 1987 by creating manufacturing, assembly, and other process solutions. We offer full turn-key system solutions..." />
+<meta name="robots" content="index, follow" />
+<meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+<meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+<link rel="canonical" href="https://tekno.com/" />
+<script type="application/ld+json">{
+				"@context": "https://schema.org",
+				"@type": "WebSite",
+				"url" : "https:\/\/tekno.com",
+				"potentialAction": {
+					"@type": "SearchAction",
+					"target": "https:\/\/tekno.com\/?s={search_term_string}",
+					"query-input": "required name=search_term_string"
+				}
+			}</script>
+<meta property="og:url" content="https://tekno.com/" />
+<meta property="og:site_name" content="Tekno" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Tekno Modular Equipment Solutions  - Manufacturing Success" />
+<meta property="og:description" content="We’ve been serving the industry since 1987 by creating manufacturing, assembly, and other process solutions. We offer full turn-key system solutions..." />
+<meta property="og:image" content="https://tekno.com/wp-content/uploads/2021/06/tekno-home-kentucky-modular-systems.jpg" />
+<meta property="og:image:secure_url" content="https://tekno.com/wp-content/uploads/2021/06/tekno-home-kentucky-modular-systems.jpg" />
+<meta property="og:image:width" content="1024" />
+<meta property="og:image:height" content="683" />
+<meta property="og:image:alt" content="Home preview - Tekno" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Tekno Modular Equipment Solutions  - Manufacturing Success" />
+<meta name="twitter:description" content="We’ve been serving the industry since 1987 by creating manufacturing, assembly, and other process solutions. We offer full turn-key system solutions..." />
+<meta name="twitter:image" content="https://tekno.com/wp-content/uploads/2021/06/tekno-home-kentucky-modular-systems.jpg" />
+<link rel='dns-prefetch' href='//js.hs-scripts.com' />
+<link rel='dns-prefetch' href='//externalassets.wpengine.com' />
+<link rel='dns-prefetch' href='//cdn.jsdelivr.net' />
+        <script type="application/ld+json">{"@context":"https:\/\/schema.org","@type":"Organization","name":"Tekno Modular Equipment Solutions","url":"https:\/\/tekno.com","logo":"https:\/\/tekno.com\/wp-content\/uploads\/2021\/01\/tekno-notag-reverse.png","contactPoint":[{"@type":"ContactPoint","telephone":"18663504181","contactOption":"TollFree","contactType":"customer support"}]}</script>
+                <script type="application/ld+json">
+            {"@context":"https:\/\/schema.org","@type":"LocalBusiness","image":"https:\/\/tekno.com\/wp-content\/uploads\/2021\/01\/tekno-notag-reverse.png","@id":"https:\/\/tekno.com","name":"Tekno Modular Equipment Solutions","url":"tekno.com","telephone":"1-866-350-4181","address":{"@type":"PostalAddress","streetAddress":"1 Wall Street","addressLocality":"Cave City","addressRegion":"Kentucky","postalCode":"42127","addressCountry":"United States"},"geo":{"@type":"GeoCoordinates","latitude":"37.131570","longitude":"-85.966000"},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","opens":"08:00:00","closes":"11:59:00","dayOfWeek":"https:\/\/schema.org\/Monday"},{"@type":"OpeningHoursSpecification","opens":"12:00:00","closes":"17:00:00","dayOfWeek":"https:\/\/schema.org\/Monday"},{"@type":"OpeningHoursSpecification","opens":"08:00:00","closes":"11:59:00","dayOfWeek":"https:\/\/schema.org\/Tuesday"},{"@type":"OpeningHoursSpecification","opens":"12:00:00","closes":"17:00:00","dayOfWeek":"https:\/\/schema.org\/Tuesday"},{"@type":"OpeningHoursSpecification","opens":"08:00:00","closes":"11:59:00","dayOfWeek":"https:\/\/schema.org\/Wednesday"},{"@type":"OpeningHoursSpecification","opens":"12:00:00","closes":"17:00:00","dayOfWeek":"https:\/\/schema.org\/Wednesday"},{"@type":"OpeningHoursSpecification","opens":"08:00:00","closes":"11:59:00","dayOfWeek":"https:\/\/schema.org\/Thursday"},{"@type":"OpeningHoursSpecification","opens":"12:00:00","closes":"17:00:00","dayOfWeek":"https:\/\/schema.org\/Thursday"},{"@type":"OpeningHoursSpecification","opens":"08:00:00","closes":"11:59:00","dayOfWeek":"https:\/\/schema.org\/Friday"}]}        </script>
+        <link rel='stylesheet' id='wp-block-library-css' href='https://tekno.com/wp-includes/css/dist/block-library/style.min.css?ver=6.4.3' type='text/css' media='all' />
+<link rel='stylesheet' id='wc-blocks-vendors-style-css' href='https://tekno.com/wp-content/plugins/woocommerce/packages/woocommerce-blocks/build/wc-blocks-vendors-style.css?ver=8.5.2' type='text/css' media='all' />
+<link rel='stylesheet' id='wc-blocks-style-css' href='https://tekno.com/wp-content/plugins/woocommerce/packages/woocommerce-blocks/build/wc-blocks-style.css?ver=8.5.2' type='text/css' media='all' />
+<link rel='stylesheet' id='yith-wcan-shortcodes-css' href='https://tekno.com/wp-content/plugins/yith-woocommerce-ajax-navigation/assets/css/shortcodes.css?ver=4.15.0' type='text/css' media='all' />
+<style id='yith-wcan-shortcodes-inline-css' type='text/css'>
+:root{
+	--yith-wcan-filters_colors_titles: #434343;
+	--yith-wcan-filters_colors_background: #FFFFFF;
+	--yith-wcan-filters_colors_accent: #A7144C;
+	--yith-wcan-filters_colors_accent_r: 167;
+	--yith-wcan-filters_colors_accent_g: 20;
+	--yith-wcan-filters_colors_accent_b: 76;
+	--yith-wcan-color_swatches_border_radius: 100%;
+	--yith-wcan-color_swatches_size: 30px;
+	--yith-wcan-labels_style_background: #FFFFFF;
+	--yith-wcan-labels_style_background_hover: #A7144C;
+	--yith-wcan-labels_style_background_active: #A7144C;
+	--yith-wcan-labels_style_text: #434343;
+	--yith-wcan-labels_style_text_hover: #FFFFFF;
+	--yith-wcan-labels_style_text_active: #FFFFFF;
+	--yith-wcan-anchors_style_text: #434343;
+	--yith-wcan-anchors_style_text_hover: #A7144C;
+	--yith-wcan-anchors_style_text_active: #A7144C;
+}
+</style>
+<style id='wpseopress-local-business-style-inline-css' type='text/css'>
+span.wp-block-wpseopress-local-business-field{margin-right:8px}
+
+</style>
+<style id='classic-theme-styles-inline-css' type='text/css'>
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+</style>
+<style id='global-styles-inline-css' type='text/css'>
+body{--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1);--wp--preset--shadow--crisp: 6px 6px 0px rgba(0, 0, 0, 1);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+.wp-block-navigation a:where(:not(.wp-element-button)){color: inherit;}
+:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}
+.wp-block-pullquote{font-size: 1.5em;line-height: 1.6;}
+</style>
+<link rel='stylesheet' id='slick-css-css' href='//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css?ver=6.4.3' type='text/css' media='all' />
+<link rel='stylesheet' id='oxygen-aos-css' href='https://tekno.com/wp-content/plugins/oxygen/component-framework/vendor/aos/aos.css?ver=6.4.3' type='text/css' media='all' />
+<link rel='stylesheet' id='oxygen-css' href='https://tekno.com/wp-content/plugins/oxygen/component-framework/oxygen.css?ver=4.1' type='text/css' media='all' />
+<link rel='stylesheet' id='core-sss-css' href='https://tekno.com/wp-content/plugins/oxy-ninja/public/css/core-sss.min.css?ver=3.5.3' type='text/css' media='all' />
+<link rel='stylesheet' id='responsive-lightbox-swipebox-css' href='https://tekno.com/wp-content/plugins/responsive-lightbox/assets/swipebox/swipebox.min.css?ver=2.4.6' type='text/css' media='all' />
+<link rel='stylesheet' id='woocommerce-layout-css' href='https://tekno.com/wp-content/plugins/woocommerce/assets/css/woocommerce-layout.css?ver=7.0.1' type='text/css' media='all' />
+<link rel='stylesheet' id='woocommerce-smallscreen-css' href='https://tekno.com/wp-content/plugins/woocommerce/assets/css/woocommerce-smallscreen.css?ver=7.0.1' type='text/css' media='only screen and (max-width: 768px)' />
+<link rel='stylesheet' id='woocommerce-general-css' href='https://tekno.com/wp-content/plugins/woocommerce/assets/css/woocommerce.css?ver=7.0.1' type='text/css' media='all' />
+<style id='woocommerce-inline-inline-css' type='text/css'>
+.woocommerce form .form-row .required { visibility: visible; }
+</style>
+<link rel='stylesheet' id='splide-css' href='https://tekno.com/wp-content/plugins/oxy-ninja/public/css/splide.min.css?ver=4.0.14' type='text/css' media='all' />
+<link rel='stylesheet' id='yith_ywraq_frontend-css' href='https://tekno.com/wp-content/plugins/yith-woocommerce-request-a-quote-premium/assets/css/ywraq-frontend.css?ver=2.4.3' type='text/css' media='all' />
+<style id='yith_ywraq_frontend-inline-css' type='text/css'>
+.woocommerce .add-request-quote-button.button, .woocommerce .add-request-quote-button-addons.button{
+    background-color: rgb(42,48,134)!important;
+    color: #fff!important;
+}
+.woocommerce .add-request-quote-button.button:hover,  .woocommerce .add-request-quote-button-addons.button:hover{
+    background-color: rgb(0,163,74)!important;
+    color: #fff!important;
+}
+.woocommerce a.add-request-quote-button{
+    color: #fff!important;
+}
+
+.woocommerce a.add-request-quote-button:hover{
+    color: #fff!important;
+}
+
+</style>
+<script type="text/javascript" src="https://tekno.com/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
+<script type="text/javascript" src="https://tekno.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1" id="jquery-migrate-js"></script>
+<script type="text/javascript" src="https://externalassets.wpengine.com/wp-content/themes/fontawesome-pro/js/all.js?ver=6.4.3" id="font-awesome-js-js"></script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js?ver=6.4.3" id="slick-js-js"></script>
+<script type="text/javascript" src="https://tekno.com/wp-content/plugins/oxygen/component-framework/vendor/aos/aos.js?ver=1" id="oxygen-aos-js"></script>
+<script type="text/javascript" src="https://tekno.com/wp-content/plugins/responsive-lightbox/assets/swipebox/jquery.swipebox.min.js?ver=2.4.6" id="responsive-lightbox-swipebox-js"></script>
+<script type="text/javascript" src="https://tekno.com/wp-includes/js/underscore.min.js?ver=1.13.4" id="underscore-js"></script>
+<script type="text/javascript" src="https://tekno.com/wp-content/plugins/responsive-lightbox/assets/infinitescroll/infinite-scroll.pkgd.min.js?ver=6.4.3" id="responsive-lightbox-infinite-scroll-js"></script>
+<script type="text/javascript" id="responsive-lightbox-js-before">
+/* <![CDATA[ */
+var rlArgs = {"script":"swipebox","selector":"lightbox","customEvents":"","activeGalleries":true,"animation":true,"hideCloseButtonOnMobile":false,"removeBarsOnMobile":false,"hideBars":true,"hideBarsDelay":5000,"videoMaxWidth":1080,"useSVG":true,"loopAtEnd":false,"woocommerce_gallery":true,"ajaxurl":"https:\/\/tekno.com\/wp-admin\/admin-ajax.php","nonce":"72e6de4935","preview":false,"postId":18,"scriptExtension":false};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://tekno.com/wp-content/plugins/responsive-lightbox/js/front.js?ver=2.4.6" id="responsive-lightbox-js"></script>
+<script type="text/javascript" src="https://tekno.com/wp-content/plugins/oxy-ninja/public/js/splide/splide.min.js?ver=4.0.14" id="splide-js"></script>
+<script type="text/javascript" src="https://tekno.com/wp-content/plugins/oxy-ninja/public/js/splide/splide-extension-auto-scroll.min.js?ver=0.5.2" id="splide-autoscroll-js"></script>
+<link rel="https://api.w.org/" href="https://tekno.com/wp-json/" /><link rel="alternate" type="application/json" href="https://tekno.com/wp-json/wp/v2/pages/18" /><link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://tekno.com/xmlrpc.php?rsd" />
+<link rel='shortlink' href='https://tekno.com/' />
+<link rel="alternate" type="application/json+oembed" href="https://tekno.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Ftekno.com%2F" />
+<link rel="alternate" type="text/xml+oembed" href="https://tekno.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Ftekno.com%2F&#038;format=xml" />
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-150922573-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-150922573-1');
+</script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KXKRDJP');</script>
+<!-- End Google Tag Manager -->
+
+<meta name="google-site-verification" content="pagngT_s4q-BpRecsRbeTNqEmqZqauEgF7WzR2fgfLw" />			<!-- DO NOT COPY THIS SNIPPET! Start of Page Analytics Tracking for HubSpot WordPress plugin v11.0.8-->
+			<script class="hsq-set-content-id" data-content-id="standard-page">
+				var _hsq = _hsq || [];
+				_hsq.push(["setContentType", "standard-page"]);
+			</script>
+			<!-- DO NOT COPY THIS SNIPPET! End of Page Analytics Tracking for HubSpot WordPress plugin -->
+			
+	<script>
+		jQuery( document ).ready(function() {
+			/*jQuery('a.add-request-quote-button').append('<i class="fas fa-arrow-right"></i>');*/
+			jQuery('.aw-arrow-after a').append('<i class="fas fa-arrow-right"></i>');
+			jQuery('.special-placement-btn a').append('<i class="fal fa-long-arrow-right"></i>');
+			jQuery('.gform_button').append('<i class="fas fa-arrow-right"></i>');
+			jQuery('.oxy-posts a.oxy-read-more').append('<i class="fas fa-long-arrow-right"></i>');
+		});
+	</script>
+
+        <script type="text/javascript">
+            var jQueryMigrateHelperHasSentDowngrade = false;
+
+			window.onerror = function( msg, url, line, col, error ) {
+				// Break out early, do not processing if a downgrade reqeust was already sent.
+				if ( jQueryMigrateHelperHasSentDowngrade ) {
+					return true;
+                }
+
+				var xhr = new XMLHttpRequest();
+				var nonce = 'fdceadac7d';
+				var jQueryFunctions = [
+					'andSelf',
+					'browser',
+					'live',
+					'boxModel',
+					'support.boxModel',
+					'size',
+					'swap',
+					'clean',
+					'sub',
+                ];
+				var match_pattern = /\)\.(.+?) is not a function/;
+                var erroredFunction = msg.match( match_pattern );
+
+                // If there was no matching functions, do not try to downgrade.
+                if ( null === erroredFunction || typeof erroredFunction !== 'object' || typeof erroredFunction[1] === "undefined" || -1 === jQueryFunctions.indexOf( erroredFunction[1] ) ) {
+                    return true;
+                }
+
+                // Set that we've now attempted a downgrade request.
+                jQueryMigrateHelperHasSentDowngrade = true;
+
+				xhr.open( 'POST', 'https://tekno.com/wp-admin/admin-ajax.php' );
+				xhr.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' );
+				xhr.onload = function () {
+					var response,
+                        reload = false;
+
+					if ( 200 === xhr.status ) {
+                        try {
+                        	response = JSON.parse( xhr.response );
+
+                        	reload = response.data.reload;
+                        } catch ( e ) {
+                        	reload = false;
+                        }
+                    }
+
+					// Automatically reload the page if a deprecation caused an automatic downgrade, ensure visitors get the best possible experience.
+					if ( reload ) {
+						location.reload();
+                    }
+				};
+
+				xhr.send( encodeURI( 'action=jquery-migrate-downgrade-version&_wpnonce=' + nonce ) );
+
+				// Suppress error alerts in older browsers
+				return true;
+			}
+        </script>
+
+			<noscript><style>.woocommerce-product-gallery{ opacity: 1 !important; }</style></noscript>
+	<link rel="icon" href="https://tekno.com/wp-content/uploads/2021/01/cropped-Tekno-Favicon-32x32.png" sizes="32x32" />
+<link rel="icon" href="https://tekno.com/wp-content/uploads/2021/01/cropped-Tekno-Favicon-192x192.png" sizes="192x192" />
+<link rel="apple-touch-icon" href="https://tekno.com/wp-content/uploads/2021/01/cropped-Tekno-Favicon-180x180.png" />
+<meta name="msapplication-TileImage" content="https://tekno.com/wp-content/uploads/2021/01/cropped-Tekno-Favicon-270x270.png" />
+<link rel='stylesheet' id='oxygen-cache-19011-css' href='//tekno.com/wp-content/uploads/oxygen/css/19011.css?cache=1670426385&#038;ver=6.4.3' type='text/css' media='all' />
+<link rel='stylesheet' id='oxygen-cache-191-css' href='//tekno.com/wp-content/uploads/oxygen/css/191.css?cache=1669906854&#038;ver=6.4.3' type='text/css' media='all' />
+<link rel='stylesheet' id='oxygen-cache-19033-css' href='//tekno.com/wp-content/uploads/oxygen/css/19033.css?cache=1669840279&#038;ver=6.4.3' type='text/css' media='all' />
+<link rel='stylesheet' id='oxygen-cache-19010-css' href='//tekno.com/wp-content/uploads/oxygen/css/19010.css?cache=1669910673&#038;ver=6.4.3' type='text/css' media='all' />
+<link rel='stylesheet' id='oxygen-cache-15-css' href='//tekno.com/wp-content/uploads/oxygen/css/15.css?cache=1669833374&#038;ver=6.4.3' type='text/css' media='all' />
+<link rel='stylesheet' id='oxygen-cache-18-css' href='//tekno.com/wp-content/uploads/oxygen/css/18.css?cache=1669906614&#038;ver=6.4.3' type='text/css' media='all' />
+<link rel='stylesheet' id='oxygen-universal-styles-css' href='//tekno.com/wp-content/uploads/oxygen/css/universal.css?cache=1694119361&#038;ver=6.4.3' type='text/css' media='all' />
+<!-- END OF WP_HEAD() -->
+</head>
+<body class="home page-template-default page page-id-18  wp-embed-responsive theme-oxygen-is-not-a-theme oxygen-body woocommerce-no-js yith-wcan-free" >
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KXKRDJP"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+
+						<div id="div_block-2-15" class="ct-div-block" ><div id="code_block-3-15" class="ct-code-block" ></div><header id="_header-4-15" class="oxy-header-wrapper oxy-sticky-header oxy-overlay-header oxy-header c-shadow c-header" ><div id="_header_row-5-15" class="oxygen-hide-in-sticky oxy-header-row " ><div class="oxy-header-container"><div id="_header_left-6-15" class="oxy-header-left" ><div id="div_block-7-15" class="ct-div-block c-header-contact" ><div id="text_block-204-15" class="ct-text-block" >Call us for a Free Quote:&nbsp;<a href="tel: 18663504181">1.866.350.4181</a><span id="span-205-15" class="ct-span" ></span></div></div></div><div id="_header_center-14-15" class="oxy-header-center" ></div><div id="_header_right-15-15" class="oxy-header-right" ><div id="div_block-180-15" class="ct-div-block c-header-contact" ><a id="link-181-15" class="ct-link c-transition c-link-m" href="https://tekno.com/blog/"   ><div id="text_block-183-15" class="ct-text-block" >Blog</div></a><a id="link-184-15" class="ct-link c-transition c-link-m" href="https://tekno.com/support/"   ><div id="text_block-186-15" class="ct-text-block" >Support</div></a><div id="_toggle-243-15" class="oxy-toggle toggle-0687 toggle-0687-expanded" data-oxy-toggle-target="#quote-title" data-oxy-toggle-initial-state="closed" data-oxy-toggle-active-class="toggle-0687-expanded" >
+			<div class='oxy-expand-collapse-icon' href='#'></div>
+			<div class='oxy-toggle-content'>
+                <div id="div_block-249-15" class="ct-div-block" ><div id="text_block-247-15" class="ct-text-block" >Quote List</div><div id="fancy_icon-246-15" class="ct-fancy-icon" ><svg id="svg-fancy_icon-246-15"><use xlink:href="#FontAwesomeicon-shopping-basket"></use></svg></div></div>			</div>
+		</div><div id="quote-title" class="ct-widget" ><div class="widget woocommerce widget_ywraq_list_quote"><h2 class="widgettitle">Quote List</h2><div class="yith-ywraq-list-widget-wrapper" data-instance="template_part=view&button_label=View+Quote+List&show_thumbnail=1&show_price=0&show_quantity=0&show_variations=0&widget_type=large">
+<div class="yith-ywraq-list-wrapper">
+			<p>No products in the list</p>
+	</div>
+
+
+</div></div></div></div></div></div></div><div id="_header_row-25-15" class="oxy-header-row " ><div class="oxy-header-container"><div id="_header_left-26-15" class="oxy-header-left" ><a id="link-27-15" class="ct-link" href="/"   ><img  id="image-28-15" alt="tekno modern logo" src="https://tekno.com/wp-content/uploads/2022/09/tekno-white.png" class="ct-image c-logo"/></a></div><div id="_header_center-29-15" class="oxy-header-center" ></div><div id="_header_right-121-15" class="oxy-header-right" ><nav id="_nav_menu-203-15" class="oxy-nav-menu oxy-nav-menu-dropdowns oxy-nav-menu-dropdown-arrow oxy-nav-menu-responsive-dropdowns" ><div class='oxy-menu-toggle'><div class='oxy-nav-menu-hamburger-wrap'><div class='oxy-nav-menu-hamburger'><div class='oxy-nav-menu-hamburger-line'></div><div class='oxy-nav-menu-hamburger-line'></div><div class='oxy-nav-menu-hamburger-line'></div></div></div></div><div class="menu-main-navigation-container"><ul id="menu-main-navigation" class="oxy-nav-menu-list"><li id="menu-item-19041" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-19041"><a href="https://tekno.com/conveyor-system-solutions/" data-ps2id-api="true">Conveyor Systems</a>
+<ul class="sub-menu">
+	<li id="menu-item-19042" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-19042"><a href="https://tekno.com/conveyor-system-solutions/assembly/" data-ps2id-api="true">Assembly</a>
+	<ul class="sub-menu">
+		<li id="menu-item-19043" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-19043"><a href="https://tekno.com/conveyor-system-solutions/assembly/conveyor-automation/" data-ps2id-api="true">Conveyor Automation</a></li>
+	</ul>
+</li>
+	<li id="menu-item-19044" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-19044"><a href="https://tekno.com/conveyor-system-solutions/asrs/" data-ps2id-api="true">ASRS</a></li>
+	<li id="menu-item-19045" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-19045"><a href="https://tekno.com/conveyor-system-solutions/shipping/" data-ps2id-api="true">Shipping</a></li>
+</ul>
+</li>
+<li id="menu-item-123" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-123"><a href="/projects/" data-ps2id-api="true">Our Work</a></li>
+<li id="menu-item-19046" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-19046"><a href="https://tekno.com/components/" data-ps2id-api="true">Components</a></li>
+<li id="menu-item-218" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-218"><a href="https://tekno.com/why-tekno/" data-ps2id-api="true">Why Tekno</a></li>
+</ul></div></nav><a id="link-262-15" class="ct-link c-btn-m c-transition" href="https://tekno.com/talk-with-an-engineer/" target="_self"  ><div id="text_block-266-15" class="ct-text-block c-margin-right-s" >Talk to an Engineer</div><div id="fancy_icon-265-15" class="ct-fancy-icon" ><svg id="svg-fancy_icon-265-15"><use xlink:href="#Lineariconsicon-arrow-right"></use></svg></div></a></div></div></div></header>
+				<script type="text/javascript">
+			jQuery(document).ready(function() {
+				var selector = "#_header-4-15",
+					scrollval = parseInt("300");
+				if (!scrollval || scrollval < 1) {
+										if (jQuery(window).width() >= 992){
+											jQuery("body").css("margin-top", jQuery(selector).outerHeight());
+						jQuery(selector).addClass("oxy-sticky-header-active");
+										}
+									}
+				else {
+					var scrollTopOld = 0;
+					jQuery(window).scroll(function() {
+						if (!jQuery('body').hasClass('oxy-nav-menu-prevent-overflow')) {
+							if (jQuery(this).scrollTop() > scrollval 
+																) {
+								if (
+																		jQuery(window).width() >= 992 && 
+																		!jQuery(selector).hasClass("oxy-sticky-header-active")) {
+									if (jQuery(selector).css('position')!='absolute') {
+										jQuery("body").css("margin-top", jQuery(selector).outerHeight());
+									}
+									jQuery(selector)
+										.addClass("oxy-sticky-header-active")
+																			.addClass("oxy-sticky-header-fade-in");
+																	}
+							}
+							else {
+								jQuery(selector)
+									.removeClass("oxy-sticky-header-fade-in")
+									.removeClass("oxy-sticky-header-active");
+								if (jQuery(selector).css('position')!='absolute') {
+									jQuery("body").css("margin-top", "");
+								}
+							}
+							scrollTopOld = jQuery(this).scrollTop();
+						}
+					})
+				}
+			});
+		</script></div><div id='inner_content-173-15' class='ct-inner-content'><div id="code_block-105-18" class="ct-code-block" ></div><section id="section-77-18" class="oxy-video-background ct-section" ><div class='oxy-video-container'><video autoplay loop playsinline muted><source src='https://tekno.com/wp-content/uploads/2021/02/Tekno-Film-FINAL_Trim.mp4'></video><div class='oxy-video-overlay'></div></div><div class="ct-section-inner-wrap"><div id="div_block-88-18" class="ct-div-block" ><h1 id="headline-80-18" class="ct-headline">Modular Equipment Solutions&nbsp;<br>For Manufacturing Success</h1><div id="div_block-81-18" class="ct-div-block c-buttons" ><a id="link-82-18" class="ct-link c-btn-m c-transition white-outline" href="https://tekno.com/conveyor-system-solutions/"   ><div id="text_block-83-18" class="ct-text-block c-margin-right-m" >View Systems</div><div id="fancy_icon-84-18" class="ct-fancy-icon c-icon-light-m" ><svg id="svg-fancy_icon-84-18"><use xlink:href="#Lineariconsicon-arrow-right"></use></svg></div></a><a id="link-85-18" class="ct-link c-btn-m c-transition white-outline" href="https://tekno.com/talk-with-an-engineer/"   ><div id="text_block-86-18" class="ct-text-block c-margin-right-m" >Talk to an engineer</div><div id="fancy_icon-87-18" class="ct-fancy-icon c-icon-accent-m" ><svg id="svg-fancy_icon-87-18"><use xlink:href="#Lineariconsicon-arrow-right"></use></svg></div></a></div></div></div></section><section id="section-22-18" class=" ct-section c-bg-light global-section-padding" ><div class="ct-section-inner-wrap"><h2 id="headline-23-18" class="ct-headline c-heading-dark c-margin-bottom-m c-h2">WHY TEKNO</h2><div id="text_block-91-18" class="ct-text-block c-text-m c-text-dark c-margin-bottom-m" >Tekno has been providing modular conveyor systems and solutions since 1988. Our equipment works seamlessly together to create an efficient, durable and customized solution to any pallet-driven manufacturing and assembly line. When you work with Tekno, you work with our team of expert engineers, programmers and technicians that to create the best solution for your unique system needs.</div><a id="link-425-18" class="ct-link c-transition c-btn-m c-btn-outline" href="https://tekno.com/why-tekno/"   ><div id="text_block-426-18" class="ct-text-block c-margin-right-m" >Learn More</div><div id="fancy_icon-427-18" class="ct-fancy-icon " ><svg id="svg-fancy_icon-427-18"><use xlink:href="#Lineariconsicon-arrow-right"></use></svg></div></a></div></section>
+		<div id="-woo-product-categories-103-18" class="oxy-woo-product-categories oxy-woo-element"><div class="woocommerce columns-3"><ul class="products columns-3">
+<li class="product-category product first">
+	<a href="https://tekno.com/product-category/conveyor-systems/"><img src="https://tekno.com/wp-content/uploads/2021/02/conveyor-systems-300x300.jpg" alt="Conveyor Systems" width="300" height="300" srcset="https://tekno.com/wp-content/uploads/2021/02/conveyor-systems-300x300.jpg 300w, https://tekno.com/wp-content/uploads/2021/02/conveyor-systems-200x200.jpg 200w" sizes="(max-width: 300px) 100vw, 300px" />		<h2 class="woocommerce-loop-category__title">
+			Conveyor Systems <mark class="count">(5)</mark>		</h2>
+		</a></li>
+<li class="product-category product">
+	<a href="https://tekno.com/product-category/conveyor-automation/"><img src="https://tekno.com/wp-content/uploads/2021/02/automation-300x300.jpg" alt="Conveyor Automation" width="300" height="300" srcset="https://tekno.com/wp-content/uploads/2021/02/automation-300x300.jpg 300w, https://tekno.com/wp-content/uploads/2021/02/automation-200x200.jpg 200w" sizes="(max-width: 300px) 100vw, 300px" />		<h2 class="woocommerce-loop-category__title">
+			Conveyor Automation <mark class="count">(8)</mark>		</h2>
+		</a></li>
+<li class="product-category product last">
+	<a href="https://tekno.com/product-category/conveyor-pallets/"><img src="https://tekno.com/wp-content/uploads/2021/02/pallets-300x300.jpg" alt="Conveyor Pallets" width="300" height="300" srcset="https://tekno.com/wp-content/uploads/2021/02/pallets-300x300.jpg 300w, https://tekno.com/wp-content/uploads/2021/02/pallets-200x200.jpg 200w" sizes="(max-width: 300px) 100vw, 300px" />		<h2 class="woocommerce-loop-category__title">
+			Conveyor Pallets <mark class="count">(1)</mark>		</h2>
+		</a></li>
+</ul>
+</div></div>
+
+		<div id="code_block-288-18" class="ct-code-block" ></div><section id="section-440-18" class=" ct-section" ><div class="ct-section-inner-wrap"><div id="new_columns-441-18" class="ct-new-columns" ><div id="div_block-442-18" class="ct-div-block" ><div id="div_block-443-18" class="ct-div-block systems-hover-box-div" ><a id="link-444-18" class="ct-link systems-hover-box" href="https://tekno.com/conveyor-system-solutions/assembly/"   ><h2 id="headline-445-18" class="ct-headline systems-hover-box-h">Assembly</h2><div id="fancy_icon-446-18" class="ct-fancy-icon systems-hover-box-i" ><svg id="svg-fancy_icon-446-18"><use xlink:href="#Lineariconsicon-arrow-right"></use></svg></div></a></div></div><div id="div_block-447-18" class="ct-div-block" ><div id="div_block-448-18" class="ct-div-block systems-hover-box-div" ><a id="link-449-18" class="ct-link systems-hover-box" href="https://tekno.com/conveyor-system-solutions/asrs/"   ><h2 id="headline-450-18" class="ct-headline systems-hover-box-h">ASRS</h2><div id="fancy_icon-451-18" class="ct-fancy-icon systems-hover-box-i" ><svg id="svg-fancy_icon-451-18"><use xlink:href="#Lineariconsicon-arrow-right"></use></svg></div></a></div></div><div id="div_block-452-18" class="ct-div-block" ><div id="div_block-453-18" class="ct-div-block systems-hover-box-div" ><a id="link-454-18" class="ct-link systems-hover-box" href="https://tekno.com/conveyor-system-solutions/shipping/"   ><h2 id="headline-455-18" class="ct-headline systems-hover-box-h">Shipping</h2><div id="fancy_icon-456-18" class="ct-fancy-icon systems-hover-box-i" ><svg id="svg-fancy_icon-456-18"><use xlink:href="#Lineariconsicon-arrow-right"></use></svg></div></a></div></div></div></div></section><div id="div_block-108-18" class="ct-div-block" ><a id="link-53-18" class="ct-link c-transition c-btn-m white-outline" href="https://tekno.com/conveyor-system-solutions/"   ><div id="text_block-54-18" class="ct-text-block c-margin-right-m" >View Systems</div><div id="fancy_icon-55-18" class="ct-fancy-icon " ><svg id="svg-fancy_icon-55-18"><use xlink:href="#Lineariconsicon-arrow-right"></use></svg></div></a></div><section id="section-118-18" class=" ct-section global-section-padding" ><div class="ct-section-inner-wrap"><div id="div_block-119-18" class="ct-div-block customWrap text-center" ><h2 id="headline-120-18" class="ct-headline blue-heading text-upper text-center">Industries Served</h2><div id="text_block-122-18" class="ct-text-block centered-content eight-hundo" >No matter the industry, we stand behind our turnkey yet tailored equipment solutions because they’ve helped our clients succeed for over 30 years. </div></div><div id="div_block-124-18" class="ct-div-block" ><div id="code_block-125-18" class="ct-code-block " ><div class="responsive">		<div class="industry-div">
+          
+          	  <img src="https://tekno.com/wp-content/uploads/2022/09/dark-blue-rocket.png" alt="Aerospace" />
+            <p class="industry-link">Aerospace</p>
+          
+		</div>		<div class="industry-div">
+          
+          	  <img src="https://tekno.com/wp-content/uploads/2022/09/dark-blue-factory.png" alt="Appliances" />
+            <p class="industry-link">Appliances</p>
+          
+		</div>		<div class="industry-div">
+          
+          	  <img src="https://tekno.com/wp-content/uploads/2022/09/dark-blue-car.png" alt="Automotive" />
+            <p class="industry-link">Automotive</p>
+          
+		</div>		<div class="industry-div">
+          
+          	  <img src="https://tekno.com/wp-content/uploads/2022/09/dark-blue-cross.png" alt="Medical" />
+            <p class="industry-link">Medical</p>
+          
+		</div></div></div></div></div></section><section id="section-46-18" class=" ct-section c-bg-light-alt" ><div class="ct-section-inner-wrap"><div id="div_block-47-18" class="ct-div-block c-columns-2 c-columns-m-1" ><div id="div_block-49-18" class="ct-div-block c-column-max-width c-padding-xl" ><h2 id="headline-50-18" class="ct-headline c-h2 c-heading-dark c-margin-bottom-m">Parts</h2><h3 id="headline-98-18" class="ct-headline">We offer a full line of extrusions, profiles, hardware, and accessories to build your own solutions.</h3><div id="text_block-94-18" class="ct-text-block" ><div style="text-align: left;">Our easy-to-work-with components are designed to be built with basic tools, no machinery or tapping required, for ease and speed of assembly.<br> </div></div><a id="link-429-18" class="ct-link c-transition c-btn-m c-btn-outline" href="https://tekno.com/product-category/parts"   ><div id="text_block-430-18" class="ct-text-block c-margin-right-m" >View Parts</div><div id="fancy_icon-431-18" class="ct-fancy-icon " ><svg id="svg-fancy_icon-431-18"><use xlink:href="#Lineariconsicon-arrow-right"></use></svg></div></a></div><div id="div_block-48-18" class="ct-div-block" ></div></div></div></section><section id="section-127-18" class=" ct-section global-section-padding" ><div class="ct-section-inner-wrap"><div id="div_block-128-18" class="ct-div-block customWrap content-center" ><h2 id="headline-129-18" class="ct-headline blue-heading text-upper text-center">Recent Projects</h2>        
+                <div id="_posts_grid-287-18" class='oxy-easy-posts oxy-posts-grid' >
+                    <div class='oxy-posts'>
+                 <div class='oxy-post'>
+  
+    <a class='post-image' href='https://tekno.com/projects/revitalizing-with-modern-manufacturing-solutions-and-expertise/'>
+      
+      <div class='post-image-fixed-ratio' style='background-image: url(https://tekno.com/wp-content/uploads/2022/04/pallet-conveyor-system-e1654631430725.jpg);'>
+      	<div class='post-info-wrap'>
+          <h3>Revitalizing with Modern Manufacturing Solutions and Expertise</h3>
+          <div class="meta">
+             
+                
+                          </div>
+          
+        </div>
+        <i class="far fa-long-arrow-right"></i>
+      </div>
+      
+	</a>
+  
+</div> <div class='oxy-post'>
+  
+    <a class='post-image' href='https://tekno.com/projects/seat-pallet-shipping-trailer/'>
+      
+      <div class='post-image-fixed-ratio' style='background-image: url(https://tekno.com/wp-content/uploads/2021/03/DY2A0644.jpg);'>
+      	<div class='post-info-wrap'>
+          <h3>Seat Pallet Shipping Trailer</h3>
+          <div class="meta">
+             
+                
+                                      <div class="flexitem">
+                          
+                          <h4>Automation</h4>                      </div>
+                                         <div class="flexitem">
+                          
+                          <h4>Interior</h4>                      </div>
+                             </div>
+          
+        </div>
+        <i class="far fa-long-arrow-right"></i>
+      </div>
+      
+	</a>
+  
+</div> <div class='oxy-post'>
+  
+    <a class='post-image' href='https://tekno.com/projects/seat-sequence-center/'>
+      
+      <div class='post-image-fixed-ratio' style='background-image: url(https://tekno.com/wp-content/uploads/2021/03/DSC_0690-scaled.jpg);'>
+      	<div class='post-info-wrap'>
+          <h3>Seat Sequence Center</h3>
+          <div class="meta">
+             
+                
+                                      <div class="flexitem">
+                          
+                          <h4>Automation</h4>                      </div>
+                                         <div class="flexitem">
+                          
+                          <h4>Interior</h4>                      </div>
+                             </div>
+          
+        </div>
+        <i class="far fa-long-arrow-right"></i>
+      </div>
+      
+	</a>
+  
+</div>            </div>
+                            </div>
+                </div><div id="new_columns-133-18" class="ct-new-columns customWrap" ><div id="div_block-134-18" class="ct-div-block" ><h3 id="headline-136-18" class="ct-headline blue-heading text-upper">Who we work with</h3><div id="text_block-138-18" class="ct-text-block" >For over 30 years, we’ve been putting our customers first. Choose Tekno today &amp; join our list of satisfied customers.</div></div><div id="div_block-387-18" class="ct-div-block" ><link rel='stylesheet' id='oxygen-unslider-css'  href='https://tekno.com/wp-content/plugins/oxygen/component-framework/vendor/unslider/unslider.css' type='text/css' media='all'/><div id="slider-378-18" class="ct-slider ct_unique_slider_5011" ><div class="oxygen-unslider-container"><ul><li><div id="slide-379-18" class="ct-slide" ><img  id="image-392-18" alt="" src="https://tekno.com/wp-content/uploads/2021/03/kohler.jpg" class="ct-image"/><img  id="image-393-18" alt="" src="https://tekno.com/wp-content/uploads/2021/03/faurecia.jpg" class="ct-image"/><img  id="image-394-18" alt="" src="https://tekno.com/wp-content/uploads/2021/03/denso.jpg" class="ct-image"/></div></li><li><div id="slide-399-18" class="ct-slide" ><img  id="image-400-18" alt="" src="https://tekno.com/wp-content/uploads/2021/03/trane.jpg" class="ct-image"/><img  id="image-401-18" alt="" src="https://tekno.com/wp-content/uploads/2021/03/johnson-controls.jpg" class="ct-image"/><img  id="image-402-18" alt="" src="https://tekno.com/wp-content/uploads/2021/03/grupo-antolin.jpg" class="ct-image"/></div></li><li><div id="slide-403-18" class="ct-slide" ><img  id="image-404-18" alt="" src="https://tekno.com/wp-content/uploads/2021/03/GE.jpg" class="ct-image"/><img  id="image-405-18" alt="" src="https://tekno.com/wp-content/uploads/2021/03/nissan.jpg" class="ct-image"/><img  id="image-406-18" alt="" src="https://tekno.com/wp-content/uploads/2021/03/frigidaire.jpg" class="ct-image"/></div></li><li><div id="slide-407-18" class="ct-slide" ><img  id="image-408-18" alt="" src="https://tekno.com/wp-content/uploads/2021/03/toshiba.jpg" class="ct-image"/><img  id="image-409-18" alt="" src="https://tekno.com/wp-content/uploads/2021/03/york.jpg" class="ct-image"/><img  id="image-410-18" alt="" src="https://tekno.com/wp-content/uploads/2021/03/lacks.jpg" class="ct-image"/></div></li><li><div id="slide-411-18" class="ct-slide" ><img  id="image-412-18" alt="" src="https://tekno.com/wp-content/uploads/2021/03/whirlpool.jpg" class="ct-image"/><img  id="image-413-18" alt="" src="https://tekno.com/wp-content/uploads/2021/03/magna.jpg" class="ct-image"/><img  id="image-414-18" alt="" src="https://tekno.com/wp-content/uploads/2021/03/hitachi-1.jpg" class="ct-image"/></div></li><li><div id="slide-415-18" class="ct-slide" ><img  id="image-416-18" alt="" src="https://tekno.com/wp-content/uploads/2021/03/callaway.jpg" class="ct-image"/><img  id="image-417-18" alt="" src="https://tekno.com/wp-content/uploads/2021/03/honda.jpg" class="ct-image"/><img  id="image-418-18" alt="" src="https://tekno.com/wp-content/uploads/2021/03/benteler.jpg" class="ct-image"/></div></li></ul></div></div><script class="ct-slider-script">jQuery(document).ready(function($){$('#slider-378-18.ct_unique_slider_5011 .oxygen-unslider-container:not(.unslider-horizontal,.unslider-fade)').unslider({autoplay: true, delay: 6000, animation: 'horizontal', speed : 750, arrows: true, nav: true, infinite: true})});</script></div></div></div></section><section id="section-216-18" class=" ct-section global-section-padding" ><div class="ct-section-inner-wrap"><div id="fancy_icon-217-18" class="ct-fancy-icon" ><svg id="svg-fancy_icon-217-18"><use xlink:href="#FontAwesomeicon-question-circle"></use></svg></div><h2 id="headline-218-18" class="ct-headline text-upper">Get Support</h2><div id="text_block-220-18" class="ct-text-block centered-content eight-hundo" >At Tekno, we are dedicated to putting our customers first, from the initial request through ongoing support. You are the reason we do what we do! From general maintenance, adjustments, and repairs, our goal is to fulfill any and all support needs, you might have. Check out a few of our Frequently Asked Questions below or&nbsp;<a href="https://tekno.com/contact/">contact us</a>&nbsp;to for the support you need!<br></div><div id="div_block-226-18" class="ct-div-block centered-content eight-hundo" ><div id="_dynamic_list-294-18" class="oxy-dynamic-list home-faq"><div id="div_block-295-18-1" class="ct-div-block" data-id="div_block-295-18"><div id="_toggle-296-18-1" class="oxy-toggle toggle-9860 toggle-9860-expanded" data-oxy-toggle-initial-state="closed" data-oxy-toggle-active-class="toggle-9860-expanded" data-id="_toggle-296-18">
+			<div class="oxy-expand-collapse-icon" href="#"></div>
+			<div class="oxy-toggle-content">
+                <h3 id="headline-297-18-1" class="ct-headline" data-id="headline-297-18"><span id="span-298-18-1" class="ct-span" data-id="span-298-18">Does it come in steel?</span></h3>			</div>
+		</div><div id="text_block-299-18-1" class="ct-text-block" data-id="text_block-299-18"><span id="span-300-18-1" class="ct-span oxy-stock-content-styles" data-id="span-300-18"><p>We do not offer steel conveyor options, but we do partner with a company that does. Innovative Conveyance Solutions (ICS) &hellip;</p></span></div></div><div id="div_block-295-18-2" class="ct-div-block" data-id="div_block-295-18"><div id="_toggle-296-18-2" class="oxy-toggle toggle-9860 toggle-9860-expanded" data-oxy-toggle-initial-state="closed" data-oxy-toggle-active-class="toggle-9860-expanded" data-id="_toggle-296-18">
+			<div class="oxy-expand-collapse-icon" href="#"></div>
+			<div class="oxy-toggle-content">
+                <h3 id="headline-297-18-2" class="ct-headline" data-id="headline-297-18"><span id="span-298-18-2" class="ct-span" data-id="span-298-18">If I share my process with Tekno, how can I be assured that it will not be shared with my competitors?</span></h3>			</div>
+		</div><div id="text_block-299-18-2" class="ct-text-block" data-id="text_block-299-18"><span id="span-300-18-2" class="ct-span oxy-stock-content-styles" data-id="span-300-18"><p><span style="font-size: 10.0pt; color: #555555;">We&rsquo;re happy to sign NDA agreements. We have them standing with all of our current customers and we do not </span>&hellip;</p></span></div></div><div id="div_block-295-18-3" class="ct-div-block" data-id="div_block-295-18"><div id="_toggle-296-18-3" class="oxy-toggle toggle-9860 toggle-9860-expanded" data-oxy-toggle-initial-state="closed" data-oxy-toggle-active-class="toggle-9860-expanded" data-id="_toggle-296-18">
+			<div class="oxy-expand-collapse-icon" href="#"></div>
+			<div class="oxy-toggle-content">
+                <h3 id="headline-297-18-3" class="ct-headline" data-id="headline-297-18"><span id="span-298-18-3" class="ct-span" data-id="span-298-18">Does Tekno do the actual installation or do they subcontract the work?</span></h3>			</div>
+		</div><div id="text_block-299-18-3" class="ct-text-block" data-id="text_block-299-18"><span id="span-300-18-3" class="ct-span oxy-stock-content-styles" data-id="span-300-18"><p>We have a team of installers that also help assembly the equipment. They&rsquo;ll travel to the job site and install, &hellip;</p></span></div></div><div id="div_block-295-18-4" class="ct-div-block" data-id="div_block-295-18"><div id="_toggle-296-18-4" class="oxy-toggle toggle-9860 toggle-9860-expanded" data-oxy-toggle-initial-state="closed" data-oxy-toggle-active-class="toggle-9860-expanded" data-id="_toggle-296-18">
+			<div class="oxy-expand-collapse-icon" href="#"></div>
+			<div class="oxy-toggle-content">
+                <h3 id="headline-297-18-4" class="ct-headline" data-id="headline-297-18"><span id="span-298-18-4" class="ct-span" data-id="span-298-18">How is support handled at Tekno?</span></h3>			</div>
+		</div><div id="text_block-299-18-4" class="ct-text-block" data-id="text_block-299-18"><span id="span-300-18-4" class="ct-span oxy-stock-content-styles" data-id="span-300-18"><p><span style="font-size: 10.0pt; color: #555555;">Typically the best way to request support is to contact your project engineer. They will answer or return your call </span>&hellip;</p></span></div></div>                    
+                                            
+                                        <div class="oxy-repeater-pages-wrap">
+                        <div class="oxy-repeater-pages">
+                            <span aria-current="page" class="page-numbers current">1</span>
+<a class="page-numbers" href="https://tekno.com/page/2/">2</a>
+<a class="page-numbers" href="https://tekno.com/page/3/">3</a>
+<a class="page-numbers" href="https://tekno.com/page/4/">4</a>
+<a class="next page-numbers" href="https://tekno.com/page/2/">Next &raquo;</a>                        </div>
+                    </div>
+                                        
+                    </div>
+</div><a id="link-420-18" class="ct-link c-btn-m white-outline c-transition" href="https://tekno.com/support/" target="_self"  ><div id="text_block-422-18" class="ct-text-block c-margin-right-m" >GET SUPPORT</div><div id="fancy_icon-421-18" class="ct-fancy-icon c-icon-light-m" ><svg id="svg-fancy_icon-421-18"><use xlink:href="#Lineariconsicon-arrow-right"></use></svg></div></a></div></section><section id="section-274-18" class=" ct-section global-section-padding" ><div class="ct-section-inner-wrap"><h2 id="headline-273-18" class="ct-headline text-upper blue-heading text-center">Tekno News</h2>        
+                <div id="_posts_grid-271-18" class='oxy-easy-posts oxy-posts-grid' >
+                    <div class='oxy-posts'>
+                 <div class='oxy-post feat-post-flex'>
+  
+    <div class='flexitem'>
+      <a class='oxy-post-image' href='https://tekno.com/5-creative-ways-to-take-advantage-of-t-slotted-extrusions/'>
+        <div class'post-thumb'>
+          <img class='responsive-img' src='https://tekno.com/wp-content/uploads/2022/12/t-slotted.jpg' alt='5 Creative Ways to Take Advantage of T-Slotted Extrusions' />
+        </div>
+      </a>
+  	</div>
+  	<div class='flexitem'>
+      <a class='oxy-post-title' href='https://tekno.com/5-creative-ways-to-take-advantage-of-t-slotted-extrusions/'>5 Creative Ways to Take Advantage of T-Slotted Extrusions</a>
+
+      <div class='oxy-post-meta'>
+
+          <div class='oxy-post-meta-author oxy-post-meta-item'>
+              By Tekno          </div>
+
+      </div>
+
+      <div class='oxy-post-content'>
+          <p>Here at Tekno, innovation has always been part of our DNA. Our modular conveyor systems have been game changers in &hellip;</p>      </div>
+
+      <a href='https://tekno.com/5-creative-ways-to-take-advantage-of-t-slotted-extrusions/' class='oxy-read-more c-btn-m c-transition c-btn-outline'>Read More</a>
+  	</div>
+</div>            </div>
+                            </div>
+                </div></section></div><section id="section-275-18" class=" ct-section footer-cta" ><div class="ct-section-inner-wrap"><div id="new_columns-276-18" class="ct-new-columns" ><div id="div_block-277-18" class="ct-div-block" ><h3 id="headline-278-18" class="ct-headline blue-heading">We’re here to help</h3><div id="text_block-279-18" class="ct-text-block" >We know that your needs are unique. That's why we aim to answer all your questions and to provide tailored solutions! Schedule a consultation today to get started on your next project.</div></div><div id="div_block-280-18" class="ct-div-block" ><a id="link-281-18" class="ct-link white-outline" href="https://tekno.com/contact/"   ><div id="text_block-283-18" class="ct-text-block" >Talk to an engineer</div><div id="fancy_icon-282-18" class="ct-fancy-icon" ><svg id="svg-fancy_icon-282-18"><use xlink:href="#Lineariconsicon-arrow-right"></use></svg></div></a></div></div></div></section><section id="section-124-15" class=" ct-section " ><div class="ct-section-inner-wrap"><div id="div_block-128-15" class="ct-div-block c-columns-gap-l c-margin-bottom-l c-columns-s-1 c-columns-m-3 c-columns-4" ><div id="div_block-129-15" class="ct-div-block " ><img  id="image-213-15" alt="tekno modern blue logo" src="https://tekno.com/wp-content/uploads/2022/09/TEKNO.png" class="ct-image"/></div><div id="div_block-136-15" class="ct-div-block " ><div id="text_block-137-15" class="ct-text-block c-margin-bottom-s c-footer-heading-light" >Quick Links</div><a id="link_text-138-15" class="ct-link-text c-transition c-footer-link-light" href="https://tekno.com/conveyor-system-solutions/"   >Conveyor Systems</a><a id="link_text-139-15" class="ct-link-text c-transition c-footer-link-light" href="https://tekno.com/components/"   >Components</a><a id="link_text-141-15" class="ct-link-text c-transition c-footer-link-light" href="https://tekno.com/why-tekno/"   >Why Tekno</a><a id="link_text-142-15" class="ct-link-text c-transition c-footer-link-light" href="https://tekno.com/blog/"   >Blog</a><a id="link-258-15" class="ct-link c-btn-m c-transition white-outline" href="https://tekno.com/talk-with-an-engineer/"   ><div id="text_block-259-15" class="ct-text-block" >Talk to an engineer</div><div id="fancy_icon-260-15" class="ct-fancy-icon" ><svg id="svg-fancy_icon-260-15"><use xlink:href="#Lineariconsicon-arrow-right"></use></svg></div></a><a id="link_button-255-15" class="ct-link-button c-transition" href="https://tekno.com/schedule-a-consultation"   >Talk to an engineer</a></div><div id="div_block-143-15" class="ct-div-block " ><div id="text_block-144-15" class="ct-text-block c-margin-bottom-s c-footer-heading-light" >USA</div><div id="text_block-224-15" class="ct-text-block" >1 Wall Street<br>Cave City KY 42127<br><br><a href="tel: 18663504181">1 (866) 350-4181</a><br><a href="mailto: sales@tekno.com">sales@tekno.com</a><br></div></div><div id="div_block-206-15" class="ct-div-block " ><div id="text_block-207-15" class="ct-text-block c-margin-bottom-s c-footer-heading-light" >Follow Us</div><div id="text_block-230-15" class="ct-text-block" >Keep up to date with the latest in modular solutions!</div><div id="code_block-261-15" class="ct-code-block" ></div><div id="shortcode-253-15" class="ct-shortcode horizontal-sub" ><script type="text/javascript"></script>
+                <div class='gf_browser_unknown gform_wrapper gform_legacy_markup_wrapper' id='gform_wrapper_1' ><div id='gf_1' class='gform_anchor' tabindex='-1'></div><form method='post' enctype='multipart/form-data' target='gform_ajax_frame_1' id='gform_1'  action='/#gf_1' >
+                        <div class='gform_body gform-body'><ul id='gform_fields_1' class='gform_fields top_label form_sublabel_below description_below'><li id="field_1_1"  class="gfield gfield_contains_required field_sublabel_below field_description_below hidden_label gfield_visibility_visible"  data-js-reload="field_1_1"><label class='gfield_label' for='input_1_1' >Email<span class="gfield_required"><span class="gfield_required gfield_required_asterisk">*</span></span></label><div class='ginput_container ginput_container_email'>
+                            <input name='input_1' id='input_1_1' type='text' value='' class='large'   placeholder='Email Address' aria-required="true" aria-invalid="false"  />
+                        </div></li><li id="field_1_2"  class="gfield gform_validation_container field_sublabel_below field_description_below gfield_visibility_visible"  data-js-reload="field_1_2"><label class='gfield_label' for='input_1_2' >Email</label><div class='ginput_container'><input name='input_2' id='input_1_2' type='text' value='' /></div><div class='gfield_description' id='gfield_description_1_2'>This field is for validation purposes and should be left unchanged.</div></li></ul></div>
+        <div class='gform_footer top_label'> <input type='submit' id='gform_submit_button_1' class='gform_button button' value='Subscribe'  onclick='if(window["gf_submitting_1"]){return false;}  window["gf_submitting_1"]=true;  ' onkeypress='if( event.keyCode == 13 ){ if(window["gf_submitting_1"]){return false;} window["gf_submitting_1"]=true;  jQuery("#gform_1").trigger("submit",[true]); }' /> <input type='hidden' name='gform_ajax' value='form_id=1&amp;title=&amp;description=&amp;tabindex=0' />
+            <input type='hidden' class='gform_hidden' name='is_submit_1' value='1' />
+            <input type='hidden' class='gform_hidden' name='gform_submit' value='1' />
+            
+            <input type='hidden' class='gform_hidden' name='gform_unique_id' value='' />
+            <input type='hidden' class='gform_hidden' name='state_1' value='WyJbXSIsImQzOGNiY2NkYTQyYTRmZTg1MGZjOGUzMjAwY2Y2NmRkIl0=' />
+            <input type='hidden' class='gform_hidden' name='gform_target_page_number_1' id='gform_target_page_number_1' value='0' />
+            <input type='hidden' class='gform_hidden' name='gform_source_page_number_1' id='gform_source_page_number_1' value='1' />
+            <input type='hidden' name='gform_field_values' value='' />
+            
+        </div>
+                        <p style="display: none !important;" class="akismet-fields-container" data-prefix="ak_"><label>&#916;<textarea name="ak_hp_textarea" cols="45" rows="8" maxlength="100"></textarea></label><input type="hidden" id="ak_js_1" name="ak_js" value="18"/><script>document.getElementById( "ak_js_1" ).setAttribute( "value", ( new Date() ).getTime() );</script></p></form>
+                        </div>
+                <iframe style='display:none;width:0px;height:0px;' src='about:blank' name='gform_ajax_frame_1' id='gform_ajax_frame_1' title='This iframe contains the logic required to handle Ajax powered Gravity Forms.'></iframe>
+                <script type="text/javascript">
+/* <![CDATA[ */
+ gform.initializeOnLoaded( function() {gformInitSpinner( 1, 'https://tekno.com/wp-content/plugins/gravityforms/images/spinner.svg' );jQuery('#gform_ajax_frame_1').on('load',function(){var contents = jQuery(this).contents().find('*').html();var is_postback = contents.indexOf('GF_AJAX_POSTBACK') >= 0;if(!is_postback){return;}var form_content = jQuery(this).contents().find('#gform_wrapper_1');var is_confirmation = jQuery(this).contents().find('#gform_confirmation_wrapper_1').length > 0;var is_redirect = contents.indexOf('gformRedirect(){') >= 0;var is_form = form_content.length > 0 && ! is_redirect && ! is_confirmation;var mt = parseInt(jQuery('html').css('margin-top'), 10) + parseInt(jQuery('body').css('margin-top'), 10) + 100;if(is_form){jQuery('#gform_wrapper_1').html(form_content.html());if(form_content.hasClass('gform_validation_error')){jQuery('#gform_wrapper_1').addClass('gform_validation_error');} else {jQuery('#gform_wrapper_1').removeClass('gform_validation_error');}setTimeout( function() { /* delay the scroll by 50 milliseconds to fix a bug in chrome */ jQuery(document).scrollTop(jQuery('#gform_wrapper_1').offset().top - mt); }, 50 );if(window['gformInitDatepicker']) {gformInitDatepicker();}if(window['gformInitPriceFields']) {gformInitPriceFields();}var current_page = jQuery('#gform_source_page_number_1').val();gformInitSpinner( 1, 'https://tekno.com/wp-content/plugins/gravityforms/images/spinner.svg' );jQuery(document).trigger('gform_page_loaded', [1, current_page]);window['gf_submitting_1'] = false;}else if(!is_redirect){var confirmation_content = jQuery(this).contents().find('.GF_AJAX_POSTBACK').html();if(!confirmation_content){confirmation_content = contents;}setTimeout(function(){jQuery('#gform_wrapper_1').replaceWith(confirmation_content);jQuery(document).scrollTop(jQuery('#gf_1').offset().top - mt);jQuery(document).trigger('gform_confirmation_loaded', [1]);window['gf_submitting_1'] = false;wp.a11y.speak(jQuery('#gform_confirmation_message_1').text());}, 50);}else{jQuery('#gform_1').append(contents);if(window['gformRedirect']) {gformRedirect();}}jQuery(document).trigger('gform_post_render', [1, current_page]);} );} ); 
+/* ]]> */
+</script>
+</div><div id="div_block-159-15" class="ct-div-block c-inline" ><a id="link-160-15" class="ct-link " href="https://www.facebook.com/teknoincorporated" target="_blank"  ><div id="fancy_icon-161-15" class="ct-fancy-icon c-transition c-follow-light" ><svg id="svg-fancy_icon-161-15"><use xlink:href="#FontAwesomeicon-facebook"></use></svg></div></a><a id="link-235-15" class="ct-link " href="https://www.linkedin.com/company/tekno-inc-" target="_blank"  ><div id="fancy_icon-236-15" class="ct-fancy-icon c-transition c-follow-light" ><svg id="svg-fancy_icon-236-15"><use xlink:href="#FontAwesomeicon-linkedin"></use></svg></div></a><a id="link-256-15" class="ct-link " href="https://www.youtube.com/channel/UCtG8HmmovQQ2htuQfg0IE8A" target="_blank"  ><div id="fancy_icon-257-15" class="ct-fancy-icon c-transition c-follow-light" ><svg id="svg-fancy_icon-257-15"><use xlink:href="#FontAwesomeicon-youtube-play"></use></svg></div></a></div></div></div><div id="div_block-157-15" class="ct-div-block c-footer-row" ><div id="text_block-158-15" class="ct-text-block c-text-s c-text-light" >Copyright © <span id="span-267-15" class="ct-span" >2024</span> Website Design By&nbsp;<a href="https://themarketingsquad.com/" target="_blank">The Marketing Squad</a></div></div></div></section>	<!-- WP_FOOTER -->
+<!-- Start of HubSpot Embed Code -->
+<script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/20095207.js"></script>
+<!-- End of HubSpot Embed Code --><style>.ct-FontAwesomeicon-question-circle{width:0.857142857143em}</style>
+<style>.ct-FontAwesomeicon-facebook{width:0.571428571429em}</style>
+<style>.ct-FontAwesomeicon-linkedin{width:0.857142857143em}</style>
+<style>.ct-FontAwesomeicon-shopping-basket{width:1.14285714286em}</style>
+<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1"><defs><symbol id="FontAwesomeicon-question-circle" viewBox="0 0 24 28"><title>question-circle</title><path d="M14 21.5v-3c0-0.281-0.219-0.5-0.5-0.5h-3c-0.281 0-0.5 0.219-0.5 0.5v3c0 0.281 0.219 0.5 0.5 0.5h3c0.281 0 0.5-0.219 0.5-0.5zM18 11c0-2.859-3-5-5.688-5-2.547 0-4.453 1.094-5.797 3.328-0.141 0.219-0.078 0.5 0.125 0.656l2.063 1.563c0.078 0.063 0.187 0.094 0.297 0.094 0.141 0 0.297-0.063 0.391-0.187 0.734-0.938 1.047-1.219 1.344-1.437 0.266-0.187 0.781-0.375 1.344-0.375 1 0 1.922 0.641 1.922 1.328 0 0.812-0.422 1.219-1.375 1.656-1.109 0.5-2.625 1.797-2.625 3.313v0.562c0 0.281 0.219 0.5 0.5 0.5h3c0.281 0 0.5-0.219 0.5-0.5v0c0-0.359 0.453-1.125 1.188-1.547 1.188-0.672 2.812-1.578 2.812-3.953zM24 14c0 6.625-5.375 12-12 12s-12-5.375-12-12 5.375-12 12-12 12 5.375 12 12z"/></symbol><symbol id="FontAwesomeicon-facebook" viewBox="0 0 16 28"><title>facebook</title><path d="M14.984 0.187v4.125h-2.453c-1.922 0-2.281 0.922-2.281 2.25v2.953h4.578l-0.609 4.625h-3.969v11.859h-4.781v-11.859h-3.984v-4.625h3.984v-3.406c0-3.953 2.422-6.109 5.953-6.109 1.687 0 3.141 0.125 3.563 0.187z"/></symbol><symbol id="FontAwesomeicon-linkedin" viewBox="0 0 24 28"><title>linkedin</title><path d="M5.453 9.766v15.484h-5.156v-15.484h5.156zM5.781 4.984c0.016 1.484-1.109 2.672-2.906 2.672v0h-0.031c-1.734 0-2.844-1.188-2.844-2.672 0-1.516 1.156-2.672 2.906-2.672 1.766 0 2.859 1.156 2.875 2.672zM24 16.375v8.875h-5.141v-8.281c0-2.078-0.75-3.5-2.609-3.5-1.422 0-2.266 0.953-2.641 1.875-0.125 0.344-0.172 0.797-0.172 1.266v8.641h-5.141c0.063-14.031 0-15.484 0-15.484h5.141v2.25h-0.031c0.672-1.062 1.891-2.609 4.672-2.609 3.391 0 5.922 2.219 5.922 6.969z"/></symbol><symbol id="FontAwesomeicon-youtube-play" viewBox="0 0 28 28"><title>youtube-play</title><path d="M11.109 17.625l7.562-3.906-7.562-3.953v7.859zM14 4.156c5.891 0 9.797 0.281 9.797 0.281 0.547 0.063 1.75 0.063 2.812 1.188 0 0 0.859 0.844 1.109 2.781 0.297 2.266 0.281 4.531 0.281 4.531v2.125s0.016 2.266-0.281 4.531c-0.25 1.922-1.109 2.781-1.109 2.781-1.062 1.109-2.266 1.109-2.812 1.172 0 0-3.906 0.297-9.797 0.297v0c-7.281-0.063-9.516-0.281-9.516-0.281-0.625-0.109-2.031-0.078-3.094-1.188 0 0-0.859-0.859-1.109-2.781-0.297-2.266-0.281-4.531-0.281-4.531v-2.125s-0.016-2.266 0.281-4.531c0.25-1.937 1.109-2.781 1.109-2.781 1.062-1.125 2.266-1.125 2.812-1.188 0 0 3.906-0.281 9.797-0.281v0z"/></symbol><symbol id="FontAwesomeicon-shopping-basket" viewBox="0 0 32 28"><title>shopping-basket</title><path d="M30 12c1.109 0 2 0.891 2 2s-0.891 2-2 2h-0.234l-1.797 10.344c-0.172 0.953-1 1.656-1.969 1.656h-20c-0.969 0-1.797-0.703-1.969-1.656l-1.797-10.344h-0.234c-1.109 0-2-0.891-2-2s0.891-2 2-2h28zM7.578 24.5c0.547-0.047 0.969-0.531 0.922-1.078l-0.5-6.5c-0.047-0.547-0.531-0.969-1.078-0.922s-0.969 0.531-0.922 1.078l0.5 6.5c0.047 0.516 0.484 0.922 1 0.922h0.078zM14 23.5v-6.5c0-0.547-0.453-1-1-1s-1 0.453-1 1v6.5c0 0.547 0.453 1 1 1s1-0.453 1-1zM20 23.5v-6.5c0-0.547-0.453-1-1-1s-1 0.453-1 1v6.5c0 0.547 0.453 1 1 1s1-0.453 1-1zM25.5 23.578l0.5-6.5c0.047-0.547-0.375-1.031-0.922-1.078s-1.031 0.375-1.078 0.922l-0.5 6.5c-0.047 0.547 0.375 1.031 0.922 1.078h0.078c0.516 0 0.953-0.406 1-0.922zM7.438 4.562l-1.453 6.438h-2.063l1.578-6.891c0.406-1.828 2.016-3.109 3.891-3.109h2.609c0-0.547 0.453-1 1-1h6c0.547 0 1 0.453 1 1h2.609c1.875 0 3.484 1.281 3.891 3.109l1.578 6.891h-2.063l-1.453-6.438c-0.219-0.922-1.016-1.563-1.953-1.563h-2.609c0 0.547-0.453 1-1 1h-6c-0.547 0-1-0.453-1-1h-2.609c-0.938 0-1.734 0.641-1.953 1.563z"/></symbol></defs></svg><?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1"><defs><symbol id="Lineariconsicon-arrow-right" viewBox="0 0 20 20"><title>arrow-right</title><path class="path1" d="M19.354 10.146l-6-6c-0.195-0.195-0.512-0.195-0.707 0s-0.195 0.512 0 0.707l5.146 5.146h-16.293c-0.276 0-0.5 0.224-0.5 0.5s0.224 0.5 0.5 0.5h16.293l-5.146 5.146c-0.195 0.195-0.195 0.512 0 0.707 0.098 0.098 0.226 0.146 0.354 0.146s0.256-0.049 0.354-0.146l6-6c0.195-0.195 0.195-0.512 0-0.707z"/></symbol></defs></svg><!-- Start of Async HubSpot Analytics Code -->
+<script type="text/javascript">
+(function(d,s,i,r) {
+if (d.getElementById(i)){return;}
+var n=d.createElement(s),e=d.getElementsByTagName(s)[0];
+n.id=i;n.src='//js.hs-analytics.net/analytics/'+(Math.ceil(new Date()/r)*r)+'/20095207.js';
+e.parentNode.insertBefore(n, e);
+})(document,"script","hs-analytics",300000);
+</script>
+<!-- End of Async HubSpot Analytics Code -->
+
+		<script type="text/javascript">
+
+			jQuery(document).ready(function() {
+                let event = new Event('oxygenVSBInitToggleJs');
+                document.dispatchEvent(event);
+			});
+
+            document.addEventListener("oxygenVSBInitToggleJs",function(){
+                oxygenVSBInitToggleState();
+            },false);
+
+			oxygenVSBInitToggleState = function() {
+
+				jQuery('.oxy-toggle').each(function() {
+				
+					var initial_state = jQuery(this).attr('data-oxy-toggle-initial-state'),
+					   toggle_target = jQuery(this).attr('data-oxy-toggle-target'),
+                       active_class = jQuery(this).attr('data-oxy-toggle-active-class');
+				
+					if (initial_state == 'closed') {
+						if (!toggle_target) {
+							jQuery(this).next().hide();
+						} else {
+							jQuery(toggle_target).hide();
+						}
+						jQuery(this).children('.oxy-expand-collapse-icon').addClass('oxy-eci-collapsed');
+                        jQuery(this).removeClass(active_class)
+					}
+                    else {
+                        jQuery(this).addClass(active_class)
+                    }
+				});
+			}
+
+            jQuery("body").on('click', '.oxy-toggle', function() {
+
+                var toggle_target  = jQuery(this).attr('data-oxy-toggle-target'),
+                    active_class   = jQuery(this).attr('data-oxy-toggle-active-class');
+
+                jQuery(this).toggleClass(active_class)
+                jQuery(this).children('.oxy-expand-collapse-icon').toggleClass('oxy-eci-collapsed');
+
+                if (!toggle_target) {
+                    jQuery(this).next().toggle();
+                } else {
+                    jQuery(toggle_target).toggle();
+                }
+
+                // force 3rd party plugins to rerender things inside the toggle
+                jQuery(window).trigger('resize');
+            });
+		</script>
+
+	
+		<script type="text/javascript">
+			jQuery(document).ready(function() {
+				jQuery('body').on('click', '.oxy-menu-toggle', function() {
+					jQuery(this).parent('.oxy-nav-menu').toggleClass('oxy-nav-menu-open');
+					jQuery('body').toggleClass('oxy-nav-menu-prevent-overflow');
+					jQuery('html').toggleClass('oxy-nav-menu-prevent-overflow');
+				});
+				var selector = '.oxy-nav-menu-open .menu-item a[href*="#"]';
+				jQuery('body').on('click', selector, function(){
+					jQuery('.oxy-nav-menu-open').removeClass('oxy-nav-menu-open');
+					jQuery('body').removeClass('oxy-nav-menu-prevent-overflow');
+					jQuery('html').removeClass('oxy-nav-menu-prevent-overflow');
+					jQuery(this).click();
+				});
+			});
+		</script>
+
+		<script type="text/javascript">
+		(function () {
+			var c = document.body.className;
+			c = c.replace(/woocommerce-no-js/, 'woocommerce-js');
+			document.body.className = c;
+		})();
+	</script>
+	<link rel='stylesheet' id='gforms_reset_css-css' href='https://tekno.com/wp-content/plugins/gravityforms/legacy/css/formreset.min.css?ver=2.6.9' type='text/css' media='all' />
+<link rel='stylesheet' id='gforms_formsmain_css-css' href='https://tekno.com/wp-content/plugins/gravityforms/legacy/css/formsmain.min.css?ver=2.6.9' type='text/css' media='all' />
+<link rel='stylesheet' id='gforms_ready_class_css-css' href='https://tekno.com/wp-content/plugins/gravityforms/legacy/css/readyclass.min.css?ver=2.6.9' type='text/css' media='all' />
+<link rel='stylesheet' id='gforms_browsers_css-css' href='https://tekno.com/wp-content/plugins/gravityforms/legacy/css/browsers.min.css?ver=2.6.9' type='text/css' media='all' />
+<script type="text/javascript" src="https://tekno.com/wp-content/plugins/woocommerce/assets/js/accounting/accounting.min.js?ver=0.4.2" id="accounting-js"></script>
+<script type="text/javascript" src="https://tekno.com/wp-content/plugins/woocommerce/assets/js/selectWoo/selectWoo.full.min.js?ver=1.0.9-wc.7.0.1" id="selectWoo-js"></script>
+<script type="text/javascript" id="yith-wcan-shortcodes-js-extra">
+/* <![CDATA[ */
+var yith_wcan_shortcodes = {"query_param":"yith_wcan","supported_taxonomies":["product_cat","product_tag","pa_brinell-hardness","pa_elongation","pa_material","pa_modulus-of-elasticity","pa_straightness","pa_surface-finish","pa_tensile-strength","pa_twist","pa_yield-strength"],"content":"#content","change_browser_url":"1","instant_filters":"1","ajax_filters":"1","reload_on_back":"1","show_clear_filter":"","scroll_top":"","scroll_target":"","modal_on_mobile":"","session_param":"","show_current_children":"","loader":"","toggles_open_on_modal":"","mobile_media_query":"991","base_url":"https:\/\/tekno.com\/","terms_per_page":"10","currency_format":{"symbol":"&#36;","decimal":".","thousand":",","precision":2,"format":"%s%v"},"labels":{"empty_option":"All","search_placeholder":"Search...","no_items":"No item found","show_more":"Show %d more","close":"Close","save":"Save","show_results":"Show results","clear_selection":"Clear","clear_all_selections":"Clear All"}};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://tekno.com/wp-content/plugins/yith-woocommerce-ajax-navigation/assets/js/yith-wcan-shortcodes.min.js?ver=4.15.0" id="yith-wcan-shortcodes-js"></script>
+<script type="text/javascript" id="leadin-script-loader-js-js-extra">
+/* <![CDATA[ */
+var leadin_wordpress = {"userRole":"visitor","pageType":"home","leadinPluginVersion":"11.0.8"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://js.hs-scripts.com/20095207.js?integration=WordPress&amp;ver=11.0.8" id="leadin-script-loader-js-js"></script>
+<script type="text/javascript" id="page-scroll-to-id-plugin-script-js-extra">
+/* <![CDATA[ */
+var mPS2id_params = {"instances":{"mPS2id_instance_0":{"selector":"a[href*='#']:not([href='#'])","autoSelectorMenuLinks":"true","excludeSelector":"a[href^='#tab-'], a[href^='#tabs-'], a[data-toggle]:not([data-toggle='tooltip']), a[data-slide], a[data-vc-tabs], a[data-vc-accordion], a.screen-reader-text.skip-link","scrollSpeed":800,"autoScrollSpeed":"true","scrollEasing":"easeInOutQuint","scrollingEasing":"easeOutQuint","forceScrollEasing":"false","pageEndSmoothScroll":"true","stopScrollOnUserAction":"false","autoCorrectScroll":"false","autoCorrectScrollExtend":"false","layout":"vertical","offset":"110","dummyOffset":"false","highlightSelector":"","clickedClass":"mPS2id-clicked","targetClass":"mPS2id-target","highlightClass":"mPS2id-highlight","forceSingleHighlight":"false","keepHighlightUntilNext":"false","highlightByNextTarget":"false","appendHash":"false","scrollToHash":"true","scrollToHashForAll":"true","scrollToHashDelay":0,"scrollToHashUseElementData":"true","scrollToHashRemoveUrlHash":"false","disablePluginBelow":0,"adminDisplayWidgetsId":"true","adminTinyMCEbuttons":"true","unbindUnrelatedClickEvents":"false","unbindUnrelatedClickEventsSelector":"","normalizeAnchorPointTargets":"false","encodeLinks":"false"}},"total_instances":"1","shortcode_class":"_ps2id"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://tekno.com/wp-content/plugins/page-scroll-to-id/js/page-scroll-to-id.min.js?ver=1.7.9" id="page-scroll-to-id-plugin-script-js"></script>
+<script type="text/javascript" src="https://tekno.com/wp-content/plugins/woocommerce/assets/js/jquery-blockui/jquery.blockUI.min.js?ver=2.7.0-wc.7.0.1" id="jquery-blockui-js"></script>
+<script type="text/javascript" id="wc-add-to-cart-js-extra">
+/* <![CDATA[ */
+var wc_add_to_cart_params = {"ajax_url":"\/wp-admin\/admin-ajax.php","wc_ajax_url":"\/?wc-ajax=%%endpoint%%","i18n_view_cart":"View cart","cart_url":"https:\/\/tekno.com\/cart\/","is_cart":"","cart_redirect_after_add":"no"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://tekno.com/wp-content/plugins/woocommerce/assets/js/frontend/add-to-cart.min.js?ver=7.0.1" id="wc-add-to-cart-js"></script>
+<script type="text/javascript" src="https://tekno.com/wp-content/plugins/woocommerce/assets/js/js-cookie/js.cookie.min.js?ver=2.1.4-wc.7.0.1" id="js-cookie-js"></script>
+<script type="text/javascript" id="woocommerce-js-extra">
+/* <![CDATA[ */
+var woocommerce_params = {"ajax_url":"\/wp-admin\/admin-ajax.php","wc_ajax_url":"\/?wc-ajax=%%endpoint%%"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://tekno.com/wp-content/plugins/woocommerce/assets/js/frontend/woocommerce.min.js?ver=7.0.1" id="woocommerce-js"></script>
+<script type="text/javascript" id="wc-cart-fragments-js-extra">
+/* <![CDATA[ */
+var wc_cart_fragments_params = {"ajax_url":"\/wp-admin\/admin-ajax.php","wc_ajax_url":"\/?wc-ajax=%%endpoint%%","cart_hash_key":"wc_cart_hash_0ddf905549145396b151691e657e32cd","fragment_name":"wc_fragments_0ddf905549145396b151691e657e32cd","request_timeout":"5000"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://tekno.com/wp-content/plugins/woocommerce/assets/js/frontend/cart-fragments.min.js?ver=7.0.1" id="wc-cart-fragments-js"></script>
+<script type="text/javascript" src="https://tekno.com/wp-content/plugins/woocommerce/assets/js/zoom/jquery.zoom.min.js?ver=1.7.21-wc.7.0.1" id="zoom-js"></script>
+<script type="text/javascript" src="https://tekno.com/wp-content/plugins/woocommerce/assets/js/flexslider/jquery.flexslider.min.js?ver=2.7.2-wc.7.0.1" id="flexslider-js"></script>
+<script type="text/javascript" id="wc-single-product-js-extra">
+/* <![CDATA[ */
+var wc_single_product_params = {"i18n_required_rating_text":"Please select a rating","review_rating_required":"yes","flexslider":{"rtl":false,"animation":"slide","smoothHeight":true,"directionNav":false,"controlNav":"thumbnails","slideshow":false,"animationSpeed":500,"animationLoop":false,"allowOneSlide":false,"touch":false},"zoom_enabled":"1","zoom_options":[],"photoswipe_enabled":"","photoswipe_options":{"shareEl":false,"closeOnScroll":false,"history":false,"hideAnimationDuration":0,"showAnimationDuration":0},"flexslider_enabled":"1"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://tekno.com/wp-content/plugins/woocommerce/assets/js/frontend/single-product.min.js?ver=7.0.1" id="wc-single-product-js"></script>
+<script type="text/javascript" id="yith_ywraq_frontend-js-extra">
+/* <![CDATA[ */
+var ywraq_frontend = {"ajaxurl":"\/?wc-ajax=%%endpoint%%","current_lang":"","no_product_in_list":"<p class=\"ywraq_list_empty_message\">Your list is empty, add products to the list to send a request<p><p class=\"return-to-shop\"><a class=\"button wc-backward\" href=\"\"><\/a><\/p>","block_loader":"https:\/\/tekno.com\/wp-content\/plugins\/yith-woocommerce-request-a-quote-premium\/assets\/images\/ajax-loader.gif","go_to_the_list":"no","rqa_url":"https:\/\/tekno.com\/request-quote\/","current_user_id":"","hide_price":"0","allow_out_of_stock":"yes","allow_only_on_out_of_stock":"no","select_quantity":"Set at least the quantity for a product","i18n_choose_a_variation":"Please select some product options before adding this product to your quote list.","i18n_out_of_stock":"This Variation is Out of Stock, please select another one.","raq_table_refresh_check":"1","auto_update_cart_on_quantity_change":"1","enable_ajax_loading":"1","widget_classes":".widget_ywraq_list_quote, .widget_ywraq_mini_list_quote"};
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://tekno.com/wp-content/plugins/yith-woocommerce-request-a-quote-premium/assets/js/frontend.min.js?ver=2.4.3" id="yith_ywraq_frontend-js"></script>
+<script type="text/javascript" src="https://tekno.com/wp-includes/js/dist/vendor/wp-polyfill-inert.min.js?ver=3.1.2" id="wp-polyfill-inert-js"></script>
+<script type="text/javascript" src="https://tekno.com/wp-includes/js/dist/vendor/regenerator-runtime.min.js?ver=0.14.0" id="regenerator-runtime-js"></script>
+<script type="text/javascript" src="https://tekno.com/wp-includes/js/dist/vendor/wp-polyfill.min.js?ver=3.15.0" id="wp-polyfill-js"></script>
+<script type="text/javascript" src="https://tekno.com/wp-includes/js/dist/dom-ready.min.js?ver=392bdd43726760d1f3ca" id="wp-dom-ready-js"></script>
+<script type="text/javascript" src="https://tekno.com/wp-includes/js/dist/hooks.min.js?ver=c6aec9a8d4e5a5d543a1" id="wp-hooks-js"></script>
+<script type="text/javascript" src="https://tekno.com/wp-includes/js/dist/i18n.min.js?ver=7701b0c3857f914212ef" id="wp-i18n-js"></script>
+<script type="text/javascript" id="wp-i18n-js-after">
+/* <![CDATA[ */
+wp.i18n.setLocaleData( { 'text direction\u0004ltr': [ 'ltr' ] } );
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://tekno.com/wp-includes/js/dist/a11y.min.js?ver=7032343a947cfccf5608" id="wp-a11y-js"></script>
+<script type="text/javascript" defer='defer' src="https://tekno.com/wp-content/plugins/gravityforms/js/jquery.json.min.js?ver=2.6.9" id="gform_json-js"></script>
+<script type="text/javascript" id="gform_gravityforms-js-extra">
+/* <![CDATA[ */
+var gform_i18n = {"datepicker":{"days":{"monday":"Mon","tuesday":"Tue","wednesday":"Wed","thursday":"Thu","friday":"Fri","saturday":"Sat","sunday":"Sun"},"months":{"january":"January","february":"February","march":"March","april":"April","may":"May","june":"June","july":"July","august":"August","september":"September","october":"October","november":"November","december":"December"},"firstDay":1,"iconText":"Select date"}};
+var gf_legacy_multi = [];
+var gform_gravityforms = {"strings":{"invalid_file_extension":"This type of file is not allowed. Must be one of the following:","delete_file":"Delete this file","in_progress":"in progress","file_exceeds_limit":"File exceeds size limit","illegal_extension":"This type of file is not allowed.","max_reached":"Maximum number of files reached","unknown_error":"There was a problem while saving the file on the server","currently_uploading":"Please wait for the uploading to complete","cancel":"Cancel","cancel_upload":"Cancel this upload","cancelled":"Cancelled"},"vars":{"images_url":"https:\/\/tekno.com\/wp-content\/plugins\/gravityforms\/images"}};
+var gf_global = {"gf_currency_config":{"name":"U.S. Dollar","symbol_left":"$","symbol_right":"","symbol_padding":"","thousand_separator":",","decimal_separator":".","decimals":2,"code":"USD"},"base_url":"https:\/\/tekno.com\/wp-content\/plugins\/gravityforms","number_formats":[],"spinnerUrl":"https:\/\/tekno.com\/wp-content\/plugins\/gravityforms\/images\/spinner.svg","strings":{"newRowAdded":"New row added.","rowRemoved":"Row removed","formSaved":"The form has been saved.  The content contains the link to return and complete the form."}};
+/* ]]> */
+</script>
+<script type="text/javascript" defer='defer' src="https://tekno.com/wp-content/plugins/gravityforms/js/gravityforms.min.js?ver=2.6.9" id="gform_gravityforms-js"></script>
+<script type="text/javascript" defer='defer' src="https://tekno.com/wp-content/plugins/gravityforms/js/placeholders.jquery.min.js?ver=2.6.9" id="gform_placeholder-js"></script>
+<script defer type="text/javascript" src="https://tekno.com/wp-content/plugins/akismet/_inc/akismet-frontend.js?ver=1705714741" id="akismet-frontend-js"></script>
+<script type="text/javascript" src="https://tekno.com/wp-content/plugins/oxygen/component-framework/vendor/unslider/unslider-min.js?ver=6.4.3" id="oxygen-unslider-js"></script>
+<script type="text/javascript" src="https://tekno.com/wp-content/plugins/oxygen/component-framework/vendor/unslider/jquery.event.move.js?ver=6.4.3" id="oxygen-event-move-js"></script>
+<script type="text/javascript" src="https://tekno.com/wp-content/plugins/oxygen/component-framework/vendor/unslider/jquery.event.swipe.js?ver=6.4.3" id="oxygen-event-swipe-js"></script>
+<script type="text/javascript" id="ct-footer-js">jQuery('.c-hero-14').attr({'data-aos-enable': 'true','data-aos': 'zoom-in','data-aos-duration': '850','data-aos-delay': '50','data-aos-once': 'true',});
+	  	AOS.init({
+	  		  		  		  		  		  		  				  			})
+		
+				jQuery('body').addClass('oxygen-aos-enabled');
+		
+		
+	</script><script type="text/javascript" id="ct_code_block_js_2">document.querySelector('.c-header-mobile-toggle').addEventListener('click', function(e) {
+
+  [].map.call(document.querySelectorAll('.c-menu'), function(el) {
+    el.classList.toggle('c-mobile-menu-active');    
+  });
+  
+    [].map.call(document.querySelectorAll('.c-hamburger'), function(el) {
+    el.classList.toggle('c-is-active');
+  });
+});</script>
+<style type="text/css" id="ct_code_block_css_2">/* CUSTOM CSS FOR MEGA MENUS */
+
+
+/* DESKTOP */
+
+@media (min-width: 994px) {
+ .c-menu-open:hover .c-submenu-1 { 
+  opacity: 1;
+  max-height: 2000px;
+  padding-top: 75px;
+  padding-bottom: 75px;
+}
+.c-header-mobile-toggle { 
+  display:none;
+}
+}
+
+/* TABLETS & PHONES */
+
+@media (max-width: 993px) { 
+.c-menu {
+  display: none!important;
+  width: 100%;
+  position: absolute;
+  top:100%;
+  left: 0;
+  overflow: hidden;
+}
+.c-menu-open .c-menu-dropdown {
+  display:none;
+}
+.c-mobile-menu-active.c-menu {
+  display: flex!important;
+  flex-direction: column;
+  align-items: flex-start; 
+}
+
+}
+
+/* HAMBURGER ICON */
+
+.c-hamburger .c-line{
+  width: 30px;
+  height: 3px;
+  border-radius:2px;
+  background-color: #353535;
+  display: block;
+  margin: 7px auto;
+  -webkit-transition: all 0.3s ease-in-out;
+  -o-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+}
+
+.c-hamburger:hover{
+  cursor: pointer;
+}
+#c-hamburger-1.c-is-active{
+  -webkit-transition: all 0.3s ease-in-out;
+  -o-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+#c-hamburger-1.c-is-active .c-line:nth-child(2){
+  width: 0px;
+}
+
+#c-hamburger-1.c-is-active .c-line:nth-child(1),
+#c-hamburger-1.c-is-active .c-line:nth-child(3){
+  -webkit-transition-delay: 0.3s;
+  -o-transition-delay: 0.3s;
+  transition-delay: 0.3s;
+}
+
+#c-hamburger-1.c-is-active .c-line:nth-child(1){
+  -webkit-transform: translateY(10px);
+  -ms-transform: translateY(10px);
+  -o-transform: translateY(10px);
+  transform: translateY(10px);
+}
+
+#c-hamburger-1.c-is-active .c-line:nth-child(3){
+  -webkit-transform: translateY(-10px) rotate(90deg);
+  -ms-transform: translateY(-10px) rotate(90deg);
+  -o-transform: translateY(-10px) rotate(90deg);
+  transform: translateY(-10px) rotate(90deg);
+}</style>
+<style type="text/css" id="ct_code_block_css_105">#-woo-product-categories-103-18 ul li a:hover > h2 {
+ 	top: 40%; 
+}
+
+#-woo-product-categories-103-18 ul li:hover:after {
+ 	bottoom: 40%; 
+}</style>
+<style type="text/css" id="ct_code_block_css_288">#-woo-product-categories-103-18 ul li:hover:after {
+ 	bottom: 45%; 
+}
+
+.systems-hover-box:hover{
+	opacity: .5;
+	background: (0, 51, 88);
+}
+
+
+.systems-hover-box{
+	position:relative;
+	transition: .5s ease-in-out;
+}
+
+.systems-hover-box-div:hover{
+	background:#003358;
+}
+
+.systems-hover-box-h{
+	position:absolute;
+	top:2%;
+	left:30px;
+	transition: .5s;
+}
+
+.systems-hover-box-div:hover .systems-hover-box-h{
+	top:40%;
+	
+	
+}
+
+.systems-hover-box-i{
+	position: absolute;
+	bottom: 5%;
+	right: 30px;
+	transition:.5s;
+}
+
+.systems-hover-box-div:hover .systems-hover-box-i{
+	bottom: 40%;
+}</style>
+<style type="text/css" id="ct_code_block_css_25">#gform_submit_button_1{
+
+	
+	background: url(
+"https://tekno.com/wp-content/uploads/2022/02/Artboard-1@3x-1.png") right no-repeat;
+	background-size: 22px;
+	color: #fff!important;
+	border: 1px solid #fff;
+	background-position: 90% 50%;
+	background-color: #003358!important;
+	transition: .4s;
+}
+
+#gform_submit_button_1:hover{
+	border: 1px solid #fff;
+	background-position: 90% 50%;
+	background-color: #005AA1!important;
+}</style>
+<script type="text/javascript">
+/* <![CDATA[ */
+ gform.initializeOnLoaded( function() { jQuery(document).on('gform_post_render', function(event, formId, currentPage){if(formId == 1) {if(typeof Placeholders != 'undefined'){
+                        Placeholders.enable();
+                    }} } );jQuery(document).bind('gform_post_conditional_logic', function(event, formId, fields, isInit){} ) } ); 
+/* ]]> */
+</script>
+<script type="text/javascript">
+/* <![CDATA[ */
+ gform.initializeOnLoaded( function() { jQuery(document).trigger('gform_post_render', [1, 1]) } ); 
+/* ]]> */
+</script>
+<!-- /WP_FOOTER --> 
+</body>
+</html>

@@ -1,5 +1,7 @@
 package com.XYai.myai.commonUtils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -9,6 +11,7 @@ import java.util.*;
 @Service
 public class OllamaRerankerService {
 
+    private static final Logger log = LoggerFactory.getLogger(OllamaRerankerService.class);
     private final RestClient restClient;
 
     @Value("${ollama.rerank.model:qwen3-reranker-0.6b}")   // 默认模型名
@@ -35,11 +38,17 @@ public class OllamaRerankerService {
         requestBody.put("documents", documents);
 
         // Ollama V1 Rerank API 返回格式：{ "results": [ { "index": 0, "score": 0.98 }, ... ] }
-        OllamaRerankResponse response = restClient.post()
-                .uri("/v1/rerank")
-                .body(requestBody)
-                .retrieve()
-                .body(OllamaRerankResponse.class);
+        OllamaRerankResponse response;
+        try {
+            response = restClient.post()
+                    .uri("/v1/rerank")
+                    .body(requestBody)
+                    .retrieve()
+                    .body(OllamaRerankResponse.class);
+        } catch (Exception e) {
+            log.warn("Ollama Rerank 服务不可用，降级为混合排序: {}", e.getMessage());
+            return Collections.emptyList();
+        }
 
         // 将结果按 index 排序，确保返回的分数列表与输入 documents 顺序一致
         double[] scores = new double[documents.size()];

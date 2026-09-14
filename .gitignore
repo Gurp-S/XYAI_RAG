@@ -1,5 +1,10 @@
 ### CUSTOM ###
 application-local.yaml
+application-emb.yaml
+
+# JWT RSA 密钥 — 任何私钥都不入库（测试用密钥在运行时生成）
+*.pem
+!**/src/test/resources/keys/README.md
 
 HELP.md
 target/
@@ -37,3 +42,40 @@ build/
 
 ### Node / Frontend ###
 node_modules/
+
+### 运行时令牌 / 密钥（严禁入库） ###
+.evalbot_token
+*.env.local
+.local.env
+scripts/.local.env
+comments.txt
+
+### 日志与本地运行产物 ###
+*.log
+backend*.log
+chat_resp.txt
+test_tools_temp.txt
+_tokenuse_recovered.java
+
+### 打包与构建产物 ###
+out/
+*.zip
+*.jar
+
+### 性能压测产物（JMeter 报告/结果） ###
+*.jtl
+r50/
+r100/
+r200/
+
+### RAG 评测大数据资产（体积大，仅本地保留；corpus 保留以便复现） ###
+scripts/crag_eval/data/
+
+### Python ###
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+### WorkBuddy 工作区本地数据 ###
+.workbuddy/

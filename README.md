@@ -1,6 +1,8 @@
 # XYAI — 企业级 RAG 智能问答平台
 
 > **技术栈**: Spring Boot 3 · MySQL · Redis · Spring AI · Milvus · Neo4j · Tika · Ollama
+>
+> 本仓库为学习与扩展用的 RAG（检索增强生成）智能体平台，包含核心接口与模块实现（检索、意图识别、问题重写、会话记忆、文档入库 Pipeline、MCP 工具等）。
 
 ## 项目概述
 

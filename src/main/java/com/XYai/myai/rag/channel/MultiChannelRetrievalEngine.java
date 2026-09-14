@@ -1,28 +1,31 @@
 package com.XYai.myai.rag.channel;
 
 import com.XYai.myai.mapper.FileRecordMapper;
-import com.XYai.myai.rag.aop.annotation.RagTraceRoot;
 import com.XYai.myai.rag.channel.pojo.RetrievedChunk;
 import com.XYai.myai.rag.channel.pojo.SearchChannel;
 import com.XYai.myai.rag.channel.pojo.SearchChannelResult;
 import com.XYai.myai.rag.channel.pojo.SearchContext;
 import com.XYai.myai.rag.channel.processor.BM25PostProcessor;
 import com.XYai.myai.rag.channel.processor.FilterPostProcessor;
+import com.XYai.myai.rag.channel.processor.ParentExpandPostProcessor;
 import com.XYai.myai.rag.channel.processor.RerankPostProcessor;
+import com.XYai.myai.rag.kafka.event.AnalyticsEvent;
 import com.XYai.myai.rag.milvus.pojo.FileRecord;
 import com.XYai.myai.rag.rewrite.pojo.RewriteResult;
 import com.XYai.myai.xyAdmin.DashboardManager;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -46,12 +49,27 @@ public class MultiChannelRetrievalEngine {
     @Resource
     private RerankPostProcessor rerankPostProcessor;
     @Resource
+    private com.XYai.myai.rag.channel.processor.MetadataBoostPostProcessor metadataBoostPostProcessor;
+    @Resource
+    private com.XYai.myai.rag.channel.processor.DocumentConsolidationPostProcessor documentConsolidationPostProcessor;
+    @Resource
+    private ParentExpandPostProcessor parentExpandPostProcessor;
+    @Resource
     private FileRecordMapper fileRecordMapper;
     @Resource
     private DashboardManager dashboardManager;
+    @Resource
+    private com.XYai.myai.rag.channel.pojo.RetrievalProperties retrievalProperties;
 
     @Resource(name = "searchChannelExecutor")
     private TaskExecutor searchChannelExecutor;
+
+    @Resource
+    private KafkaTemplate<String, Object> kafkaTemplate;
+
+    /** 尽力而为观测事件（use_count 等）专用轻量 producer：acks=1 + 微批 + lz4 */
+    @Resource(name = "fastKafkaTemplate")
+    private KafkaTemplate<String, Object> fastKafkaTemplate;
 
     /**
      * 多通道检索主入口：筛选启用通道 -> 并行检索 -> 合并 -> 后处理。
@@ -69,6 +87,10 @@ public class MultiChannelRetrievalEngine {
         context.setUserMessageEntityFileChunkIds(userMessageEntityFileChunkIds);
         context.setRewriteQuestion(query);
         context.setConversationId(conversationId);
+        // 精排后最终保留 TopK（RerankPostProcessor 读取该值截断）
+        if (retrievalProperties != null) {
+            context.setTopK(retrievalProperties.getFinalTopK());
+        }
         // 进行可执行的通道查找
         List<SearchChannel> enabledChannels = channels.stream()
                 .filter(channel -> channel != null && channel.isEnabled(context))
@@ -76,7 +98,7 @@ public class MultiChannelRetrievalEngine {
                 .toList();
         // 没有可以检索的通道
         if (enabledChannels.isEmpty())
-            return null;
+            return List.of();
         // 并行查找
         List<CompletableFuture<SearchChannelResult>> futures = enabledChannels.stream()
                 .map(channel -> CompletableFuture.supplyAsync(() -> safeSearch(channel, context), searchChannelExecutor)
@@ -98,7 +120,7 @@ public class MultiChannelRetrievalEngine {
                 )
                 .toList();
         if (futures.isEmpty())
-            return null;
+            return List.of();
         // 查找结果合并
         List<RetrievedChunk> merged = futures.stream()
                 .map(CompletableFuture::join)
@@ -145,24 +167,34 @@ public class MultiChannelRetrievalEngine {
         // 3 重排：基于语义模型或融合策略调整最终排序。
         List<RetrievedChunk> rerankProcess = rerankPostProcessor.process(filterProcess, context);//rerank模型
         log.info("rerank:{},token:{}", rerankProcess.stream().map(RetrievedChunk::getScore).toList(),rerankProcess.stream().map(RetrievedChunk::getContent).map(String::length).toList());
-        // 4.异步保存文档使用次数
-        rerankProcess.forEach(chunk ->
+        // 3.5a 文档级整合：弱源文档候选门控（同主题多文档不互相稀释）
+        List<RetrievedChunk> consolidated = documentConsolidationPostProcessor.process(rerankProcess, context);
+        // 3.5b 元数据加权 + 分数落差截断 + 最终 Top-K（精排最后一环）
+        List<RetrievedChunk> boosted = metadataBoostPostProcessor.process(consolidated, context);
+        // 4 父块展开：生成用章节全文（检索/精排仍基于子块），small-to-big
+        List<RetrievedChunk> expanded = parentExpandPostProcessor.process(boosted, context);
+        // 5.异步保存文档使用次数—通过Kafka异步写，不阻塞检索链路（尽力而为事件走轻量 producer）
+        expanded.forEach(chunk ->
                 CompletableFuture.runAsync(
-                        () -> incrementFileChunkCount(chunk.getId()),
+                        () -> fastKafkaTemplate.send("analytics-event", null, new AnalyticsEvent(
+                                UUID.randomUUID().toString(), "use_count",
+                                FileRecord.builder().fileChunkId(chunk.getId()).build(),
+                                null, null
+                        )),
                         searchChannelExecutor
-                ).exceptionally(ex -> {
-                    log.error("异步更新文件使用次数失败: chunkId={}", chunk.getId(), ex);
+                )                .exceptionally(ex -> {
+                    log.error("异步发送使用次数事件失败: chunkId={}", chunk.getId(), ex);
                     return null;
                 })
         );
-        return rerankProcess;
+        return expanded;
     }
 
     /**
      * 对指定 chunk 的使用次数原子 +1。
      * 若记录不存在则先插入（use_count = 1），存在则递增。
      */
-    private void incrementFileChunkCount(String fileChunkId) {
+    public void incrementFileChunkCount(String fileChunkId) {
         log.info("准备异步更新文件使用次数");
         dashboardManager.addFileUseCount();
         boolean updated = fileRecordMapper.update(

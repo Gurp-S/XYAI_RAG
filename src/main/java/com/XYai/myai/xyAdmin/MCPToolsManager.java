@@ -1,5 +1,7 @@
 package com.XYai.myai.xyAdmin;
 
+import com.XYai.myai.security.annotation.AdminOnly;
+
 import com.XYai.myai.config.Result;
 import com.XYai.myai.rag.mcp.McpToolToggleRegistry;
 import com.XYai.myai.rag.mcp.ToolDecisionManager;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
+@AdminOnly
 @RestController
 @RequestMapping("/xyAdmin/mcp")
 public class MCPToolsManager {

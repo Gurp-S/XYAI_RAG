@@ -1,5 +1,7 @@
 package com.XYai.myai.xyAdmin;
 
+import com.XYai.myai.security.annotation.AdminOnly;
+
 import com.XYai.myai.config.Result;
 import com.XYai.myai.xyAdmin.service.SystemConfigService;
 import jakarta.annotation.Resource;
@@ -14,6 +16,7 @@ import java.util.Map;
  * 存储功能-模型分配、管道节点配置等
  */
 @Slf4j
+@AdminOnly
 @RestController
 @RequestMapping("/xyAdmin/system/config")
 public class SystemConfigController {

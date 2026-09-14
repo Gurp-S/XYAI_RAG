@@ -7,7 +7,6 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.neo4j.core.Neo4jClient;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -37,8 +36,6 @@ public class Neo4jKnowledgeGraphService {
     private IKAnalyzerTokenize ikAnalyzerTokenize;
     @Resource
     private EntityRecognizer entityRecognizer;
-    @Resource(name = "neo4jExecutor")
-    private TaskExecutor neo4jExecutor;
     private volatile long lastCommunityBuildTime = 0;
 
     // ==================== 定时任务与触发 ====================
@@ -118,10 +115,8 @@ public class Neo4jKnowledgeGraphService {
         // 异步更新实体词库，避免阻塞主流程
         if (!newEntityNames.isEmpty()) {
             List<String> words = new ArrayList<>(newEntityNames);
-            neo4jExecutor.execute(() -> {
-                ikAnalyzerTokenize.addWords(words);
-                entityRecognizer.refreshEntities();
-            });
+            ikAnalyzerTokenize.addWords(words);
+            entityRecognizer.refreshEntities();
         }
     }
 
@@ -253,9 +248,26 @@ public class Neo4jKnowledgeGraphService {
         }).collect(Collectors.toList());
     }
 
+    /** 实体识别结果缓存：高并发下相同查询直接命中，避免打满 Neo4j 连接池 */
+    private final com.github.benmanes.caffeine.cache.Cache<String, Map<String, Integer>> entityCache =
+            com.github.benmanes.caffeine.cache.Caffeine.newBuilder()
+                    .maximumSize(10_000)
+                    .expireAfterWrite(java.time.Duration.ofSeconds(60))
+                    .build();
+
     public Map<String, Integer> getUserMessageFileChunkId(String userMessage) {
         List<String> userMessageTokenize = ikAnalyzerTokenize.tokenize(userMessage);
-        return getChunkMatchCountMap(userMessageTokenize);
+        if (userMessageTokenize == null || userMessageTokenize.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        String cacheKey = String.join("|", userMessageTokenize);
+        Map<String, Integer> cached = entityCache.getIfPresent(cacheKey);
+        if (cached != null) {
+            return cached;
+        }
+        Map<String, Integer> result = getChunkMatchCountMap(userMessageTokenize);
+        entityCache.put(cacheKey, result);
+        return result;
     }
 
     public Map<String, Integer> getChunkMatchCountMap(List<String> entityNames) {

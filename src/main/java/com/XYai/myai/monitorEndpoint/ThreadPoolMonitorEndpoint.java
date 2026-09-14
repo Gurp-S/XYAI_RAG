@@ -16,12 +16,6 @@ public class ThreadPoolMonitorEndpoint {
     @Resource(name = "userExecutor")
     private TaskExecutor userExecutor;
 
-    @Resource(name = "memeryExecutor")
-    private TaskExecutor memeryExecutor;
-
-    @Resource(name = "uploadExecutor")
-    private TaskExecutor uploadExecutor;
-
     @Resource(name = "searchChannelExecutor")
     private TaskExecutor searchChannelExecutor;
 
@@ -29,8 +23,6 @@ public class ThreadPoolMonitorEndpoint {
     public Map<String, Object> monitor() {
         Map<String, Object> result = new HashMap<>();
         result.put("userExecutor", getExecutorInfo(userExecutor));
-        result.put("memeryExecutor", getExecutorInfo(memeryExecutor));
-        result.put("uploadExecutor", getExecutorInfo(uploadExecutor));
         result.put("searchChannelExecutor", getExecutorInfo(searchChannelExecutor));
         return result;
     }

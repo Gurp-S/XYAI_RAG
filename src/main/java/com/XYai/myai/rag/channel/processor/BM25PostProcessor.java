@@ -111,7 +111,14 @@ public class BM25PostProcessor implements SearchResultPostProcessor {
             return chunks;
         }
 
-        String question = context.getOriginalQuery();
+        // 打分查询与向量检索/重排语义一致：优先重写后的标准查询
+        String question = null;
+        if (context.getRewriteQuestion() != null) {
+            question = context.getRewriteQuestion().getRewrittenQuery();
+        }
+        if (question == null || question.isBlank()) {
+            question = context.getOriginalQuery();
+        }
         if (question == null || question.trim().isEmpty()) {
             log.warn("BM25 processor: empty query, skip.");
             return chunks;

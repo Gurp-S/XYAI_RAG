@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+
+
+<html dir="ltr" lang="en" itemscope itemtype="https://schema.org/WebPage" xmlns:fb="https://developers.facebook.com/schema/" xmlns:og="https://opengraphprotocol.org/schema/">
+
+<head id="ctl00_ctl00_MasterHead"><meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+    
+    <script type="text/javascript" src="https://go.automatad.com/geo/huWcRT/afihbs.js" async></script>
+
+    <meta name="atdlayout" content="section" /><meta name="atdlayout" content="sideads" /><meta property="fb:app_id" content="131096884466" /><meta property="og:locale" content="en_US" /><meta property="og:site_name" content="Flickchart" />
+
+    <script type="application/ld+json">
+    {
+        "@context" : "https://schema.org",
+        "@type" : "Organization",
+        "name" : "Flickchart",
+        "url" : "https://www.flickchart.com",
+        "logo": "https://flickchartstorage.blob.core.windows.net/FlickchartLargeIcon.png",
+        "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://www.flickchart.com/SearchResults.aspx?s={search_term_string}",
+        "query-input": "required name=search_term_string"
+      },
+      "sameAs" : [
+        "https://www.facebook.com/Flickchart",
+        "https://www.twitter.com/Flickchart",
+        "https://instagram.com/flickchart/",
+        "https://www.youtube.com/Flickchart",
+        "https://www.pinterest.com/flickchart/",
+        "https://flickchart.tumblr.com/"
+      ]
+    }
+    </script>
+    
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" /><link rel="alternate" type="application/rss+xml" title="Flickchart: The Blog RSS Feed" href="https://feeds.feedburner.com/FlickchartTheBlog" />  
+	<link rel="Stylesheet" href="/HttpCombiner.ashx?s=CombineCss_Master&t=text/css&v=1.3.9i&rjsc=" type="text/css" />
+
+    
+    
+	<link rel="Stylesheet" href="/HttpCombiner.ashx?s=CombineCss_Discussions&t=text/css&v=1.0.2n&rjsc=" type="text/css" />
+
+
+
+    <script data-cfasync="false" src="/HttpCombiner.ashx?s=CombineJavascript_Master&t=text/javascript&v=1.6.6d&rjsc=" type="text/javascript"></script>	
+
+    
+    
+	<meta id="ctl00_ctl00_head_head_movieMetaDescription" name="description" content="Discussion, debate, and comments on whether Schindler&#39;s List is better than The Godfather at Flickchart"></meta>
+	<meta id="ctl00_ctl00_head_head_movieMetaKeywords" name="keywords" content="Schindler&#39;s List, The Godfather, Flickchart discussions, Flickchart discussion, Flickchart matchup, Flickchart match-up, Flickchart forum, Flickchart comments, flickchart"></meta>
+    <meta property="og:type" content="flickchart:matchup">
+    <meta property="og:title" content="Schindler's List vs. The Godfather" />
+    <meta property="og:image"                content="https://flickchartposters.blob.core.windows.net/posters/1993/posters/58307CB622-f67f.jpg">
+    <meta property="og:image"                content="http://www.flickchart.com/images/versus.png" />
+    <meta property="og:image"                content="https://flickchartposters.blob.core.windows.net/posters/1972/posters/B4CFDA198E-77d1.jpg">
+    	
+	<script type="text/javascript" src="/js/smooth.pack.js"></script>
+	
+	<script type="text/javascript">
+	<!--
+	    function setPostParent(parentID, doesAgree) {
+	        parentIDField = document.getElementById("");
+	        parentIDField.value = parentID;
+
+	        agreementField = document.getElementById("");
+	        agreementField.value = doesAgree;
+	    }
+
+
+	//-->
+	</script>	
+
+
+        
+    <!--[if lte IE 7]>        
+        <script type="text/javascript"> 
+	        /*Load jQuery if not already loaded*/ if(typeof jQuery == 'undefined'){ document.write("<script type=\"text/javascript\"   src=\"https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js\"></"+"script>"); var __noconflict = true; } 
+	        var IE6UPDATE_OPTIONS = {
+		        icons_path: "https://static.ie6update.com/hosted/ie6update/images/"
+	        }
+        </script>
+        <script type="text/javascript" src="https://static.ie6update.com/hosted/ie6update/ie6update.js"></script>
+    <![endif]-->    
+    <!--[if IE 7]> <link rel="stylesheet" type="text/css" href="/styles/ie7.css" /><![endif]-->    
+    <!--[if IE 8]><link rel="stylesheet" type="text/css" href="/styles/ie8.css" /><![endif]-->   
+    <!--[if lt IE 9]>
+		<script src="/js/html5.js"></script>
+	<![endif]--> 
+    <!--[if IE 9]><link rel="stylesheet" type="text/css" href="/styles/ie9.css" /><![endif]-->    
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1ZCW8CK3YB"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-1ZCW8CK3YB');
+    </script>
+<title>
+	Schindler's List vs. The Godfather - Flickchart
+</title></head>
+
+<body>
+    
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+        ga('create', 'UA-2730895-1', 'auto');
+        ga('send', 'pageview');
+    </script>    
+    
+
+    <form name="aspnetForm" method="post" action="/discussion/58307CB622/vs/B4CFDA198E" id="aspnetForm">
+<input type="hidden" name="ctl00_ctl00_ScriptManager1_HiddenField" id="ctl00_ctl00_ScriptManager1_HiddenField" value="" />
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwUKMTg5OTY1NTc2MmQYAQUeX19Db250cm9sc1JlcXVpcmVQb3N0QmFja0tleV9fFgIFI2N0bDAwJGN0bDAwJG1haW5TZWFyY2gkc2VhcmNoQnV0dG9uBTFjdGwwMCRjdGwwMCRNYWluQ29udGVudCRNYWluQ29udGVudCRzdWJtaXRDb21tZW50vtdfmHscrnq+jmuFGLx7YHr9EY4YosZLXSqouBLNLbU=" />
+
+
+<script src="/ScriptResource.axd?d=eTKcNxdKdRwKsN4TMydRkQ678UCoQhDuqYSqqrMivqI9Tnr9WVX1ygDEVUdSFf7LgkosjfKF_mSjAMMAn08Rh4gm0liRVCyRvtxEa8PpXmBy6Bp0vbhH6q2JPsjrVnpXXl0pfPxWQA-vqUD--iZmeiIMSWWba1gCT8lp6RUlKQ8tlrWcogYoKyuk4IGGkZss0&amp;t=722fe453" type="text/javascript"></script>
+<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="2856D68B" />
+<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="/wEdAAfAvy4wNWwL2r8uAu72fo3D2MooyggOAyXNXoHnVBPW3WS2G5IofuBXt6l1qaoNl8kYleL3bGkdRdY+QSbVVQAmlws7qyD1e6FGCOoWdQNMEFZYdvdhsgzyQLvLT9CiVJcTGDwvW5M0qBoX1UbA+9G0Ksw1cDsLx5HxFu8g+T8p+FRdmQsZX6J3nujN5THkz/w=" />
+         
+
+        <div id="topBg">
+            <div id="topContainer">
+                <div id="ctl00_ctl00_topAd" itemscope="" itemtype="https://schema.org/WPAdBlock" class="bannerAd">
+                    <div id="ATD_FC_728x90_P1" style='width:728px;height:90px;overflow: hidden;'>
+                    </div>
+                </div>
+
+                <div id="userProfileContainer">
+                    
+        <div id="anon-info">     
+                <p>
+                    <a id="ctl00_ctl00_UserProfileMini_loginView_lnkSignIn" class="signin" href="/Splash.aspx?return=%2fdiscussion%2f58307CB622%2fvs%2fB4CFDA198E">Sign In Now <span class="rightTriangle">&#9658;</span></a><br />
+                    <a href="/register.aspx">or Create A New Account <span class="rightTriangle">&#9658;</span></a>
+                </p>
+        </div>
+    
+
+                </div>
+            </div>
+        </div>
+                
+        <div id="navbar-bg">
+            <div id="navbarContainer">
+                <div id="logo">
+                    <a href="/" style="position: relative;"><img src="/images/logo.png" alt="">
+                        
+                        
+                    </a>                        
+                </div>
+
+                <div id="navbar" itemscope itemtype="https://schema.org/SiteNavigationElement">
+                    <ul>
+                        <li><a href="/" class="rankMovies">Rank Movies</a></li>
+                        <li><a href="/charts">Charts</a></li>
+                        <li><a href="/users">Users</a></li>
+                        <li><a href="/discussions">Discussions</a></li>
+                        <li><a href="/blog/">Blog</a></li>
+                        <li class="blogLink"><a href="https://donate.flickchart.com">Donate</a></li>
+                    </ul>
+                    <div id="search">
+                        <div id="ctl00_ctl00_mainSearch_siteSearchPanel" align="center">
+	
+    <input name="ctl00$ctl00$mainSearch$searchBox" type="text" value="Search..." id="ctl00_ctl00_mainSearch_searchBox" class="search-form autoMovie" />
+    <input type="image" name="ctl00$ctl00$mainSearch$searchButton" id="ctl00_ctl00_mainSearch_searchButton" class="search-button" src="/images/search-icon.png" style="" />
+
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="containerBg">
+            <div id="container">
+                
+    
+    <div itemscope itemtype="http://schema.org/Conversation">
+    
+	    <div id="main-content-container-top">
+	        <h1 itemprop="name">
+	            
+    Schindler's List vs. The Godfather
+
+	        </h1>
+	    </div>
+	    
+	    <div id="main-content-container">
+	        <div id="main-content">
+	            
+        
+        <div id="discussions-top">
+            <div id="discussions-info-bar">
+                <p id="discussions-info-left">6 comments</p>
+                <p id="discussions-info-right">32 comments</p>
+            </div>  
+            <img id="comments-top" src="/images/comments-top.gif" alt="" />
+            <img id="versus" src="/images/versus.png" alt=""/>
+            <div id="posters">                
+                <div id="leftMoviePoster">
+		            <a href="/movie/58307CB622">
+						<img id="ctl00_ctl00_MainContent_MainContent_leftPosterImage" class="posterImg" onerror="showDefaultPoster(this);" src="https://flickchartposters.blob.core.windows.net/posters/1993/posters/58307CB622-f67f.jpg" style="" />
+		            </a>
+	            </div>
+                <div id="rightMoviePoster">
+		            <a href="/movie/B4CFDA198E">
+		                <img id="ctl00_ctl00_MainContent_MainContent_rightPosterImage" class="posterImg" onerror="showDefaultPoster(this);" src="https://flickchartposters.blob.core.windows.net/posters/1972/posters/B4CFDA198E-77d1.jpg" style="" />
+		            </a>
+	            </div>	 
+		    </div>
+		    
+		</div>
+		
+		<div style="clear: both;"></div>
+				
+		<div id="comments">
+		    <p id="matchupLink"><a href="/58307CB622/vs/B4CFDA198E">Rank This Matchup</a><span id="ctl00_ctl00_MainContent_MainContent_replyBelow" style="display:none;"> or Comment/Reply Below</span></p>
+			
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl00_commentDiv" class="left-comment left" itemscope="" itemtype="https://schema.org/Comment">
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl00_leftArrow" class="l-arrow" src="/images/l-arrow.gif" style="" />
+						
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl00_commentUsername" class="name" itemprop="name" href="/JRM">JRM</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl00_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl00_commentAvatar_avatarLink" href="/JRM"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl00_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/c567aed3-b2d1-4578-a9b5-875c6bfd2b6b.htm?tr=w-15,h-15" alt="JRM" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 4/17/2010</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl00_replyLink" class="reply" onClick="setPostParent(67134, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Hmmm..
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl01_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl01_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl01_commentUsername" class="name" itemprop="name" href="/MateoU2">MateoU2</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl01_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl01_commentAvatar_avatarLink" href="/MateoU2"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl01_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/26a56ae7-4b80-4f0a-8a0d-80e777898ef9.jpg?tr=w-15,h-15" alt="MateoU2" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 5/28/2010</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl01_replyLink" class="reply" onClick="setPostParent(70517, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Tough one at first sight, but definitely The Godfather.
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl02_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl02_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl02_commentUsername" class="name" itemprop="name" href="/Yellowjacket">Yellowjacket</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl02_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl02_commentAvatar_avatarLink" href="/Yellowjacket"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl02_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/f8583133-e0d8-4cc5-9602-87bd509bb8a8.png?tr=w-15,h-15" alt="Yellowjacket" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 8/15/2010</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl02_replyLink" class="reply" onClick="setPostParent(77543, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Epic match and why I set up an account at flickchart. Awesome films awesome match ups!
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl03_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl03_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl03_commentUsername" class="name" itemprop="name" href="/joeboo1000">joeboo1000</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl03_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl03_commentAvatar_avatarLink" href="/joeboo1000"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl03_commentAvatar_avatarImage" class="avatarImage" src="/images/avatar.jpg?tr=w-15,h-15" alt="joeboo1000" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 4/19/2011</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl03_replyLink" class="reply" onClick="setPostParent(100198, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Seriously, who can make this choice
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl04_commentDiv" class="unranked-comment unranked" itemscope="" itemtype="https://schema.org/Comment">
+						
+						
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl04_commentUsername" class="name" itemprop="name" href="/Cleckley">Cleckley</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl04_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl04_commentAvatar_avatarLink" href="/Cleckley"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl04_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/4a8be045-d764-48e2-b9e5-96ac329f68c3.bmp?tr=w-15,h-15" alt="Cleckley" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 11/1/2011</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl04_replyLink" class="reply" onClick="setPostParent(112341, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							I can! 
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl05_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl05_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl05_commentUsername" class="name" itemprop="name" href="/robmoviefilms13">robmoviefilms13</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl05_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl05_commentAvatar_avatarLink" href="/robmoviefilms13"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl05_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/61340f1a-bebd-4f9b-a6c9-a826ac255c04.jpg?tr=w-15,h-15" alt="robmoviefilms13" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 2/11/2012</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl05_replyLink" class="reply" onClick="setPostParent(117684, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							The Godfather by a mile
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl06_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl06_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl06_commentUsername" class="name" itemprop="name" href="/rta1234">rta1234</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl06_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl06_commentAvatar_avatarLink" href="/rta1234"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl06_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/fa9986a0-8564-4930-8315-c710f558e80c.jpg?tr=w-15,h-15" alt="rta1234" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 2/13/2012</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl06_replyLink" class="reply" onClick="setPostParent(117989, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Godfather without a doubt. 
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl07_commentDiv" class="unranked-comment unranked" itemscope="" itemtype="https://schema.org/Comment">
+						
+						
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl07_commentUsername" class="name" itemprop="name" href="/LordVader">LordVader</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl07_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl07_commentAvatar_avatarLink" href="/LordVader"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl07_commentAvatar_avatarImage" class="avatarImage" src="/images/avatar.jpg?tr=w-15,h-15" alt="LordVader" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 2/13/2012</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl07_replyLink" class="reply" onClick="setPostParent(118123, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Schindler's List wins this one for sure. The Godfather is a miserable gangster movie, I realy had great expectations for The Godfather, but then it turned out to be a bad movie with both bad story and bad acting, and there was not any action nor excitement, not even at the shooting scenes, and Godfather was TOO boring and lengthy. Godfather can only be discouraged. While Schindler's List is a movie that is based on a true story, and has better acting and better music.
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl08_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl08_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl08_commentUsername" class="name" itemprop="name" href="/donman">donman</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl08_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl08_commentAvatar_avatarLink" href="/donman"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl08_commentAvatar_avatarImage" class="avatarImage" src="/images/avatar.jpg?tr=w-15,h-15" alt="donman" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 3/10/2012</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl08_replyLink" class="reply" onClick="setPostParent(120280, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							The Godfather wins this by far. Schindler's list is up there though.
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl09_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl09_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl09_commentUsername" class="name" itemprop="name" href="/Randommale7">Randommale7</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl09_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl09_commentAvatar_avatarLink" href="/Randommale7"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl09_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/c83d52b0-1be0-4a14-839c-137d153a9a48.jpg?tr=w-15,h-15" alt="Randommale7" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 7/14/2012</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl09_replyLink" class="reply" onClick="setPostParent(130705, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							The Godfather, it the greatest movie of all time, Schindler's is close though and just as important
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl10_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl10_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl10_commentUsername" class="name" itemprop="name" href="/alav">alav</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl10_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl10_commentAvatar_avatarLink" href="/alav"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl10_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/f36f702b-20ac-4025-a8b0-2e07ab55ea86.jpg?tr=w-15,h-15" alt="alav" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 2/3/2013</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl10_replyLink" class="reply" onClick="setPostParent(152638, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Schindler's List is tedious garbage in my eyes, the plot deteriorates and the characters aren't strong enough. The Godfather is the exact opposite.  
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl11_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl11_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl11_commentUsername" class="name" itemprop="name" href="/SLionsCricket">SLionsCricket</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl11_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl11_commentAvatar_avatarLink" href="/SLionsCricket"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl11_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/17197359-33e3-496f-99f1-3326cf3e01f6.JPG?tr=w-15,h-15" alt="SLionsCricket" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 4/24/2013</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl11_replyLink" class="reply" onClick="setPostParent(164254, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							The Godfather crushes. Schindler's List bored me so much
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl12_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl12_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl12_commentUsername" class="name" itemprop="name" href="/sickkoRn">sickkoRn</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl12_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl12_commentAvatar_avatarLink" href="/sickkoRn"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl12_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/d70abac3-b283-4e2a-962e-ab21de4f2736.jpg?tr=w-15,h-15" alt="sickkoRn" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 4/24/2013</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl12_replyLink" class="reply" onClick="setPostParent(164264, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Godfather wins this one, Schindler's List is good, but not that good.
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl13_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl13_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl13_commentUsername" class="name" itemprop="name" href="/skywalker17">skywalker17</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl13_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl13_commentAvatar_avatarLink" href="/skywalker17"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl13_commentAvatar_avatarImage" class="avatarImage" src="/images/avatar.jpg?tr=w-15,h-15" alt="skywalker17" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 5/20/2013</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl13_replyLink" class="reply" onClick="setPostParent(167642, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							I found Schindler's list to be boring & lengthy
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl14_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl14_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl14_commentUsername" class="name" itemprop="name" href="/empirosaur">empirosaur</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl14_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl14_commentAvatar_avatarLink" href="/empirosaur"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl14_commentAvatar_avatarImage" class="avatarImage" src="/images/avatar.jpg?tr=w-15,h-15" alt="empirosaur" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 6/16/2013</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl14_replyLink" class="reply" onClick="setPostParent(171983, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							I'm gonna go with Schindler's List.
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl15_commentDiv" class="unranked-comment unranked" itemscope="" itemtype="https://schema.org/Comment">
+						
+						
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl15_commentUsername" class="name" itemprop="name" href="/LordVader">LordVader</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl15_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl15_commentAvatar_avatarLink" href="/LordVader"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl15_commentAvatar_avatarImage" class="avatarImage" src="/images/avatar.jpg?tr=w-15,h-15" alt="LordVader" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 6/30/2013</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl15_replyLink" class="reply" onClick="setPostParent(174005, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Don't forget that Oscar Schindler was a real person, and that he saved 1100 people from a terrible death. Schindler's List is by far superior better. Godfather is nothing but some old booring and lenghty piece of shit, with bad and booring story and no excitement nor good action either. Schindler's List wins by far.
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl16_commentDiv" class="unranked-comment unranked" itemscope="" itemtype="https://schema.org/Comment">
+						
+						
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl16_commentUsername" class="name" itemprop="name" href="/JC13">JC13</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl16_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl16_commentAvatar_avatarLink" href="/JC13"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl16_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/5e6cdb15-fba7-46b3-941b-c50f99f268b7.png?tr=w-15,h-15" alt="JC13" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 3/2/2014</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl16_replyLink" class="reply" onClick="setPostParent(209209, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Easy. The Godfather.
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl17_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl17_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl17_commentUsername" class="name" itemprop="name" href="/Saltzman_Sees">Saltzman_Sees</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl17_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl17_commentAvatar_avatarLink" href="/Saltzman_Sees"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl17_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/1e7d08cf-c365-490e-84e8-a52aed9a216c.jpg?tr=w-15,h-15" alt="Saltzman_Sees" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 3/7/2014</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl17_replyLink" class="reply" onClick="setPostParent(209865, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Godfather is absolutely perfect and one of the greatest films I have ever seen. Schindler's List is certainly the best film based on a true story I've seen and Spielberg's best, but Godfather is as good as it gets.
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl18_commentDiv" class="left-comment left" itemscope="" itemtype="https://schema.org/Comment">
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl18_leftArrow" class="l-arrow" src="/images/l-arrow.gif" style="" />
+						
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl18_commentUsername" class="name" itemprop="name" href="/welshlady94">welshlady94</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl18_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl18_commentAvatar_avatarLink" href="/welshlady94"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl18_commentAvatar_avatarImage" class="avatarImage" src="/images/avatar.jpg?tr=w-15,h-15" alt="welshlady94" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 6/3/2014</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl18_replyLink" class="reply" onClick="setPostParent(223774, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							This is an extremely tough choice for me but for me personally, I think Schindler's list is the better film but I love both of them.
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl19_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl19_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl19_commentUsername" class="name" itemprop="name" href="/HorrorHistorian5">HorrorHistorian5</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl19_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl19_commentAvatar_avatarLink" href="/HorrorHistorian5"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl19_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/9ff36a23-e382-40f9-829a-ebc1b3ca62df.jpg?tr=w-15,h-15" alt="HorrorHistorian5" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 6/16/2014</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl19_replyLink" class="reply" onClick="setPostParent(225884, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Schindler's List wins this way more compelling and condemn's Violence and hatred Masterfully while Godfather Glorify's it and its a great film but its starky and times flat both are in my top 35 films ever though.
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl20_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl20_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl20_commentUsername" class="name" itemprop="name" href="/Wade92">Wade92</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl20_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl20_commentAvatar_avatarLink" href="/Wade92"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl20_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/d1751889-ec91-4c33-9733-15b899897f43.png?tr=w-15,h-15" alt="Wade92" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 6/17/2014</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl20_replyLink" class="reply" onClick="setPostParent(225982, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Schindler's List is a very powerful film but The Godfather wins
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl21_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl21_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl21_commentUsername" class="name" itemprop="name" href="/TheEgant">TheEgant</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl21_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl21_commentAvatar_avatarLink" href="/TheEgant"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl21_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/2caa1453-3722-4f8e-9f93-fd558f7e7cd2.jpg?tr=w-15,h-15" alt="TheEgant" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 6/17/2014</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl21_replyLink" class="reply" onClick="setPostParent(225992, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							The Godfather is just too damn good...
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl22_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl22_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl22_commentUsername" class="name" itemprop="name" href="/Saltzman_Sees">Saltzman_Sees</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl22_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl22_commentAvatar_avatarLink" href="/Saltzman_Sees"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl22_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/1e7d08cf-c365-490e-84e8-a52aed9a216c.jpg?tr=w-15,h-15" alt="Saltzman_Sees" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 8/26/2014</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl22_replyLink" class="reply" onClick="setPostParent(235659, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Schindler's List is one of the best films I have ever seen, but Godfather is perfect.
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl23_commentDiv" class="unranked-comment unranked" itemscope="" itemtype="https://schema.org/Comment">
+						
+						
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl23_commentUsername" class="name" itemprop="name" href="/LordVader">LordVader</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl23_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl23_commentAvatar_avatarLink" href="/LordVader"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl23_commentAvatar_avatarImage" class="avatarImage" src="/images/avatar.jpg?tr=w-15,h-15" alt="LordVader" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 11/15/2014</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl23_replyLink" class="reply" onClick="setPostParent(251862, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Amon Goeth and his nazi soldiers would totally destroy the mafias and gas them to death. Schindler's List for the world.
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl24_commentDiv" class="unranked-comment unranked" itemscope="" itemtype="https://schema.org/Comment">
+						
+						
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl24_commentUsername" class="name" itemprop="name" href="/LordVader">LordVader</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl24_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl24_commentAvatar_avatarLink" href="/LordVader"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl24_commentAvatar_avatarImage" class="avatarImage" src="/images/avatar.jpg?tr=w-15,h-15" alt="LordVader" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 11/18/2014</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl24_replyLink" class="reply" onClick="setPostParent(254841, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Don't forget that Oscar Schindler was a real person, and that he saved 1100 people from a terrible death. Schindler's List is by far superior better. Godfather is nothing but some old booring and lenghty piece of shit, with bad and booring story and no excitement nor good action either. Schindler's List wins by far. 
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl25_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl25_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl25_commentUsername" class="name" itemprop="name" href="/walterwhite413">walterwhite413</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl25_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl25_commentAvatar_avatarLink" href="/walterwhite413"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl25_commentAvatar_avatarImage" class="avatarImage" src="/images/avatar.jpg?tr=w-15,h-15" alt="walterwhite413" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 11/18/2014</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl25_replyLink" class="reply" onClick="setPostParent(254851, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Both are phenomenal works of art but The Godfather is a better film
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl26_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl26_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl26_commentUsername" class="name" itemprop="name" href="/lantio">lantio</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl26_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl26_commentAvatar_avatarLink" href="/lantio"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl26_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/529eea2a-1ab8-4a49-82f8-ac9ea7247f89.jpg?tr=w-15,h-15" alt="lantio" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 11/19/2014</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl26_replyLink" class="reply" onClick="setPostParent(254854, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							The Godfather is the better film. 
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl27_commentDiv" class="unranked-comment unranked" itemscope="" itemtype="https://schema.org/Comment">
+						
+						
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl27_commentUsername" class="name" itemprop="name" href="/LordVader">LordVader</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl27_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl27_commentAvatar_avatarLink" href="/LordVader"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl27_commentAvatar_avatarImage" class="avatarImage" src="/images/avatar.jpg?tr=w-15,h-15" alt="LordVader" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 11/21/2014</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl27_replyLink" class="reply" onClick="setPostParent(255786, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							"Whoever saves one life, saves the world entire." Oskar Schindler is the one true hero.
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl28_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl28_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl28_commentUsername" class="name" itemprop="name" href="/Danny237">Danny237</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl28_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl28_commentAvatar_avatarLink" href="/Danny237"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl28_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/f72da6f4-c51d-4526-84dd-cabddcd08120.jpg?tr=w-15,h-15" alt="Danny237" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 4/7/2015</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl28_replyLink" class="reply" onClick="setPostParent(271544, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Schindler's List wins easily.
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl29_commentDiv" class="left-comment left" itemscope="" itemtype="https://schema.org/Comment">
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl29_leftArrow" class="l-arrow" src="/images/l-arrow.gif" style="" />
+						
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl29_commentUsername" class="name" itemprop="name" href="/Koroy">Koroy</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl29_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl29_commentAvatar_avatarLink" href="/Koroy"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl29_commentAvatar_avatarImage" class="avatarImage" src="/images/avatar.jpg?tr=w-15,h-15" alt="Koroy" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 7/12/2015</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl29_replyLink" class="reply" onClick="setPostParent(290038, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							The godfather will forever be in my top 100 but schindler's list will forever be in my top 10 .Schindler's list wins in my opinion
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl30_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl30_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl30_commentUsername" class="name" itemprop="name" href="/Vachan23">Vachan23</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl30_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl30_commentAvatar_avatarLink" href="/Vachan23"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl30_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/5f72da16-1315-40b7-bb2a-08c351da6969.jpg?tr=w-15,h-15" alt="Vachan23" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 7/13/2015</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl30_replyLink" class="reply" onClick="setPostParent(290189, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Both of these movies are winners but if i had to make a "sophie's choice" it would be The Godfather...
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl31_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl31_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl31_commentUsername" class="name" itemprop="name" href="/Nils98">Nils98</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl31_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl31_commentAvatar_avatarLink" href="/Nils98"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl31_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/7d3b8b76-bda7-4789-8922-40c40d6af75c.jpg?tr=w-15,h-15" alt="Nils98" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 7/28/2016</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl31_replyLink" class="reply" onClick="setPostParent(331032, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Holy shit, The Godfather is crushing. I mean, sure, it's The Godfather and even I'll pick The Godfather, but to see a film of such esteem as Schindler's List getting crushed was not quite what I expected. 
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl32_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl32_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl32_commentUsername" class="name" itemprop="name" href="/FixedNation">FixedNation</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl32_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl32_commentAvatar_avatarLink" href="/FixedNation"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl32_commentAvatar_avatarImage" class="avatarImage" src="/images/avatar.jpg?tr=w-15,h-15" alt="FixedNation" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 5/21/2017</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl32_replyLink" class="reply" onClick="setPostParent(350978, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Both are legendary movies, Schindler's List is incredible, definitely one of the best movies of all time. However, not even Schindler's List beats The Godfather for me.
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl33_commentDiv" class="unranked-comment unranked" itemscope="" itemtype="https://schema.org/Comment">
+						
+						
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl33_commentUsername" class="name" itemprop="name" href="/Kassuts">Kassuts</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl33_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl33_commentAvatar_avatarLink" href="/Kassuts"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl33_commentAvatar_avatarImage" class="avatarImage" src="/images/avatar.jpg?tr=w-15,h-15" alt="Kassuts" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 6/3/2019</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl33_replyLink" class="reply" onClick="setPostParent(394034, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Godfather has far better performances better charecters because More charecter Anarchy to it and we get To know those charecters better STORY has More To it and its "bigger"  More memorible lines and there More deeper themes but schindler's list  has better cinematography STORY is More powerful cause it actully happend and its not just entertaining but also history lesson and something that can change persons lifes so I  say schindler's list is More powerful film but godfather is technicaly better film overrall
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl34_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl34_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl34_commentUsername" class="name" itemprop="name" href="/MrREE">MrREE</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl34_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl34_commentAvatar_avatarLink" href="/MrREE"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl34_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/da61cd9b-1e69-4a20-96d2-074281e925d6.jpeg?tr=w-15,h-15" alt="MrREE" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 6/3/2019</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl34_replyLink" class="reply" onClick="setPostParent(394037, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Both are amazing films that many consider to be the greatest of all time, but The Godfather is my all time favorite movie, so I will have to choose that one.
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl35_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl35_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl35_commentUsername" class="name" itemprop="name" href="/Cxfatesniper8ck">Cxfatesniper8ck</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl35_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl35_commentAvatar_avatarLink" href="/Cxfatesniper8ck"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl35_commentAvatar_avatarImage" class="avatarImage" src="/images/avatar.jpg?tr=w-15,h-15" alt="Cxfatesniper8ck" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 6/3/2019</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl35_replyLink" class="reply" onClick="setPostParent(394043, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Going with TGF.
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl36_commentDiv" class="unranked-comment unranked" itemscope="" itemtype="https://schema.org/Comment">
+						
+						
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl36_commentUsername" class="name" itemprop="name" href="/PigletPig">PigletPig</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl36_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl36_commentAvatar_avatarLink" href="/PigletPig"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl36_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/c9d98466-14ff-411b-baaa-948efddc31bb.jpg?tr=w-15,h-15" alt="PigletPig" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 1/22/2021</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl36_replyLink" class="reply" onClick="setPostParent(434723, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							However unpopular this may be, for now, my vote goes to Schindler's List... barely, and I truly mean barely.
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl37_commentDiv" class="left-comment left" itemscope="" itemtype="https://schema.org/Comment">
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl37_leftArrow" class="l-arrow" src="/images/l-arrow.gif" style="" />
+						
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl37_commentUsername" class="name" itemprop="name" href="/CadetheCritic99">CadetheCritic99</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl37_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl37_commentAvatar_avatarLink" href="/CadetheCritic99"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl37_commentAvatar_avatarImage" class="avatarImage" src="/images/avatar.jpg?tr=w-15,h-15" alt="CadetheCritic99" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 4/23/2021</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl37_replyLink" class="reply" onClick="setPostParent(440381, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							My number 1 vs number 2, it is Schindler list by the edge of a razorblade, these films are both so amazing
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl38_commentDiv" class="left-comment left" itemscope="" itemtype="https://schema.org/Comment">
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl38_leftArrow" class="l-arrow" src="/images/l-arrow.gif" style="" />
+						
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl38_commentUsername" class="name" itemprop="name" href="/TheLovecraft98">TheLovecraft98</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl38_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl38_commentAvatar_avatarLink" href="/TheLovecraft98"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl38_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/7cbcf19a-717d-4999-a2d9-856b42bf0883.png?tr=w-15,h-15" alt="TheLovecraft98" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 5/8/2021</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl38_replyLink" class="reply" onClick="setPostParent(441627, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Jesus Christ, why is Schindler's List losing so badly? Both of these are technical masterpieces of cinema, can't go wrong with either. Although I truly do believe Liam Neeson and Ralph Fiennes beat Al Pacino and Marlon Brando, they may not better actors overall but they gave better performances here. I'll give Schindler's List the slight edge.
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl39_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl39_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl39_commentUsername" class="name" itemprop="name" href="/Crapbaskets123">Crapbaskets123</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl39_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl39_commentAvatar_avatarLink" href="/Crapbaskets123"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl39_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/b7d6c947-73e6-4bb0-8953-8bee3658b6c2.jpg?tr=w-15,h-15" alt="Crapbaskets123" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 7/4/2022</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl39_replyLink" class="reply" onClick="setPostParent(464416, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							I adore both these movies, but yeah The Godfather edges out in literally every way. I think the acting is somewhat on par, tho I think Brando and Pacino narrowly edge out with their performances. I think the story is far more engaging and well-made dialogue and expertly implemented themes. I think it also looks better than Schindler's List, with gorgeous cinematography and every shot looking like a painting of sorts. 
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl40_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl40_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl40_commentUsername" class="name" itemprop="name" href="/ear">ear</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl40_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl40_commentAvatar_avatarLink" href="/ear"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl40_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/a4cc4aa7-8f88-4c5a-b848-7b430c7e68d5(2).jpg?tr=w-15,h-15" alt="ear" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 7/4/2022</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl40_replyLink" class="reply" onClick="setPostParent(464420, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							I think Schindler's List had a more emotional and powerful story to tell but I will give The Godfather a slight edge for the  acting  performances and the brilliant score and direction of Francis Ford Cappella.
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl41_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl41_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl41_commentUsername" class="name" itemprop="name" href="/ear">ear</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl41_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl41_commentAvatar_avatarLink" href="/ear"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl41_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/a4cc4aa7-8f88-4c5a-b848-7b430c7e68d5(2).jpg?tr=w-15,h-15" alt="ear" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 7/4/2022</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl41_replyLink" class="reply" onClick="setPostParent(464426, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Francis Ford Coppolo wins this match.
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl42_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl42_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl42_commentUsername" class="name" itemprop="name" href="/ear">ear</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl42_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl42_commentAvatar_avatarLink" href="/ear"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl42_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/a4cc4aa7-8f88-4c5a-b848-7b430c7e68d5(2).jpg?tr=w-15,h-15" alt="ear" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 7/4/2022</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl42_replyLink" class="reply" onClick="setPostParent(464428, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Francis Ford Coppola wins the match. I hate my spell check lol.
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl43_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl43_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl43_commentUsername" class="name" itemprop="name" href="/Crapbaskets123">Crapbaskets123</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl43_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl43_commentAvatar_avatarLink" href="/Crapbaskets123"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl43_commentAvatar_avatarImage" class="avatarImage" src="https://ik.imagekit.io/75mgj6y0wrj/https://flickchartavatars.blob.core.windows.net/web/b7d6c947-73e6-4bb0-8953-8bee3658b6c2.jpg?tr=w-15,h-15" alt="Crapbaskets123" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 9/3/2022</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl43_replyLink" class="reply" onClick="setPostParent(466791, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							On rewatch, the match isn't as close. I feel like The Godfather just did everything right. Blocking and staging masterfully used, the lighting and overall cinematography is flawless, the screenplay tight, epic, and tragic, the characters complex and iconic, the acting brilliant on all sides. Schindler's List is the more emotionally crushing movie because of the subject matter, but as a movie I feel that The Godfather wins
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl44_commentDiv" class="unranked-comment unranked" itemscope="" itemtype="https://schema.org/Comment">
+						
+						
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl44_commentUsername" class="name" itemprop="name" href="/WAM">WAM</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl44_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl44_commentAvatar_avatarLink" href="/WAM"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl44_commentAvatar_avatarImage" class="avatarImage" src="/images/avatar.jpg?tr=w-15,h-15" alt="WAM" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 10/25/2022</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl44_replyLink" class="reply" onClick="setPostParent(470325, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							The godfather is good but schindler's list is great 
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl45_commentDiv" class="left-comment left" itemscope="" itemtype="https://schema.org/Comment">
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl45_leftArrow" class="l-arrow" src="/images/l-arrow.gif" style="" />
+						
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl45_commentUsername" class="name" itemprop="name" href="/Antonalvik">Antonalvik</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl45_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl45_commentAvatar_avatarLink" href="/Antonalvik"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl45_commentAvatar_avatarImage" class="avatarImage" src="/images/avatar.jpg?tr=w-15,h-15" alt="Antonalvik" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 10/25/2022</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl45_replyLink" class="reply" onClick="setPostParent(470326, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							Schindler's list is a masterpiece but the godfather isn't om sorry but schindler's list wins
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl46_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl46_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl46_commentUsername" class="name" itemprop="name" href="/Kubrick1928">Kubrick1928</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl46_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl46_commentAvatar_avatarLink" href="/Kubrick1928"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl46_commentAvatar_avatarImage" class="avatarImage" src="/images/avatar.jpg?tr=w-15,h-15" alt="Kubrick1928" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 1/21/2023</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl46_replyLink" class="reply" onClick="setPostParent(474692, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							I love Schindler's List but how can it beat The Godfather?
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+					<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl47_commentDiv" class="right-comment right" itemscope="" itemtype="https://schema.org/Comment">
+						
+						<img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl47_rightArrow" class="r-arrow" src="/images/r-arrow.gif" style="" />
+						<div class="userdata">		            
+							<div class="username" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+								<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl47_commentUsername" class="name" itemprop="name" href="/Pulsar44">Pulsar44</a>
+								<div id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl47_commentAvatar_avatarDiv" class="avatar">
+	<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl47_commentAvatar_avatarLink" href="/Pulsar44"><img id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl47_commentAvatar_avatarImage" class="avatarImage" src="/images/avatar.jpg?tr=w-15,h-15" alt="Pulsar44" style="height:15px;width:15px;" /></a>
+	
+</div>
+
+							</div>
+							<p class="timestamp" itemprop="datePublished">on 5/15/2023</p>
+							<div class="reply-links">							
+							    <!--<a id="ctl00_ctl00_MainContent_MainContent_commentRepeater_ctl47_replyLink" class="reply" onClick="setPostParent(478878, 1);" href="http://www.flickchart.com/Discussions.aspx?MovieID1=58307CB622&amp;MovieID2=B4CFDA198E#commentField">reply</a>-->
+						    </div>
+						</div>
+						<p class="comment" itemprop="text">
+							2 Masterpieces. Who wins. Godfather is far more watchable and it wins by only a tiny TAD.
+ Godfather by a point
+						</p>
+						<div style="clear: both;"></div>				
+						
+					</div>
+				
+		   <div id="ctl00_ctl00_MainContent_MainContent_commentBox" class="comment-box" style="display:none;">
+		       
+				<div class="commentForm">
+					<h2>Add Your Comment About This Movie Matchup</h2>
+					<textarea name="ctl00$ctl00$MainContent$MainContent$commentTextArea" rows="2" cols="20" id="ctl00_ctl00_MainContent_MainContent_commentTextArea" class="commentTextArea">
+</textarea>							
+                    &nbsp;
+					<input type="image" name="ctl00$ctl00$MainContent$MainContent$submitComment" id="ctl00_ctl00_MainContent_MainContent_submitComment" class="submitButton" src="/images/submit-comment.gif" alt="Submit Comment" onclick="javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(&quot;ctl00$ctl00$MainContent$MainContent$submitComment&quot;, &quot;&quot;, true, &quot;&quot;, &quot;&quot;, false, false))" style="" />
+					<input type="hidden" name="ctl00$ctl00$MainContent$MainContent$agreementField" id="ctl00_ctl00_MainContent_MainContent_agreementField" value="0" />
+					<input type="hidden" name="ctl00$ctl00$MainContent$MainContent$parentIDField" id="ctl00_ctl00_MainContent_MainContent_parentIDField" value="0" />
+					<a name="commentField"></a>
+				</div>
+		    </div>
+		    <div style="clear: both;"></div>
+		</div>
+		
+		<div style="clear: both;"></div>
+		
+
+	        </div>
+	    </div>
+	    
+	    <div id="main-content-container-bottom">
+            <div itemscope="" itemtype="https://schema.org/WPAdBlock" class="bannerAd footerAd">
+                <div id="ATD_FC_728x90_P2">
+                </div>
+            </div>
+
+	        <div>
+                <ul id='feeds'></ul>
+            </div>  
+	    </div>
+    
+   </div>
+
+
+
+                <footer id="siteFooter" itemscope itemtype="https://schema.org/WPFooter">
+                    <nav>
+                        <small>
+                            <span class="newline">
+                                <a href="/"><span>Flickchart.com.</span></a>
+                                <span class="half-size-bottom">Copyright</span>
+                                <span>2006-2024.</span>                                
+                                <a href="/about">
+                                    <span class="half-size">Written<br />
+                                        By</span>
+                                    <span>Jeremy Thompson</span>
+                                    <span class="half-size">Production<br />
+                                        Designer</span>
+                                    <span>Nathan Chase</span>
+                                </a>
+                            </span>
+
+                            <span class="newline">
+                                <span class="half-size">All<br />
+                                    Rights</span>
+                                <span>Reserved.</span>
+                                <a href="/privacy">
+                                    <span class="half-size-bottom">Privacy</span>
+                                    <span>Policy</span>
+                                </a>
+                                <a href="/tos">
+                                    <span class="half-size">Terms<br />
+                                        of</span>
+                                    <span>Service</span>
+                                </a>
+                                <a href="/disclaimer"><span class="divided">Disclaimer</span></a>
+                                <a href="/faq"><span class="divided">FAQ</span></a>
+                                <a href="/contact"><span class="divided">Contact Us</span></a>
+                                <span class="half-size footerResponsiveHidden">Follow<br />
+                                    Us At</span>
+                                <a class="footerResponsiveHidden" href="https://www.twitter.com/Flickchart"><span>Twitter</span></a>
+                                <a class="footerResponsiveHidden" href="https://www.facebook.com/Flickchart"><span>Facebook</span></a>
+                            </span>
+                        </small>
+                    </nav>
+                </footer>
+            </div>
+        </div>
+   </form>
+    
+    
+    
+
+    <div id="fb-root"></div>		
+    <script type="text/javascript">
+        window.fbAsyncInit = function () {
+            FB.init({ appId: '131096884466', status: true, cookie: true,
+                xfbml: true
+            });
+        };
+        (function () {
+            var e = document.createElement('script'); e.async = true;
+            e.src = document.location.protocol +
+          '//connect.facebook.net/en_US/all.js';
+            document.getElementById('fb-root').appendChild(e);
+        } ());
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Facebook Timeline Posting of Reading A Matchup Discussion                                         //
+        //---------------------------------------------------------------------------------------------------//	        
+
+        var facebookDiscussionShareURL = document.URL;
+
+        function postDiscussionReadingToFacebook() {
+            console.log('/me/flickchart:read?matchup=' + encodeURIComponent(facebookDiscussionShareURL) + '&expires_in=90&scrape=true');
+            FB.api('/me/flickchart:read?matchup=' + encodeURIComponent(facebookDiscussionShareURL) + '&expires_in=90&scrape=true', 'post',
+            function (response) {
+                if (!response || response.error) {
+                    console.log('Error occured: ' + response.error);
+                } else {
+                    console.log('Post was successful! Action ID: ' + response.id);
+                }
+            });
+        }
+        setTimeout("postDiscussionReadingToFacebook()", 3000);
+
+        //---------------------------------------------------------------------------------------------------//
+        // end Facebook Timeline Posting of Reading A Matchup Discussion                                     //
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    </script>
+
+
+
+     <script>
+          jQuery(document).ready(function () {
+              jQuery.getJSON("https://www.flickchart.com/blog/?json=1&count=3", function (data) {
+                  console.log("success");
+                  for (var i = 0; i < data.posts.length; i++) {
+                      item = "<li>" + "<a href='" + data.posts[i].url + "'>" + "<img src='" + data.posts[i].thumbnail_images.medium.url + "' />" + data.posts[i].title + "</a>" + "</li>"
+                      jQuery('#feeds').append(item);
+			console.log(data.posts.length);
+                  }
+              })
+          });   
+      </script>
+
+ 
+   
+
+    	
+		<script type="text/javascript">
+		    _qoptions = {
+		        qacct: "p-3ci8EtGKV7qjY"
+		    };
+		</script>
+		<script type="text/javascript" src="https://edge.quantserve.com/quant.js"></script>
+		<noscript>
+		    <img src="https://pixel.quantserve.com/pixel/p-3ci8EtGKV7qjY.gif" style="display: none;" border="0" height="1" width="1" alt="Quantcast"/>
+		</noscript>
+		         
+</body>
+</html>

@@ -1,0 +1,85 @@
+
+/* ===== Bubble Skins General ===== */
+body[class*="bubble-skin-"] .message {
+  border-radius: 14px !important;
+  /* Add padding to prevent text from overlapping decorations */
+}
+
+/* Base shape positioning */
+.skin-decor {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  overflow: visible;
+}
+.skin-decor.top-left {
+  top: -20px;
+  left: -10px;
+  height: 40px;
+  width: 40px;
+}
+.skin-decor.top-right {
+  top: -20px;
+  right: -10px;
+  height: 40px;
+  width: 40px;
+}
+.skin-decor.bottom-left {
+  bottom: 0px;
+  left: -20px;
+  height: 30px;
+  width: 30px;
+}
+.skin-decor.bottom-right {
+  bottom: 0px;
+  right: -20px;
+  height: 30px;
+  width: 30px;
+}
+.skin-decor.center-right {
+  top: 50%;
+  right: -24px;
+  height: 40px;
+  width: 40px;
+  transform: translateY(-50%);
+}
+.skin-decor.center-left {
+  top: 50%;
+  left: -24px;
+  height: 40px;
+  width: 40px;
+  transform: translateY(-50%);
+}
+
+/* User Bubble Reversals for generic flip */
+.user .flip-for-user {
+  transform: scaleX(-1);
+}
+
+/* Colors for SVGs */
+/* Fill matches the main card background (opaque) so it cleanly hides the border behind it */
+.skin-fill { fill: var(--card-bg, #ffffff); }
+.skin-stroke {
+  stroke: var(--custom-border, rgba(161, 183, 222, 0.6));
+  stroke-width: 2.5px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.user .skin-stroke { stroke: var(--custom-border, #cbd5e1); }
+
+/* Solid feature elements (like eyes, noses) */
+.skin-feature { fill: var(--text-main, #333); stroke: none; }
+.skin-feature-stroke {
+  stroke: var(--text-main, #333);
+  fill: none;
+  stroke-width: 2.5px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Remove default pattern */
+body[class*="bubble-skin-"] .user .message::after {
+  display: none !important;
+}
+

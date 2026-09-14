@@ -1,5 +1,7 @@
 package com.XYai.myai.xyAdmin;
 
+import com.XYai.myai.security.annotation.AdminOnly;
+
 import com.XYai.myai.commonUtils.redis.RedisBitSetUtils;
 import com.XYai.myai.commonUtils.redis.RedisKeyConfig;
 import com.XYai.myai.config.Result;
@@ -33,6 +35,7 @@ import java.util.*;
  * 支持分页、搜索、排序、缓存刷新与数据清理
  */
 @Slf4j
+@AdminOnly
 @RestController
 @RequestMapping("/xyAdmin/milvus")
 public class MilvusManager {

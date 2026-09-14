@@ -8,7 +8,7 @@ import com.XYai.myai.commonUtils.redis.RedisKeyConfig;
 import com.XYai.myai.mapper.IntentNodeMapper;
 import com.XYai.myai.rag.intent.pojo.*;
 import com.XYai.myai.rag.memory.pojo.LoadSession;
-import com.XYai.myai.rag.milvus.MilvusVectorStoreConfig;
+import com.XYai.myai.rag.milvus.config.MilvusVectorStoreConfig;
 import com.XYai.myai.rag.rewrite.pojo.RewriteResult;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;

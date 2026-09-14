@@ -1,5 +1,7 @@
 package com.XYai.myai.xyAdmin;
 
+import com.XYai.myai.security.annotation.AdminOnly;
+
 import com.XYai.myai.config.Result;
 import com.XYai.myai.mapper.NodeRecordMapper;
 import com.XYai.myai.mapper.TraceRecordMapper;
@@ -20,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
+@AdminOnly
 @RequestMapping("/xyAdmin/traceInfo")
 @RestController
 public class TraceInfo {

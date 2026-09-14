@@ -1,5 +1,7 @@
 package com.XYai.myai.xyAdmin;
 
+import com.XYai.myai.security.annotation.AdminOnly;
+
 import com.XYai.myai.commonUtils.redis.RedisKeyConfig;
 import com.XYai.myai.config.Result;
 import com.XYai.myai.mapper.ChatConversationMapper;
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
  * status 语义：true=在线, false=离线/禁用
  */
 @Slf4j
+@AdminOnly
 @RestController
 @RequestMapping("/xyAdmin/user")
 public class userManager {

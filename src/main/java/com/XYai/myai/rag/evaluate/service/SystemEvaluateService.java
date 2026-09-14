@@ -15,6 +15,7 @@ import jakarta.annotation.Resource;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -36,11 +37,15 @@ public class SystemEvaluateService {
     @Resource
     private SystemEvaluateMapper systemEvaluateMapper;
     @Resource
+    private KafkaTemplate<String, Object> kafkaTemplate;
+    @Resource
     private SystemConfigMapper systemConfigMapper;
     @Resource(name = "evaluateExecutor")
     private TaskExecutor evaluateExecutor;
 
-    /** 三层开关（默认全开，volatile保证多线程可见性，setter 自动持久化） */
+    /**
+     * 三层开关（默认全开，volatile保证多线程可见性，setter 自动持久化）
+     */
     @Getter
     private volatile boolean ruleEnabled = true;
     @Getter
@@ -80,8 +85,8 @@ public class SystemEvaluateService {
      * 异步提交评估任务（不阻塞主流程）
      */
     public void submitEvaluate(Long conversationId, ChatMessage message,
-            List<String> retrievedChunks, long latencyMs,
-            String userQuestion) {
+                               List<String> retrievedChunks, long latencyMs,
+                               String userQuestion) {
         // 空值防护
         if (message == null || conversationId == null) {
             log.warn("[EVAL] 跳过评估：参数不完整 conversationId={}", conversationId);
@@ -89,36 +94,29 @@ public class SystemEvaluateService {
         }
         SystemConfig systemConfig = systemConfigMapper.selectOne(
                 new QueryWrapper<SystemConfig>().eq("config_key", "chat_default"));
-        CompletableFuture.runAsync(() -> {
-            try {
-                // 空集合处理
-                List<String> chunks = retrievedChunks == null ? Collections.emptyList() : retrievedChunks;
-                EvaluateResult result = evaluate(message, chunks, latencyMs, userQuestion,conversationId);
+        // 空集合处理
+        List<String> chunks = retrievedChunks == null ? Collections.emptyList() : retrievedChunks;
+        EvaluateResult result = evaluate(message, chunks, latencyMs, userQuestion, conversationId);
+        // 构建数据库记录
+        SystemEvaluatePOJO record = SystemEvaluatePOJO.builder()
+                .chatMessageId(message.getChatMessageId())
+                .conversationId(conversationId)
+                .userId(message.getUserId())
+                .overallScore(result.getOverallF1())
+                .retrievalScore(result.getRetrievalF1())
+                .faithfulnessScore(result.getFaithfulnessF1())
+                .answerRelevanceScore(result.getRelevanceF1())
+                .completenessScore(result.getCompletenessF1())
+                .retrievedDocCount(chunks.size())
+                .latencyMs(latencyMs)
+                .modelName(systemConfig.getConfigValue())
+                .ruleScore(result.getRuleScore())
+                .rerankScore(result.getRerankScore())
+                .llmScore(result.getLlmScore())
+                .build();
 
-                // 构建数据库记录
-                SystemEvaluatePOJO record = SystemEvaluatePOJO.builder()
-                        .chatMessageId(message.getChatMessageId())
-                        .conversationId(conversationId)
-                        .userId(message.getUserId())
-                        .overallScore(result.getOverallF1())
-                        .retrievalScore(result.getRetrievalF1())
-                        .faithfulnessScore(result.getFaithfulnessF1())
-                        .answerRelevanceScore(result.getRelevanceF1())
-                        .completenessScore(result.getCompletenessF1())
-                        .retrievedDocCount(chunks.size())
-                        .latencyMs(latencyMs)
-                        .modelName(systemConfig.getConfigValue())
-                        .ruleScore(result.getRuleScore())
-                        .rerankScore(result.getRerankScore())
-                        .llmScore(result.getLlmScore())
-                        .build();
-
-                systemEvaluateMapper.insert(record);
-                log.info("[EVAL] 评估完成 conversationId={}, 总分={}", conversationId, result.getOverallF1());
-            } catch (Exception e) {
-                log.warn("[EVAL] 执行异常 conversationId={}", conversationId, e);
-            }
-        }, evaluateExecutor);
+        systemEvaluateMapper.insert(record);
+        log.info("[EVAL] 评估完成 conversationId={}, 总分={}", conversationId, result.getOverallF1());
     }
 
     /**
@@ -144,19 +142,19 @@ public class SystemEvaluateService {
         // 异步执行三路评估（开关控制）
         CompletableFuture<Double> ruleFut = ruleEnabled
                 ? CompletableFuture.supplyAsync(
-                        () -> ruleEvaluator.evaluate(finalQuestion, finalAnswer, retrievedChunks, latencyMs)
-                                .getTotalScore(),
-                        evaluateExecutor)
+                () -> ruleEvaluator.evaluate(finalQuestion, finalAnswer, retrievedChunks, latencyMs)
+                      .getTotalScore(),
+                evaluateExecutor)
                 : CompletableFuture.completedFuture(0.5);
 
         CompletableFuture<Double> rerankFut = rerankEnabled
                 ? CompletableFuture.supplyAsync(
-                        () -> rerankEvaluator.evaluate(finalQuestion, finalAnswer, retrievedChunks), evaluateExecutor)
+                () -> rerankEvaluator.evaluate(finalQuestion, finalAnswer, retrievedChunks), evaluateExecutor)
                 : CompletableFuture.completedFuture(0.5);
 
         CompletableFuture<Double> llmFut = llmEnabled
                 ? CompletableFuture.supplyAsync(
-                        () -> llmEvaluator.evaluate(finalQuestion, finalAnswer, retrievedChunks,conversationId,message.getChatMessageId()), evaluateExecutor)
+                () -> llmEvaluator.evaluate(finalQuestion, finalAnswer, retrievedChunks, conversationId, message.getChatMessageId()), evaluateExecutor)
                 : CompletableFuture.completedFuture(0.5);
 
         // 等待结果

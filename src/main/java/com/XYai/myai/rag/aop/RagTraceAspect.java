@@ -5,20 +5,23 @@ import com.XYai.myai.monitorEndpoint.service.TraceRecordService;
 import com.XYai.myai.rag.aop.annotation.RagTraceContext;
 import com.XYai.myai.rag.aop.annotation.RagTraceNode;
 import com.XYai.myai.rag.aop.annotation.RagTraceRoot;
+import com.XYai.myai.rag.kafka.event.TraceLogEvent;
+import com.XYai.myai.user.LoginUserInfoManager;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Method;
 import java.util.Deque;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 
 /**
  * RAG 链路追踪切面 – 最终稳定版（兼容虚拟线程 + 异步响应式）。
@@ -35,8 +38,12 @@ public class RagTraceAspect {
     @Resource
     private TraceRecordService traceRecordService;
 
-    @Resource(name = "traceDbExecutor")
-    private Executor traceDbExecutor;
+    @Resource(name = "kafkaTemplate")
+    private KafkaTemplate<String, Object> kafkaTemplate;
+
+    /** trace-log 为尽力而为事件：使用轻量 producer（acks=1 + 微批），不与 ETL 强一致 producer 抢资源 */
+    @Resource(name = "fastKafkaTemplate")
+    private KafkaTemplate<String, Object> fastKafkaTemplate;
 
     // ==================== Root 切面 ====================
     @Around("@annotation(com.XYai.myai.rag.aop.annotation.RagTraceRoot)")
@@ -45,11 +52,15 @@ public class RagTraceAspect {
         Method method = signature.getMethod();
         RagTraceRoot traceRoot = method.getAnnotation(RagTraceRoot.class);
         if (traceRoot == null) return joinPoint.proceed();
-
+        Long userId = LoginUserInfoManager.getUserId();
         String traceId = IdUtil.getSnowflakeNextIdStr();
         RagTraceContext.setTraceId(traceId);
         RagTraceContext.setRootName(traceRoot.name());
-        traceDbExecutor.execute(() -> traceRecordService.startRun(traceId, traceRoot.name()));
+
+        fastKafkaTemplate.send("trace-log", null, new TraceLogEvent(
+                UUID.randomUUID().toString(), traceId, null, traceRoot.name(),
+                "start", null, null, System.currentTimeMillis(), userId
+        ));
 
         long startTime = System.nanoTime();
         Object result = joinPoint.proceed();
@@ -66,13 +77,23 @@ public class RagTraceAspect {
                 try {
                     if (ex != null) {
                         log.error("[TRACE_ROOT] CompletableFuture异常, traceId={}", traceId, ex);
-                        traceDbExecutor.execute(() -> traceRecordService.recordError(traceId, ex.getMessage()));
+                        fastKafkaTemplate.send("trace-log", null, new TraceLogEvent(
+                                UUID.randomUUID().toString(), traceId, null, traceRoot.name(),
+                                "error", ex.getMessage(), null, System.currentTimeMillis(), userId
+                        ));
                     } else {
                         String finalWarn = runWarn != null ? runWarn : RagTraceContext.getAndClearRunWarn();
+                        long costMs = costTime / 1_000_000;
                         if (finalWarn != null) {
-                            traceDbExecutor.execute(() -> traceRecordService.recordRunWarn(traceId, finalWarn, costTime / 1_000_000));
+                            fastKafkaTemplate.send("trace-log", null, new TraceLogEvent(
+                                    UUID.randomUUID().toString(), traceId, null, traceRoot.name(),
+                                    "warn", finalWarn, costMs, System.currentTimeMillis(), userId
+                            ));
                         } else {
-                            traceDbExecutor.execute(() -> traceRecordService.finishRun(traceId, costTime / 1_000_000));
+                            fastKafkaTemplate.send("trace-log", null, new TraceLogEvent(
+                                    UUID.randomUUID().toString(), traceId, null, traceRoot.name(),
+                                    "finish", null, costMs, System.currentTimeMillis(), userId
+                            ));
                         }
                     }
                 } catch (Exception e) {
@@ -87,9 +108,15 @@ public class RagTraceAspect {
         long costTime = System.nanoTime() - startTime;
         String runWarn = RagTraceContext.getAndClearRunWarn();
         if (runWarn != null) {
-            traceDbExecutor.execute(() -> traceRecordService.recordRunWarn(traceId, runWarn, costTime / 1_000_000));
+            fastKafkaTemplate.send("trace-log", null, new TraceLogEvent(
+                    UUID.randomUUID().toString(), traceId, null, traceRoot.name(),
+                    "warn", runWarn, costTime / 1_000_000, System.currentTimeMillis(), userId
+            ));
         } else {
-            traceDbExecutor.execute(() -> traceRecordService.finishRun(traceId, costTime / 1_000_000));
+            fastKafkaTemplate.send("trace-log", null, new TraceLogEvent(
+                    UUID.randomUUID().toString(), traceId, null, traceRoot.name(),
+                    "finish", null, costTime / 1_000_000, System.currentTimeMillis(), userId
+            ));
         }
         RagTraceContext.clear();
         return result;
@@ -105,6 +132,7 @@ public class RagTraceAspect {
         String rootName = RagTraceContext.getRootName();
         String phase = RagTraceContext.getPhase();
         String rawName = traceNode.name();
+        Long userId = LoginUserInfoManager.getUserId();
 
         // 显示名称优先级：父节点 > 阶段标签 > 根名称
         String displayName;
@@ -122,14 +150,20 @@ public class RagTraceAspect {
         Deque<String> stackSnapshot = RagTraceContext.getNodeStackSnapshot();
         Deque<String> namesSnapshot = RagTraceContext.getNodeNamesSnapshot();
         RagTraceContext.pushNode(nodeId, displayName);
-        traceDbExecutor.execute(() -> traceRecordService.recordNode(traceId, nodeId, displayName, traceNode.type()));
+        fastKafkaTemplate.send("trace-log", null, new TraceLogEvent(
+                UUID.randomUUID().toString(), traceId, nodeId, displayName,
+                "node", traceNode.type(), null, System.currentTimeMillis(), userId
+        ));
 
         long startTimeMs = System.nanoTime();
         Object result;
         try {
             result = joinPoint.proceed();
         } catch (Exception e) {
-            traceDbExecutor.execute(() -> traceRecordService.recordNodeError(traceId, nodeId, e.getMessage()));
+            fastKafkaTemplate.send("trace-log", null, new TraceLogEvent(
+                    UUID.randomUUID().toString(), traceId, nodeId, displayName,
+                    "node_error", e.getMessage(), null, System.currentTimeMillis(), userId
+            ));
             RagTraceContext.popNode();
             throw e;
         }
@@ -140,30 +174,36 @@ public class RagTraceAspect {
             String currentPhase = RagTraceContext.getPhase();
             RagTraceContext.popNode();
             return wrapCompletableFutureNode(future, traceId, nodeId, displayName, traceNode.type(),
-                    startTimeMs, stackSnapshot, namesSnapshot, rootName, currentPhase, nodeWarn);
+                    startTimeMs, stackSnapshot, namesSnapshot, rootName, currentPhase, nodeWarn, userId);
         }
         if (result instanceof Mono<?> mono) {
             String nodeWarn = RagTraceContext.getAndClearNodeWarn();
             String currentPhase = RagTraceContext.getPhase();
             RagTraceContext.popNode();
             return wrapMonoNode(mono, traceId, nodeId, displayName, traceNode.type(),
-                    startTimeMs, stackSnapshot, namesSnapshot, rootName, currentPhase, nodeWarn);
+                    startTimeMs, stackSnapshot, namesSnapshot, rootName, currentPhase, nodeWarn, userId);
         }
         if (result instanceof Flux<?> flux) {
             String nodeWarn = RagTraceContext.getAndClearNodeWarn();
             String currentPhase = RagTraceContext.getPhase();
             RagTraceContext.popNode();
             return wrapFluxNode(flux, traceId, nodeId, displayName, traceNode.type(),
-                    startTimeMs, stackSnapshot, namesSnapshot, rootName, currentPhase, nodeWarn);
+                    startTimeMs, stackSnapshot, namesSnapshot, rootName, currentPhase, nodeWarn, userId);
         }
 
         // 同步完成
         long cost = System.nanoTime() - startTimeMs;
         String warnMsg = RagTraceContext.getAndClearNodeWarn();
         if (warnMsg != null) {
-            traceDbExecutor.execute(() -> traceRecordService.recordNodeWarn(traceId, nodeId, warnMsg, cost / 1_000_000));
+            fastKafkaTemplate.send("trace-log", null, new TraceLogEvent(
+                    UUID.randomUUID().toString(), traceId, nodeId, displayName,
+                    "node_warn", warnMsg, cost / 1_000_000, System.currentTimeMillis(), userId
+            ));
         } else {
-            traceDbExecutor.execute(() -> traceRecordService.updateNode(traceId, nodeId, displayName, traceNode.type(), cost / 1_000_000));
+            fastKafkaTemplate.send("trace-log", null, new TraceLogEvent(
+                    UUID.randomUUID().toString(), traceId, nodeId, displayName,
+                    "node_success", null, cost / 1_000_000, System.currentTimeMillis(), userId
+            ));
         }
         RagTraceContext.popNode();
         return result;
@@ -173,7 +213,7 @@ public class RagTraceAspect {
     private CompletableFuture<?> wrapCompletableFutureNode(CompletableFuture<?> future,
                                                            String traceId, String nodeId, String nodeName, String nodeType,
                                                            long startTimeMs, Deque<String> stackSnapshot, Deque<String> namesSnapshot,
-                                                           String rootName, String phase, String nodeWarn) {
+                                                           String rootName, String phase, String nodeWarn, Long userId) {
         return future.whenComplete((res, ex) -> {
             long cost = System.nanoTime() - startTimeMs;
             // 手动恢复所有上下文（虚拟线程下依然必要）
@@ -185,13 +225,22 @@ public class RagTraceAspect {
             RagTraceContext.pushNode(nodeId, nodeName);
             try {
                 if (ex != null) {
-                    traceDbExecutor.execute(() -> traceRecordService.recordNodeError(traceId, nodeId, ex.getMessage()));
+                    fastKafkaTemplate.send("trace-log", null, new TraceLogEvent(
+                            UUID.randomUUID().toString(), traceId, nodeId, nodeName,
+                            "node_error", ex.getMessage(), cost / 1_000_000, System.currentTimeMillis(), userId
+                    ));
                 } else {
                     String finalWarn = nodeWarn != null ? nodeWarn : RagTraceContext.getAndClearNodeWarn();
                     if (finalWarn != null) {
-                        traceDbExecutor.execute(() -> traceRecordService.recordNodeWarn(traceId, nodeId, finalWarn, cost / 1_000_000));
+                        fastKafkaTemplate.send("trace-log", null, new TraceLogEvent(
+                                UUID.randomUUID().toString(), traceId, nodeId, nodeName,
+                                "node_warn", finalWarn, cost / 1_000_000, System.currentTimeMillis(), userId
+                        ));
                     } else {
-                        traceDbExecutor.execute(() -> traceRecordService.updateNode(traceId, nodeId, nodeName, nodeType, cost / 1_000_000));
+                        fastKafkaTemplate.send("trace-log", null, new TraceLogEvent(
+                                UUID.randomUUID().toString(), traceId, nodeId, nodeName,
+                                "node_success", null, cost / 1_000_000, System.currentTimeMillis(), userId
+                        ));
                     }
                 }
             } catch (Exception e) {
@@ -204,7 +253,7 @@ public class RagTraceAspect {
 
     private Mono<?> wrapMonoNode(Mono<?> mono, String traceId, String nodeId, String nodeName, String nodeType,
                                  long startTimeMs, Deque<String> stackSnapshot, Deque<String> namesSnapshot,
-                                 String rootName, String phase, String nodeWarn) {
+                                 String rootName, String phase, String nodeWarn, Long userId) {
         return mono.doFinally(signal -> {
             long cost = System.nanoTime() - startTimeMs;
             RagTraceContext.setTraceId(traceId);
@@ -215,13 +264,22 @@ public class RagTraceAspect {
             RagTraceContext.pushNode(nodeId, nodeName);
             try {
                 if (signal == reactor.core.publisher.SignalType.ON_ERROR) {
-                    traceDbExecutor.execute(() -> traceRecordService.recordNodeError(traceId, nodeId, "Mono error"));
+                    fastKafkaTemplate.send("trace-log", null, new TraceLogEvent(
+                            UUID.randomUUID().toString(), traceId, nodeId, nodeName,
+                            "node_error", "Mono error", cost / 1_000_000, System.currentTimeMillis(), userId
+                    ));
                 } else {
                     String finalWarn = nodeWarn != null ? nodeWarn : RagTraceContext.getAndClearNodeWarn();
                     if (finalWarn != null) {
-                        traceDbExecutor.execute(() -> traceRecordService.recordNodeWarn(traceId, nodeId, finalWarn, cost / 1_000_000));
+                        fastKafkaTemplate.send("trace-log", null, new TraceLogEvent(
+                                UUID.randomUUID().toString(), traceId, nodeId, nodeName,
+                                "node_warn", finalWarn, cost / 1_000_000, System.currentTimeMillis(), userId
+                        ));
                     } else {
-                        traceDbExecutor.execute(() -> traceRecordService.updateNode(traceId, nodeId, nodeName, nodeType, cost / 1_000_000));
+                        fastKafkaTemplate.send("trace-log", null, new TraceLogEvent(
+                                UUID.randomUUID().toString(), traceId, nodeId, nodeName,
+                                "node_success", null, cost / 1_000_000, System.currentTimeMillis(), userId
+                        ));
                     }
                 }
             } catch (Exception e) {
@@ -234,7 +292,7 @@ public class RagTraceAspect {
 
     private Flux<?> wrapFluxNode(Flux<?> flux, String traceId, String nodeId, String nodeName, String nodeType,
                                  long startTimeMs, Deque<String> stackSnapshot, Deque<String> namesSnapshot,
-                                 String rootName, String phase, String nodeWarn) {
+                                 String rootName, String phase, String nodeWarn, Long userId) {
         return flux.doFinally(signal -> {
             long cost = System.nanoTime() - startTimeMs;
             RagTraceContext.setTraceId(traceId);
@@ -245,13 +303,22 @@ public class RagTraceAspect {
             RagTraceContext.pushNode(nodeId, nodeName);
             try {
                 if (signal == reactor.core.publisher.SignalType.ON_ERROR) {
-                    traceDbExecutor.execute(() -> traceRecordService.recordNodeError(traceId, nodeId, "Flux error"));
+                    fastKafkaTemplate.send("trace-log", null, new TraceLogEvent(
+                            UUID.randomUUID().toString(), traceId, nodeId, nodeName,
+                            "node_error", "Flux error", cost / 1_000_000, System.currentTimeMillis(), userId
+                    ));
                 } else {
                     String finalWarn = nodeWarn != null ? nodeWarn : RagTraceContext.getAndClearNodeWarn();
                     if (finalWarn != null) {
-                        traceDbExecutor.execute(() -> traceRecordService.recordNodeWarn(traceId, nodeId, finalWarn, cost / 1_000_000));
+                        fastKafkaTemplate.send("trace-log", null, new TraceLogEvent(
+                                UUID.randomUUID().toString(), traceId, nodeId, nodeName,
+                                "node_warn", finalWarn, cost / 1_000_000, System.currentTimeMillis(), userId
+                        ));
                     } else {
-                        traceDbExecutor.execute(() -> traceRecordService.updateNode(traceId, nodeId, nodeName, nodeType, cost / 1_000_000));
+                        fastKafkaTemplate.send("trace-log", null, new TraceLogEvent(
+                                UUID.randomUUID().toString(), traceId, nodeId, nodeName,
+                                "node_success", null, cost / 1_000_000, System.currentTimeMillis(), userId
+                        ));
                     }
                 }
             } catch (Exception e) {
